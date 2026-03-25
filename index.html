@@ -5,286 +5,51 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
 <title>Wolfpack Weather | NC Storm Intelligence</title>
-<meta name="description" content="Live NC weather — Tuffy's Storm Prediction, NWS alerts, radar, 7-day forecast, climate almanac."/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="theme-color" content="#070707"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-:root{
-  --red:#CC0000;--red2:#990000;--red3:#5a0000;
-  --black:#070707;--off:#101010;--p1:#161616;--p2:#1c1c1c;--p3:#212121;
-  --gold:#FFD700;--white:#efefef;--bd:#282828;--bd2:#3a3a3a;
-  --tx:#e5e5e5;--mu:#999;--mu2:#666;
-  --green:#00d44a;--orange:#ff6600;--yellow:#ffcc00;--cyan:#00ccff;
-  --font:'Segoe UI',system-ui,sans-serif;
-}
+:root{--red:#CC0000;--red2:#990000;--red3:#5a0000;--black:#070707;--off:#101010;--p1:#161616;--p2:#1c1c1c;--p3:#212121;--gold:#FFD700;--white:#efefef;--bd:#282828;--bd2:#3a3a3a;--tx:#e5e5e5;--mu:#999;--mu2:#666;--green:#00d44a;--orange:#ff6600;--yellow:#ffcc00;--cyan:#00ccff;--font:'Segoe UI',system-ui,sans-serif}
 *{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;overflow-x:hidden}
-body{background:var(--black);color:var(--tx);font-family:var(--font);overflow-x:hidden;-webkit-font-smoothing:antialiased;max-width:100vw}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{background:var(--black);color:var(--tx);font-family:var(--font);overflow-x:hidden;max-width:100vw}
 body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.04) 3px,rgba(0,0,0,.04) 4px);pointer-events:none;z-index:9998}
-
-/* TICKER */
-.ticker-wrap{background:var(–red2);height:32px;display:flex;overflow:hidden;border-bottom:2px solid var(–red3)}
-.ticker-badge{background:var(–black);color:var(–gold);font-size:11px;font-weight:900;letter-spacing:2px;padding:0 16px;height:100%;display:flex;align-items:center;flex-shrink:0;border-right:2px solid var(–red)}
-.ticker-inner{overflow:hidden;flex:1}
-.ticker-track{display:inline-flex;animation:tick 60s linear infinite;white-space:nowrap}
-.ticker-track span{font-size:12px;font-weight:700;color:#fff;padding:0 52px;letter-spacing:.5px}
-@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-
-/* HEADER */
-header{background:var(–off);border-bottom:3px solid var(–red);padding:10px 22px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
-.logo{display:flex;align-items:center;gap:12px}
-.logo svg{width:48px;height:48px;flex-shrink:0}
-.logo-text h1{font-size:20px;font-weight:900;letter-spacing:2px;color:var(–white);text-transform:uppercase}
-.logo-text p{font-size:9px;color:var(–red);letter-spacing:4px;font-weight:700;text-transform:uppercase;margin-top:2px}
-.hdr-r{text-align:right}
-.clock{font-size:26px;font-weight:200;color:var(–white);letter-spacing:3px;font-variant-numeric:tabular-nums}
-.cdate{font-size:9px;color:var(–mu);letter-spacing:2px;text-transform:uppercase;margin-top:2px}
-
-/* ON AIR */
-.onair{background:linear-gradient(90deg,var(–red3),var(–red2) 60%,var(–red3));padding:5px 22px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(–red3);overflow:hidden}
-.lpulse{width:7px;height:7px;background:#ff3333;border-radius:50%;animation:pulse 1.2s infinite;flex-shrink:0}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.7)}}
-.onair span{font-size:10px;font-weight:800;letter-spacing:2px;color:#fff}
-.onair .mu{color:rgba(255,255,255,.5);font-weight:400;letter-spacing:1px}
-.onair .net-lbl{font-size:9px;color:rgba(255,255,255,.4);letter-spacing:2px;margin-left:auto}
-
-/* TABS */
-.tab-bar{display:flex;background:var(–off);border-bottom:1px solid var(–bd);padding:0 22px;gap:0;overflow-x:auto}
-.tab-btn{background:none;border:none;border-bottom:3px solid transparent;color:var(–mu);font-family:var(–font);font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;padding:10px 20px;cursor:pointer;white-space:nowrap;transition:all .2s;-webkit-tap-highlight-color:transparent}
-.tab-btn:hover{color:var(–white)}
-.tab-btn.active{color:var(–red);border-bottom-color:var(–red)}
-.tab-pane{display:none}
-.tab-pane.active{display:block}
-
-/* LAYOUT */
+.ticker-wrap{background:var(--red2);height:32px;display:flex;overflow:hidden;border-bottom:2px solid var(--red3)}.ticker-badge{background:var(--black);color:var(--gold);font-size:11px;font-weight:900;letter-spacing:2px;padding:0 16px;height:100%;display:flex;align-items:center;flex-shrink:0;border-right:2px solid var(--red)}.ticker-inner{overflow:hidden;flex:1}.ticker-track{display:inline-flex;animation:tick 60s linear infinite;white-space:nowrap}.ticker-track span{font-size:12px;font-weight:700;color:#fff;padding:0 52px;letter-spacing:.5px}@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+header{background:var(--off);border-bottom:3px solid var(--red);padding:10px 22px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}.logo{display:flex;align-items:center;gap:12px}.logo svg{width:48px;height:48px;flex-shrink:0}.logo-text h1{font-size:20px;font-weight:900;letter-spacing:2px;color:var(--white);text-transform:uppercase}.logo-text p{font-size:9px;color:var(--red);letter-spacing:4px;font-weight:700;text-transform:uppercase;margin-top:2px}.hdr-r{text-align:right}.clock{font-size:26px;font-weight:200;color:var(--white);letter-spacing:3px;font-variant-numeric:tabular-nums}.cdate{font-size:9px;color:var(--mu);letter-spacing:2px;text-transform:uppercase;margin-top:2px}
+.onair{background:linear-gradient(90deg,var(--red3),var(--red2) 60%,var(--red3));padding:5px 22px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--red3);overflow:hidden}.lpulse{width:7px;height:7px;background:#ff3333;border-radius:50%;animation:pulse 1.2s infinite;flex-shrink:0}@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.7)}}.onair span{font-size:10px;font-weight:800;letter-spacing:2px;color:#fff}.onair .mu{color:rgba(255,255,255,.5);font-weight:400;letter-spacing:1px}.onair .net-lbl{font-size:9px;color:rgba(255,255,255,.4);letter-spacing:2px;margin-left:auto}
+.tab-bar{display:flex;background:var(--off);border-bottom:1px solid var(--bd);padding:0 22px;overflow-x:auto}.tab-btn{background:none;border:none;border-bottom:3px solid transparent;color:var(--mu);font-family:var(--font);font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;padding:10px 20px;cursor:pointer;white-space:nowrap;transition:all .2s}.tab-btn:hover{color:var(--white)}.tab-btn.active{color:var(--red);border-bottom-color:var(--red)}.tab-pane{display:none}.tab-pane.active{display:block}
 main{max-width:1100px;margin:0 auto;padding:18px;overflow-x:hidden}
-.sec{font-size:13px;font-weight:900;letter-spacing:2px;color:var(–red);text-transform:uppercase;border-left:3px solid var(–red);padding-left:10px;margin-bottom:13px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.sec em{color:var(–mu);font-style:normal;font-weight:500;font-size:11px;letter-spacing:1px}
-.card{background:var(–p1);border:1px solid var(–bd);border-top:3px solid var(–red);border-radius:3px;padding:18px;overflow:hidden}
-
-/* TOOLTIP */
-.tip-btn{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.5);font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;transition:all .2s;-webkit-tap-highlight-color:transparent;font-family:var(–font);line-height:1;user-select:none}
-.tip-btn:hover,.tip-btn:active{background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.3)}
-.tip-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:10000;align-items:center;justify-content:center;padding:20px}
-.tip-overlay.show{display:flex}
-.tip-panel{background:#151518;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:24px;max-width:480px;width:100%;max-height:80vh;overflow-y:auto;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.6)}
-.tip-close{position:absolute;top:12px;right:14px;background:none;border:none;color:rgba(255,255,255,.4);font-size:20px;cursor:pointer;padding:4px 8px;line-height:1}
-.tip-close:hover{color:#fff}
-.tip-title{font-size:14px;font-weight:800;color:var(–red);letter-spacing:1px;text-transform:uppercase;margin-bottom:14px;padding-right:30px}
-.tip-body{font-size:12px;color:rgba(255,255,255,.65);line-height:1.8}
-.tip-body strong{color:rgba(255,255,255,.85)}
-.tip-body .tip-divider{height:1px;background:rgba(255,255,255,.06);margin:12px 0}
-.tip-body .tip-label{font-size:10px;font-weight:700;color:var(–red);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;margin-top:14px}
-.tip-body .tip-label:first-child{margin-top:0}
-.tip-body .tip-color-row{display:flex;align-items:center;gap:8px;margin:4px 0}
-.tip-body .tip-swatch{width:14px;height:8px;border-radius:2px;flex-shrink:0}
-
-/* CONDITIONS */
-.ctop{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px}
-.tbig{font-size:72px;font-weight:200;color:var(–white);line-height:1;letter-spacing:-2px;font-variant-numeric:tabular-nums}
-.tsup{font-size:28px;font-weight:300;color:var(–red);margin-top:10px}
-.cmeta{text-align:right}
-.cdesc{font-size:22px;font-weight:700;color:var(–white);margin-bottom:6px}
-.csub{font-size:14px;color:var(–mu);line-height:2.1}
-.csub strong{color:var(–white);font-weight:600}
-.cupd{font-size:11px;color:var(–mu2);margin-top:8px}
-.sgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px}
-.sbox{background:var(–p2);border:1px solid var(–bd);border-radius:2px;padding:12px 14px}
-.slbl{font-size:11px;font-weight:900;letter-spacing:1.5px;color:var(–red);text-transform:uppercase;margin-bottom:6px}
-.sval{font-size:24px;font-weight:300;color:var(–white)}
-.sunit{font-size:12px;color:var(–mu);margin-top:3px}
-.hlrow{display:flex;border:1px solid var(–bd);border-radius:2px;overflow:hidden}
-.hlbox{flex:1;padding:14px;text-align:center}
-.hlbox:first-child{background:#130000;border-right:1px solid var(–bd)}
-.hlbox:last-child{background:#001015}
-.hllbl{font-size:11px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px}
-.hlbox:first-child .hllbl{color:#ff7777}
-.hlbox:last-child .hllbl{color:#77aaff}
-.hlval{font-size:28px;font-weight:200;color:var(–white)}
-
-/* TSPS */
-#tsps{font-family:var(–font);position:relative;overflow:hidden}
-#tsps *{box-sizing:border-box}
+.sec{font-size:13px;font-weight:900;letter-spacing:2px;color:var(--red);text-transform:uppercase;border-left:3px solid var(--red);padding-left:10px;margin-bottom:13px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}.sec em{color:var(--mu);font-style:normal;font-weight:500;font-size:11px;letter-spacing:1px}
+.card{background:var(--p1);border:1px solid var(--bd);border-top:3px solid var(--red);border-radius:3px;padding:18px;overflow:hidden}
+.tip-btn{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.5);font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;font-family:var(--font);line-height:1;user-select:none}.tip-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:10000;align-items:center;justify-content:center;padding:20px}.tip-overlay.show{display:flex}.tip-panel{background:#151518;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:24px;max-width:480px;width:100%;max-height:80vh;overflow-y:auto;position:relative}.tip-close{position:absolute;top:12px;right:14px;background:none;border:none;color:rgba(255,255,255,.4);font-size:20px;cursor:pointer;padding:4px 8px;line-height:1}.tip-close:hover{color:#fff}.tip-title{font-size:14px;font-weight:800;color:var(--red);letter-spacing:1px;text-transform:uppercase;margin-bottom:14px;padding-right:30px}.tip-body{font-size:12px;color:rgba(255,255,255,.65);line-height:1.8}.tip-body strong{color:rgba(255,255,255,.85)}.tip-body .tip-divider{height:1px;background:rgba(255,255,255,.06);margin:12px 0}.tip-body .tip-label{font-size:10px;font-weight:700;color:var(--red);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;margin-top:14px}.tip-body .tip-label:first-child{margin-top:0}.tip-body .tip-color-row{display:flex;align-items:center;gap:8px;margin:4px 0}.tip-body .tip-swatch{width:14px;height:8px;border-radius:2px;flex-shrink:0}
+.ctop{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px}.tbig{font-size:72px;font-weight:200;color:var(--white);line-height:1;letter-spacing:-2px;font-variant-numeric:tabular-nums}.tsup{font-size:28px;font-weight:300;color:var(--red);margin-top:10px}.cmeta{text-align:right}.cdesc{font-size:22px;font-weight:700;color:var(--white);margin-bottom:6px}.csub{font-size:14px;color:var(--mu);line-height:2.1}.csub strong{color:var(--white);font-weight:600}.cupd{font-size:11px;color:var(--mu2);margin-top:8px}
+.sgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px}.sbox{background:var(--p2);border:1px solid var(--bd);border-radius:2px;padding:12px 14px}.slbl{font-size:11px;font-weight:900;letter-spacing:1.5px;color:var(--red);text-transform:uppercase;margin-bottom:6px}.sval{font-size:24px;font-weight:300;color:var(--white)}.sunit{font-size:12px;color:var(--mu);margin-top:3px}
+.hlrow{display:flex;border:1px solid var(--bd);border-radius:2px;overflow:hidden}.hlbox{flex:1;padding:14px;text-align:center}.hlbox:first-child{background:#130000;border-right:1px solid var(--bd)}.hlbox:last-child{background:#001015}.hllbl{font-size:11px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px}.hlbox:first-child .hllbl{color:#ff7777}.hlbox:last-child .hllbl{color:#77aaff}.hlval{font-size:28px;font-weight:200;color:var(--white)}
+#tsps{font-family:var(--font);position:relative;overflow:hidden}
 #tsps .tsps-pulse{position:absolute;top:0;left:0;right:0;height:2px;opacity:0;transition:opacity .5s}
 #tsps.tsps-threat .tsps-pulse{animation:tspsPulse 2s ease-in-out infinite}
 @keyframes tspsPulse{0%,100%{opacity:.35}50%{opacity:1}}
 @keyframes tspsSpin{to{transform:rotate(360deg)}}
-@keyframes tspsFadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.tsps-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;flex-wrap:wrap;gap:12px}
-.tsps-hdr-l .tsps-tag{font-size:9px;font-weight:700;color:rgba(255,255,255,.25);letter-spacing:2.5px}
-.tsps-hdr-l h2{font-size:20px;font-weight:800;letter-spacing:-.3px;margin-top:3px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.tsps-hdr-l h2 .tsps-r{color:#ef4444}
-.tsps-hdr-l .tsps-loc{font-size:10px;color:rgba(255,255,255,.3);margin-top:4px}
-.tsps-hdr-r{text-align:right}
-.tsps-hdr-r .tsps-ulbl{font-size:8px;color:rgba(255,255,255,.2);letter-spacing:1px}
-.tsps-hdr-r .tsps-utime{font-size:10px;color:rgba(255,255,255,.45);margin-top:2px}
-.tsps-hdr-r .tsps-rbtn{font-size:9px;color:#60a5fa;cursor:pointer;margin-top:4px;background:none;border:none;font-family:inherit;padding:6px 10px}
-.tsps-alerts{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:10px 14px;margin-bottom:18px}
-.tsps-al-hdr{display:flex;align-items:center;gap:8px;margin-bottom:6px}
-.tsps-al-hdr span:last-child{font-size:11px;font-weight:700;color:#ef4444;letter-spacing:1.5px}
-.tsps-al-item{display:flex;align-items:center;gap:8px;padding:4px 0;border-top:1px solid rgba(255,255,255,.04)}
-.tsps-al-item:first-child{border-top:none}
-.tsps-al-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.tsps-al-ev{font-size:10px;color:rgba(255,255,255,.8);font-weight:600}
-.tsps-al-src{font-size:9px;color:rgba(255,255,255,.25);margin-left:auto}
-.tsps-top{display:flex;justify-content:center;align-items:center;gap:28px;margin-bottom:22px;flex-wrap:wrap}
-.tsps-gauge-w{text-align:center}
-.tsps-gauge-w svg{max-width:100%;height:auto}
-.tsps-gauge-lbl{font-size:8px;font-weight:700;color:rgba(255,255,255,.25);letter-spacing:2px;margin-bottom:4px}
-.tsps-stats{display:flex;flex-direction:column;gap:7px;min-width:170px}
-.tsps-sbox{background:rgba(255,255,255,.025);border-radius:8px;padding:9px 13px;border:1px solid rgba(255,255,255,.05)}
-.tsps-sbox .tsps-slbl{font-size:8px;color:rgba(255,255,255,.25);letter-spacing:1px}
-.tsps-sbox .tsps-sval{font-size:14px;font-weight:700;margin-top:2px}
+.tsps-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;flex-wrap:wrap;gap:12px}.tsps-hdr-l .tsps-tag{font-size:9px;font-weight:700;color:rgba(255,255,255,.25);letter-spacing:2.5px}.tsps-hdr-l h2{font-size:20px;font-weight:800;margin-top:3px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}.tsps-hdr-l h2 .tsps-r{color:#ef4444}.tsps-hdr-l .tsps-loc{font-size:10px;color:rgba(255,255,255,.3);margin-top:4px}.tsps-hdr-r{text-align:right}.tsps-hdr-r .tsps-ulbl{font-size:8px;color:rgba(255,255,255,.2);letter-spacing:1px}.tsps-hdr-r .tsps-utime{font-size:10px;color:rgba(255,255,255,.45);margin-top:2px}.tsps-hdr-r .tsps-rbtn{font-size:9px;color:#60a5fa;cursor:pointer;margin-top:4px;background:none;border:none;font-family:inherit;padding:6px 10px}
+.tsps-alerts{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:10px 14px;margin-bottom:18px}.tsps-al-hdr{display:flex;align-items:center;gap:8px;margin-bottom:6px}.tsps-al-hdr span:last-child{font-size:11px;font-weight:700;color:#ef4444;letter-spacing:1.5px}.tsps-al-item{display:flex;align-items:center;gap:8px;padding:4px 0;border-top:1px solid rgba(255,255,255,.04)}.tsps-al-item:first-child{border-top:none}.tsps-al-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}.tsps-al-ev{font-size:10px;color:rgba(255,255,255,.8);font-weight:600}.tsps-al-src{font-size:9px;color:rgba(255,255,255,.25);margin-left:auto}
+.tsps-top{display:flex;justify-content:center;align-items:center;gap:28px;margin-bottom:22px;flex-wrap:wrap}.tsps-gauge-w{text-align:center}.tsps-gauge-w svg{max-width:100%;height:auto}.tsps-gauge-lbl{font-size:8px;font-weight:700;color:rgba(255,255,255,.25);letter-spacing:2px;margin-bottom:4px}.tsps-stats{display:flex;flex-direction:column;gap:7px;min-width:170px}.tsps-sbox{background:rgba(255,255,255,.025);border-radius:8px;padding:9px 13px;border:1px solid rgba(255,255,255,.05)}.tsps-sbox .tsps-slbl{font-size:8px;color:rgba(255,255,255,.25);letter-spacing:1px}.tsps-sbox .tsps-sval{font-size:14px;font-weight:700;margin-top:2px}
 .tsps-sec-lbl{font-size:8px;font-weight:700;color:rgba(255,255,255,.25);letter-spacing:2px;margin-bottom:8px}
-.tsps-cards{display:flex;gap:8px;margin-bottom:8px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
-.tsps-fc{min-width:125px;flex:1 1 0;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.05);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all .25s;-webkit-tap-highlight-color:transparent}
-.tsps-fc.act{transform:scale(1.03)}
-.tsps-fc .fc-lbl{font-size:9px;color:rgba(255,255,255,.4);font-weight:600;letter-spacing:1px;margin-bottom:5px}
-.tsps-fc .fc-score{font-size:26px;font-weight:800;line-height:1}
-.tsps-fc .fc-unit{font-size:10px;color:rgba(255,255,255,.3);margin-left:3px}
-.tsps-fc .fc-threat{font-size:8px;margin-top:3px;letter-spacing:.5px}
-.tsps-fc .fc-lk{display:flex;justify-content:space-between;align-items:center;margin-top:7px}
-.tsps-fc .fc-lk-l{font-size:8px;color:rgba(255,255,255,.25)}
-.tsps-fc .fc-lk-v{font-size:12px;font-weight:700}
-.tsps-fc .fc-bar{height:2px;background:rgba(255,255,255,.05);border-radius:2px;margin-top:5px;overflow:hidden}
-.tsps-fc .fc-bar-f{height:100%;border-radius:2px;transition:width .5s}
-.tsps-fc .fc-meta{margin-top:6px;font-size:8px;color:rgba(255,255,255,.25)}
-.tsps-tl-box{background:rgba(255,255,255,.02);border-radius:10px;padding:14px;border:1px solid rgba(255,255,255,.05);margin-top:14px}
-.tsps-tl-box .tsps-ct{font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1px;margin-bottom:10px}
-.tsps-tl-box canvas{width:100%!important;max-height:155px}
-.tsps-ch-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
-.tsps-ch-box{background:rgba(255,255,255,.02);border-radius:10px;padding:14px;border:1px solid rgba(255,255,255,.05)}
-.tsps-ch-box .tsps-ct{font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1px;margin-bottom:10px}
-.tsps-ch-box canvas{width:100%!important;max-height:195px}
-.tsps-det{background:rgba(255,255,255,.02);border-radius:10px;padding:18px;border:1px solid rgba(255,255,255,.05);margin-top:14px}
-.tsps-det-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px}
-.tsps-det-per{font-size:10px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px}
-.tsps-det-fc{font-size:11px;color:rgba(255,255,255,.55);margin-top:3px}
-.tsps-det-sc{font-size:32px;font-weight:800;line-height:1}
-.tsps-det-lv{font-size:9px;font-weight:700;letter-spacing:1.5px;margin-top:2px;text-align:right}
-.tsps-det-mg{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
-.tsps-dm{background:rgba(255,255,255,.03);border-radius:6px;padding:9px 10px;text-align:center}
-.tsps-dm .dm-l{font-size:7px;color:rgba(255,255,255,.25);letter-spacing:1px;margin-bottom:3px}
-.tsps-dm .dm-v{font-size:15px;font-weight:700;color:rgba(255,255,255,.85)}
-.tsps-det-nar{font-size:10px;color:rgba(255,255,255,.4);line-height:1.7;padding:10px 12px;background:rgba(255,255,255,.02);border-radius:6px;border-left:3px solid rgba(255,255,255,.06)}
-.tsps-det-nar b{color:rgba(255,255,255,.55)}
-.tsps-foot{margin-top:18px;padding-top:12px;border-top:1px solid rgba(255,255,255,.04);display:flex;justify-content:space-between;flex-wrap:wrap;gap:5px}
-.tsps-foot span{font-size:7px;color:rgba(255,255,255,.15)}
-.tsps-ld{text-align:center;padding:40px 20px}
-.tsps-spinner{width:36px;height:36px;border:3px solid rgba(255,255,255,.07);border-top-color:#60a5fa;border-radius:50%;margin:0 auto 14px;animation:tspsSpin .8s linear infinite}
-.tsps-ld p{font-size:11px;color:rgba(255,255,255,.35)}
-.tsps-ld p.sub{font-size:9px;color:rgba(255,255,255,.18);margin-top:4px}
-
-/* HOURLY */
-.hourly-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-.hr-row{display:flex;gap:10px;min-width:max-content;padding-bottom:2px}
-.hr{background:var(–p2);border:1px solid var(–bd);border-radius:2px;padding:10px 14px;text-align:center;min-width:70px}
-.hr.now{border-color:var(–red);background:#140404}
-.hr-t{font-size:10px;color:var(–mu);letter-spacing:1px;margin-bottom:4px;text-transform:uppercase}
-.hr-i{font-size:19px;margin-bottom:4px}
-.hr-v{font-size:17px;font-weight:200;color:var(–white)}
-.hr-p{font-size:10px;color:#77aaff;margin-top:3px}
-
-/* 7-DAY */
-.ext-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
-.ext-day{background:var(–p2);border:1px solid var(–bd);border-radius:3px;padding:14px 10px;text-align:center;overflow:hidden}
-.ext-day.today{border-color:var(–red);background:#150505}
-.ext-dow{font-size:13px;font-weight:900;color:var(–white);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px}
-.ext-date{font-size:11px;color:var(–mu);margin-bottom:9px}
-.ext-icon{font-size:26px;margin-bottom:7px}
-.ext-desc{font-size:11px;color:var(–mu);margin-bottom:9px;line-height:1.5;min-height:32px}
-.ext-temps{display:flex;justify-content:center;gap:9px;align-items:baseline;margin-bottom:4px}
-.ext-hi{font-size:20px;font-weight:600;color:var(–white)}
-.ext-lo{font-size:14px;color:#77aaff}
-.ext-pop{font-size:11px;color:#77aaff;margin-top:3px}
-.ext-wind{font-size:10px;color:var(–mu);margin-top:5px}
-.ext-range{margin-top:10px;position:relative;height:22px}
-.ext-range-track{position:absolute;top:8px;height:6px;border-radius:3px;opacity:.7}
-.ext-range-lo,.ext-range-hi{position:absolute;top:0;font-size:9px;font-weight:700;line-height:1}
-.ext-range-lo{color:#77aaff}
-.ext-range-hi{color:#ffaa55}
-
-/* MEDIA ROW — satellite, radar, cams below 7-day */
-.media-row{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:18px}
-.media-card{background:var(–p1);border:1px solid var(–bd);border-top:3px solid var(–red);border-radius:3px;padding:14px;overflow:hidden}
-.media-frame{width:100%;height:220px;border:1px solid var(–bd);border-radius:2px;overflow:hidden;background:#111;display:flex;align-items:center;justify-content:center}
-.media-frame iframe{width:100%;height:100%;border:none}
-.media-frame img{width:100%;height:100%;object-fit:cover}
-.mfooter{font-size:10px;color:var(–mu2);margin-top:6px;display:flex;align-items:center;gap:6px}
-.mfooter .ldot{width:5px;height:5px;background:var(–red);border-radius:50%;animation:pulse 1.4s infinite}
-.cam-fb{display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px}
-.cam-fb-title{font-size:13px;color:var(–mu)}
-.cam-fb a{background:var(–red2);color:#fff;font-size:12px;font-weight:700;padding:8px 20px;border-radius:2px;letter-spacing:1px;border:1px solid var(–red);text-decoration:none}
-.cam-fb-sub{font-size:10px;color:var(–mu2)}
-.cam-overlay{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.8));padding:7px 10px;pointer-events:none}
-.cam-overlay span{font-size:11px;color:#fff;font-weight:700;letter-spacing:1px}
-
-/* ALMANAC */
-.alm-wrap{max-width:1100px;margin:0 auto;padding:18px;overflow-x:hidden}
-.alm-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-.alm-card{background:var(–p1);border:1px solid var(–bd);border-top:3px solid var(–red);border-radius:3px;padding:20px;overflow:hidden}
-.alm-card h3{font-size:13px;font-weight:900;letter-spacing:2px;color:var(–red);text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px}
-.alm-card h3 span{font-size:16px}
-.alm-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
-.alm-big{background:var(–p2);border:1px solid var(–bd);border-radius:4px;padding:14px;text-align:center}
-.alm-big-lbl{font-size:9px;font-weight:800;letter-spacing:1.5px;color:var(–red);text-transform:uppercase;margin-bottom:6px}
-.alm-big-val{font-size:28px;font-weight:200;color:var(–white)}
-.alm-big-sub{font-size:10px;color:var(–mu);margin-top:4px}
-.alm-mo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.alm-mo{background:var(–p2);border:1px solid var(–bd);border-radius:3px;padding:10px 8px;text-align:center}
-.alm-mo.current{border-color:var(–red);background:#150505}
-.alm-mo.future{opacity:.3}
-.alm-mo-name{font-size:10px;font-weight:800;color:var(–mu);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
-.alm-mo-val{font-size:16px;font-weight:600;color:var(–white)}
-.alm-mo-nrm{font-size:9px;color:var(–mu2);margin-top:2px}
-.alm-mo-diff{font-size:9px;font-weight:700;margin-top:2px}
-.alm-mo-diff.pos{color:#ff8844}
-.alm-mo-diff.neg{color:#77aaff}
-.alm-mo-diff.zero{color:var(–green)}
-.alm-mo-bar{height:4px;background:var(–bd2);border-radius:2px;margin-top:6px;overflow:hidden}
-.alm-mo-bar-fill{height:100%;border-radius:2px}
-.alm-cmp{font-size:11px;padding:2px 8px;border-radius:3px;font-weight:700;display:inline-block;margin-top:4px}
-.alm-cmp.above{background:rgba(255,102,0,.15);color:#ff8844}
-.alm-cmp.below{background:rgba(68,136,255,.15);color:#77aaff}
-.alm-cmp.normal{background:rgba(0,212,74,.12);color:var(–green)}
-.alm-note{font-size:9px;color:var(–mu2);text-align:center;margin-top:16px;line-height:1.8}
-.alm-ld{text-align:center;padding:40px;color:var(–mu);font-size:12px}
-
-/* PWS */
-.pws-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
-.pws-card{background:var(–p1);border:1px solid var(–bd);border-top:3px solid var(–red);border-radius:3px;padding:18px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;transition:border-color .3s}
-.pws-card:hover{border-color:var(–bd2)}
-.pws-card.own{border-top-color:var(–gold);background:linear-gradient(135deg,var(–p1),#1a1500)}
-.pws-left{flex:1;min-width:0}
-.pws-name{font-size:15px;font-weight:800;color:var(–white);letter-spacing:.5px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pws-loc{font-size:11px;color:var(–mu);margin-bottom:2px}
-.pws-id{font-size:9px;color:var(–mu2);letter-spacing:1.5px;font-weight:700;text-transform:uppercase}
-.pws-right{text-align:right;flex-shrink:0}
-.pws-temp{font-size:36px;font-weight:200;color:var(–white);line-height:1}
-.pws-temp sup{font-size:16px;color:var(–red);font-weight:300}
-.pws-updated{font-size:9px;color:var(–mu2);margin-top:4px}
-.pws-details{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
-.pws-det-item{background:var(–p2);border:1px solid var(–bd);border-radius:2px;padding:8px 10px;text-align:center}
-.pws-det-lbl{font-size:8px;font-weight:800;letter-spacing:1px;color:var(–red);text-transform:uppercase;margin-bottom:3px}
-.pws-det-val{font-size:14px;font-weight:300;color:var(–white)}
-.pws-det-unit{font-size:9px;color:var(–mu2);margin-top:1px}
-.pws-err{font-size:10px;color:var(–mu2);text-align:center;padding:14px;font-style:italic}
-.pws-note{font-size:9px;color:var(–mu2);text-align:center;margin-top:16px;line-height:1.8}
-
-footer{background:var(–off);border-top:3px solid var(–red);padding:20px;margin-top:32px;text-align:center}
-footer p{font-size:10px;color:var(–mu2);letter-spacing:.4px;line-height:2.2}
-footer strong{color:var(–red)}
-
-.ld{color:var(–mu);animation:blink .9s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
-::-webkit-scrollbar{width:4px;height:4px}
-::-webkit-scrollbar-track{background:var(–p1)}
-::-webkit-scrollbar-thumb{background:var(–bd2)}
-
-/* RESPONSIVE */
-@media(max-width:960px){.media-row{grid-template-columns:1fr 1fr}.ext-grid{grid-template-columns:repeat(4,1fr)}.alm-grid{grid-template-columns:1fr}.pws-grid{grid-template-columns:1fr}}
-@media(max-width:760px){.ext-grid{grid-template-columns:repeat(3,1fr)}.sgrid{grid-template-columns:repeat(2,1fr)}.alm-mo-grid{grid-template-columns:repeat(3,1fr)}.media-row{grid-template-columns:1fr}}
+.tsps-cards{display:flex;gap:8px;margin-bottom:8px;overflow-x:auto;padding-bottom:4px}.tsps-fc{min-width:125px;flex:1 1 0;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.05);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all .25s}.tsps-fc.act{transform:scale(1.03)}.tsps-fc .fc-lbl{font-size:9px;color:rgba(255,255,255,.4);font-weight:600;letter-spacing:1px;margin-bottom:5px}.tsps-fc .fc-score{font-size:26px;font-weight:800;line-height:1}.tsps-fc .fc-unit{font-size:10px;color:rgba(255,255,255,.3);margin-left:3px}.tsps-fc .fc-threat{font-size:8px;margin-top:3px}.tsps-fc .fc-lk{display:flex;justify-content:space-between;align-items:center;margin-top:7px}.tsps-fc .fc-lk-l{font-size:8px;color:rgba(255,255,255,.25)}.tsps-fc .fc-lk-v{font-size:12px;font-weight:700}.tsps-fc .fc-bar{height:2px;background:rgba(255,255,255,.05);border-radius:2px;margin-top:5px;overflow:hidden}.tsps-fc .fc-bar-f{height:100%;border-radius:2px;transition:width .5s}.tsps-fc .fc-meta{margin-top:6px;font-size:8px;color:rgba(255,255,255,.25)}
+.tsps-tl-box{background:rgba(255,255,255,.02);border-radius:10px;padding:14px;border:1px solid rgba(255,255,255,.05);margin-top:14px}.tsps-tl-box .tsps-ct{font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1px;margin-bottom:10px}.tsps-tl-box canvas{width:100%!important;max-height:155px}
+.tsps-ch-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}.tsps-ch-box{background:rgba(255,255,255,.02);border-radius:10px;padding:14px;border:1px solid rgba(255,255,255,.05)}.tsps-ch-box .tsps-ct{font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1px;margin-bottom:10px}.tsps-ch-box canvas{width:100%!important;max-height:195px}
+.tsps-det{background:rgba(255,255,255,.02);border-radius:10px;padding:18px;border:1px solid rgba(255,255,255,.05);margin-top:14px}.tsps-det-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px}.tsps-det-per{font-size:10px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px}.tsps-det-fc{font-size:11px;color:rgba(255,255,255,.55);margin-top:3px}.tsps-det-sc{font-size:32px;font-weight:800;line-height:1}.tsps-det-lv{font-size:9px;font-weight:700;letter-spacing:1.5px;margin-top:2px;text-align:right}.tsps-det-mg{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}.tsps-dm{background:rgba(255,255,255,.03);border-radius:6px;padding:9px 10px;text-align:center}.tsps-dm .dm-l{font-size:7px;color:rgba(255,255,255,.25);letter-spacing:1px;margin-bottom:3px}.tsps-dm .dm-v{font-size:15px;font-weight:700;color:rgba(255,255,255,.85)}.tsps-det-nar{font-size:10px;color:rgba(255,255,255,.4);line-height:1.7;padding:10px 12px;background:rgba(255,255,255,.02);border-radius:6px;border-left:3px solid rgba(255,255,255,.06)}.tsps-det-nar b{color:rgba(255,255,255,.55)}
+.tsps-foot{margin-top:18px;padding-top:12px;border-top:1px solid rgba(255,255,255,.04);display:flex;justify-content:space-between;flex-wrap:wrap;gap:5px}.tsps-foot span{font-size:7px;color:rgba(255,255,255,.15)}
+.tsps-ld{text-align:center;padding:40px 20px}.tsps-spinner{width:36px;height:36px;border:3px solid rgba(255,255,255,.07);border-top-color:#60a5fa;border-radius:50%;margin:0 auto 14px;animation:tspsSpin .8s linear infinite}.tsps-ld p{font-size:11px;color:rgba(255,255,255,.35)}.tsps-ld p.sub{font-size:9px;color:rgba(255,255,255,.18);margin-top:4px}
+.hourly-wrap{overflow-x:auto}.hr-row{display:flex;gap:10px;min-width:max-content;padding-bottom:2px}.hr{background:var(--p2);border:1px solid var(--bd);border-radius:2px;padding:10px 14px;text-align:center;min-width:70px}.hr.now{border-color:var(--red);background:#140404}.hr-t{font-size:10px;color:var(--mu);letter-spacing:1px;margin-bottom:4px;text-transform:uppercase}.hr-i{font-size:19px;margin-bottom:4px}.hr-v{font-size:17px;font-weight:200;color:var(--white)}.hr-p{font-size:10px;color:#77aaff;margin-top:3px}
+.ext-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}.ext-day{background:var(--p2);border:1px solid var(--bd);border-radius:3px;padding:14px 10px;text-align:center;overflow:hidden}.ext-day.today{border-color:var(--red);background:#150505}.ext-dow{font-size:13px;font-weight:900;color:var(--white);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px}.ext-date{font-size:11px;color:var(--mu);margin-bottom:9px}.ext-icon{font-size:26px;margin-bottom:7px}.ext-desc{font-size:11px;color:var(--mu);margin-bottom:9px;line-height:1.5;min-height:32px}.ext-temps{display:flex;justify-content:center;gap:9px;align-items:baseline;margin-bottom:4px}.ext-hi{font-size:20px;font-weight:600;color:var(--white)}.ext-lo{font-size:14px;color:#77aaff}.ext-pop{font-size:11px;color:#77aaff;margin-top:3px}.ext-wind{font-size:10px;color:var(--mu);margin-top:5px}.ext-range{margin-top:10px;position:relative;height:22px}.ext-range-track{position:absolute;top:8px;height:6px;border-radius:3px;opacity:.7}.ext-range-lo,.ext-range-hi{position:absolute;top:0;font-size:9px;font-weight:700;line-height:1}.ext-range-lo{color:#77aaff}.ext-range-hi{color:#ffaa55}
+.media-row{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:18px}.media-card{background:var(--p1);border:1px solid var(--bd);border-top:3px solid var(--red);border-radius:3px;padding:14px;overflow:hidden}.media-frame{width:100%;height:220px;border:1px solid var(--bd);border-radius:2px;overflow:hidden;background:#111;display:flex;align-items:center;justify-content:center}.media-frame iframe{width:100%;height:100%;border:none}.media-frame img{width:100%;height:100%;object-fit:cover}.mfooter{font-size:10px;color:var(--mu2);margin-top:6px;display:flex;align-items:center;gap:6px}.mfooter .ldot{width:5px;height:5px;background:var(--red);border-radius:50%;animation:pulse 1.4s infinite}.cam-fb{display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px}.cam-fb-title{font-size:13px;color:var(--mu)}.cam-fb a{background:var(--red2);color:#fff;font-size:12px;font-weight:700;padding:8px 20px;border-radius:2px;letter-spacing:1px;border:1px solid var(--red);text-decoration:none}.cam-overlay{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.8));padding:7px 10px;pointer-events:none}.cam-overlay span{font-size:11px;color:#fff;font-weight:700;letter-spacing:1px}
+.alm-wrap{max-width:1100px;margin:0 auto;padding:18px;overflow-x:hidden}.alm-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.alm-card{background:var(--p1);border:1px solid var(--bd);border-top:3px solid var(--red);border-radius:3px;padding:20px;overflow:hidden}.alm-card h3{font-size:13px;font-weight:900;letter-spacing:2px;color:var(--red);text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px}.alm-card h3 span{font-size:16px}.alm-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}.alm-big{background:var(--p2);border:1px solid var(--bd);border-radius:4px;padding:14px;text-align:center}.alm-big-lbl{font-size:9px;font-weight:800;letter-spacing:1.5px;color:var(--red);text-transform:uppercase;margin-bottom:6px}.alm-big-val{font-size:28px;font-weight:200;color:var(--white)}.alm-big-sub{font-size:10px;color:var(--mu);margin-top:4px}.alm-mo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.alm-mo{background:var(--p2);border:1px solid var(--bd);border-radius:3px;padding:10px 8px;text-align:center}.alm-mo.current{border-color:var(--red);background:#150505}.alm-mo.future{opacity:.3}.alm-mo-name{font-size:10px;font-weight:800;color:var(--mu);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}.alm-mo-val{font-size:16px;font-weight:600;color:var(--white)}.alm-mo-nrm{font-size:9px;color:var(--mu2);margin-top:2px}.alm-mo-diff{font-size:9px;font-weight:700;margin-top:2px}.alm-mo-diff.pos{color:#ff8844}.alm-mo-diff.neg{color:#77aaff}.alm-mo-diff.zero{color:var(--green)}.alm-mo-bar{height:4px;background:var(--bd2);border-radius:2px;margin-top:6px;overflow:hidden}.alm-mo-bar-fill{height:100%;border-radius:2px}.alm-cmp{font-size:11px;padding:2px 8px;border-radius:3px;font-weight:700;display:inline-block;margin-top:4px}.alm-cmp.above{background:rgba(255,102,0,.15);color:#ff8844}.alm-cmp.below{background:rgba(68,136,255,.15);color:#77aaff}.alm-cmp.normal{background:rgba(0,212,74,.12);color:var(--green)}.alm-note{font-size:9px;color:var(--mu2);text-align:center;margin-top:16px;line-height:1.8}.alm-ld{text-align:center;padding:40px;color:var(--mu);font-size:12px}
+.pws-station{background:var(--p1);border:1px solid var(--bd);border-top:3px solid var(--red);border-radius:3px;padding:16px;overflow:hidden}.pws-station.own{border-top-color:var(--gold);background:linear-gradient(135deg,var(--p1),#1a1500)}.pws-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px}.pws-name{font-size:15px;font-weight:800;color:var(--white)}.pws-loc{font-size:11px;color:var(--mu);margin-top:2px}.pws-id{font-size:9px;color:var(--mu2);letter-spacing:1.5px;font-weight:700;margin-top:2px}.pws-temp{font-size:36px;font-weight:200;color:var(--white);line-height:1;text-align:right}.pws-temp sup{font-size:16px;color:var(--red);font-weight:300}.pws-updated{font-size:9px;color:var(--mu2);text-align:right;margin-top:4px}.pws-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.pws-stat{background:var(--p2);border:1px solid var(--bd);border-radius:2px;padding:8px 10px;text-align:center}.pws-stat-lbl{font-size:8px;font-weight:800;letter-spacing:1px;color:var(--red);text-transform:uppercase;margin-bottom:3px}.pws-stat-val{font-size:14px;font-weight:300;color:var(--white)}.pws-stat-unit{font-size:9px;color:var(--mu2);margin-top:1px}.pws-err{color:var(--mu2);font-size:11px;font-style:italic;padding:8px 0}
+footer{background:var(--off);border-top:3px solid var(--red);padding:20px;margin-top:32px;text-align:center}footer p{font-size:10px;color:var(--mu2);letter-spacing:.4px;line-height:2.2}footer strong{color:var(--red)}
+.ld{color:var(--mu);animation:blink .9s infinite}@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-track{background:var(--p1)}::-webkit-scrollbar-thumb{background:var(--bd2)}
+@media(max-width:960px){.media-row{grid-template-columns:1fr 1fr}.ext-grid{grid-template-columns:repeat(4,1fr)}.alm-grid{grid-template-columns:1fr}}
+@media(max-width:760px){.ext-grid{grid-template-columns:repeat(3,1fr)}.sgrid{grid-template-columns:repeat(2,1fr)}.alm-mo-grid{grid-template-columns:repeat(3,1fr)}.media-row{grid-template-columns:1fr}.pws-grid{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:600px){
 .ticker-wrap{height:28px}.ticker-badge{font-size:9px;padding:0 10px}.ticker-track span{font-size:10px;padding:0 30px}
 header{padding:8px 14px}.logo svg{width:36px;height:36px}.logo-text h1{font-size:16px}.logo-text p{font-size:7px}.clock{font-size:20px}.cdate{font-size:8px}
@@ -299,281 +64,588 @@ main{padding:10px 8px}.sec{font-size:11px;padding-left:8px;margin-bottom:10px}.s
 .tsps-ch-row{grid-template-columns:1fr}.tsps-det-mg{grid-template-columns:repeat(2,1fr)}.tsps-det-sc{font-size:28px}
 .hr{min-width:64px;padding:8px 10px}.hr-v{font-size:15px}
 .ext-grid{grid-template-columns:repeat(2,1fr);gap:8px}.ext-day{padding:12px 8px}.ext-hi{font-size:18px}.ext-lo{font-size:13px}
-.media-row{grid-template-columns:1fr;gap:12px}.media-frame{height:180px}
+.media-frame{height:180px}
 .alm-wrap{padding:10px 8px}.alm-summary{grid-template-columns:1fr}.alm-mo-grid{grid-template-columns:repeat(2,1fr)}.alm-big-val{font-size:24px}
-.pws-grid{grid-template-columns:1fr}.pws-details{grid-template-columns:repeat(2,1fr)}.pws-temp{font-size:30px}.pws-name{font-size:13px}
+.pws-grid{grid-template-columns:repeat(2,1fr)}.pws-temp{font-size:30px}.pws-name{font-size:13px}
 footer{padding:16px 12px;margin-top:20px}footer p{font-size:9px}
 .tip-panel{padding:18px;margin:10px}
 }
 @media(max-width:380px){.tbig{font-size:46px}.logo svg{width:30px;height:30px}.logo-text h1{font-size:14px}.clock{font-size:17px}.tsps-hdr-l h2{font-size:14px}.tsps-fc{min-width:100px}.tsps-sbox{flex:1 1 100%}.tsps-stats{flex-direction:column}}
 </style>
-
 </head>
 <body>
 
 <!-- TOOLTIPS -->
 
-<div class="tip-overlay" id="tipTSPS"><div class="tip-panel"><button class="tip-close" onclick="closeTip('tipTSPS')">&times;</button><div class="tip-title">🔴 About Tuffy's Storm Prediction System</div><div class="tip-body"><div class="tip-label">What Is This?</div>A <strong>proprietary severe weather intelligence engine</strong> generating a real-time <strong>Severe Weather Index (0–100)</strong> and occurrence likelihood for +3, +6, +9, +12, and +24 hour windows.<div class="tip-divider"></div><div class="tip-label">Data Sources</div>All data from the <strong>National Weather Service (NWS) API</strong>: hourly forecast (temp, wind, precip, dewpoint) and active alerts.<div class="tip-divider"></div><div class="tip-label">6-Component Algorithm</div><strong>Wind Speed</strong> (0–20), <strong>Gust Potential</strong> (0–18), <strong>Precipitation</strong> (0–14), <strong>Instability</strong> (0–16), <strong>Forecast Text Analysis</strong> (0–22), <strong>Alert Severity</strong> (0–10).<div class="tip-divider"></div><div class="tip-label">Threat Levels</div><div class="tip-color-row"><div class="tip-swatch" style="background:#1a6b3a"></div><strong>0–9 NONE</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#22c55e"></div><strong>10–24 LOW</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#eab308"></div><strong>25–49 GUARDED</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#f97316"></div><strong>50–74 ELEVATED</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#ef4444"></div><strong>75–89 HIGH</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#dc2626"></div><strong>90–100 EXTREME</strong></div><div class="tip-divider"></div><span style="font-size:10px;color:rgba(255,255,255,.3)">Auto-refreshes every 5 min. Not a replacement for official NWS warnings.</span></div></div></div>
-<div class="tip-overlay" id="tipForecast"><div class="tip-panel"><button class="tip-close" onclick="closeTip('tipForecast')">&times;</button><div class="tip-title">📊 Reading the 7-Day Forecast</div><div class="tip-body"><div class="tip-label">Temperature Range Bar</div>Each day's bar spans from <strong style="color:#77aaff">Low</strong> to <strong style="color:#ffaa55">High</strong>, positioned relative to the week's full range.<div class="tip-divider"></div><div class="tip-label">Bar Colors</div><div class="tip-color-row"><div class="tip-swatch" style="background:#ff6600"></div><strong>Orange</strong> — 80°F+ (hot)</div><div class="tip-color-row"><div class="tip-swatch" style="background:#ffcc00"></div><strong>Yellow</strong> — 60–79°F (mild)</div><div class="tip-color-row"><div class="tip-swatch" style="background:#4488ff"></div><strong>Blue</strong> — Below 60°F (cool)</div><div class="tip-divider"></div><strong>💧</strong> = precipitation chance. <strong>Red border</strong> = today.</div></div></div>
-<div class="tip-overlay" id="tipAlmanac"><div class="tip-panel"><button class="tip-close" onclick="closeTip('tipAlmanac')">&times;</button><div class="tip-title">📊 About the Raleigh Wx Almanac</div><div class="tip-body"><div class="tip-label">What Is This?</div><strong>Year-to-date climate statistics</strong> for Raleigh-Durham vs. 30-year normals (1991–2020).<div class="tip-divider"></div><div class="tip-label">Data Source</div><strong>Open-Meteo Historical Archive</strong> (ERA5 + NOAA). Reference: RDU Airport.<div class="tip-divider"></div><div class="tip-label">Color Coding</div><div class="tip-color-row"><div class="tip-swatch" style="background:#ff8844"></div><strong>Orange</strong> — Above normal</div><div class="tip-color-row"><div class="tip-swatch" style="background:#77aaff"></div><strong>Blue</strong> — Below normal</div><div class="tip-color-row"><div class="tip-swatch" style="background:#00d44a"></div><strong>Green</strong> — Near normal</div></div></div></div>
+<div class="tip-overlay" id="tipTSPS"><div class="tip-panel"><button class="tip-close" onclick="closeTip('tipTSPS')">&times;</button><div class="tip-title">About Tuffy's Storm Prediction System</div><div class="tip-body"><div class="tip-label">What Is This?</div>A <strong>proprietary severe weather intelligence engine</strong> generating a <strong>Severe Weather Index (0-100)</strong> and occurrence likelihood for +3, +6, +9, +12, and +24 hour windows.<div class="tip-divider"></div><div class="tip-label">Data Sources</div>All data from the <strong>National Weather Service (NWS) API</strong>: hourly forecast and active alerts.<div class="tip-divider"></div><div class="tip-label">6-Component Algorithm</div><strong>Wind</strong> (0-20), <strong>Gusts</strong> (0-18), <strong>Precip</strong> (0-14), <strong>Instability</strong> (0-16), <strong>Forecast Text</strong> (0-22), <strong>Alerts</strong> (0-10).<div class="tip-divider"></div><div class="tip-label">Threat Levels</div><div class="tip-color-row"><div class="tip-swatch" style="background:#1a6b3a"></div><strong>0-9 NONE</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#22c55e"></div><strong>10-24 LOW</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#eab308"></div><strong>25-49 GUARDED</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#f97316"></div><strong>50-74 ELEVATED</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#ef4444"></div><strong>75-89 HIGH</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#dc2626"></div><strong>90-100 EXTREME</strong></div></div></div></div>
+<div class="tip-overlay" id="tipForecast"><div class="tip-panel"><button class="tip-close" onclick="closeTip('tipForecast')">&times;</button><div class="tip-title">Reading the 7-Day Forecast</div><div class="tip-body"><div class="tip-label">Temperature Range Bar</div>Each bar spans <strong style="color:#77aaff">Low</strong> to <strong style="color:#ffaa55">High</strong>, positioned relative to the full week.<div class="tip-divider"></div><div class="tip-color-row"><div class="tip-swatch" style="background:#ff6600"></div><strong>Orange</strong> 80F+</div><div class="tip-color-row"><div class="tip-swatch" style="background:#ffcc00"></div><strong>Yellow</strong> 60-79F</div><div class="tip-color-row"><div class="tip-swatch" style="background:#4488ff"></div><strong>Blue</strong> Below 60F</div></div></div></div>
+<div class="tip-overlay" id="tipAlmanac"><div class="tip-panel"><button class="tip-close" onclick="closeTip('tipAlmanac')">&times;</button><div class="tip-title">Raleigh Wx Almanac</div><div class="tip-body"><strong>Year-to-date climate stats</strong> vs 30-year normals (1991-2020). Data from <strong>Open-Meteo Archive</strong> (ERA5). Reference: RDU Airport.<div class="tip-divider"></div><div class="tip-color-row"><div class="tip-swatch" style="background:#ff8844"></div><strong>Orange</strong> Above normal</div><div class="tip-color-row"><div class="tip-swatch" style="background:#77aaff"></div><strong>Blue</strong> Below normal</div><div class="tip-color-row"><div class="tip-swatch" style="background:#00d44a"></div><strong>Green</strong> Near normal</div></div></div></div>
 
 <!-- TICKER -->
 
-<div class="ticker-wrap"><div class="ticker-badge">⬤ WOLFPACK WEATHER</div><div class="ticker-inner"><div class="ticker-track" id="ticker"><span>LIVE CONDITIONS · KNCRALEI761 · RED WOLF FARM - S. WAKE COUNTY, NC</span><span>TUFFY'S STORM PREDICTION SYSTEM ACTIVE · NWS ALERTS MONITORED</span><span>NC STATE WOLFPACK WEATHER NETWORK · GO PACK</span><span>LIVE CONDITIONS · KNCRALEI761 · RED WOLF FARM - S. WAKE COUNTY, NC</span><span>TUFFY'S STORM PREDICTION SYSTEM ACTIVE · NWS ALERTS MONITORED</span><span>NC STATE WOLFPACK WEATHER NETWORK · GO PACK</span></div></div></div>
+<div class="ticker-wrap"><div class="ticker-badge">&#11044; WOLFPACK WEATHER</div><div class="ticker-inner"><div class="ticker-track" id="ticker"><span>LIVE CONDITIONS - KNCRALEI761 - RED WOLF FARM - S. WAKE COUNTY, NC</span><span>TUFFY'S STORM PREDICTION SYSTEM ACTIVE</span><span>NC STATE WOLFPACK WEATHER NETWORK - GO PACK</span><span>LIVE CONDITIONS - KNCRALEI761 - RED WOLF FARM - S. WAKE COUNTY, NC</span><span>TUFFY'S STORM PREDICTION SYSTEM ACTIVE</span><span>NC STATE WOLFPACK WEATHER NETWORK - GO PACK</span></div></div></div>
 
-<!-- HEADER -->
+<header><div class="logo"><svg viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="3" fill="#CC0000"/><polygon points="7,39 14,18 22,30 24,13 26,30 34,18 41,39 35,39 29,23 24,35 19,23 13,39" fill="white"/></svg><div class="logo-text"><h1>Wolfpack Weather</h1><p>Storm Intelligence Network - NC State</p></div></div><div class="hdr-r"><div class="clock" id="clock">--:--:--</div><div class="cdate" id="cdate">Loading...</div></div></header>
 
-<header><div class="logo"><svg viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="3" fill="#CC0000"/><polygon points="7,39 14,18 22,30 24,13 26,30 34,18 41,39 35,39 29,23 24,35 19,23 13,39" fill="white"/></svg><div class="logo-text"><h1>Wolfpack Weather</h1><p>Storm Intelligence Network · NC State</p></div></div><div class="hdr-r"><div class="clock" id="clock">--:--:--</div><div class="cdate" id="cdate">Loading...</div></div></header>
+<div class="onair"><div class="lpulse"></div><span>ON AIR</span><span style="color:rgba(255,255,255,.3)">|</span><span class="mu">RED WOLF FARM - S. WAKE COUNTY, NC - </span><span id="oatemp">--F</span><span class="net-lbl">WOLFPACK WEATHER NETWORK</span></div>
 
-<!-- ON AIR -->
+<div class="tab-bar">
+<button class="tab-btn active" id="tabBtnLive" onclick="switchTab('live',this)">Live Weather</button>
+<button class="tab-btn" id="tabBtnAlmanac" onclick="switchTab('almanac',this)">Raleigh Wx Almanac</button>
+<button class="tab-btn" id="tabBtnPws" onclick="switchTab('pws',this)">Wake PWS Wx</button>
+</div>
 
-<div class="onair"><div class="lpulse"></div><span>ON AIR</span><span style="color:rgba(255,255,255,.3)">|</span><span class="mu">RED WOLF FARM · S. WAKE COUNTY, NC · </span><span id="oatemp">--°F</span><span class="net-lbl">WOLFPACK WEATHER NETWORK</span></div>
-
-<!-- TAB BAR -->
-
-<div class="tab-bar"><button class="tab-btn active" onclick="switchTab('live')">Live Weather</button><button class="tab-btn" onclick="switchTab('almanac')">Raleigh Wx Almanac</button><button class="tab-btn" onclick="switchTab('pws')">Wake PWS Wx</button></div>
-
-<!-- ==================== LIVE WEATHER TAB ==================== -->
+<!-- LIVE TAB -->
 
 <div class="tab-pane active" id="tab-live">
 <main>
-  <!-- CONDITIONS -->
-  <div class="sec">Current Conditions <em>· Red Wolf Farm - S. Wake County, NC · KNCRALEI761</em></div>
+  <div class="sec">Current Conditions <em>- Red Wolf Farm - S. Wake County, NC - KNCRALEI761</em></div>
   <div class="card">
-    <div class="ctop"><div style="display:flex;align-items:flex-start"><div class="tbig ld" id="temp">--</div><div class="tsup">°F</div></div>
-    <div class="cmeta"><div class="cdesc" id="cdesc">Loading...</div><div class="csub">Feels like <strong id="feels">--°F</strong><br>Dew Point <strong id="dewpt">--°F</strong><br>Visibility <strong>~10 mi</strong></div><div style="display:flex;align-items:center;gap:8px;margin-top:8px;justify-content:flex-end;flex-wrap:wrap"><div class="cupd" id="cupd">Fetching...</div><button onclick="refreshAll()" style="background:var(--red2);border:1px solid var(--red);color:#fff;font-size:10px;font-weight:800;letter-spacing:1px;padding:6px 14px;border-radius:2px;cursor:pointer;font-family:var(--font)">↺ REFRESH</button></div></div></div>
-    <div class="sgrid"><div class="sbox"><div class="slbl">Humidity</div><div class="sval" id="humid">--%</div></div><div class="sbox"><div class="slbl">Wind</div><div class="sval" id="wspd">--</div><div class="sunit" id="wdir">--</div></div><div class="sbox"><div class="slbl">Gusts</div><div class="sval" id="gust">--</div><div class="sunit">mph</div></div><div class="sbox"><div class="slbl">Pressure</div><div class="sval" id="pres">--</div><div class="sunit">inHg</div></div><div class="sbox"><div class="slbl">Precip</div><div class="sval" id="prec">--</div><div class="sunit">in today</div></div><div class="sbox"><div class="slbl">UV Index</div><div class="sval" id="uv">--</div><div class="sunit" id="uvl">--</div></div></div>
-    <div class="hlrow"><div class="hlbox"><div class="hllbl">▲ Today's High</div><div class="hlval"><span id="hi">--</span>°F</div></div><div class="hlbox"><div class="hllbl">▼ Today's Low</div><div class="hlval"><span id="lo">--</span>°F</div></div></div>
+    <div class="ctop">
+      <div style="display:flex;align-items:flex-start"><div class="tbig ld" id="temp">--</div><div class="tsup">F</div></div>
+      <div class="cmeta">
+        <div class="cdesc" id="cdesc">Loading...</div>
+        <div class="csub">Feels like <strong id="feels">--F</strong><br>Dew Point <strong id="dewpt">--F</strong><br>Visibility <strong>~10 mi</strong></div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:8px;justify-content:flex-end;flex-wrap:wrap">
+          <div class="cupd" id="cupd">Fetching...</div>
+          <button onclick="refreshAll()" style="background:var(--red2);border:1px solid var(--red);color:#fff;font-size:10px;font-weight:800;letter-spacing:1px;padding:6px 14px;border-radius:2px;cursor:pointer;font-family:var(--font)">REFRESH</button>
+        </div>
+      </div>
+    </div>
+    <div class="sgrid">
+      <div class="sbox"><div class="slbl">Humidity</div><div class="sval" id="humid">--%</div></div>
+      <div class="sbox"><div class="slbl">Wind</div><div class="sval" id="wspd">--</div><div class="sunit" id="wdir">--</div></div>
+      <div class="sbox"><div class="slbl">Gusts</div><div class="sval" id="gust">--</div><div class="sunit">mph</div></div>
+      <div class="sbox"><div class="slbl">Pressure</div><div class="sval" id="pres">--</div><div class="sunit">inHg</div></div>
+      <div class="sbox"><div class="slbl">Precip</div><div class="sval" id="prec">--</div><div class="sunit">in today</div></div>
+      <div class="sbox"><div class="slbl">UV Index</div><div class="sval" id="uv">--</div><div class="sunit" id="uvl">--</div></div>
+    </div>
+    <div class="hlrow">
+      <div class="hlbox"><div class="hllbl">Today High</div><div class="hlval"><span id="hi">--</span>F</div></div>
+      <div class="hlbox"><div class="hllbl">Today Low</div><div class="hlval"><span id="lo">--</span>F</div></div>
+    </div>
   </div>
 
-  <!-- TSPS -->
+  <div style="margin-top:18px">
+    <div class="card" style="padding:0;overflow:hidden">
+      <div id="tsps" style="padding:20px 22px">
+        <div class="tsps-pulse" id="tspsPulseBar"></div>
+        <div id="tspsContent"><div class="tsps-ld"><div class="tsps-spinner"></div><p>Initializing Storm Prediction System...</p></div></div>
+      </div>
+    </div>
+  </div>
 
-  <div style="margin-top:18px"><div class="card" style="padding:0;overflow:hidden"><div id="tsps" style="padding:20px 22px"><div class="tsps-pulse" id="tspsPulseBar"></div><div id="tspsContent"><div class="tsps-ld"><div class="tsps-spinner"></div><p>Initializing Storm Prediction System...</p></div></div></div></div></div>
+  <div style="margin-top:18px">
+    <div class="sec">12-Hour Forecast</div>
+    <div class="card hourly-wrap"><div class="hr-row" id="hr-row"><div class="ld">Loading...</div></div></div>
+  </div>
 
-  <!-- HOURLY -->
-
-  <div style="margin-top:18px"><div class="sec">12-Hour Forecast <em>· Red Wolf Farm - S. Wake County, NC</em></div><div class="card hourly-wrap"><div class="hr-row" id="hr-row"><div class="ld" style="font-size:13px">Loading...</div></div></div></div>
-
-  <!-- 7-DAY -->
-
-  <div style="margin-top:18px"><div class="sec">7-Day Extended Forecast <em>· NWS</em> <div class="tip-btn" onclick="openTip('tipForecast')">?</div></div><div class="card" style="padding:18px"><div class="ext-grid" id="ext-grid"></div></div></div>
-
-  <!-- SATELLITE + RADAR + CAMS — full width below 7-day -->
+  <div style="margin-top:18px">
+    <div class="sec">7-Day Extended Forecast <div class="tip-btn" onclick="openTip('tipForecast')">?</div></div>
+    <div class="card" style="padding:18px"><div class="ext-grid" id="ext-grid"></div></div>
+  </div>
 
   <div class="media-row">
-    <div class="media-card"><div class="sec" style="margin-bottom:10px">GOES-East Satellite · Carolinas</div><div class="media-frame" style="height:280px"><img id="goes-img" src="https://cdn.star.nesdis.noaa.gov/GOES16/ABI/SECTOR/eus/GEOCOLOR/latest.jpg" alt="GOES-East US East Coast GeoColor" onerror="this.src='https://cdn.star.nesdis.noaa.gov/GOES16/ABI/SECTOR/se/GEOCOLOR/latest.jpg'"/></div><div class="mfooter"><div class="ldot"></div>NOAA GOES-East · US East Coast · GeoColor · Updates every 5 min</div></div>
-    <div class="media-card"><div class="sec" style="margin-bottom:10px">NWS KRAX Radar · Raleigh-Durham</div><div class="media-frame" style="height:280px"><iframe src="https://radar.weather.gov/station/KRAX/standard" title="KRAX" loading="lazy"></iframe></div><div class="mfooter"><div class="ldot"></div>NWS KRAX · Live loop</div></div>
-    <div class="media-card"><div class="sec" style="margin-bottom:10px">Live Cam · Sugar Mountain Base <em>· Banner Elk, NC</em></div><div class="media-frame" style="position:relative" id="sugar-wrap"><img id="sugar-cam" src="" alt="Sugar Mtn" style="width:100%;height:100%;object-fit:cover;display:none" onerror="showCamFb('sugar-wrap','sugar-cam','https://skisugar.com/cams/','⛷ Sugar Mountain Base Cam','skisugar.com')"/><div class="cam-overlay"><span>⛷ SUGAR MTN · BASE · 4,000 ft</span></div></div><div class="mfooter"><div class="ldot"></div>Sugar Mountain Resort · Banner Elk, NC</div></div>
-    <div class="media-card"><div class="sec" style="margin-bottom:10px">Live Cam · Cape Hatteras <em>· Outer Banks, NC</em></div><div class="media-frame" style="position:relative" id="hat-wrap"><img id="hat-cam" src="" alt="Hatteras" style="width:100%;height:100%;object-fit:cover;display:none" onerror="showCamFb('hat-wrap','hat-cam','https://www.surfchex.com/cams/hatteras-web-cam/','🌊 Cape Hatteras Live Cam','surfchex.com')"/><div class="cam-overlay"><span>🌊 CAPE HATTERAS · OUTER BANKS</span></div></div><div class="mfooter"><div class="ldot"></div>Surfchex · Durant Station, Hatteras NC</div></div>
+    <div class="media-card"><div class="sec" style="margin-bottom:10px">GOES-East Satellite</div><div class="media-frame" style="height:280px"><img id="goes-img" alt="GOES-East" src="https://cdn.star.nesdis.noaa.gov/GOES16/ABI/SECTOR/eus/GEOCOLOR/latest.jpg"/></div><div class="mfooter"><div class="ldot"></div>NOAA GOES-East - US East Coast - GeoColor</div></div>
+    <div class="media-card"><div class="sec" style="margin-bottom:10px">NWS KRAX Radar</div><div class="media-frame" style="height:280px"><iframe src="https://radar.weather.gov/station/KRAX/standard" title="KRAX" loading="lazy"></iframe></div><div class="mfooter"><div class="ldot"></div>NWS KRAX - Live loop</div></div>
+    <div class="media-card"><div class="sec" style="margin-bottom:10px">Sugar Mountain Base Cam</div><div class="media-frame" style="position:relative" id="sugar-wrap"><img id="sugar-cam" src="" alt="Sugar Mtn" style="width:100%;height:100%;object-fit:cover;display:none" onerror="showCamFb('sugar-wrap','sugar-cam','https://skisugar.com/cams/')"/><div class="cam-overlay"><span>SUGAR MTN - 4,000 ft</span></div></div><div class="mfooter"><div class="ldot"></div>Sugar Mountain Resort - Banner Elk, NC</div></div>
+    <div class="media-card"><div class="sec" style="margin-bottom:10px">Cape Hatteras Live Cam</div><div class="media-frame" style="position:relative" id="hat-wrap"><img id="hat-cam" src="" alt="Hatteras" style="width:100%;height:100%;object-fit:cover;display:none" onerror="showCamFb('hat-wrap','hat-cam','https://www.surfchex.com/cams/hatteras-web-cam/')"/><div class="cam-overlay"><span>CAPE HATTERAS - OBX</span></div></div><div class="mfooter"><div class="ldot"></div>Surfchex - Hatteras, NC</div></div>
   </div>
 </main>
 </div>
 
-<!-- ==================== ALMANAC TAB ==================== -->
+<!-- ALMANAC TAB -->
 
 <div class="tab-pane" id="tab-almanac">
 <div class="alm-wrap">
-  <div class="sec">Raleigh Wx Almanac <em>· RDU Airport · Historical Climate Data</em> <div class="tip-btn" onclick="openTip('tipAlmanac')">?</div></div>
-  <div id="alm-content"><div class="alm-ld"><div class="tsps-spinner"></div>Loading climate data from Open-Meteo Archive...</div></div>
+  <div class="sec">Raleigh Wx Almanac <em>- RDU Airport - Historical Climate Data</em> <div class="tip-btn" onclick="openTip('tipAlmanac')">?</div></div>
+  <div id="alm-content"><div class="alm-ld"><div class="tsps-spinner"></div>Loading climate data...</div></div>
 </div>
 </div>
 
-<!-- ==================== PWS TAB ==================== -->
+<!-- PWS TAB -->
 
 <div class="tab-pane" id="tab-pws">
 <div class="alm-wrap">
-  <div class="sec">Wake County PWS Network <em>· Personal Weather Stations · Weather Underground</em></div>
-  <div id="pws-content"><div class="alm-ld"><div class="tsps-spinner"></div>Loading PWS observations...</div></div>
+  <div class="sec">Wake County PWS Network <em>- Personal Weather Stations - Weather Underground</em></div>
+  <div id="pws-content"><div class="alm-ld"><div class="tsps-spinner"></div>Loading PWS data...</div></div>
 </div>
 </div>
 
 <footer>
-  <p><strong>Wolfpack Weather</strong> · Station <strong>KNCRALEI761</strong> · Red Wolf Farm - S. Wake County, NC</p>
-  <p>Weather: Open-Meteo · Alerts: NWS api.weather.gov · Satellite: NOAA GOES-East · Radar: NWS KRAX</p>
-  <p>Tuffy's Storm Prediction System v2.0 · Wolfpack Weather Network · NC State Athletics</p>
+  <p><strong>Wolfpack Weather</strong> - Station <strong>KNCRALEI761</strong> - Red Wolf Farm - S. Wake County, NC</p>
+  <p>Weather: Open-Meteo - Alerts: NWS - Satellite: NOAA GOES-East - Radar: NWS KRAX</p>
+  <p>Tuffy's Storm Prediction System v2.0 - Wolfpack Weather Network - NC State Athletics</p>
 </footer>
 
 <script>
-/* TOOLTIPS + TABS */
-function openTip(id){document.getElementById(id).classList.add("show")}
-function closeTip(id){document.getElementById(id).classList.remove("show")}
-document.querySelectorAll(".tip-overlay").forEach(o=>{o.addEventListener("click",function(e){if(e.target===this)this.classList.remove("show")})});
-function switchTab(t){document.querySelectorAll(".tab-pane").forEach(p=>p.classList.remove("active"));document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));document.getElementById("tab-"+t).classList.add("active");event.target.classList.add("active");if(t==="almanac"&&!window.__almLoaded)fetchAlmanac();if(t==="pws"&&!window.__pwsLoaded)fetchPWS()}
+// ============================================================
+// UTILITY FUNCTIONS
+// ============================================================
+function $(id) { return document.getElementById(id); }
 
-/* CORE */
-const G=id=>document.getElementById(id),NOW=()=>new Date();
-const wmoDesc=c=>({0:"Clear Sky",1:"Mainly Clear",2:"Partly Cloudy",3:"Overcast",45:"Fog",48:"Icy Fog",51:"Light Drizzle",53:"Drizzle",55:"Heavy Drizzle",61:"Light Rain",63:"Rain",65:"Heavy Rain",71:"Light Snow",73:"Snow",75:"Heavy Snow",80:"Rain Showers",81:"Heavy Showers",82:"Violent Showers",95:"Thunderstorms",96:"T-Storm+Hail",99:"Severe T-Storm"})[c]||"Unknown";
-const wmoIcon=c=>{if(c===0)return"☀️";if(c<=2)return"🌤️";if(c===3)return"☁️";if(c<=48)return"🌫️";if(c<=55)return"🌦️";if(c<=65)return"🌧️";if(c<=75)return"❄️";if(c<=82)return"🌦️";return"⛈️"};
-const deg2dir=d=>["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"][Math.round(d/22.5)%16];
-const uvLbl=v=>v<=2?"Low":v<=5?"Moderate":v<=7?"High":v<=10?"Very High":"Extreme";
-const nwsIcon=d=>{const s=d.toLowerCase();if(s.includes("thunder"))return"⛈️";if(s.includes("snow"))return"❄️";if(s.includes("sleet")||s.includes("freezing"))return"🌨️";if(s.includes("rain")||s.includes("shower"))return"🌧️";if(s.includes("fog"))return"🌫️";if(s.includes("cloud")||s.includes("overcast"))return"☁️";if(s.includes("partly"))return"🌤️";if(s.includes("sunny")||s.includes("clear"))return"☀️";return"🌡️"};
-
-/* CLOCK */
-(function tick(){const n=NOW();G("clock").textContent=n.toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit",second:"2-digit"});G("cdate").textContent=n.toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric",year:"numeric"}).toUpperCase();setTimeout(tick,1000)})();
-
-/* CAMS + GOES */
-function showCamFb(w,i,u,l,s){const wrap=G(w);if(!wrap)return;const img=G(i);if(img)img.style.display="none";if(wrap.querySelector(".cam-fb"))return;const fb=document.createElement("div");fb.className="cam-fb";fb.innerHTML=`<div class="cam-fb-title">${l}</div><a href="${u}" target="_blank">VIEW LIVE CAM →</a><div class="cam-fb-sub">Opens ${s}</div>`;wrap.insertBefore(fb,wrap.querySelector(".cam-overlay"))}
-function refreshCams(){const ts=Date.now();const gi=G("goes-img");if(gi)gi.src=`https://cdn.star.nesdis.noaa.gov/GOES16/ABI/SECTOR/eus/GEOCOLOR/latest.jpg?t=${ts}`;const s=G("sugar-cam");if(s&&!G("sugar-wrap").querySelector(".cam-fb")){s.style.display="block";s.src=`https://skisugar.com/webcam/base.jpg?t=${ts}`}const h=G("hat-cam");if(h&&!G("hat-wrap").querySelector(".cam-fb")){h.style.display="block";h.src=`https://www.surfchex.com/webcam-images/hatteras.jpg?t=${ts}`}}
-refreshCams();setInterval(refreshCams,60000);
-
-/* CONDITIONS */
-function applyConditions(t,feels,dew,humid,wspd,wdir,gust,pres,prec,uv,hi,lo,code,hourly){G("temp").textContent=t;G("temp").classList.remove("ld");G("oatemp").textContent=t+"°F";G("feels").textContent=feels+"°F";G("dewpt").textContent=dew+"°F";G("humid").textContent=humid+"%";G("wspd").textContent=wspd;G("wdir").textContent=deg2dir(wdir)+" · "+wdir+"°";G("gust").textContent=gust;G("pres").textContent=pres;G("prec").textContent=prec;G("uv").textContent=uv;G("uvl").textContent=uvLbl(uv);G("hi").textContent=hi;G("lo").textContent=lo;G("cdesc").textContent=wmoDesc(code);G("cupd").textContent="Updated "+NOW().toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit",second:"2-digit"})+" ET";const msg=`RED WOLF FARM · S. WAKE COUNTY NC · ${t}°F · ${wmoDesc(code).toUpperCase()} · WIND ${wspd} MPH ${deg2dir(wdir)} · HI/LO ${hi}°/${lo}°F`;G("ticker").innerHTML=`<span>${msg}</span><span>TUFFY'S STORM PREDICTION SYSTEM ACTIVE · WOLFPACK WEATHER</span><span>${msg}</span><span>TUFFY'S STORM PREDICTION SYSTEM ACTIVE · WOLFPACK WEATHER</span>`;if(hourly)buildHourly(hourly)}
-async function fetchConditions(){try{const r=await fetch("https://api.open-meteo.com/v1/forecast?latitude=35.686&longitude=-78.614&current=temperature_2m,apparent_temperature,relative_humidity_2m,dew_point_2m,wind_speed_10m,wind_gusts_10m,wind_direction_10m,surface_pressure,precipitation,weather_code,uv_index&hourly=temperature_2m,weather_code,precipitation_probability&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=America%2FNew_York&forecast_days=2");if(!r.ok)throw 0;const d=await r.json(),c=d.current,dl=d.daily;applyConditions(Math.round(c.temperature_2m),Math.round(c.apparent_temperature),Math.round(c.dew_point_2m),Math.round(c.relative_humidity_2m),Math.round(c.wind_speed_10m),Math.round(c.wind_direction_10m),Math.round(c.wind_gusts_10m),(c.surface_pressure*.02953).toFixed(2),c.precipitation.toFixed(2),Math.round(c.uv_index),Math.round(dl.temperature_2m_max[0]),Math.round(dl.temperature_2m_min[0]),c.weather_code,d.hourly)}catch(e){G("cupd").textContent="⚠ Data unavailable"}}
-function buildHourly(h){const row=G("hr-row");row.innerHTML="";const n=NOW();let cnt=0;for(let i=0;i<h.time.length&&cnt<14;i++){const t=new Date(h.time[i]);if(t<n&&i>0)continue;const b=document.createElement("div");b.className="hr"+(cnt===0?" now":"");const lbl=cnt===0?"NOW":t.toLocaleTimeString("en-US",{hour:"numeric",hour12:true});const pp=(h.precipitation_probability||[])[i]||0;b.innerHTML=`<div class="hr-t">${lbl}</div><div class="hr-i">${wmoIcon(h.weather_code[i])}</div><div class="hr-v">${Math.round(h.temperature_2m[i])}°</div>${pp>15?`<div class="hr-p">${pp}%💧</div>`:""}`;row.appendChild(b);cnt++}}
-
-/* 7-DAY */
-function seedExtended(){const grid=G("ext-grid");if(!grid)return;let h="";for(let i=0;i<7;i++){const dt=new Date();dt.setDate(dt.getDate()+i);h+=`<div class="ext-day${i===0?" today":""}"><div class="ext-dow">${i===0?"Today":dt.toLocaleDateString("en-US",{weekday:"short"})}</div><div class="ext-date">${dt.toLocaleDateString("en-US",{month:"short",day:"numeric"})}</div><div class="ext-icon ld">—</div><div class="ext-desc" style="color:var(--mu2)">Loading...</div><div class="ext-temps"><span class="ext-hi" style="color:var(--mu2)">--°</span><span class="ext-lo">--°</span></div></div>`}grid.innerHTML=h}
-function buildRangeBar(hi,lo,mn,mx){const range=mx-mn||1;const l=Math.round(((lo-mn)/range)*100);const w=Math.max(8,Math.round(((hi-lo)/range)*100));const c=hi>=80?"#ff6600":hi>=60?"#ffcc00":"#4488ff";return`<div class="ext-range"><span class="ext-range-lo" style="left:${Math.max(0,l-1)}%">${lo}°</span><div class="ext-range-track" style="left:${l}%;width:${w}%;background:linear-gradient(90deg,#4488ff,${c})"></div><span class="ext-range-hi" style="left:${Math.min(88,l+w+1)}%">${hi}°</span></div>`}
-async function fetchExtended(){const grid=G("ext-grid");if(!grid)return;try{const ptR=await fetch("https://api.weather.gov/points/35.686,-78.614",{headers:{"User-Agent":"WolfpackWeather/2.0"}});if(!ptR.ok)throw 0;const ptD=await ptR.json();const fR=await fetch(ptD.properties.forecast,{headers:{"User-Agent":"WolfpackWeather/2.0"}});if(!fR.ok)throw 0;const periods=(await fR.json()).properties.periods;const days=[];for(let i=0;i<periods.length&&days.length<7;i++){const p=periods[i];if(!p.isDaytime)continue;const n=periods[i+1];days.push({st:p.startTime,hi:p.temperature,lo:n?n.temperature:p.temperature-15,desc:p.shortForecast,pop:p.probabilityOfPrecipitation?.value||0,wind:p.windSpeed,wd:p.windDirection})}
-const allT=days.flatMap(d=>[d.hi,d.lo]);const mn=Math.min(...allT),mx=Math.max(...allT);let h="";days.forEach((d,i)=>{const dt=new Date(d.st);h+=`<div class="ext-day${i===0?" today":""}"><div class="ext-dow">${i===0?"Today":dt.toLocaleDateString("en-US",{weekday:"short"})}</div><div class="ext-date">${dt.toLocaleDateString("en-US",{month:"short",day:"numeric"})}</div><div class="ext-icon">${nwsIcon(d.desc)}</div><div class="ext-desc">${d.desc}</div><div class="ext-temps"><span class="ext-hi">${d.hi}°</span><span class="ext-lo">${d.lo}°</span></div>${d.pop>10?`<div class="ext-pop">💧 ${d.pop}%</div>`:""}${buildRangeBar(d.hi,d.lo,mn,mx)}<div class="ext-wind">${d.wind} ${d.wd}</div></div>`});grid.innerHTML=h}catch(e){try{const r=await fetch("https://api.open-meteo.com/v1/forecast?latitude=35.686&longitude=-78.614&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max,wind_speed_10m_max&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=7");const dl=(await r.json()).daily;const allT=dl.temperature_2m_max.concat(dl.temperature_2m_min);const mn=Math.min(...allT),mx=Math.max(...allT);let h="";dl.time.forEach((t,i)=>{const dt=new Date(t+"T12:00:00");const hi=Math.round(dl.temperature_2m_max[i]),lo=Math.round(dl.temperature_2m_min[i]),pop=dl.precipitation_probability_max[i]||0;h+=`<div class="ext-day${i===0?" today":""}"><div class="ext-dow">${i===0?"Today":dt.toLocaleDateString("en-US",{weekday:"short"})}</div><div class="ext-date">${dt.toLocaleDateString("en-US",{month:"short",day:"numeric"})}</div><div class="ext-icon">${wmoIcon(dl.weather_code[i])}</div><div class="ext-desc">${wmoDesc(dl.weather_code[i])}</div><div class="ext-temps"><span class="ext-hi">${hi}°</span><span class="ext-lo">${lo}°</span></div>${pop>10?`<div class="ext-pop">💧 ${pop}%</div>`:""}${buildRangeBar(hi,lo,mn,mx)}<div class="ext-wind">${Math.round(dl.wind_speed_10m_max[i])} mph</div></div>`});grid.innerHTML=h}catch(e2){grid.innerHTML='<div style="color:var(--mu);padding:16px">Forecast unavailable</div>'}}}
-
-/* ═══ TSPS v2.0 ═══ */
-(function(){const CFG={lat:35.7113,lon:-78.6141,name:"Red Wolf Farm - S. Wake County, NC",refresh:300000};const HKW={tornado:30,tornadoes:30,funnel:25,"tornado watch":22,"tornado warning":30,"damaging wind":20,"destructive wind":25,derecho:28,"large hail":20,"giant hail":25,"golf ball":20,"severe thunderstorm":18,supercell:22,hurricane:30,"tropical storm":22,flooding:15,"flash flood":20,thunder:8,thunderstorm:10,storm:6,lightning:7,hail:12,"heavy rain":8,downpour:7,gusty:6,windy:5};const ASEV={Extreme:35,Severe:25,Moderate:15,Minor:8,Unknown:5};const ACOL={"Tornado Warning":"#ff0000","Severe Thunderstorm Warning":"#ffa500","Tornado Watch":"#ffff00","Flash Flood Warning":"#8b0000","Flood Warning":"#00ff00","Special Weather Statement":"#ffe4b5",default:"#7b68ee"};
-function sL(s){if(s<10)return{label:"NONE",color:"#1a6b3a",desc:"No severe weather expected"};if(s<25)return{label:"LOW",color:"#22c55e",desc:"Minimal threat"};if(s<50)return{label:"GUARDED",color:"#eab308",desc:"Strong storms possible"};if(s<75)return{label:"ELEVATED",color:"#f97316",desc:"Severe storms likely"};if(s<90)return{label:"HIGH",color:"#ef4444",desc:"Damaging weather expected"};return{label:"EXTREME",color:"#dc2626",desc:"Life-threatening weather"}}
-function cI(p,al){let bd={wind:0,gusts:0,precip:0,instability:0,textual:0,alerts:0};const ws=parseInt(p.windSpeed)||0,wg=parseInt(p.windGust)||0,pop=(p.probabilityOfPrecipitation&&p.probabilityOfPrecipitation.value)||0,temp=p.temperature||70,dpR=p.dewpoint&&p.dewpoint.value,dp=dpR!=null?(dpR*9/5+32):null,txt=((p.detailedForecast||"")+" "+(p.shortForecast||"")).toLowerCase();if(ws>=60)bd.wind=20;else if(ws>=45)bd.wind=16;else if(ws>=30)bd.wind=12;else if(ws>=20)bd.wind=7;else if(ws>=15)bd.wind=4;else if(ws>=10)bd.wind=2;const eg=Math.max(wg,ws*1.3);if(eg>=70)bd.gusts=18;else if(eg>=58)bd.gusts=15;else if(eg>=45)bd.gusts=12;else if(eg>=35)bd.gusts=8;else if(eg>=25)bd.gusts=4;else if(eg>=15)bd.gusts=1;if(pop>=90)bd.precip=14;else if(pop>=70)bd.precip=11;else if(pop>=50)bd.precip=8;else if(pop>=30)bd.precip=5;else if(pop>=15)bd.precip=2;if(dp!==null){const sp=temp-dp;if(sp<=3&&temp>=75)bd.instability=16;else if(sp<=5&&temp>=70)bd.instability=13;else if(sp<=8&&temp>=65)bd.instability=9;else if(sp<=12&&temp>=60)bd.instability=6;else if(sp<=15)bd.instability=3}else if(pop>=50&&temp>=70)bd.instability=8;let mT=0,hits=0;for(const[k,v]of Object.entries(HKW)){if(txt.includes(k)){mT=Math.max(mT,v);hits++}}bd.textual=Math.min(22,mT+Math.min(hits*1.5,8));if(al&&al.length>0){let mx=0;for(const a of al)mx=Math.max(mx,ASEV[a.properties?.severity]||5);bd.alerts=Math.min(10,mx*(1+Math.min(al.length-1,3)*.15))}const score=Math.min(100,Math.round(bd.wind+bd.gusts+bd.precip+bd.instability+bd.textual+bd.alerts));const likelihood=Math.min(99,Math.round((pop*.35)+(score*.45)+(bd.textual>10?15:bd.textual>5?8:0)+(al&&al.length>0?5:0)));return{score,likelihood,breakdown:bd}}
-let S={forecasts:[],alerts:[],activeIdx:0,lastUpdate:null,charts:{},peakScore:0};const root=G("tsps"),cont=G("tspsContent"),pulse=G("tspsPulseBar");
-function gS(){return Math.min(230,Math.max(180,(root.clientWidth||300)*.55))}
-function bG(score,size){const lv=sL(score),r=size*.38,cx=size/2,cy=size/2+10,sA=-220,eA=40,tot=eA-sA,scA=sA+(score/100)*tot;const p=(a,rd)=>({x:cx+rd*Math.cos(a*Math.PI/180),y:cy+rd*Math.sin(a*Math.PI/180)});const arc=(a1,a2,rd)=>{const s=p(a1,rd),e=p(a2,rd);return`M ${s.x} ${s.y} A ${rd} ${rd} 0 ${a2-a1>180?1:0} 1 ${e.x} ${e.y}`};let tk="";[0,10,25,50,75,90,100].forEach(t=>{const a=sA+(t/100)*tot,i=p(a,r-12),o=p(a,r+12),l=p(a,r+22);tk+=`<line x1="${i.x}" y1="${i.y}" x2="${o.x}" y2="${o.y}" stroke="rgba(255,255,255,.2)" stroke-width="1.5"/><text x="${l.x}" y="${l.y}" fill="rgba(255,255,255,.35)" font-size="8" text-anchor="middle" dominant-baseline="middle">${t}</text>`});const np=p(scA,r-2),h=size*.72;return`<svg viewBox="0 0 ${size} ${h}" style="width:100%;max-width:${size}px;height:auto"><defs><linearGradient id="tsG" x1="0%" x2="100%"><stop offset="0%" stop-color="#1a472a"/><stop offset="25%" stop-color="#22c55e"/><stop offset="45%" stop-color="#eab308"/><stop offset="65%" stop-color="#f97316"/><stop offset="80%" stop-color="#ef4444"/><stop offset="100%" stop-color="#dc2626"/></linearGradient><filter id="tsGl"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><path d="${arc(sA,eA,r)}" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="14" stroke-linecap="round"/><path d="${arc(sA,scA,r)}" fill="none" stroke="url(#tsG)" stroke-width="14" stroke-linecap="round" filter="url(#tsGl)"/>${tk}<circle cx="${np.x}" cy="${np.y}" r="5.5" fill="${lv.color}" filter="url(#tsGl)"/><text x="${cx}" y="${cy-16}" fill="${lv.color}" font-size="38" font-weight="800" text-anchor="middle" dominant-baseline="middle" filter="url(#tsGl)">${score}</text><text x="${cx}" y="${cy+10}" fill="${lv.color}" font-size="12" font-weight="700" text-anchor="middle" letter-spacing="3">${lv.label}</text><text x="${cx}" y="${cy+27}" fill="rgba(255,255,255,.45)" font-size="8" text-anchor="middle">${lv.desc}</text></svg>`}
-function h2r(hex){hex=hex.replace("#","");return parseInt(hex.substr(0,2),16)+","+parseInt(hex.substr(2,2),16)+","+parseInt(hex.substr(4,2),16)}
-function dC(){["tl","radar","bar"].forEach(k=>{if(S.charts[k]){S.charts[k].destroy();S.charts[k]=null}})}
-function rM(){const pk=S.peakScore,pkL=sL(pk),f=S.forecasts,al=S.alerts,pw=f.length?f.reduce((a,b)=>a.score>b.score?a:b).label:"—",ml=f.length?Math.max(...f.map(x=>x.likelihood)):0,gs=gS();if(pk>=50){root.classList.add("tsps-threat");pulse.style.background=`linear-gradient(90deg,transparent,${pkL.color},transparent)`}else root.classList.remove("tsps-threat");
-let aH="";if(al.length>0){aH=`<div class="tsps-alerts"><div class="tsps-al-hdr"><span>⚠️</span><span>ACTIVE ALERTS — ${al.length}</span></div>${al.slice(0,6).map(a=>{const e=a.properties?.event||"Alert",c=ACOL[e]||ACOL.default;return`<div class="tsps-al-item"><div class="tsps-al-dot" style="background:${c};box-shadow:0 0 6px ${c}"></div><span class="tsps-al-ev">${e}</span><span class="tsps-al-src">${a.properties?.senderName||"NWS"}</span></div>`}).join("")}</div>`}
-let cH=f.map((fc,i)=>{const lv=sL(fc.score),isA=i===S.activeIdx;return`<div class="tsps-fc${isA?" act":""}" data-idx="${i}" style="background:${isA?"rgba("+h2r(lv.color)+",.12)":"rgba(255,255,255,.025)"};border-color:${isA?lv.color+"77":"rgba(255,255,255,.05)"}"><div class="fc-lbl">${fc.label}</div><div><span class="fc-score" style="color:${lv.color}">${fc.score}</span><span class="fc-unit">/100</span></div><div class="fc-threat" style="color:${lv.color}88">${lv.label}</div><div class="fc-lk"><span class="fc-lk-l">Likelihood</span><span class="fc-lk-v" style="color:${lv.color}">${fc.likelihood}%</span></div><div class="fc-bar"><div class="fc-bar-f" style="width:${fc.likelihood}%;background:${lv.color}"></div></div><div class="fc-meta">${fc.temp!==undefined?fc.temp+"°F":""}${fc.wind?" · "+fc.wind:""}</div></div>`}).join("");
-const af=f[S.activeIdx],afL=af?sL(af.score):{color:"#888",label:"—"};let dH="";if(af)dH=`<div class="tsps-det"><div class="tsps-det-hdr"><div><div class="tsps-det-per">DETAILED ANALYSIS — ${af.label}</div><div class="tsps-det-fc">${af.shortForecast||"—"}</div></div><div style="text-align:right"><div class="tsps-det-sc" style="color:${afL.color}">${af.score}</div><div class="tsps-det-lv" style="color:${afL.color}">${afL.label}</div></div></div><div class="tsps-det-mg"><div class="tsps-dm"><div class="dm-l">TEMP</div><div class="dm-v">${af.temp!==undefined?af.temp+"°F":"—"}</div></div><div class="tsps-dm"><div class="dm-l">WIND</div><div class="dm-v">${af.wind||"—"}</div></div><div class="tsps-dm"><div class="dm-l">PRECIP</div><div class="dm-v">${af.pop??0}%</div></div><div class="tsps-dm"><div class="dm-l">LIKELIHOOD</div><div class="dm-v">${af.likelihood}%</div></div></div>${af.detailedForecast?`<div class="tsps-det-nar" style="border-left-color:${afL.color}44"><b>NWS Forecast:</b> ${af.detailedForecast}</div>`:""}</div>`;
-cont.innerHTML=`<div class="tsps-hdr"><div class="tsps-hdr-l"><div class="tsps-tag">PROPRIETARY MODEL</div><h2><span class="tsps-r">Tuffy's</span> Storm Prediction System <div class="tip-btn" onclick="openTip('tipTSPS')" style="font-size:10px;width:18px;height:18px">?</div></h2><div class="tsps-loc">📍 ${CFG.name} · Real-time NWS-powered severe weather intelligence</div></div><div class="tsps-hdr-r"><div class="tsps-ulbl">LAST UPDATE</div><div class="tsps-utime">${S.lastUpdate?S.lastUpdate.toLocaleTimeString():"—"}</div><button class="tsps-rbtn" id="tspsRB">↻ Refresh</button></div></div>${aH}<div class="tsps-top"><div class="tsps-gauge-w"><div class="tsps-gauge-lbl">PEAK SEVERE WEATHER INDEX</div>${bG(pk,gs)}</div><div class="tsps-stats"><div class="tsps-sbox"><div class="tsps-slbl">PEAK WINDOW</div><div class="tsps-sval" style="color:${pkL.color}">${pw}</div></div><div class="tsps-sbox"><div class="tsps-slbl">ACTIVE ALERTS</div><div class="tsps-sval" style="color:${al.length>0?"#ef4444":"#22c55e"}">${al.length>0?al.length+" ACTIVE":"ALL CLEAR"}</div></div><div class="tsps-sbox"><div class="tsps-slbl">MAX LIKELIHOOD</div><div class="tsps-sval" style="color:rgba(255,255,255,.85)">${ml}%</div></div></div></div><div class="tsps-sec-lbl">FORECAST PERIODS</div><div class="tsps-cards">${cH}</div><div class="tsps-tl-box"><div class="tsps-ct">SEVERITY TIMELINE</div><canvas id="tsTL"></canvas></div><div class="tsps-ch-row"><div class="tsps-ch-box"><div class="tsps-ct">THREAT RADAR</div><canvas id="tsRD"></canvas></div><div class="tsps-ch-box"><div class="tsps-ct">COMPONENT BREAKDOWN</div><canvas id="tsBA"></canvas></div></div>${dH}<div class="tsps-foot"><span>Tuffy's Storm Prediction System v2.0 · Proprietary Severe Weather Index · Data: NWS API</span><span>Auto-refresh every 5 min · Not a replacement for official NWS warnings</span></div>`;
-G("tspsRB").addEventListener("click",()=>tsR());document.querySelectorAll(".tsps-fc").forEach(c=>{c.addEventListener("click",function(){S.activeIdx=parseInt(this.dataset.idx);rM();bCh()})});bCh()}
-function bCh(){dC();const f=S.forecasts;if(!f.length)return;const af=f[S.activeIdx],lbl=f.map(x=>x.label),sc=f.map(x=>x.score),lk=f.map(x=>x.likelihood),pkL=sL(S.peakScore),afL=sL(af?af.score:0),mob=innerWidth<600;Chart.defaults.color="rgba(255,255,255,.4)";Chart.defaults.borderColor="rgba(255,255,255,.06)";Chart.defaults.font.family="'Segoe UI',sans-serif";Chart.defaults.font.size=mob?9:10;
-const tl=G("tsTL");if(tl)S.charts.tl=new Chart(tl,{type:"line",data:{labels:lbl,datasets:[{label:"Severity",data:sc,borderColor:pkL.color,backgroundColor:pkL.color+"30",fill:true,tension:.4,borderWidth:2,pointRadius:mob?3:4,pointBackgroundColor:sc.map(s=>sL(s).color)},{label:"Likelihood",data:lk,borderColor:"#60a5fa",borderDash:[5,4],fill:false,tension:.4,borderWidth:1.5,pointRadius:mob?2:3}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{min:0,max:100,grid:{color:"rgba(255,255,255,.04)"}},x:{grid:{display:false}}},plugins:{legend:{labels:{boxWidth:10,padding:mob?8:16}}}}});
-if(af&&af.breakdown){const bd=af.breakdown,items=[{k:"wind",l:"Wind",m:20},{k:"gusts",l:"Gusts",m:18},{k:"precip",l:"Precip",m:14},{k:"instability",l:"Instab.",m:16},{k:"textual",l:"Fcst Text",m:22},{k:"alerts",l:"Alerts",m:10}];const rd=G("tsRD");if(rd)S.charts.radar=new Chart(rd,{type:"radar",data:{labels:items.map(x=>x.l),datasets:[{data:items.map(x=>Math.round(bd[x.k]/x.m*100)),borderColor:afL.color,backgroundColor:afL.color+"25",borderWidth:2,pointRadius:mob?2:3,pointBackgroundColor:afL.color}]},options:{responsive:true,maintainAspectRatio:false,scales:{r:{min:0,max:100,ticks:{display:false,stepSize:25},grid:{color:"rgba(255,255,255,.06)"},angleLines:{color:"rgba(255,255,255,.06)"},pointLabels:{font:{size:mob?8:10}}}},plugins:{legend:{display:false}}}});const ba=G("tsBA");if(ba){const pcts=items.map(x=>Math.round(bd[x.k]/x.m*100));S.charts.bar=new Chart(ba,{type:"bar",data:{labels:items.map(x=>x.l),datasets:[{data:pcts,backgroundColor:pcts.map(p=>p>70?"#ef4444":p>40?"#f97316":p>20?"#eab308":"#22c55e"),borderRadius:4,barThickness:mob?12:14}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:"y",scales:{x:{min:0,max:100,grid:{color:"rgba(255,255,255,.04)"}},y:{grid:{display:false}}},plugins:{legend:{display:false}}}})}}}
-async function tsR(){cont.innerHTML=`<div class="tsps-ld"><div class="tsps-spinner"></div><p>Refreshing predictions...</p></div>`;try{const hdr={"User-Agent":"TSPS/2.0"};const[pR,aR]=await Promise.all([fetch(`https://api.weather.gov/points/${CFG.lat},${CFG.lon}`,{headers:hdr}),fetch(`https://api.weather.gov/alerts/active?point=${CFG.lat},${CFG.lon}`,{headers:hdr})]);if(!pR.ok)throw new Error("NWS unavailable");const pD=await pR.json(),fU=pD.properties?.forecastHourly;if(!fU)throw new Error("No forecast");const fR=await fetch(fU,{headers:hdr});if(!fR.ok)throw new Error("Forecast unavailable");const periods=(await fR.json()).properties?.periods||[];if(!periods.length)throw new Error("No data");let alerts=[];if(aR.ok)alerts=(await aR.json()).features||[];S.alerts=alerts;const now=Date.now();S.forecasts=[{h:3,l:"+3 HR"},{h:6,l:"+6 HR"},{h:9,l:"+9 HR"},{h:12,l:"+12 HR"},{h:24,l:"+24 HR"}].map(t=>{const tgt=now+t.h*3600000;let best=periods[0],bD=Infinity;for(const p of periods){const d=Math.abs(new Date(p.startTime).getTime()-tgt);if(d<bD){bD=d;best=p}}const{score,likelihood,breakdown}=cI(best,alerts);return{label:t.l,score,likelihood,breakdown,temp:best.temperature,wind:(best.windSpeed||"")+" "+(best.windDirection||""),pop:(best.probabilityOfPrecipitation&&best.probabilityOfPrecipitation.value)||0,shortForecast:best.shortForecast||"",detailedForecast:best.detailedForecast||""}});S.peakScore=Math.max(...S.forecasts.map(x=>x.score));S.lastUpdate=new Date();S.activeIdx=0;rM()}catch(e){cont.innerHTML=`<div class="tsps-ld"><p style="color:#ef4444">⚠ ${e.message}</p><p class="sub" style="margin-top:10px"><button class="tsps-rbtn" onclick="window.__tsR()">↻ Retry</button></p></div>`}}
-window.__tsR=tsR;tsR();setInterval(tsR,CFG.refresh);let rT;addEventListener("resize",()=>{clearTimeout(rT);rT=setTimeout(()=>{if(S.forecasts.length)rM()},300)})})();
-
-/* ═══ ALMANAC ═══ */
-const RDU_NORMALS_TEMP=[40.4,43.2,50.5,60.1,68.8,76.8,80.6,79.0,72.7,61.5,51.0,42.8];
-const RDU_NORMALS_PRECIP=[3.55,3.16,3.82,3.18,3.95,4.06,4.67,4.44,4.39,3.42,3.22,3.27];
-const MO_NAMES=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-async function fetchAlmanac(){const el=G("alm-content");try{const yr=new Date().getFullYear();const today=new Date().toISOString().split("T")[0];const r=await fetch(`https://archive-api.open-meteo.com/v1/archive?latitude=35.78&longitude=-78.64&start_date=${yr}-01-01&end_date=${today}&daily=temperature_2m_mean,precipitation_sum&temperature_unit=fahrenheit&precipitation_unit=inch&timezone=America%2FNew_York`);if(!r.ok)throw new Error("Archive API error");const d=await r.json(),dl=d.daily;
-const moTemp={},moPrec={},moCnt={};for(let i=0;i<dl.time.length;i++){const m=new Date(dl.time[i]+"T12:00:00").getMonth();if(!moTemp[m]){moTemp[m]=0;moPrec[m]=0;moCnt[m]=0}if(dl.temperature_2m_mean[i]!=null){moTemp[m]+=dl.temperature_2m_mean[i];moCnt[m]++}if(dl.precipitation_sum[i]!=null)moPrec[m]+=dl.precipitation_sum[i]}
-let ytdP=0,ytdTS=0,ytdD=0;for(let i=0;i<dl.time.length;i++){if(dl.precipitation_sum[i]!=null)ytdP+=dl.precipitation_sum[i];if(dl.temperature_2m_mean[i]!=null){ytdTS+=dl.temperature_2m_mean[i];ytdD++}}const ytdAT=ytdD?ytdTS/ytdD:0;
-const curMo=new Date().getMonth(),curDay=new Date().getDate(),dim=[31,28+(yr%4===0?1:0),31,30,31,30,31,31,30,31,30,31];let nP=0,nTT=0,nD=0;for(let m=0;m<12;m++){if(m<curMo){nP+=RDU_NORMALS_PRECIP[m];nTT+=RDU_NORMALS_TEMP[m]*dim[m];nD+=dim[m]}else if(m===curMo){const f=curDay/dim[m];nP+=RDU_NORMALS_PRECIP[m]*f;nTT+=RDU_NORMALS_TEMP[m]*curDay;nD+=curDay}}const nAT=nD?nTT/nD:0;const pDiff=ytdP-nP,tDiff=ytdAT-nAT;
-function dCls(d,th){return Math.abs(d)<th?"zero":d>0?"pos":"neg"}function dLbl(d,u,th){if(Math.abs(d)<th)return`<span class="alm-cmp normal">NORMAL</span>`;return`<span class="alm-cmp ${d>0?"above":"below"}">${d>0?"+":""}${d.toFixed(1)}${u} ${d>0?"ABOVE":"BELOW"}</span>`}
-let tMo="",pMo="";for(let m=0;m<12;m++){const iC=m===curMo,iF=m>curMo;const aT=moCnt[m]?moTemp[m]/moCnt[m]:null,tP=moPrec[m]||null;const td=aT!==null?aT-RDU_NORMALS_TEMP[m]:null,pd=tP!==null?tP-RDU_NORMALS_PRECIP[m]:null;
-tMo+=`<div class="alm-mo${iC?" current":""}${iF?" future":""}"><div class="alm-mo-name">${MO_NAMES[m]}</div><div class="alm-mo-val">${aT!==null?aT.toFixed(1)+"°":"—"}</div><div class="alm-mo-nrm">Nrm: ${RDU_NORMALS_TEMP[m].toFixed(1)}°</div>${td!==null?`<div class="alm-mo-diff ${dCls(td,.5)}">${Math.abs(td)<.5?"≈ Normal":(td>0?"+":"")+td.toFixed(1)+"°"}</div>`:""}</div>`;
-const pB=tP!==null?Math.min(100,Math.round(tP/Math.max(RDU_NORMALS_PRECIP[m],.01)*100)):0;const pC=pd!==null?(pd>.25?"#ff8844":pd<-.25?"#4488ff":"#00d44a"):"#333";
-pMo+=`<div class="alm-mo${iC?" current":""}${iF?" future":""}"><div class="alm-mo-name">${MO_NAMES[m]}</div><div class="alm-mo-val">${tP!==null?tP.toFixed(2)+'"':"—"}</div><div class="alm-mo-nrm">Nrm: ${RDU_NORMALS_PRECIP[m].toFixed(2)}"</div>${pd!==null?`<div class="alm-mo-diff ${dCls(pd,.25)}">${Math.abs(pd)<.25?"≈ Normal":(pd>0?"+":"")+pd.toFixed(2)+'"'}</div>`:""}${tP!==null?`<div class="alm-mo-bar"><div class="alm-mo-bar-fill" style="width:${pB}%;background:${pC}"></div></div>`:""}</div>`}
-el.innerHTML=`<div class="alm-summary"><div class="alm-big"><div class="alm-big-lbl">YTD Rainfall</div><div class="alm-big-val">${ytdP.toFixed(2)}"</div><div class="alm-big-sub">Normal: ${nP.toFixed(2)}"</div>${dLbl(pDiff,'"',.25)}</div><div class="alm-big"><div class="alm-big-lbl">YTD Avg Temp</div><div class="alm-big-val">${ytdAT.toFixed(1)}°F</div><div class="alm-big-sub">Normal: ${nAT.toFixed(1)}°F</div>${dLbl(tDiff,"°F",.5)}</div><div class="alm-big"><div class="alm-big-lbl">Days Tracked</div><div class="alm-big-val">${ytdD}</div><div class="alm-big-sub">${yr} Year-to-Date</div></div></div><div class="alm-grid"><div class="alm-card"><h3><span>🌡️</span> Monthly Avg Temperature</h3><div class="alm-mo-grid">${tMo}</div></div><div class="alm-card"><h3><span>🌧️</span> Monthly Rainfall Totals</h3><div class="alm-mo-grid">${pMo}</div></div></div><div class="alm-note">Data: Open-Meteo Historical Archive (ERA5) · RDU Airport · 30-year normals: 1991–2020 NCEI<br>Future months shown as placeholders · Updated on each visit</div>`;window.__almLoaded=true}catch(e){el.innerHTML=`<div class="alm-ld" style="color:#ef4444">⚠ ${e.message}<br><button onclick="fetchAlmanac()" style="margin-top:10px;background:var(--red2);border:1px solid var(--red);color:#fff;padding:6px 16px;border-radius:2px;cursor:pointer">↻ Retry</button></div>`}}
-
-/* ═══ PWS NETWORK ═══ */
-const PWS_STATIONS=[
-  {id:"KNCRALEI761",name:"Red Wolf Farm",loc:"S. Wake County / Garner",own:true},
-  {id:"KNCRALEI828",name:"G. Bragg",loc:"Raleigh"},
-  {id:"KNCRALEI1276",name:"Vorbeck Residence",loc:"Juniper"},
-  {id:"KNCRALEI1175",name:"Grayson Merrill",loc:"Raleigh"},
-  {id:"KNCRALEI668",name:"Jon Wall - near RDU",loc:"Northwest Raleigh"}
-];
-const WU_KEY="6532d6454b8aa370768e63d6ba5a832e";
-
-async function fetchPWS(){
-  const el=G("pws-content");
-  el.innerHTML='<div class="alm-ld"><div class="tsps-spinner"></div>Loading PWS observations...</div>';
-  const results=await Promise.allSettled(PWS_STATIONS.map(async st=>{
-    try{
-      const r=await fetch(`https://api.weather.com/v2/pws/observations/current?stationId=${st.id}&format=json&units=e&apiKey=${WU_KEY}`);
-      if(!r.ok)throw new Error(r.status);
-      const d=await r.json();
-      const obs=d.observations&&d.observations[0];
-      if(!obs)throw new Error("No data");
-      return{...st,obs,ok:true};
-    }catch(e){return{...st,ok:false,err:e.message}}
-  }));
-
-  const data=results.map(r=>r.value);
-  let html='<div class="pws-grid">';
-  data.forEach(st=>{
-    if(!st.ok){
-      html+=`<div class="pws-card${st.own?" own":""}"><div class="pws-left"><div class="pws-name">${st.name}</div><div class="pws-loc">${st.loc}</div><div class="pws-id">${st.id}</div></div><div class="pws-right"><div class="pws-err">Offline or unavailable</div></div></div>`;
-      return;
-    }
-    const o=st.obs,imp=o.imperial||{};
-    const temp=imp.temp!=null?imp.temp:"--";
-    const feels=imp.heatIndex!=null?imp.heatIndex:(imp.windChill!=null?imp.windChill:temp);
-    const humid=o.humidity!=null?o.humidity:"--";
-    const wspd=imp.windSpeed!=null?imp.windSpeed:"--";
-    const wgust=imp.windGust!=null?imp.windGust:"--";
-    const wdir=o.winddir!=null?deg2dir(o.winddir):"--";
-    const pres=imp.pressure!=null?imp.pressure:"--";
-    const precip=imp.precipTotal!=null?imp.precipTotal:"--";
-    const dewpt=imp.dewpt!=null?imp.dewpt:"--";
-    const uvi=o.uv!=null?o.uv:"--";
-    const solar=o.solarRadiation!=null?o.solarRadiation:"--";
-    const obsTime=o.obsTimeLocal?new Date(o.obsTimeLocal).toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit"}):"--";
-
-    html+=`<div class="pws-card${st.own?" own":""}">
-      <div class="pws-left">
-        <div class="pws-name">${st.own?"🐺 ":""}${st.name}</div>
-        <div class="pws-loc">${st.loc}</div>
-        <div class="pws-id">${st.id}</div>
-      </div>
-      <div class="pws-right">
-        <div class="pws-temp">${temp}<sup>°F</sup></div>
-        <div class="pws-updated">Updated ${obsTime}</div>
-      </div>
-    </div>
-    <style>.pws-card:nth-child(${data.indexOf(st)*2+1})+.pws-det-row{display:contents}</style>`;
-
-```
-// We'll append detail row as a full-width spanning element
-```
-
+function openTip(id) { $(id).classList.add("show"); }
+function closeTip(id) { $(id).classList.remove("show"); }
+document.querySelectorAll(".tip-overlay").forEach(function(o) {
+  o.addEventListener("click", function(e) { if (e.target === this) this.classList.remove("show"); });
 });
-html+=’</div>’;
 
-// Build detail sections per station
-html+=’<div style="margin-top:18px;display:flex;flex-direction:column;gap:14px">’;
-data.forEach(st=>{
-if(!st.ok)return;
-const o=st.obs,imp=o.imperial||{};
-const temp=imp.temp!=null?imp.temp:”–”;
-const feels=imp.heatIndex!=null?imp.heatIndex:(imp.windChill!=null?imp.windChill:temp);
-const humid=o.humidity!=null?o.humidity:”–”;
-const wspd=imp.windSpeed!=null?imp.windSpeed:”–”;
-const wgust=imp.windGust!=null?imp.windGust:”–”;
-const wdir=o.winddir!=null?deg2dir(o.winddir):”–”;
-const pres=imp.pressure!=null?imp.pressure:”–”;
-const precip=imp.precipTotal!=null?imp.precipTotal:”–”;
-const dewpt=imp.dewpt!=null?imp.dewpt:”–”;
-const uvi=o.uv!=null?o.uv:”–”;
-const solar=o.solarRadiation!=null?o.solarRadiation:”–”;
-
-```
-html+=`<div class="card" style="padding:14px${st.own?";border-top-color:var(--gold)":""}">
-  <div style="font-size:11px;font-weight:900;letter-spacing:1.5px;color:${st.own?"var(--gold)":"var(--red)"};text-transform:uppercase;margin-bottom:10px">${st.own?"🐺 ":""}${st.name} <span style="color:var(--mu);font-weight:500;letter-spacing:1px">· ${st.loc} · ${st.id}</span></div>
-  <div class="pws-details">
-    <div class="pws-det-item"><div class="pws-det-lbl">Temp</div><div class="pws-det-val">${temp}°F</div></div>
-    <div class="pws-det-item"><div class="pws-det-lbl">Feels Like</div><div class="pws-det-val">${feels}°F</div></div>
-    <div class="pws-det-item"><div class="pws-det-lbl">Humidity</div><div class="pws-det-val">${humid}%</div></div>
-    <div class="pws-det-item"><div class="pws-det-lbl">Dew Point</div><div class="pws-det-val">${dewpt}°F</div></div>
-    <div class="pws-det-item"><div class="pws-det-lbl">Wind</div><div class="pws-det-val">${wspd} mph</div><div class="pws-det-unit">${wdir}</div></div>
-    <div class="pws-det-item"><div class="pws-det-lbl">Gusts</div><div class="pws-det-val">${wgust} mph</div></div>
-    <div class="pws-det-item"><div class="pws-det-lbl">Pressure</div><div class="pws-det-val">${pres}</div><div class="pws-det-unit">inHg</div></div>
-    <div class="pws-det-item"><div class="pws-det-lbl">Precip</div><div class="pws-det-val">${precip}"</div><div class="pws-det-unit">today</div></div>
-    <div class="pws-det-item"><div class="pws-det-lbl">UV Index</div><div class="pws-det-val">${uvi}</div></div>
-    <div class="pws-det-item"><div class="pws-det-lbl">Solar Rad</div><div class="pws-det-val">${solar}</div><div class="pws-det-unit">W/m²</div></div>
-  </div>
-</div>`;
-```
-
-});
-html+=’</div>’;
-html+=’<div class="pws-note">Data: Weather Underground Personal Weather Stations · Wake County, NC<br>Your station (Red Wolf Farm) highlighted in gold · Auto-refreshes on tab switch</div>’;
-el.innerHTML=html;
-window.__pwsLoaded=true;
-// Allow re-fetch on subsequent tab switches for fresh data
-setTimeout(()=>{window.__pwsLoaded=false},120000);
+function switchTab(name, btn) {
+  document.querySelectorAll(".tab-pane").forEach(function(p) { p.classList.remove("active"); });
+  document.querySelectorAll(".tab-btn").forEach(function(b) { b.classList.remove("active"); });
+  $("tab-" + name).classList.add("active");
+  btn.classList.add("active");
+  if (name === "almanac" && !window._almLoaded) { fetchAlmanac(); }
+  if (name === "pws") { fetchPWS(); }
 }
 
-/* BOOT */
-seedExtended();async function refreshAll(){await Promise.allSettled([fetchConditions()])}refreshAll();fetchExtended();setInterval(refreshAll,5*60*1000);setInterval(fetchExtended,30*60*1000);
+var wmoDescMap = {0:"Clear Sky",1:"Mainly Clear",2:"Partly Cloudy",3:"Overcast",45:"Fog",48:"Icy Fog",51:"Light Drizzle",53:"Drizzle",55:"Heavy Drizzle",61:"Light Rain",63:"Rain",65:"Heavy Rain",71:"Light Snow",73:"Snow",75:"Heavy Snow",80:"Rain Showers",81:"Heavy Showers",82:"Violent Showers",95:"Thunderstorms",96:"T-Storm+Hail",99:"Severe T-Storm"};
+function wmoDesc(c) { return wmoDescMap[c] || "Unknown"; }
+function wmoIcon(c) { if(c===0)return"\u2600\uFE0F";if(c<=2)return"\uD83C\uDF24\uFE0F";if(c===3)return"\u2601\uFE0F";if(c<=48)return"\uD83C\uDF2B\uFE0F";if(c<=55)return"\uD83C\uDF26\uFE0F";if(c<=65)return"\uD83C\uDF27\uFE0F";if(c<=75)return"\u2744\uFE0F";if(c<=82)return"\uD83C\uDF26\uFE0F";return"\u26C8\uFE0F"; }
+function deg2dir(d) { var dirs=["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"]; return dirs[Math.round(d/22.5)%16]; }
+function uvLbl(v) { return v<=2?"Low":v<=5?"Moderate":v<=7?"High":v<=10?"Very High":"Extreme"; }
+function nwsIcon(d) { var s=d.toLowerCase(); if(s.indexOf("thunder")>=0)return"\u26C8\uFE0F";if(s.indexOf("snow")>=0)return"\u2744\uFE0F";if(s.indexOf("rain")>=0||s.indexOf("shower")>=0)return"\uD83C\uDF27\uFE0F";if(s.indexOf("fog")>=0)return"\uD83C\uDF2B\uFE0F";if(s.indexOf("cloud")>=0||s.indexOf("overcast")>=0)return"\u2601\uFE0F";if(s.indexOf("partly")>=0)return"\uD83C\uDF24\uFE0F";if(s.indexOf("sunny")>=0||s.indexOf("clear")>=0)return"\u2600\uFE0F";return"\uD83C\uDF21\uFE0F"; }
+
+// ============================================================
+// CLOCK
+// ============================================================
+function tickClock() {
+  var n = new Date();
+  $("clock").textContent = n.toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
+  $("cdate").textContent = n.toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric",year:"numeric"}).toUpperCase();
+  setTimeout(tickClock, 1000);
+}
+tickClock();
+
+// ============================================================
+// CAMS + GOES
+// ============================================================
+function showCamFb(wrapId, imgId, url) {
+  var wrap = $(wrapId); if (!wrap) return;
+  var img = $(imgId); if (img) img.style.display = "none";
+  if (wrap.querySelector(".cam-fb")) return;
+  var fb = document.createElement("div"); fb.className = "cam-fb";
+  fb.innerHTML = '<a href="' + url + '" target="_blank">VIEW LIVE CAM</a>';
+  wrap.insertBefore(fb, wrap.querySelector(".cam-overlay"));
+}
+function refreshCams() {
+  var ts = Date.now();
+  var gi = $("goes-img");
+  if (gi) gi.src = "https://cdn.star.nesdis.noaa.gov/GOES16/ABI/SECTOR/eus/GEOCOLOR/latest.jpg?t=" + ts;
+  var s = $("sugar-cam");
+  if (s && !$("sugar-wrap").querySelector(".cam-fb")) { s.style.display="block"; s.src="https://skisugar.com/webcam/base.jpg?t="+ts; }
+  var h = $("hat-cam");
+  if (h && !$("hat-wrap").querySelector(".cam-fb")) { h.style.display="block"; h.src="https://www.surfchex.com/webcam-images/hatteras.jpg?t="+ts; }
+}
+refreshCams();
+setInterval(refreshCams, 60000);
+
+// ============================================================
+// CONDITIONS (Open-Meteo)
+// ============================================================
+function applyConditions(t,feels,dew,humid,wspd,wdir,gust,pres,prec,uv,hi,lo,code,hourly) {
+  $("temp").textContent = t; $("temp").classList.remove("ld");
+  $("oatemp").textContent = t + "F";
+  $("feels").textContent = feels + "F";
+  $("dewpt").textContent = dew + "F";
+  $("humid").textContent = humid + "%";
+  $("wspd").textContent = wspd;
+  $("wdir").textContent = deg2dir(wdir) + " " + wdir;
+  $("gust").textContent = gust;
+  $("pres").textContent = pres;
+  $("prec").textContent = prec;
+  $("uv").textContent = uv;
+  $("uvl").textContent = uvLbl(uv);
+  $("hi").textContent = hi;
+  $("lo").textContent = lo;
+  $("cdesc").textContent = wmoDesc(code);
+  $("cupd").textContent = "Updated " + new Date().toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit",second:"2-digit"}) + " ET";
+  if (hourly) buildHourly(hourly);
+}
+
+function fetchConditions() {
+  fetch("https://api.open-meteo.com/v1/forecast?latitude=35.686&longitude=-78.614&current=temperature_2m,apparent_temperature,relative_humidity_2m,dew_point_2m,wind_speed_10m,wind_gusts_10m,wind_direction_10m,surface_pressure,precipitation,weather_code,uv_index&hourly=temperature_2m,weather_code,precipitation_probability&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=America%2FNew_York&forecast_days=2")
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    var c = d.current, dl = d.daily;
+    applyConditions(Math.round(c.temperature_2m),Math.round(c.apparent_temperature),Math.round(c.dew_point_2m),Math.round(c.relative_humidity_2m),Math.round(c.wind_speed_10m),Math.round(c.wind_direction_10m),Math.round(c.wind_gusts_10m),(c.surface_pressure*0.02953).toFixed(2),c.precipitation.toFixed(2),Math.round(c.uv_index),Math.round(dl.temperature_2m_max[0]),Math.round(dl.temperature_2m_min[0]),c.weather_code,d.hourly);
+  })
+  .catch(function() { $("cupd").textContent = "Data unavailable"; });
+}
+
+function buildHourly(h) {
+  var row = $("hr-row"); row.innerHTML = "";
+  var n = new Date(); var cnt = 0;
+  for (var i = 0; i < h.time.length && cnt < 14; i++) {
+    var t = new Date(h.time[i]); if (t < n && i > 0) continue;
+    var b = document.createElement("div"); b.className = "hr" + (cnt === 0 ? " now" : "");
+    var lbl = cnt === 0 ? "NOW" : t.toLocaleTimeString("en-US",{hour:"numeric",hour12:true});
+    var pp = (h.precipitation_probability || [])[i] || 0;
+    b.innerHTML = '<div class="hr-t">' + lbl + '</div><div class="hr-i">' + wmoIcon(h.weather_code[i]) + '</div><div class="hr-v">' + Math.round(h.temperature_2m[i]) + '</div>' + (pp > 15 ? '<div class="hr-p">' + pp + '%</div>' : '');
+    row.appendChild(b); cnt++;
+  }
+}
+
+// ============================================================
+// 7-DAY FORECAST
+// ============================================================
+function seedExtended() {
+  var grid = $("ext-grid"); if (!grid) return;
+  var h = "";
+  for (var i = 0; i < 7; i++) {
+    var dt = new Date(); dt.setDate(dt.getDate() + i);
+    var dow = i === 0 ? "Today" : dt.toLocaleDateString("en-US",{weekday:"short"});
+    var date = dt.toLocaleDateString("en-US",{month:"short",day:"numeric"});
+    h += '<div class="ext-day' + (i===0?' today':'') + '"><div class="ext-dow">' + dow + '</div><div class="ext-date">' + date + '</div><div class="ext-icon ld">--</div><div class="ext-desc" style="color:var(--mu2)">Loading...</div><div class="ext-temps"><span class="ext-hi" style="color:var(--mu2)">--</span><span class="ext-lo">--</span></div></div>';
+  }
+  grid.innerHTML = h;
+}
+
+function buildRangeBar(hi, lo, mn, mx) {
+  var range = mx - mn || 1;
+  var l = Math.round(((lo - mn) / range) * 100);
+  var w = Math.max(8, Math.round(((hi - lo) / range) * 100));
+  var c = hi >= 80 ? "#ff6600" : hi >= 60 ? "#ffcc00" : "#4488ff";
+  return '<div class="ext-range"><span class="ext-range-lo" style="left:' + Math.max(0,l-1) + '%">' + lo + '</span><div class="ext-range-track" style="left:' + l + '%;width:' + w + '%;background:linear-gradient(90deg,#4488ff,' + c + ')"></div><span class="ext-range-hi" style="left:' + Math.min(88,l+w+1) + '%">' + hi + '</span></div>';
+}
+
+function fetchExtended() {
+  var grid = $("ext-grid"); if (!grid) return;
+  fetch("https://api.open-meteo.com/v1/forecast?latitude=35.686&longitude=-78.614&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max,wind_speed_10m_max&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=7")
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    var dl = d.daily;
+    var allT = dl.temperature_2m_max.concat(dl.temperature_2m_min);
+    var mn = Math.min.apply(null, allT), mx = Math.max.apply(null, allT);
+    var h = "";
+    dl.time.forEach(function(t, i) {
+      var dt = new Date(t + "T12:00:00");
+      var dow = i === 0 ? "Today" : dt.toLocaleDateString("en-US",{weekday:"short"});
+      var date = dt.toLocaleDateString("en-US",{month:"short",day:"numeric"});
+      var hi = Math.round(dl.temperature_2m_max[i]), lo = Math.round(dl.temperature_2m_min[i]);
+      var pop = dl.precipitation_probability_max[i] || 0;
+      h += '<div class="ext-day' + (i===0?' today':'') + '"><div class="ext-dow">' + dow + '</div><div class="ext-date">' + date + '</div><div class="ext-icon">' + wmoIcon(dl.weather_code[i]) + '</div><div class="ext-desc">' + wmoDesc(dl.weather_code[i]) + '</div><div class="ext-temps"><span class="ext-hi">' + hi + '</span><span class="ext-lo">' + lo + '</span></div>' + (pop>10?'<div class="ext-pop">' + pop + '%</div>':'') + buildRangeBar(hi,lo,mn,mx) + '<div class="ext-wind">' + Math.round(dl.wind_speed_10m_max[i]) + ' mph</div></div>';
+    });
+    grid.innerHTML = h;
+  })
+  .catch(function() { grid.innerHTML = '<div style="color:var(--mu);padding:16px">Forecast unavailable</div>'; });
+}
+
+// ============================================================
+// TUFFY'S STORM PREDICTION SYSTEM
+// ============================================================
+var TSPS_CFG = {lat:35.7113, lon:-78.6141, name:"Red Wolf Farm - S. Wake County, NC", refresh:300000};
+var TSPS_HKW = {tornado:30,tornadoes:30,funnel:25,"tornado watch":22,"tornado warning":30,"damaging wind":20,"destructive wind":25,derecho:28,"large hail":20,"giant hail":25,"golf ball":20,"severe thunderstorm":18,supercell:22,hurricane:30,"tropical storm":22,flooding:15,"flash flood":20,thunder:8,thunderstorm:10,storm:6,lightning:7,hail:12,"heavy rain":8,downpour:7,gusty:6,windy:5};
+var TSPS_ASEV = {Extreme:35,Severe:25,Moderate:15,Minor:8,Unknown:5};
+var TSPS_ACOL = {"Tornado Warning":"#ff0000","Severe Thunderstorm Warning":"#ffa500","Tornado Watch":"#ffff00","Flash Flood Warning":"#8b0000","Flood Warning":"#00ff00","Special Weather Statement":"#ffe4b5"};
+var tspsState = {forecasts:[], alerts:[], activeIdx:0, lastUpdate:null, charts:{}, peakScore:0};
+
+function tsps_sevLevel(s) {
+  if (s < 10) return {label:"NONE",color:"#1a6b3a",desc:"No severe weather expected"};
+  if (s < 25) return {label:"LOW",color:"#22c55e",desc:"Minimal threat"};
+  if (s < 50) return {label:"GUARDED",color:"#eab308",desc:"Strong storms possible"};
+  if (s < 75) return {label:"ELEVATED",color:"#f97316",desc:"Severe storms likely"};
+  if (s < 90) return {label:"HIGH",color:"#ef4444",desc:"Damaging weather expected"};
+  return {label:"EXTREME",color:"#dc2626",desc:"Life-threatening weather"};
+}
+
+function tsps_computeIndex(p, alerts) {
+  var bd = {wind:0,gusts:0,precip:0,instability:0,textual:0,alerts:0};
+  var ws = parseInt(p.windSpeed) || 0;
+  var wg = parseInt(p.windGust) || 0;
+  var pop = (p.probabilityOfPrecipitation && p.probabilityOfPrecipitation.value) || 0;
+  var temp = p.temperature || 70;
+  var dpRaw = p.dewpoint && p.dewpoint.value;
+  var dp = dpRaw != null ? (dpRaw * 9/5 + 32) : null;
+  var txt = ((p.detailedForecast||"") + " " + (p.shortForecast||"")).toLowerCase();
+
+  if (ws>=60) bd.wind=20; else if (ws>=45) bd.wind=16; else if (ws>=30) bd.wind=12; else if (ws>=20) bd.wind=7; else if (ws>=15) bd.wind=4; else if (ws>=10) bd.wind=2;
+  var eg = Math.max(wg, ws*1.3);
+  if (eg>=70) bd.gusts=18; else if (eg>=58) bd.gusts=15; else if (eg>=45) bd.gusts=12; else if (eg>=35) bd.gusts=8; else if (eg>=25) bd.gusts=4; else if (eg>=15) bd.gusts=1;
+  if (pop>=90) bd.precip=14; else if (pop>=70) bd.precip=11; else if (pop>=50) bd.precip=8; else if (pop>=30) bd.precip=5; else if (pop>=15) bd.precip=2;
+  if (dp !== null) { var sp=temp-dp; if(sp<=3&&temp>=75) bd.instability=16; else if(sp<=5&&temp>=70) bd.instability=13; else if(sp<=8&&temp>=65) bd.instability=9; else if(sp<=12&&temp>=60) bd.instability=6; else if(sp<=15) bd.instability=3; }
+  else if (pop>=50 && temp>=70) bd.instability=8;
+
+  var maxTxt=0, hits=0;
+  for (var kw in TSPS_HKW) { if (txt.indexOf(kw) >= 0) { maxTxt = Math.max(maxTxt, TSPS_HKW[kw]); hits++; } }
+  bd.textual = Math.min(22, maxTxt + Math.min(hits*1.5, 8));
+
+  if (alerts && alerts.length > 0) { var mx=0; alerts.forEach(function(a){mx=Math.max(mx,TSPS_ASEV[a.properties&&a.properties.severity]||5);}); bd.alerts=Math.min(10,mx*(1+Math.min(alerts.length-1,3)*0.15)); }
+
+  var score = Math.min(100, Math.round(bd.wind+bd.gusts+bd.precip+bd.instability+bd.textual+bd.alerts));
+  var likelihood = Math.min(99, Math.round((pop*0.35)+(score*0.45)+(bd.textual>10?15:bd.textual>5?8:0)+(alerts&&alerts.length>0?5:0)));
+  return {score:score, likelihood:likelihood, breakdown:bd};
+}
+
+function tsps_hexToRgb(hex) {
+  hex = hex.replace("#","");
+  return parseInt(hex.substr(0,2),16)+","+parseInt(hex.substr(2,2),16)+","+parseInt(hex.substr(4,2),16);
+}
+
+function tsps_gaugeSize() {
+  var w = $("tsps").clientWidth || 300;
+  return Math.min(230, Math.max(180, w * 0.55));
+}
+
+function tsps_buildGauge(score, size) {
+  var lv = tsps_sevLevel(score);
+  var r=size*0.38, cx=size/2, cy=size/2+10, sA=-220, eA=40, tot=eA-sA, scA=sA+(score/100)*tot;
+  function p2c(a,rd){return{x:cx+rd*Math.cos(a*Math.PI/180),y:cy+rd*Math.sin(a*Math.PI/180)};}
+  function arc(a1,a2,rd){var s=p2c(a1,rd),e=p2c(a2,rd);return"M "+s.x+" "+s.y+" A "+rd+" "+rd+" 0 "+(a2-a1>180?1:0)+" 1 "+e.x+" "+e.y;}
+  var ticks=[0,10,25,50,75,90,100], tk="";
+  ticks.forEach(function(t){
+    var a=sA+(t/100)*tot,i=p2c(a,r-12),o=p2c(a,r+12),l=p2c(a,r+22);
+    tk+='<line x1="'+i.x+'" y1="'+i.y+'" x2="'+o.x+'" y2="'+o.y+'" stroke="rgba(255,255,255,.2)" stroke-width="1.5"/>';
+    tk+='<text x="'+l.x+'" y="'+l.y+'" fill="rgba(255,255,255,.35)" font-size="8" text-anchor="middle" dominant-baseline="middle">'+t+'</text>';
+  });
+  var np=p2c(scA,r-2), h=size*0.72;
+  return '<svg viewBox="0 0 '+size+' '+h+'" style="width:100%;max-width:'+size+'px;height:auto"><defs><linearGradient id="tsG" x1="0%" x2="100%"><stop offset="0%" stop-color="#1a472a"/><stop offset="25%" stop-color="#22c55e"/><stop offset="45%" stop-color="#eab308"/><stop offset="65%" stop-color="#f97316"/><stop offset="80%" stop-color="#ef4444"/><stop offset="100%" stop-color="#dc2626"/></linearGradient><filter id="tsGl"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><path d="'+arc(sA,eA,r)+'" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="14" stroke-linecap="round"/><path d="'+arc(sA,scA,r)+'" fill="none" stroke="url(#tsG)" stroke-width="14" stroke-linecap="round" filter="url(#tsGl)"/>'+tk+'<circle cx="'+np.x+'" cy="'+np.y+'" r="5.5" fill="'+lv.color+'" filter="url(#tsGl)"/><text x="'+cx+'" y="'+(cy-16)+'" fill="'+lv.color+'" font-size="38" font-weight="800" text-anchor="middle" dominant-baseline="middle" filter="url(#tsGl)">'+score+'</text><text x="'+cx+'" y="'+(cy+10)+'" fill="'+lv.color+'" font-size="12" font-weight="700" text-anchor="middle" letter-spacing="3">'+lv.label+'</text><text x="'+cx+'" y="'+(cy+27)+'" fill="rgba(255,255,255,.45)" font-size="8" text-anchor="middle">'+lv.desc+'</text></svg>';
+}
+
+function tsps_destroyCharts() {
+  ["tl","radar","bar"].forEach(function(k){if(tspsState.charts[k]){tspsState.charts[k].destroy();tspsState.charts[k]=null;}});
+}
+
+function tsps_renderMain() {
+  var pk=tspsState.peakScore, pkL=tsps_sevLevel(pk), f=tspsState.forecasts, al=tspsState.alerts;
+  var pw=f.length?f.reduce(function(a,b){return a.score>b.score?a:b;}).label:"--";
+  var ml=f.length?Math.max.apply(null,f.map(function(x){return x.likelihood;})):0;
+  var gs=tsps_gaugeSize();
+  var root=$("tsps"), pulse=$("tspsPulseBar"), cont=$("tspsContent");
+
+  if(pk>=50){root.classList.add("tsps-threat");pulse.style.background="linear-gradient(90deg,transparent,"+pkL.color+",transparent)";}else{root.classList.remove("tsps-threat");}
+
+  var aH="";
+  if(al.length>0){
+    var items="";
+    al.slice(0,6).forEach(function(a){var e=(a.properties&&a.properties.event)||"Alert";var c=TSPS_ACOL[e]||"#7b68ee";items+='<div class="tsps-al-item"><div class="tsps-al-dot" style="background:'+c+';box-shadow:0 0 6px '+c+'"></div><span class="tsps-al-ev">'+e+'</span><span class="tsps-al-src">'+(a.properties&&a.properties.senderName||"NWS")+'</span></div>';});
+    aH='<div class="tsps-alerts"><div class="tsps-al-hdr"><span>!!!</span><span>ACTIVE ALERTS - '+al.length+'</span></div>'+items+'</div>';
+  }
+
+  var cH="";
+  f.forEach(function(fc,i){
+    var lv=tsps_sevLevel(fc.score),isA=i===tspsState.activeIdx;
+    cH+='<div class="tsps-fc'+(isA?" act":"")+'" data-idx="'+i+'" style="background:'+(isA?"rgba("+tsps_hexToRgb(lv.color)+",.12)":"rgba(255,255,255,.025)")+';border-color:'+(isA?lv.color+"77":"rgba(255,255,255,.05)")+'"><div class="fc-lbl">'+fc.label+'</div><div><span class="fc-score" style="color:'+lv.color+'">'+fc.score+'</span><span class="fc-unit">/100</span></div><div class="fc-threat" style="color:'+lv.color+'88">'+lv.label+'</div><div class="fc-lk"><span class="fc-lk-l">Likelihood</span><span class="fc-lk-v" style="color:'+lv.color+'">'+fc.likelihood+'%</span></div><div class="fc-bar"><div class="fc-bar-f" style="width:'+fc.likelihood+'%;background:'+lv.color+'"></div></div><div class="fc-meta">'+(fc.temp!=null?fc.temp+"F":"")+(fc.wind?" - "+fc.wind:"")+'</div></div>';
+  });
+
+  var af=f[tspsState.activeIdx]; var afL=af?tsps_sevLevel(af.score):{color:"#888",label:"--"};
+  var dH="";
+  if(af){
+    dH='<div class="tsps-det"><div class="tsps-det-hdr"><div><div class="tsps-det-per">ANALYSIS - '+af.label+'</div><div class="tsps-det-fc">'+(af.shortForecast||"--")+'</div></div><div style="text-align:right"><div class="tsps-det-sc" style="color:'+afL.color+'">'+af.score+'</div><div class="tsps-det-lv" style="color:'+afL.color+'">'+afL.label+'</div></div></div><div class="tsps-det-mg"><div class="tsps-dm"><div class="dm-l">TEMP</div><div class="dm-v">'+(af.temp!=null?af.temp+"F":"--")+'</div></div><div class="tsps-dm"><div class="dm-l">WIND</div><div class="dm-v">'+(af.wind||"--")+'</div></div><div class="tsps-dm"><div class="dm-l">PRECIP</div><div class="dm-v">'+(af.pop||0)+'%</div></div><div class="tsps-dm"><div class="dm-l">LIKELIHOOD</div><div class="dm-v">'+af.likelihood+'%</div></div></div>'+(af.detailedForecast?'<div class="tsps-det-nar" style="border-left-color:'+afL.color+'44"><b>NWS:</b> '+af.detailedForecast+'</div>':'')+'</div>';
+  }
+
+  cont.innerHTML = '<div class="tsps-hdr"><div class="tsps-hdr-l"><div class="tsps-tag">PROPRIETARY MODEL</div><h2><span class="tsps-r">Tuffy\'s</span> Storm Prediction System <div class="tip-btn" onclick="openTip(\'tipTSPS\')" style="font-size:10px;width:18px;height:18px">?</div></h2><div class="tsps-loc">'+TSPS_CFG.name+' - NWS-powered intelligence</div></div><div class="tsps-hdr-r"><div class="tsps-ulbl">LAST UPDATE</div><div class="tsps-utime">'+(tspsState.lastUpdate?tspsState.lastUpdate.toLocaleTimeString():"--")+'</div><button class="tsps-rbtn" id="tspsRB">Refresh</button></div></div>'+aH+'<div class="tsps-top"><div class="tsps-gauge-w"><div class="tsps-gauge-lbl">PEAK SEVERE WEATHER INDEX</div>'+tsps_buildGauge(pk,gs)+'</div><div class="tsps-stats"><div class="tsps-sbox"><div class="tsps-slbl">PEAK WINDOW</div><div class="tsps-sval" style="color:'+pkL.color+'">'+pw+'</div></div><div class="tsps-sbox"><div class="tsps-slbl">ACTIVE ALERTS</div><div class="tsps-sval" style="color:'+(al.length>0?"#ef4444":"#22c55e")+'">'+(al.length>0?al.length+" ACTIVE":"ALL CLEAR")+'</div></div><div class="tsps-sbox"><div class="tsps-slbl">MAX LIKELIHOOD</div><div class="tsps-sval" style="color:rgba(255,255,255,.85)">'+ml+'%</div></div></div></div><div class="tsps-sec-lbl">FORECAST PERIODS</div><div class="tsps-cards">'+cH+'</div><div class="tsps-tl-box"><div class="tsps-ct">SEVERITY TIMELINE</div><canvas id="tsTL"></canvas></div><div class="tsps-ch-row"><div class="tsps-ch-box"><div class="tsps-ct">THREAT RADAR</div><canvas id="tsRD"></canvas></div><div class="tsps-ch-box"><div class="tsps-ct">COMPONENT BREAKDOWN</div><canvas id="tsBA"></canvas></div></div>'+dH+'<div class="tsps-foot"><span>TSPS v2.0 - Proprietary Index - NWS API</span><span>Auto-refresh 5 min</span></div>';
+
+  $("tspsRB").addEventListener("click", function(){ tsps_refresh(); });
+  document.querySelectorAll(".tsps-fc").forEach(function(c){
+    c.addEventListener("click", function(){ tspsState.activeIdx=parseInt(this.getAttribute("data-idx")); tsps_renderMain(); tsps_buildCharts(); });
+  });
+  tsps_buildCharts();
+}
+
+function tsps_buildCharts() {
+  tsps_destroyCharts();
+  var f=tspsState.forecasts; if(!f.length) return;
+  var af=f[tspsState.activeIdx], labels=f.map(function(x){return x.label;}), scores=f.map(function(x){return x.score;}), lks=f.map(function(x){return x.likelihood;});
+  var pkL=tsps_sevLevel(tspsState.peakScore), afL=tsps_sevLevel(af?af.score:0);
+  var mob=window.innerWidth<600;
+
+  Chart.defaults.color="rgba(255,255,255,.4)"; Chart.defaults.borderColor="rgba(255,255,255,.06)";
+  Chart.defaults.font.family="'Segoe UI',sans-serif"; Chart.defaults.font.size=mob?9:10;
+
+  var tlEl=$("tsTL");
+  if(tlEl) tspsState.charts.tl=new Chart(tlEl,{type:"line",data:{labels:labels,datasets:[{label:"Severity",data:scores,borderColor:pkL.color,backgroundColor:pkL.color+"30",fill:true,tension:.4,borderWidth:2,pointRadius:mob?3:4,pointBackgroundColor:scores.map(function(s){return tsps_sevLevel(s).color;})},{label:"Likelihood",data:lks,borderColor:"#60a5fa",borderDash:[5,4],fill:false,tension:.4,borderWidth:1.5,pointRadius:mob?2:3}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{min:0,max:100,grid:{color:"rgba(255,255,255,.04)"}},x:{grid:{display:false}}},plugins:{legend:{labels:{boxWidth:10,padding:mob?8:16}}}}});
+
+  if(af && af.breakdown){
+    var bd=af.breakdown;
+    var items=[{k:"wind",l:"Wind",m:20},{k:"gusts",l:"Gusts",m:18},{k:"precip",l:"Precip",m:14},{k:"instability",l:"Instab.",m:16},{k:"textual",l:"Fcst Text",m:22},{k:"alerts",l:"Alerts",m:10}];
+    var rdEl=$("tsRD");
+    if(rdEl) tspsState.charts.radar=new Chart(rdEl,{type:"radar",data:{labels:items.map(function(x){return x.l;}),datasets:[{data:items.map(function(x){return Math.round(bd[x.k]/x.m*100);}),borderColor:afL.color,backgroundColor:afL.color+"25",borderWidth:2,pointRadius:mob?2:3,pointBackgroundColor:afL.color}]},options:{responsive:true,maintainAspectRatio:false,scales:{r:{min:0,max:100,ticks:{display:false,stepSize:25},grid:{color:"rgba(255,255,255,.06)"},angleLines:{color:"rgba(255,255,255,.06)"},pointLabels:{font:{size:mob?8:10}}}},plugins:{legend:{display:false}}}});
+
+    var baEl=$("tsBA");
+    if(baEl){var pcts=items.map(function(x){return Math.round(bd[x.k]/x.m*100);});tspsState.charts.bar=new Chart(baEl,{type:"bar",data:{labels:items.map(function(x){return x.l;}),datasets:[{data:pcts,backgroundColor:pcts.map(function(p){return p>70?"#ef4444":p>40?"#f97316":p>20?"#eab308":"#22c55e";}),borderRadius:4,barThickness:mob?12:14}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:"y",scales:{x:{min:0,max:100,grid:{color:"rgba(255,255,255,.04)"}},y:{grid:{display:false}}},plugins:{legend:{display:false}}}});}
+  }
+}
+
+function tsps_refresh() {
+  $("tspsContent").innerHTML = '<div class="tsps-ld"><div class="tsps-spinner"></div><p>Refreshing predictions...</p></div>';
+  var hdr = {"User-Agent":"TSPS/2.0"};
+  Promise.all([
+    fetch("https://api.weather.gov/points/"+TSPS_CFG.lat+","+TSPS_CFG.lon, {headers:hdr}),
+    fetch("https://api.weather.gov/alerts/active?point="+TSPS_CFG.lat+","+TSPS_CFG.lon, {headers:hdr})
+  ]).then(function(responses){
+    if(!responses[0].ok) throw new Error("NWS unavailable");
+    return Promise.all([responses[0].json(), responses[1].ok ? responses[1].json() : {features:[]}]);
+  }).then(function(data){
+    var pD=data[0], aD=data[1];
+    var fUrl=pD.properties && pD.properties.forecastHourly;
+    if(!fUrl) throw new Error("No forecast URL");
+    tspsState.alerts = aD.features || [];
+    return fetch(fUrl, {headers:{"User-Agent":"TSPS/2.0"}});
+  }).then(function(r){
+    if(!r.ok) throw new Error("Forecast unavailable");
+    return r.json();
+  }).then(function(fcData){
+    var periods = fcData.properties && fcData.properties.periods;
+    if(!periods || !periods.length) throw new Error("No data");
+    var now = Date.now();
+    var targets = [{h:3,l:"+3 HR"},{h:6,l:"+6 HR"},{h:9,l:"+9 HR"},{h:12,l:"+12 HR"},{h:24,l:"+24 HR"}];
+    tspsState.forecasts = targets.map(function(t){
+      var tgt = now + t.h*3600000;
+      var best = periods[0], bD = Infinity;
+      periods.forEach(function(p){ var d=Math.abs(new Date(p.startTime).getTime()-tgt); if(d<bD){bD=d;best=p;} });
+      var result = tsps_computeIndex(best, tspsState.alerts);
+      return {label:t.l, score:result.score, likelihood:result.likelihood, breakdown:result.breakdown, temp:best.temperature, wind:(best.windSpeed||"")+" "+(best.windDirection||""), pop:(best.probabilityOfPrecipitation&&best.probabilityOfPrecipitation.value)||0, shortForecast:best.shortForecast||"", detailedForecast:best.detailedForecast||""};
+    });
+    tspsState.peakScore = Math.max.apply(null, tspsState.forecasts.map(function(x){return x.score;}));
+    tspsState.lastUpdate = new Date();
+    tspsState.activeIdx = 0;
+    tsps_renderMain();
+  }).catch(function(e){
+    $("tspsContent").innerHTML = '<div class="tsps-ld"><p style="color:#ef4444">' + e.message + '</p><p class="sub" style="margin-top:10px"><button class="tsps-rbtn" onclick="tsps_refresh()">Retry</button></p></div>';
+  });
+}
+
+tsps_refresh();
+setInterval(tsps_refresh, TSPS_CFG.refresh);
+var tspsResizeTimer;
+window.addEventListener("resize", function(){ clearTimeout(tspsResizeTimer); tspsResizeTimer=setTimeout(function(){ if(tspsState.forecasts.length) tsps_renderMain(); },300); });
+
+// ============================================================
+// ALMANAC
+// ============================================================
+var RDU_NTEMP = [40.4,43.2,50.5,60.1,68.8,76.8,80.6,79.0,72.7,61.5,51.0,42.8];
+var RDU_NPREC = [3.55,3.16,3.82,3.18,3.95,4.06,4.67,4.44,4.39,3.42,3.22,3.27];
+var MO_NAMES = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+function fetchAlmanac() {
+  var el = $("alm-content");
+  var yr = new Date().getFullYear();
+  var today = new Date().toISOString().split("T")[0];
+  fetch("https://archive-api.open-meteo.com/v1/archive?latitude=35.78&longitude=-78.64&start_date="+yr+"-01-01&end_date="+today+"&daily=temperature_2m_mean,precipitation_sum&temperature_unit=fahrenheit&precipitation_unit=inch&timezone=America%2FNew_York")
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    var dl = d.daily;
+    var moTemp={}, moPrec={}, moCnt={};
+    for(var i=0;i<dl.time.length;i++){
+      var m=new Date(dl.time[i]+"T12:00:00").getMonth();
+      if(!moTemp[m]){moTemp[m]=0;moPrec[m]=0;moCnt[m]=0;}
+      if(dl.temperature_2m_mean[i]!=null){moTemp[m]+=dl.temperature_2m_mean[i];moCnt[m]++;}
+      if(dl.precipitation_sum[i]!=null) moPrec[m]+=dl.precipitation_sum[i];
+    }
+    var ytdP=0,ytdTS=0,ytdD=0;
+    for(var j=0;j<dl.time.length;j++){if(dl.precipitation_sum[j]!=null)ytdP+=dl.precipitation_sum[j];if(dl.temperature_2m_mean[j]!=null){ytdTS+=dl.temperature_2m_mean[j];ytdD++;}}
+    var ytdAT=ytdD?ytdTS/ytdD:0;
+    var curMo=new Date().getMonth(), curDay=new Date().getDate();
+    var dim=[31,28+(yr%4===0?1:0),31,30,31,30,31,31,30,31,30,31];
+    var nP=0,nTT=0,nD=0;
+    for(var m2=0;m2<12;m2++){if(m2<curMo){nP+=RDU_NPREC[m2];nTT+=RDU_NTEMP[m2]*dim[m2];nD+=dim[m2];}else if(m2===curMo){var frac=curDay/dim[m2];nP+=RDU_NPREC[m2]*frac;nTT+=RDU_NTEMP[m2]*curDay;nD+=curDay;}}
+    var nAT=nD?nTT/nD:0;
+    var pDiff=ytdP-nP, tDiff=ytdAT-nAT;
+    function dLbl(d,u,th){if(Math.abs(d)<th)return'<span class="alm-cmp normal">NORMAL</span>';return'<span class="alm-cmp '+(d>0?"above":"below")+'">'+(d>0?"+":"")+d.toFixed(1)+u+" "+(d>0?"ABOVE":"BELOW")+'</span>';}
+    var tMo="",pMo="";
+    for(var m3=0;m3<12;m3++){
+      var iC=m3===curMo,iF=m3>curMo;
+      var aT=moCnt[m3]?moTemp[m3]/moCnt[m3]:null;
+      var tP=moPrec[m3]!=null&&moCnt[m3]?moPrec[m3]:null;
+      var td=aT!==null?aT-RDU_NTEMP[m3]:null;
+      var pd=tP!==null?tP-RDU_NPREC[m3]:null;
+      tMo+='<div class="alm-mo'+(iC?" current":"")+(iF?" future":"")+'"><div class="alm-mo-name">'+MO_NAMES[m3]+'</div><div class="alm-mo-val">'+(aT!==null?aT.toFixed(1):"--")+'</div><div class="alm-mo-nrm">Nrm: '+RDU_NTEMP[m3].toFixed(1)+'</div>'+(td!==null?'<div class="alm-mo-diff '+(Math.abs(td)<0.5?"zero":td>0?"pos":"neg")+'">'+(Math.abs(td)<0.5?"Normal":(td>0?"+":"")+td.toFixed(1))+'</div>':'')+'</div>';
+      var pB=tP!==null?Math.min(100,Math.round(tP/Math.max(RDU_NPREC[m3],0.01)*100)):0;
+      var pC=pd!==null?(pd>0.25?"#ff8844":pd<-0.25?"#4488ff":"#00d44a"):"#333";
+      pMo+='<div class="alm-mo'+(iC?" current":"")+(iF?" future":"")+'"><div class="alm-mo-name">'+MO_NAMES[m3]+'</div><div class="alm-mo-val">'+(tP!==null?tP.toFixed(2)+'"':"--")+'</div><div class="alm-mo-nrm">Nrm: '+RDU_NPREC[m3].toFixed(2)+'"</div>'+(pd!==null?'<div class="alm-mo-diff '+(Math.abs(pd)<0.25?"zero":pd>0?"pos":"neg")+'">'+(Math.abs(pd)<0.25?"Normal":(pd>0?"+":"")+pd.toFixed(2)+'"')+'</div>':'')+(tP!==null?'<div class="alm-mo-bar"><div class="alm-mo-bar-fill" style="width:'+pB+'%;background:'+pC+'"></div></div>':'')+'</div>';
+    }
+    el.innerHTML='<div class="alm-summary"><div class="alm-big"><div class="alm-big-lbl">YTD Rainfall</div><div class="alm-big-val">'+ytdP.toFixed(2)+'"</div><div class="alm-big-sub">Normal: '+nP.toFixed(2)+'"</div>'+dLbl(pDiff,'"',0.25)+'</div><div class="alm-big"><div class="alm-big-lbl">YTD Avg Temp</div><div class="alm-big-val">'+ytdAT.toFixed(1)+'F</div><div class="alm-big-sub">Normal: '+nAT.toFixed(1)+'F</div>'+dLbl(tDiff,"F",0.5)+'</div><div class="alm-big"><div class="alm-big-lbl">Days Tracked</div><div class="alm-big-val">'+ytdD+'</div><div class="alm-big-sub">'+yr+' Year-to-Date</div></div></div><div class="alm-grid"><div class="alm-card"><h3><span>T</span> Monthly Avg Temperature</h3><div class="alm-mo-grid">'+tMo+'</div></div><div class="alm-card"><h3><span>R</span> Monthly Rainfall Totals</h3><div class="alm-mo-grid">'+pMo+'</div></div></div><div class="alm-note">Data: Open-Meteo Historical Archive (ERA5) - RDU Airport - 30-year normals: 1991-2020 NCEI</div>';
+    window._almLoaded=true;
+  })
+  .catch(function(e){ el.innerHTML='<div class="alm-ld" style="color:#ef4444">'+e.message+'<br><button onclick="fetchAlmanac()" style="margin-top:10px;background:var(--red2);border:1px solid var(--red);color:#fff;padding:6px 16px;border-radius:2px;cursor:pointer">Retry</button></div>'; });
+}
+
+// ============================================================
+// PWS NETWORK
+// ============================================================
+var PWS_STATIONS = [
+  {id:"KNCRALEI761", name:"Red Wolf Farm", loc:"S. Wake County / Garner", own:true},
+  {id:"KNCRALEI828", name:"G. Bragg", loc:"Raleigh", own:false},
+  {id:"KNCRALEI1276", name:"Vorbeck Residence", loc:"Juniper", own:false},
+  {id:"KNCRALEI1175", name:"Grayson Merrill", loc:"Raleigh", own:false},
+  {id:"KNCRALEI668", name:"Jon Wall - near RDU", loc:"Northwest Raleigh", own:false}
+];
+
+function fetchPWS() {
+  var el = $("pws-content");
+  el.innerHTML = '<div class="alm-ld"><div class="tsps-spinner"></div>Loading PWS data...</div>';
+
+  // Use Open-Meteo as reliable free source for each station's approximate location
+  // WU API requires a key; we'll use a known community endpoint
+  var promises = PWS_STATIONS.map(function(st) {
+    return fetch("https://api.weather.com/v2/pws/observations/current?stationId=" + st.id + "&format=json&units=e&apiKey=6532d6454b8aa370768e63d6ba5a832e")
+    .then(function(r) { if(!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function(d) {
+      var obs = d.observations && d.observations[0];
+      if (!obs) throw new Error("No data");
+      return {id:st.id, name:st.name, loc:st.loc, own:st.own, obs:obs, ok:true};
+    })
+    .catch(function() { return {id:st.id, name:st.name, loc:st.loc, own:st.own, ok:false}; });
+  });
+
+  Promise.all(promises).then(function(results) {
+    var html = '<div style="display:flex;flex-direction:column;gap:14px">';
+    results.forEach(function(st) {
+      var isOwn = st.own;
+      if (!st.ok) {
+        html += '<div class="pws-station' + (isOwn?" own":"") + '"><div class="pws-top"><div><div class="pws-name">' + (isOwn?"&#x1F43A; ":"") + st.name + '</div><div class="pws-loc">' + st.loc + '</div><div class="pws-id">' + st.id + '</div></div><div><div class="pws-err">Offline or unavailable</div></div></div></div>';
+        return;
+      }
+      var o = st.obs;
+      var imp = o.imperial || {};
+      var temp = imp.temp != null ? imp.temp : "--";
+      var feels = imp.heatIndex != null ? imp.heatIndex : (imp.windChill != null ? imp.windChill : temp);
+      var humid = o.humidity != null ? o.humidity : "--";
+      var wspd = imp.windSpeed != null ? imp.windSpeed : "--";
+      var wgust = imp.windGust != null ? imp.windGust : "--";
+      var wdir = o.winddir != null ? deg2dir(o.winddir) : "--";
+      var pres = imp.pressure != null ? imp.pressure : "--";
+      var precip = imp.precipTotal != null ? imp.precipTotal : "--";
+      var dewpt = imp.dewpt != null ? imp.dewpt : "--";
+      var uvi = o.uv != null ? o.uv : "--";
+      var solar = o.solarRadiation != null ? o.solarRadiation : "--";
+      var obsTime = o.obsTimeLocal ? new Date(o.obsTimeLocal).toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit"}) : "--";
+
+      html += '<div class="pws-station' + (isOwn?" own":"") + '">';
+      html += '<div class="pws-top"><div><div class="pws-name">' + (isOwn?"&#x1F43A; ":"") + st.name + '</div><div class="pws-loc">' + st.loc + '</div><div class="pws-id">' + st.id + '</div></div><div><div class="pws-temp">' + temp + '<sup>F</sup></div><div class="pws-updated">Updated ' + obsTime + '</div></div></div>';
+      html += '<div class="pws-grid">';
+      html += '<div class="pws-stat"><div class="pws-stat-lbl">Feels</div><div class="pws-stat-val">' + feels + 'F</div></div>';
+      html += '<div class="pws-stat"><div class="pws-stat-lbl">Humidity</div><div class="pws-stat-val">' + humid + '%</div></div>';
+      html += '<div class="pws-stat"><div class="pws-stat-lbl">Dewpt</div><div class="pws-stat-val">' + dewpt + 'F</div></div>';
+      html += '<div class="pws-stat"><div class="pws-stat-lbl">Wind</div><div class="pws-stat-val">' + wspd + '</div><div class="pws-stat-unit">' + wdir + '</div></div>';
+      html += '<div class="pws-stat"><div class="pws-stat-lbl">Gusts</div><div class="pws-stat-val">' + wgust + '</div><div class="pws-stat-unit">mph</div></div>';
+      html += '<div class="pws-stat"><div class="pws-stat-lbl">Pressure</div><div class="pws-stat-val">' + pres + '</div><div class="pws-stat-unit">inHg</div></div>';
+      html += '<div class="pws-stat"><div class="pws-stat-lbl">Precip</div><div class="pws-stat-val">' + precip + '"</div><div class="pws-stat-unit">today</div></div>';
+      html += '<div class="pws-stat"><div class="pws-stat-lbl">UV</div><div class="pws-stat-val">' + uvi + '</div></div>';
+      html += '<div class="pws-stat"><div class="pws-stat-lbl">Solar</div><div class="pws-stat-val">' + solar + '</div><div class="pws-stat-unit">W/m2</div></div>';
+      html += '<div class="pws-stat"><div class="pws-stat-lbl">Temp</div><div class="pws-stat-val">' + temp + 'F</div></div>';
+      html += '</div></div>';
+    });
+    html += '</div>';
+    html += '<div class="alm-note">Data: Weather Underground Personal Weather Stations - Wake County, NC<br>Your station (Red Wolf Farm) highlighted in gold - Refreshes each tab switch</div>';
+    el.innerHTML = html;
+  });
+}
+
+// ============================================================
+// BOOT
+// ============================================================
+seedExtended();
+
+function refreshAll() {
+  fetchConditions();
+}
+
+refreshAll();
+fetchExtended();
+setInterval(refreshAll, 300000);
+setInterval(fetchExtended, 1800000);
 </script>
 
 </body>
