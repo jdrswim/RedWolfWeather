@@ -4,7 +4,8 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Wolfpack Weather | NC Storm Intelligence</title>
-<meta name="description" content="Live NC weather — Storm Intelligence, NWS alerts, NEXRAD radar, 7-day forecast."/>
+<meta name="description" content="Live NC weather — Tuffy's Storm Prediction System, NWS alerts, NEXRAD radar, 7-day forecast."/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root{
   --red:#CC0000;--red2:#990000;--red3:#5a0000;
@@ -76,60 +77,106 @@ main{max-width:1440px;margin:0 auto;padding:18px}
 .hlbox:last-child .hllbl{color:#77aaff}
 .hlval{font-size:28px;font-weight:200;color:var(--white)}
 
-/* STORM INTEL */
-.sis-wrap{background:var(--p1);border:1px solid var(--bd);border-radius:3px;overflow:hidden}
-.t-banner{padding:14px 18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;border-bottom:1px solid var(--bd);transition:background .6s}
-.tb-left{display:flex;align-items:center;gap:14px}
-.tb-icon{font-size:28px}
-.tb-info h2{font-size:16px;font-weight:900;letter-spacing:1px;text-transform:uppercase}
-.tb-info p{font-size:12px;color:rgba(255,255,255,.6);margin-top:3px}
-.tl-box{padding:6px 18px;border-radius:2px;text-align:center;border:1px solid}
-.tl-lbl{font-size:8px;font-weight:900;letter-spacing:3px;color:rgba(255,255,255,.55);text-transform:uppercase}
-.tl-val{font-size:15px;font-weight:900;letter-spacing:1px}
-.conn-badge{font-size:9px;font-weight:800;letter-spacing:1.5px;padding:3px 10px;border-radius:2px;text-transform:uppercase}
-.conn-poll{background:rgba(255,170,0,.15);color:#ffaa00;border:1px solid rgba(255,170,0,.3)}
-.conn-live{background:rgba(0,180,60,.2);color:var(--green);border:1px solid rgba(0,180,60,.4)}
-.risk-row{display:flex;border-bottom:1px solid var(--bd)}
-.rpill{flex:1;padding:8px 4px;text-align:center;font-size:9px;font-weight:900;letter-spacing:1px;text-transform:uppercase;border-right:1px solid var(--bd);position:relative;transition:background .3s}
-.rpill:last-child{border-right:none}
-.rpill.act::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:currentColor}
-.sis-grid{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--bd)}
-@media(max-width:680px){.sis-grid{grid-template-columns:1fr}}
-.sis-col{padding:14px 16px;border-right:1px solid var(--bd)}
-.sis-col:last-child{border-right:none}
-.col-hdr{font-size:10px;font-weight:900;letter-spacing:2px;color:var(--red);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:7px}
-.col-hdr .dot{width:6px;height:6px;border-radius:50%;background:var(--red);animation:pulse 1.3s infinite;flex-shrink:0}
-.al-list{display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto}
-.al-item{background:var(--p3);border-left:3px solid;border-radius:2px;padding:8px 10px}
-.al-ev{font-size:12px;font-weight:700;color:var(--white)}
-.al-area{font-size:10px;color:var(--mu);margin-top:2px}
-.al-ts{font-size:9px;color:var(--mu2);margin-top:2px}
-.no-al{font-size:12px;color:var(--green);display:flex;align-items:center;gap:8px;padding:8px 0}
-.hrrr-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.hp{background:var(--p3);border:1px solid var(--bd);border-radius:2px;padding:9px 11px}
-.hp-lbl{font-size:9px;font-weight:700;letter-spacing:1.5px;color:var(--mu);text-transform:uppercase;margin-bottom:3px}
-.hp-val{font-size:17px;font-weight:300;color:var(--white)}
-.hp-unit{font-size:9px;color:var(--mu2);margin-top:1px}
-.hp-bar{height:3px;background:var(--bd2);border-radius:2px;margin-top:5px;overflow:hidden}
-.hp-fill{height:100%;border-radius:2px;transition:width .8s}
-.wind-grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.wstat{background:var(--p3);border:1px solid var(--bd);border-radius:2px;padding:9px 11px}
-.wlbl{font-size:9px;font-weight:700;letter-spacing:1px;color:var(--mu);text-transform:uppercase;margin-bottom:3px}
-.wval{font-size:17px;font-weight:300;color:var(--white)}
-.compass-row{display:flex;align-items:center;gap:12px;margin-top:10px}
-.cring{width:72px;height:72px;border:2px solid var(--bd2);border-radius:50%;position:relative;flex-shrink:0}
-.cring::before{content:'N';position:absolute;top:-1px;left:50%;transform:translateX(-50%) translateY(-105%);font-size:9px;font-weight:900;color:var(--red)}
-.cring::after{content:'S';position:absolute;bottom:-1px;left:50%;transform:translateX(-50%) translateY(105%);font-size:9px;color:var(--mu)}
-.carrow{position:absolute;width:2px;height:30px;background:linear-gradient(var(--red) 50%,var(--mu) 50%);border-radius:1px;top:50%;left:50%;transform-origin:bottom center;transition:transform 1.2s cubic-bezier(.4,0,.2,1)}
-.future-box{background:var(--p3);border:1px solid var(--bd);border-radius:2px;padding:13px;text-align:center;color:var(--mu2);font-size:10px;line-height:1.9;margin-bottom:8px}
-.future-box strong{display:block;margin-bottom:3px;color:var(--mu);font-size:11px;letter-spacing:1px}
-.hist{max-height:140px;overflow-y:auto;font-family:'Courier New',monospace}
-.hrow{display:flex;gap:9px;padding:3px 0;border-bottom:1px solid var(--bd);font-size:10px}
-.hts{color:var(--mu2);flex-shrink:0;width:56px}
-.hev{color:var(--mu)}
-.hev.warn{color:#ff8844}
-.hev.crit{color:#ff3333}
-.hev.ok{color:var(--green)}
+/* ═══════════════════════════════════════════════════════
+   TUFFY'S STORM PREDICTION SYSTEM (TSPS)
+   ═══════════════════════════════════════════════════════ */
+#tsps{font-family:'Segoe UI',system-ui,sans-serif;position:relative;overflow:hidden}
+#tsps *{box-sizing:border-box}
+#tsps .tsps-pulse{position:absolute;top:0;left:0;right:0;height:2px;opacity:0;transition:opacity .5s}
+#tsps.tsps-threat .tsps-pulse{animation:tspsPulse 2s ease-in-out infinite}
+@keyframes tspsPulse{0%,100%{opacity:.35}50%{opacity:1}}
+@keyframes tspsSpin{to{transform:rotate(360deg)}}
+@keyframes tspsFadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.tsps-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+.tsps-hdr-l .tsps-tag{font-size:9px;font-weight:700;color:rgba(255,255,255,.25);letter-spacing:2.5px}
+.tsps-hdr-l h2{font-size:20px;font-weight:800;letter-spacing:-.3px;margin-top:3px}
+.tsps-hdr-l h2 .tsps-r{color:#ef4444}
+.tsps-hdr-l .tsps-loc{font-size:10px;color:rgba(255,255,255,.3);margin-top:4px}
+.tsps-hdr-r{text-align:right}
+.tsps-hdr-r .tsps-ulbl{font-size:8px;color:rgba(255,255,255,.2);letter-spacing:1px}
+.tsps-hdr-r .tsps-utime{font-size:10px;color:rgba(255,255,255,.45);margin-top:2px}
+.tsps-hdr-r .tsps-rbtn{font-size:9px;color:#60a5fa;cursor:pointer;margin-top:4px;background:none;border:none;font-family:inherit}
+.tsps-hdr-r .tsps-rbtn:hover{color:#93c5fd}
+.tsps-hdr-r .tsps-err{font-size:9px;color:#ef4444;margin-top:3px}
+
+/* Alerts bar */
+.tsps-alerts{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:10px 14px;margin-bottom:18px;animation:tspsFadeIn .4s ease}
+.tsps-al-hdr{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.tsps-al-hdr span:first-child{font-size:13px}
+.tsps-al-hdr span:last-child{font-size:11px;font-weight:700;color:#ef4444;letter-spacing:1.5px}
+.tsps-al-item{display:flex;align-items:center;gap:8px;padding:4px 0;border-top:1px solid rgba(255,255,255,.04)}
+.tsps-al-item:first-child{border-top:none}
+.tsps-al-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.tsps-al-ev{font-size:10px;color:rgba(255,255,255,.8);font-weight:600}
+.tsps-al-src{font-size:9px;color:rgba(255,255,255,.25);margin-left:auto}
+
+/* Top gauge + stats */
+.tsps-top{display:flex;justify-content:center;align-items:center;gap:28px;margin-bottom:22px;flex-wrap:wrap}
+.tsps-gauge-w{text-align:center}
+.tsps-gauge-lbl{font-size:8px;font-weight:700;color:rgba(255,255,255,.25);letter-spacing:2px;margin-bottom:4px}
+.tsps-stats{display:flex;flex-direction:column;gap:7px;min-width:170px}
+.tsps-sbox{background:rgba(255,255,255,.025);border-radius:8px;padding:9px 13px;border:1px solid rgba(255,255,255,.05)}
+.tsps-sbox .tsps-slbl{font-size:8px;color:rgba(255,255,255,.25);letter-spacing:1px}
+.tsps-sbox .tsps-sval{font-size:14px;font-weight:700;margin-top:2px}
+
+/* Forecast cards */
+.tsps-sec-lbl{font-size:8px;font-weight:700;color:rgba(255,255,255,.25);letter-spacing:2px;margin-bottom:8px}
+.tsps-cards{display:flex;gap:8px;margin-bottom:8px;overflow-x:auto;padding-bottom:4px}
+.tsps-cards::-webkit-scrollbar{height:3px}
+.tsps-cards::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:3px}
+.tsps-fc{min-width:125px;flex:1 1 0;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.05);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all .25s ease}
+.tsps-fc:hover{background:rgba(255,255,255,.04)}
+.tsps-fc.act{transform:scale(1.03)}
+.tsps-fc .fc-lbl{font-size:9px;color:rgba(255,255,255,.4);font-weight:600;letter-spacing:1px;margin-bottom:5px}
+.tsps-fc .fc-score{font-size:26px;font-weight:800;line-height:1}
+.tsps-fc .fc-unit{font-size:10px;color:rgba(255,255,255,.3);margin-left:3px}
+.tsps-fc .fc-threat{font-size:8px;margin-top:3px;letter-spacing:.5px}
+.tsps-fc .fc-lk{display:flex;justify-content:space-between;align-items:center;margin-top:7px}
+.tsps-fc .fc-lk-l{font-size:8px;color:rgba(255,255,255,.25)}
+.tsps-fc .fc-lk-v{font-size:12px;font-weight:700}
+.tsps-fc .fc-bar{height:2px;background:rgba(255,255,255,.05);border-radius:2px;margin-top:5px;overflow:hidden}
+.tsps-fc .fc-bar-f{height:100%;border-radius:2px;transition:width .5s ease}
+.tsps-fc .fc-meta{margin-top:6px;font-size:8px;color:rgba(255,255,255,.25)}
+
+/* Charts */
+.tsps-tl-box{background:rgba(255,255,255,.02);border-radius:10px;padding:14px;border:1px solid rgba(255,255,255,.05);margin-top:14px}
+.tsps-tl-box .tsps-ct{font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1px;margin-bottom:10px}
+.tsps-tl-box canvas{width:100%!important;max-height:155px}
+.tsps-ch-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+.tsps-ch-box{background:rgba(255,255,255,.02);border-radius:10px;padding:14px;border:1px solid rgba(255,255,255,.05)}
+.tsps-ch-box .tsps-ct{font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1px;margin-bottom:10px}
+.tsps-ch-box canvas{width:100%!important;max-height:195px}
+
+/* Detail panel */
+.tsps-det{background:rgba(255,255,255,.02);border-radius:10px;padding:18px;border:1px solid rgba(255,255,255,.05);margin-top:14px;animation:tspsFadeIn .3s ease}
+.tsps-det-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px}
+.tsps-det-per{font-size:10px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px}
+.tsps-det-fc{font-size:11px;color:rgba(255,255,255,.55);margin-top:3px}
+.tsps-det-sc{font-size:32px;font-weight:800;line-height:1}
+.tsps-det-lv{font-size:9px;font-weight:700;letter-spacing:1.5px;margin-top:2px;text-align:right}
+.tsps-det-mg{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.tsps-dm{background:rgba(255,255,255,.03);border-radius:6px;padding:9px 10px;text-align:center}
+.tsps-dm .dm-l{font-size:7px;color:rgba(255,255,255,.25);letter-spacing:1px;margin-bottom:3px}
+.tsps-dm .dm-v{font-size:15px;font-weight:700;color:rgba(255,255,255,.85)}
+.tsps-det-nar{font-size:10px;color:rgba(255,255,255,.4);line-height:1.7;padding:10px 12px;background:rgba(255,255,255,.02);border-radius:6px;border-left:3px solid rgba(255,255,255,.06)}
+.tsps-det-nar b{color:rgba(255,255,255,.55)}
+
+/* Footer */
+.tsps-foot{margin-top:18px;padding-top:12px;border-top:1px solid rgba(255,255,255,.04);display:flex;justify-content:space-between;flex-wrap:wrap;gap:5px}
+.tsps-foot span{font-size:7px;color:rgba(255,255,255,.15)}
+
+/* Loading */
+.tsps-ld{text-align:center;padding:40px 20px}
+.tsps-spinner{width:36px;height:36px;border:3px solid rgba(255,255,255,.07);border-top-color:#60a5fa;border-radius:50%;margin:0 auto 14px;animation:tspsSpin .8s linear infinite}
+.tsps-ld p{font-size:11px;color:rgba(255,255,255,.35)}
+.tsps-ld p.sub{font-size:9px;color:rgba(255,255,255,.18);margin-top:4px}
+
+@media(max-width:700px){
+  .tsps-ch-row{grid-template-columns:1fr}
+  .tsps-det-mg{grid-template-columns:repeat(2,1fr)}
+  .tsps-top{flex-direction:column}
+}
 
 /* HOURLY */
 .hourly-wrap{overflow-x:auto}
@@ -192,10 +239,10 @@ footer strong{color:var(--red)}
   <div class="ticker-inner">
     <div class="ticker-track" id="ticker">
       <span>LIVE CONDITIONS · KNCRALEI761 · GARNER, NC</span>
-      <span>STORM INTELLIGENCE SYSTEM ACTIVE · NWS ALERTS MONITORED</span>
+      <span>TUFFY'S STORM PREDICTION SYSTEM ACTIVE · NWS ALERTS MONITORED</span>
       <span>NC STATE WOLFPACK WEATHER NETWORK · GO PACK</span>
       <span>LIVE CONDITIONS · KNCRALEI761 · GARNER, NC</span>
-      <span>STORM INTELLIGENCE SYSTEM ACTIVE · NWS ALERTS MONITORED</span>
+      <span>TUFFY'S STORM PREDICTION SYSTEM ACTIVE · NWS ALERTS MONITORED</span>
       <span>NC STATE WOLFPACK WEATHER NETWORK · GO PACK</span>
     </div>
   </div>
@@ -269,77 +316,17 @@ footer strong{color:var(--red)}
       </div>
     </div>
 
-    <!-- STORM INTELLIGENCE -->
+    <!-- ═══════════════════════════════════════════════════════
+         TUFFY'S STORM PREDICTION SYSTEM — replaces old SIS
+         ═══════════════════════════════════════════════════════ -->
     <div style="margin-top:18px">
-      <div class="sec">Storm Intelligence System <em>· SIS v1.0 · NWS + NEXRAD</em>
-        <span class="conn-badge conn-poll" id="conn-badge">● POLLING</span>
-      </div>
-      <div class="sis-wrap">
-        <div class="t-banner" id="t-banner" style="background:linear-gradient(135deg,#091509,#111)">
-          <div class="tb-left">
-            <div class="tb-icon" id="t-icon">🟢</div>
-            <div class="tb-info">
-              <h2 id="t-title" style="color:var(--green)">All Clear</h2>
-              <p id="t-sub">No active watches, warnings, or advisories for NC</p>
-            </div>
+      <div class="sec">Tuffy's Storm Prediction System <em>· TSPS v2.0 · NWS-Powered</em></div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <div id="tsps" style="padding:20px 22px">
+          <div class="tsps-pulse" id="tspsPulseBar"></div>
+          <div id="tspsContent">
+            <div class="tsps-ld"><div class="tsps-spinner"></div><p>Initializing Storm Prediction System...</p><p class="sub">Fetching NWS data for Garner, NC</p></div>
           </div>
-          <div class="tl-box" id="tl-box" style="background:rgba(0,180,60,.12);border-color:rgba(0,180,60,.4)">
-            <div class="tl-lbl">Threat Level</div>
-            <div class="tl-val" id="tl-val" style="color:var(--green)">NONE</div>
-          </div>
-        </div>
-        <div class="risk-row">
-          <div class="rpill act" id="rp0" style="color:var(--green);background:rgba(0,180,60,.1)">None</div>
-          <div class="rpill" id="rp1" style="color:#4488aa">Advisory</div>
-          <div class="rpill" id="rp2" style="color:#555">Watch</div>
-          <div class="rpill" id="rp3" style="color:#555">Warning</div>
-          <div class="rpill" id="rp4" style="color:#555">Extreme</div>
-        </div>
-        <div class="sis-grid">
-          <div class="sis-col">
-            <div class="col-hdr"><div class="dot"></div>Live NWS Alerts · NC</div>
-            <div class="al-list" id="al-list"><div class="ld" style="font-size:11px">Connecting to NWS...</div></div>
-          </div>
-          <div class="sis-col">
-            <div class="col-hdr" id="col2-hdr">Atmospheric Parameters</div>
-            <div id="col2-content">
-              <div class="hrrr-grid">
-                <div class="hp"><div class="hp-lbl">MLCAPE</div><div class="hp-val" id="h-cape">--</div><div class="hp-unit">J/kg</div><div class="hp-bar"><div class="hp-fill" id="hb-cape" style="width:0%;background:var(--orange)"></div></div></div>
-                <div class="hp"><div class="hp-lbl">0-1km SRH</div><div class="hp-val" id="h-srh1">--</div><div class="hp-unit">m²/s²</div><div class="hp-bar"><div class="hp-fill" id="hb-srh1" style="width:0%;background:var(--yellow)"></div></div></div>
-                <div class="hp"><div class="hp-lbl">0-3km SRH</div><div class="hp-val" id="h-srh3">--</div><div class="hp-unit">m²/s²</div><div class="hp-bar"><div class="hp-fill" id="hb-srh3" style="width:0%;background:var(--yellow)"></div></div></div>
-                <div class="hp"><div class="hp-lbl">Eff. Shear</div><div class="hp-val" id="h-eshr">--</div><div class="hp-unit">kts</div><div class="hp-bar"><div class="hp-fill" id="hb-eshr" style="width:0%;background:var(--cyan)"></div></div></div>
-                <div class="hp" style="border-color:rgba(255,80,80,.3)"><div class="hp-lbl" style="color:#ff6666">STP</div><div class="hp-val" id="h-stp">--</div><div class="hp-unit">sig. tornado</div><div class="hp-bar"><div class="hp-fill" id="hb-stp" style="width:0%;background:var(--red)"></div></div></div>
-                <div class="hp" style="border-color:rgba(255,160,0,.3)"><div class="hp-lbl" style="color:#ffaa44">SCP</div><div class="hp-val" id="h-scp">--</div><div class="hp-unit">supercell comp.</div><div class="hp-bar"><div class="hp-fill" id="hb-scp" style="width:0%;background:var(--orange)"></div></div></div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="sis-grid" style="border-top:1px solid var(--bd)">
-          <div class="sis-col">
-            <div class="col-hdr">Wind & Rotation Data</div>
-            <div class="wind-grid2">
-              <div class="wstat"><div class="wlbl">Speed</div><div class="wval" id="sw-spd">--</div><div style="font-size:9px;color:var(--mu);margin-top:1px">mph</div></div>
-              <div class="wstat"><div class="wlbl">Gusts</div><div class="wval" id="sw-gst">--</div><div style="font-size:9px;color:var(--mu);margin-top:1px">mph</div></div>
-              <div class="wstat"><div class="wlbl">Direction</div><div class="wval" id="sw-dir">--</div></div>
-              <div class="wstat"><div class="wlbl">Shear</div><div class="wval" id="sw-shr" style="font-size:13px">--</div><div style="font-size:9px;color:var(--mu);margin-top:1px">s⁻¹</div></div>
-            </div>
-            <div class="compass-row">
-              <div class="cring"><div class="carrow" id="carrow" style="transform:translate(-50%,-100%) rotate(0deg);top:50%;left:50%"></div></div>
-              <div style="font-size:10px;color:var(--mu);line-height:2">
-                <div>Rotation: <span id="sw-rot">No Doppler Data</span></div>
-                <div style="font-size:9px;color:var(--mu2);margin-top:2px">NEXRAD Vr · connect backend</div>
-              </div>
-            </div>
-          </div>
-          <div class="sis-col">
-            <div class="col-hdr">Radar Enhancement Overlay</div>
-            <div class="future-box"><strong>⬡ NEXRAD LEVEL II RENDERER</strong>WebGL reflectivity + velocity on MapLibre<br><span style="font-size:9px">Active when backend WS connected · KRAX / KLTX / KMHX</span></div>
-            <div class="future-box"><strong>◈ MESO-VORTEX TRACKER + NOWCAST</strong>Hook echo / BWER · 0–60 min blended extrapolation<br><span style="font-size:9px">NEXRAD + HRRR blending · SIS v2.0</span></div>
-          </div>
-        </div>
-        <div style="padding:12px 16px;border-top:1px solid var(--bd)">
-          <div class="col-hdr" style="margin-bottom:8px">Alert History Log</div>
-          <div class="hist" id="hist-log"></div>
         </div>
       </div>
     </div>
@@ -358,9 +345,7 @@ footer strong{color:var(--red)}
     <div style="margin-top:18px">
       <div class="sec">7-Day Extended Forecast <em>· NWS · Garner, NC</em></div>
       <div class="card" id="ext-forecast" style="padding:18px">
-        <div class="ext-grid" id="ext-grid">
-          <!-- seeded immediately by JS below -->
-        </div>
+        <div class="ext-grid" id="ext-grid"></div>
       </div>
     </div>
 
@@ -402,10 +387,13 @@ footer strong{color:var(--red)}
 <footer>
   <p><strong>Wolfpack Weather</strong> · Station <strong>KNCRALEI761</strong> · Garner, NC</p>
   <p>Weather: Open-Meteo · Alerts: NWS api.weather.gov · Radar: Windy.com + NWS KRAX</p>
-  <p>Storm Intelligence System v1.0 · Inspired by <em>The Weather Channel "Local on the 8s"</em> · NC State Athletics</p>
+  <p>Tuffy's Storm Prediction System v2.0 · Wolfpack Weather Network · NC State Athletics</p>
 </footer>
 
 <script>
+/* ═══════════════════════════════════════════════════════════════
+   SITE CORE — Clock, Cams, Conditions, Hourly, 7-Day
+   ═══════════════════════════════════════════════════════════════ */
 const G = id => document.getElementById(id);
 const NOW = () => new Date();
 const clamp = (v,lo,hi) => Math.max(lo,Math.min(hi,v));
@@ -426,44 +414,26 @@ const nwsIcon = d => {const s=d.toLowerCase();if(s.includes("thunder"))return"�
 })();
 
 /* ── CAMS ── */
-function showCamFb(wrapId, imgId, url, label, site){
-  const wrap=G(wrapId); if(!wrap)return;
-  const img=G(imgId); if(img)img.style.display="none";
-  const existing=wrap.querySelector(".cam-fb"); if(existing)return;
-  const fb=document.createElement("div"); fb.className="cam-fb";
+function showCamFb(wrapId,imgId,url,label,site){
+  const wrap=G(wrapId);if(!wrap)return;
+  const img=G(imgId);if(img)img.style.display="none";
+  const existing=wrap.querySelector(".cam-fb");if(existing)return;
+  const fb=document.createElement("div");fb.className="cam-fb";
   fb.innerHTML=`<div class="cam-fb-title">${label}</div><a href="${url}" target="_blank" rel="noopener">VIEW LIVE CAM →</a><div class="cam-fb-sub">Opens ${site} in new tab</div>`;
   wrap.insertBefore(fb,wrap.querySelector(".cam-overlay"));
 }
 function refreshCams(){
   const ts=Date.now();
   const s=G("sugar-cam");
-  if(s&&s.style.display!=="none"||!G("sugar-wrap").querySelector(".cam-fb")){
-    s.style.display="block";
-    s.src=`https://skisugar.com/webcam/base.jpg?t=${ts}`;
-  }
+  if(s&&s.style.display!=="none"||!G("sugar-wrap").querySelector(".cam-fb")){s.style.display="block";s.src=`https://skisugar.com/webcam/base.jpg?t=${ts}`;}
   const h=G("hat-cam");
-  if(h&&h.style.display!=="none"||!G("hat-wrap").querySelector(".cam-fb")){
-    h.style.display="block";
-    h.src=`https://www.surfchex.com/webcam-images/hatteras.jpg?t=${ts}`;
-  }
+  if(h&&h.style.display!=="none"||!G("hat-wrap").querySelector(".cam-fb")){h.style.display="block";h.src=`https://www.surfchex.com/webcam-images/hatteras.jpg?t=${ts}`;}
 }
-refreshCams();
-setInterval(refreshCams,60000);
-
-/* ── HISTORY LOG ── */
-let histLog=[];
-function addHist(msg,cls=""){
-  const ts=NOW().toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
-  histLog.unshift({ts,msg,cls});
-  if(histLog.length>60)histLog.pop();
-  G("hist-log").innerHTML=histLog.map(h=>`<div class="hrow"><span class="hts">${h.ts}</span><span class="hev ${h.cls}">${h.msg}</span></div>`).join("");
-}
-addHist("SIS initialized · Wolfpack Weather v1.0","ok");
+refreshCams();setInterval(refreshCams,60000);
 
 /* ── CONDITIONS ── */
-let windDeg=0;
 function applyConditions(t,feels,dew,humid,wspd,wdir,gust,pres,prec,uv,hi,lo,code,hourly){
-  G("temp").textContent=t; G("temp").classList.remove("ld");
+  G("temp").textContent=t;G("temp").classList.remove("ld");
   G("oatemp").textContent=t+"°F";
   G("feels").textContent=feels+"°F";
   G("dewpt").textContent=dew+"°F";
@@ -479,140 +449,64 @@ function applyConditions(t,feels,dew,humid,wspd,wdir,gust,pres,prec,uv,hi,lo,cod
   G("lo").textContent=lo;
   G("cdesc").textContent=wmoDesc(code);
   G("cupd").textContent="Updated "+NOW().toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit",second:"2-digit"})+" ET";
-  windDeg=wdir;
-  G("sw-spd").textContent=wspd; G("sw-gst").textContent=gust; G("sw-dir").textContent=deg2dir(wdir);
-  G("carrow").style.transform=`translate(-50%,-100%) rotate(${wdir}deg)`;
   const msg=`GARNER NC · ${t}°F · ${wmoDesc(code).toUpperCase()} · WIND ${wspd} MPH ${deg2dir(wdir)} · HUMIDITY ${humid}% · HI/LO ${hi}°/${lo}°F`;
-  G("ticker").innerHTML=`<span>${msg}</span><span>NC WOLFPACK WEATHER · SIS ACTIVE</span><span>${msg}</span><span>NC WOLFPACK WEATHER · SIS ACTIVE</span>`;
+  G("ticker").innerHTML=`<span>${msg}</span><span>TUFFY'S STORM PREDICTION SYSTEM ACTIVE · WOLFPACK WEATHER</span><span>${msg}</span><span>TUFFY'S STORM PREDICTION SYSTEM ACTIVE · WOLFPACK WEATHER</span>`;
   if(hourly)buildHourly(hourly);
 }
 async function fetchOpenMeteo(){
   const url="https://api.open-meteo.com/v1/forecast?latitude=35.686&longitude=-78.614&current=temperature_2m,apparent_temperature,relative_humidity_2m,dew_point_2m,wind_speed_10m,wind_gusts_10m,wind_direction_10m,surface_pressure,precipitation,weather_code,uv_index&hourly=temperature_2m,weather_code,precipitation_probability&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=America%2FNew_York&forecast_days=2";
-  const r=await fetch(url); if(!r.ok)throw new Error("OM "+r.status);
-  const d=await r.json(); const c=d.current,dl=d.daily;
+  const r=await fetch(url);if(!r.ok)throw new Error("OM "+r.status);
+  const d=await r.json();const c=d.current,dl=d.daily;
   applyConditions(Math.round(c.temperature_2m),Math.round(c.apparent_temperature),Math.round(c.dew_point_2m),Math.round(c.relative_humidity_2m),Math.round(c.wind_speed_10m),Math.round(c.wind_direction_10m),Math.round(c.wind_gusts_10m),(c.surface_pressure*0.02953).toFixed(2),c.precipitation.toFixed(2),Math.round(c.uv_index),Math.round(dl.temperature_2m_max[0]),Math.round(dl.temperature_2m_min[0]),c.weather_code,d.hourly);
 }
 async function fetchWttr(){
-  const r=await fetch("https://wttr.in/Garner,NC?format=j1"); if(!r.ok)throw new Error("wttr "+r.status);
-  const d=await r.json(); const cc=d.current_condition[0],today=d.weather[0];
+  const r=await fetch("https://wttr.in/Garner,NC?format=j1");if(!r.ok)throw new Error("wttr "+r.status);
+  const d=await r.json();const cc=d.current_condition[0],today=d.weather[0];
   const wspd=Math.round(Number(cc.windspeedMiles)),wdir=Math.round(Number(cc.winddirDegree));
   applyConditions(Math.round(Number(cc.temp_F)),Math.round(Number(cc.FeelsLikeF)),Math.round(Number(cc.DewPointF||50)),Math.round(Number(cc.humidity)),wspd,wdir,Math.round(Number(cc.WindGustMiles||wspd)),(Number(cc.pressure)*0.02953).toFixed(2),(Number(cc.precipMM)*0.0394).toFixed(2),Math.round(Number(cc.uvIndex||0)),Math.round(Number(today.maxtempF)),Math.round(Number(today.mintempF)),Number(cc.weatherCode)||0,null);
 }
 async function fetchConditions(){
-  try{ await fetchOpenMeteo(); }
-  catch(e){ try{ await fetchWttr(); G("cupd").textContent+=" (wttr fallback)"; } catch(e2){ G("cupd").textContent="⚠ Data unavailable · retrying"; G("temp").classList.add("ld"); } }
+  try{await fetchOpenMeteo();}
+  catch(e){try{await fetchWttr();G("cupd").textContent+=" (wttr fallback)";}catch(e2){G("cupd").textContent="⚠ Data unavailable · retrying";G("temp").classList.add("ld");}}
 }
-
 function buildHourly(h){
-  const row=G("hr-row"); row.innerHTML="";
-  const n=NOW(); let cnt=0;
+  const row=G("hr-row");row.innerHTML="";
+  const n=NOW();let cnt=0;
   for(let i=0;i<h.time.length&&cnt<14;i++){
-    const t=new Date(h.time[i]); if(t<n&&i>0)continue;
-    const b=document.createElement("div"); b.className="hr"+(cnt===0?" now":"");
+    const t=new Date(h.time[i]);if(t<n&&i>0)continue;
+    const b=document.createElement("div");b.className="hr"+(cnt===0?" now":"");
     const lbl=cnt===0?"NOW":t.toLocaleTimeString("en-US",{hour:"numeric",hour12:true});
     const pp=(h.precipitation_probability||[])[i]||0;
     b.innerHTML=`<div class="hr-t">${lbl}</div><div class="hr-i">${wmoIcon(h.weather_code[i])}</div><div class="hr-v">${Math.round(h.temperature_2m[i])}°</div>${pp>15?`<div class="hr-p">${pp}%💧</div>`:""}`;
-    row.appendChild(b); cnt++;
+    row.appendChild(b);cnt++;
   }
-}
-
-/* ── SIS THREAT ── */
-const TL=[
-  {lbl:"NONE",   col:"var(--green)",bg:"rgba(0,180,60,.12)",bc:"rgba(0,180,60,.4)", bann:"linear-gradient(135deg,#091509,#111)",icon:"🟢",title:"All Clear",         sub:"No active watches, warnings, or advisories for NC"},
-  {lbl:"LOW",    col:"#00aaff",     bg:"rgba(0,150,220,.12)",bc:"rgba(0,150,220,.4)",bann:"linear-gradient(135deg,#001828,#111)",icon:"🔵",title:"Advisory in Effect",sub:"Low-impact advisory active for NC"},
-  {lbl:"MODERATE",col:"#ffcc00",   bg:"rgba(240,180,0,.12)",bc:"rgba(240,180,0,.4)",bann:"linear-gradient(135deg,#1a1300,#111)",icon:"🟡",title:"Watch Issued",       sub:"Conditions favorable for severe weather"},
-  {lbl:"HIGH",   col:"#ff7700",    bg:"rgba(220,80,0,.13)", bc:"rgba(220,80,0,.4)", bann:"linear-gradient(135deg,#1a0600,#111)",icon:"🟠",title:"Warning Active",     sub:"Hazardous weather occurring — take action"},
-  {lbl:"EXTREME",col:"#ff2222",    bg:"rgba(200,0,0,.18)",  bc:"rgba(200,0,0,.5)",  bann:"linear-gradient(135deg,#1f0000,#0d0000)",icon:"🔴",title:"Extreme Threat",  sub:"Life-threatening event — seek shelter now"},
-];
-function setThreat(lvl){
-  const tl=TL[lvl];
-  G("t-banner").style.background=tl.bann;
-  G("t-icon").textContent=tl.icon;
-  G("t-title").textContent=tl.title; G("t-title").style.color=tl.col;
-  G("t-sub").textContent=tl.sub;
-  G("tl-box").style.background=tl.bg; G("tl-box").style.borderColor=tl.bc;
-  G("tl-val").textContent=tl.lbl; G("tl-val").style.color=tl.col;
-  ["rp0","rp1","rp2","rp3","rp4"].forEach((id,i)=>{
-    const el=G(id); el.classList.toggle("act",i===lvl);
-    el.style.color=i===lvl?tl.col:i===0?"var(--green)":"#444";
-    el.style.background=i===lvl?tl.bg:"";
-  });
-}
-function alertLvl(ev=""){const e=ev.toLowerCase();if(e.includes("tornado warning")||e.includes("severe thunderstorm warning")||e.includes("hurricane warning"))return 4;if(e.includes(" warning"))return 3;if(e.includes("watch"))return 2;if(e.includes("advisory")||e.includes("statement"))return 1;return 0;}
-function alertColor(ev=""){const e=ev.toLowerCase();if(e.includes("tornado warning"))return"#ff2222";if(e.includes("severe thunderstorm"))return"#ff6600";if(e.includes(" warning"))return"#ff5500";if(e.includes("watch"))return"#ffcc00";if(e.includes("advisory"))return"#00aaff";return"#666";}
-let prevAlertIds=new Set();
-async function fetchAlerts(){
-  try{
-    const r=await fetch("https://api.weather.gov/alerts/active?area=NC&limit=25",{headers:{Accept:"application/geo+json"}});
-    const d=await r.json(); const features=d.features||[];
-    const list=G("al-list"); list.innerHTML="";
-    if(!features.length){list.innerHTML='<div class="no-al">✅ No active alerts for North Carolina</div>';setThreat(0);addHist("No active NWS alerts for NC","ok");return;}
-    let mx=0;
-    features.slice(0,8).forEach(f=>{
-      const p=f.properties,ev=p.event||"Unknown Alert";
-      const lvl=alertLvl(ev); if(lvl>mx)mx=lvl;
-      const area=(p.areaDesc||"").split(";")[0].trim().substring(0,50);
-      const issued=p.sent?new Date(p.sent).toLocaleString("en-US",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}):"";
-      const item=document.createElement("div"); item.className="al-item"; item.style.borderLeftColor=alertColor(ev);
-      item.innerHTML=`<div class="al-ev">${ev}</div><div class="al-area">${area}</div><div class="al-ts">Issued: ${issued}</div>`;
-      list.appendChild(item);
-      if(!prevAlertIds.has(f.id))addHist(`NEW: ${ev} · ${area.substring(0,28)}`,lvl>=3?"crit":"warn");
-    });
-    prevAlertIds=new Set(features.map(f=>f.id));
-    setThreat(Math.min(mx,4));
-  }catch(e){G("al-list").innerHTML='<div style="font-size:11px;color:var(--mu)">NWS API unreachable — retrying...</div>';addHist("NWS API connection error","warn");}
-}
-async function fetchHRRRProxy(){
-  try{
-    const r=await fetch("https://api.open-meteo.com/v1/forecast?latitude=35.686&longitude=-78.614&current=cape&hourly=cape&timezone=America%2FNew_York");
-    const d=await r.json(); const cape=d.current?.cape||0;
-    const set=(id,v,el,max,col)=>{G(id).textContent=Math.round(v);G(el).style.width=pct(v,max);G(el).style.background=col};
-    set("h-cape",cape,"hb-cape",4000,"var(--orange)");
-    set("h-srh1",cape*.08,"hb-srh1",500,"var(--yellow)");
-    set("h-srh3",cape*.15,"hb-srh3",600,"var(--yellow)");
-    set("h-eshr",cape*.012,"hb-eshr",60,"var(--cyan)");
-    const stp=+(cape*.08/150*cape/1500).toFixed(2)||0;
-    G("h-stp").textContent=stp.toFixed(1); G("hb-stp").style.width=pct(stp,5); G("hb-stp").style.background="var(--red)";
-    G("h-scp").textContent="--"; G("hb-scp").style.width="0%";
-  }catch(e){}
 }
 
 /* ── 7-DAY FORECAST ── */
 function seedExtended(){
-  const grid=G("ext-grid"); if(!grid)return;
+  const grid=G("ext-grid");if(!grid)return;
   let html="";
   for(let i=0;i<7;i++){
-    const dt=new Date(); dt.setDate(dt.getDate()+i);
+    const dt=new Date();dt.setDate(dt.getDate()+i);
     const dow=i===0?"Today":dt.toLocaleDateString("en-US",{weekday:"short"});
     const date=dt.toLocaleDateString("en-US",{month:"short",day:"numeric"});
-    html+=`<div class="ext-day${i===0?" today":""}">
-      <div class="ext-dow">${dow}</div>
-      <div class="ext-date">${date}</div>
-      <div class="ext-icon ld" style="font-size:22px">—</div>
-      <div class="ext-desc" style="color:var(--mu2)">Loading...</div>
-      <div class="ext-temps"><span class="ext-hi" style="color:var(--mu2)">--°</span> <span class="ext-lo">--°</span></div>
-      <div class="ext-bar"><div class="ext-bar-fill" style="width:30%;background:var(--bd2)"></div></div>
-    </div>`;
+    html+=`<div class="ext-day${i===0?" today":""}"><div class="ext-dow">${dow}</div><div class="ext-date">${date}</div><div class="ext-icon ld" style="font-size:22px">—</div><div class="ext-desc" style="color:var(--mu2)">Loading...</div><div class="ext-temps"><span class="ext-hi" style="color:var(--mu2)">--°</span><span class="ext-lo">--°</span></div><div class="ext-bar"><div class="ext-bar-fill" style="width:30%;background:var(--bd2)"></div></div></div>`;
   }
   grid.innerHTML=html;
 }
-
 async function fetchExtended(){
-  const grid=G("ext-grid"); if(!grid)return;
+  const grid=G("ext-grid");if(!grid)return;
   try{
-    const ptR=await fetch("https://api.weather.gov/points/35.686,-78.614",{headers:{Accept:"application/geo+json","User-Agent":"WolfpackWeather/1.0"}});
+    const ptR=await fetch("https://api.weather.gov/points/35.686,-78.614",{headers:{Accept:"application/geo+json","User-Agent":"WolfpackWeather/2.0"}});
     if(!ptR.ok)throw new Error("points "+ptR.status);
-    const ptD=await ptR.json();
-    const fcastUrl=ptD.properties?.forecast;
+    const ptD=await ptR.json();const fcastUrl=ptD.properties?.forecast;
     if(!fcastUrl)throw new Error("no forecast url");
-    const fR=await fetch(fcastUrl,{headers:{Accept:"application/geo+json","User-Agent":"WolfpackWeather/1.0"}});
+    const fR=await fetch(fcastUrl,{headers:{Accept:"application/geo+json","User-Agent":"WolfpackWeather/2.0"}});
     if(!fR.ok)throw new Error("forecast "+fR.status);
-    const fD=await fR.json();
-    const periods=fD.properties?.periods||[];
+    const fD=await fR.json();const periods=fD.properties?.periods||[];
     const days=[];
     for(let i=0;i<periods.length&&days.length<7;i++){
-      const p=periods[i];
-      if(!p.isDaytime)continue;
+      const p=periods[i];if(!p.isDaytime)continue;
       const night=periods[i+1];
       days.push({name:p.name,startTime:p.startTime,hi:p.temperature,lo:night?night.temperature:"--",desc:p.shortForecast,pop:p.probabilityOfPrecipitation?.value||0,wind:p.windSpeed,windDir:p.windDirection});
     }
@@ -625,16 +519,7 @@ async function fetchExtended(){
       const date=dt.toLocaleDateString("en-US",{month:"short",day:"numeric"});
       const barPct=hiMax>hiMin?Math.round((d.hi-hiMin)/(hiMax-hiMin)*100):50;
       const barCol=d.hi>=80?"#ff6600":d.hi>=60?"#ffcc00":"#4488ff";
-      html+=`<div class="ext-day${i===0?" today":""}">
-        <div class="ext-dow">${dow}</div>
-        <div class="ext-date">${date}</div>
-        <div class="ext-icon">${nwsIcon(d.desc)}</div>
-        <div class="ext-desc">${d.desc}</div>
-        <div class="ext-temps"><span class="ext-hi">${d.hi}°</span><span class="ext-lo">${d.lo !== "--" ? d.lo+"°" : ""}</span></div>
-        ${d.pop>10?`<div class="ext-pop">💧 ${d.pop}%</div>`:""}
-        <div class="ext-bar"><div class="ext-bar-fill" style="width:${barPct}%;background:${barCol}"></div></div>
-        <div class="ext-wind">${d.wind} ${d.windDir}</div>
-      </div>`;
+      html+=`<div class="ext-day${i===0?" today":""}"><div class="ext-dow">${dow}</div><div class="ext-date">${date}</div><div class="ext-icon">${nwsIcon(d.desc)}</div><div class="ext-desc">${d.desc}</div><div class="ext-temps"><span class="ext-hi">${d.hi}°</span><span class="ext-lo">${d.lo!=="--"?d.lo+"°":""}</span></div>${d.pop>10?`<div class="ext-pop">💧 ${d.pop}%</div>`:""}<div class="ext-bar"><div class="ext-bar-fill" style="width:${barPct}%;background:${barCol}"></div></div><div class="ext-wind">${d.wind} ${d.windDir}</div></div>`;
     });
     grid.innerHTML=html;
   }catch(e){
@@ -642,7 +527,7 @@ async function fetchExtended(){
     try{
       const r=await fetch("https://api.open-meteo.com/v1/forecast?latitude=35.686&longitude=-78.614&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max,wind_speed_10m_max&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=7");
       if(!r.ok)throw new Error("OM daily "+r.status);
-      const d=await r.json(); const dl=d.daily;
+      const d=await r.json();const dl=d.daily;
       const hiMax=Math.max(...dl.temperature_2m_max),hiMin=Math.min(...dl.temperature_2m_max);
       let html="";
       dl.time.forEach((t,i)=>{
@@ -653,43 +538,292 @@ async function fetchExtended(){
         const pop=dl.precipitation_probability_max[i]||0;
         const barPct=hiMax>hiMin?Math.round((hi-hiMin)/(hiMax-hiMin)*100):50;
         const barCol=hi>=80?"#ff6600":hi>=60?"#ffcc00":"#4488ff";
-        html+=`<div class="ext-day${i===0?" today":""}">
-          <div class="ext-dow">${dow}</div>
-          <div class="ext-date">${date}</div>
-          <div class="ext-icon">${wmoIcon(dl.weather_code[i])}</div>
-          <div class="ext-desc">${wmoDesc(dl.weather_code[i])}</div>
-          <div class="ext-temps"><span class="ext-hi">${hi}°</span><span class="ext-lo">${lo}°</span></div>
-          ${pop>10?`<div class="ext-pop">💧 ${pop}%</div>`:""}
-          <div class="ext-bar"><div class="ext-bar-fill" style="width:${barPct}%;background:${barCol}"></div></div>
-          <div class="ext-wind">${Math.round(dl.wind_speed_10m_max[i])} mph</div>
-        </div>`;
+        html+=`<div class="ext-day${i===0?" today":""}"><div class="ext-dow">${dow}</div><div class="ext-date">${date}</div><div class="ext-icon">${wmoIcon(dl.weather_code[i])}</div><div class="ext-desc">${wmoDesc(dl.weather_code[i])}</div><div class="ext-temps"><span class="ext-hi">${hi}°</span><span class="ext-lo">${lo}°</span></div>${pop>10?`<div class="ext-pop">💧 ${pop}%</div>`:""}<div class="ext-bar"><div class="ext-bar-fill" style="width:${barPct}%;background:${barCol}"></div></div><div class="ext-wind">${Math.round(dl.wind_speed_10m_max[i])} mph</div></div>`;
       });
       grid.innerHTML=html;
-    }catch(e2){grid.innerHTML='<div style="color:var(--mu);font-size:13px;padding:16px">Extended forecast unavailable — check console</div>';}
+    }catch(e2){grid.innerHTML='<div style="color:var(--mu);font-size:13px;padding:16px">Extended forecast unavailable</div>';}
   }
 }
 
-/* ── WS BACKEND ── */
-const STORM_API_BASE="";
-const WS_URL=STORM_API_BASE?`${STORM_API_BASE.replace(/^http/,"ws")}/ws/storms`:null;
-let wsConn=null;
-function connectWS(){
-  if(!WS_URL)return;
-  try{
-    wsConn=new WebSocket(WS_URL);
-    wsConn.onopen=()=>{G("conn-badge").className="conn-badge conn-live";G("conn-badge").textContent="● LIVE NEXRAD";addHist("WebSocket connected · NEXRAD backend live","ok")};
-    wsConn.onmessage=ev=>{try{const m=JSON.parse(ev.data);if(m.type==="storm_update"){if(m.hrrr){const h=m.hrrr;G("h-cape").textContent=Math.round(h.MLCAPE||0);G("h-srh1").textContent=Math.round(h.SRH1||0);G("h-srh3").textContent=Math.round(h.SRH3||0);G("h-eshr").textContent=Math.round(h.ESHEAR||0);G("h-stp").textContent=(h.STP||0).toFixed(1);G("h-scp").textContent=(h.SCP||0).toFixed(1);}}}catch(e){}};
-    wsConn.onerror=()=>{addHist("WS error — polling fallback","warn")};
-    wsConn.onclose=()=>{setTimeout(connectWS,10000)};
-  }catch(e){}
+
+/* ═══════════════════════════════════════════════════════════════
+   TUFFY'S STORM PREDICTION SYSTEM v2.0 — Self-contained engine
+   ═══════════════════════════════════════════════════════════════ */
+(function(){
+"use strict";
+
+const CFG={lat:35.7113,lon:-78.6141,name:"Garner, NC",refresh:300000};
+
+const HAZARD_KW={
+  tornado:30,tornadoes:30,funnel:25,"tornado watch":22,"tornado warning":30,
+  "damaging wind":20,"destructive wind":25,derecho:28,"wind damage":18,
+  "large hail":20,"giant hail":25,"baseball size":25,"golf ball":20,"quarter size":15,
+  "severe thunderstorm":18,"severe storm":18,supercell:22,
+  hurricane:30,"tropical storm":22,flooding:15,"flash flood":20,
+  thunder:8,thunderstorm:10,storm:6,lightning:7,hail:12,
+  "heavy rain":8,downpour:7,gusty:6,windy:5,breezy:3
+};
+const ALERT_SEV={Extreme:35,Severe:25,Moderate:15,Minor:8,Unknown:5};
+const ALERT_COLORS={"Tornado Warning":"#ff0000","Severe Thunderstorm Warning":"#ffa500","Tornado Watch":"#ffff00","Severe Thunderstorm Watch":"#db7093","Flash Flood Warning":"#8b0000","Flood Warning":"#00ff00","Special Weather Statement":"#ffe4b5","Winter Storm Warning":"#ff69b4","default":"#7b68ee"};
+
+function sevLevel(s){
+  if(s<10)return{label:"NONE",color:"#1a6b3a",desc:"No severe weather expected"};
+  if(s<25)return{label:"LOW",color:"#22c55e",desc:"Minimal threat — general storms possible"};
+  if(s<50)return{label:"GUARDED",color:"#eab308",desc:"Elevated risk — strong storms possible"};
+  if(s<75)return{label:"ELEVATED",color:"#f97316",desc:"Significant threat — severe storms likely"};
+  if(s<90)return{label:"HIGH",color:"#ef4444",desc:"Dangerous — damaging severe weather expected"};
+  return{label:"EXTREME",color:"#dc2626",desc:"Life-threatening severe weather imminent"};
 }
 
-/* ── BOOT ── */
-connectWS();
+function computeIndex(period,alerts){
+  let bd={wind:0,gusts:0,precip:0,instability:0,textual:0,alerts:0};
+  const ws=parseInt(period.windSpeed)||0,wg=parseInt(period.windGust)||0;
+  const pop=(period.probabilityOfPrecipitation&&period.probabilityOfPrecipitation.value)||0;
+  const temp=period.temperature||70;
+  const dpRaw=period.dewpoint&&period.dewpoint.value;
+  const dp=dpRaw!=null?(dpRaw*9/5+32):null;
+  const txt=((period.detailedForecast||"")+" "+(period.shortForecast||"")).toLowerCase();
+
+  if(ws>=60)bd.wind=20;else if(ws>=45)bd.wind=16;else if(ws>=30)bd.wind=12;else if(ws>=20)bd.wind=7;else if(ws>=15)bd.wind=4;else if(ws>=10)bd.wind=2;
+
+  const eg=Math.max(wg,ws*1.3);
+  if(eg>=70)bd.gusts=18;else if(eg>=58)bd.gusts=15;else if(eg>=45)bd.gusts=12;else if(eg>=35)bd.gusts=8;else if(eg>=25)bd.gusts=4;else if(eg>=15)bd.gusts=1;
+
+  if(pop>=90)bd.precip=14;else if(pop>=70)bd.precip=11;else if(pop>=50)bd.precip=8;else if(pop>=30)bd.precip=5;else if(pop>=15)bd.precip=2;
+
+  if(dp!==null){const sp=temp-dp;if(sp<=3&&temp>=75)bd.instability=16;else if(sp<=5&&temp>=70)bd.instability=13;else if(sp<=8&&temp>=65)bd.instability=9;else if(sp<=12&&temp>=60)bd.instability=6;else if(sp<=15)bd.instability=3;}
+  else if(pop>=50&&temp>=70){bd.instability=8;}
+
+  let maxTxt=0,hits=0;
+  for(const[kw,val]of Object.entries(HAZARD_KW)){if(txt.includes(kw)){maxTxt=Math.max(maxTxt,val);hits++;}}
+  bd.textual=Math.min(22,maxTxt+Math.min(hits*1.5,8));
+
+  if(alerts&&alerts.length>0){let mx=0;for(const a of alerts){mx=Math.max(mx,ALERT_SEV[a.properties?.severity]||5);}bd.alerts=Math.min(10,mx*(1+Math.min(alerts.length-1,3)*0.15));}
+
+  const score=Math.min(100,Math.round(bd.wind+bd.gusts+bd.precip+bd.instability+bd.textual+bd.alerts));
+  const likelihood=Math.min(99,Math.round((pop*0.35)+(score*0.45)+(bd.textual>10?15:bd.textual>5?8:0)+(alerts&&alerts.length>0?5:0)));
+  return{score,likelihood,breakdown:bd};
+}
+
+let tspsState={forecasts:[],alerts:[],activeIdx:0,lastUpdate:null,charts:{},peakScore:0};
+const tspsRoot=document.getElementById("tsps");
+const tspsContent=document.getElementById("tspsContent");
+const tspsPulse=document.getElementById("tspsPulseBar");
+
+function buildGaugeSVG(score,size){
+  const lv=sevLevel(score);
+  const r=size*0.38,cx=size/2,cy=size/2+10;
+  const sA=-220,eA=40,total=eA-sA;
+  const scA=sA+(score/100)*total;
+  const p2c=(a,rd)=>({x:cx+rd*Math.cos(a*Math.PI/180),y:cy+rd*Math.sin(a*Math.PI/180)});
+  const arc=(a1,a2,rd)=>{const s=p2c(a1,rd),e=p2c(a2,rd);return`M ${s.x} ${s.y} A ${rd} ${rd} 0 ${a2-a1>180?1:0} 1 ${e.x} ${e.y}`;};
+  const ticks=[0,10,25,50,75,90,100];
+  let ticksHTML="";
+  ticks.forEach(t=>{
+    const a=sA+(t/100)*total;const i=p2c(a,r-12),o=p2c(a,r+12),lb=p2c(a,r+22);
+    ticksHTML+=`<line x1="${i.x}" y1="${i.y}" x2="${o.x}" y2="${o.y}" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>`;
+    ticksHTML+=`<text x="${lb.x}" y="${lb.y}" fill="rgba(255,255,255,0.35)" font-size="8" text-anchor="middle" dominant-baseline="middle">${t}</text>`;
+  });
+  const np=p2c(scA,r-2);const h=size*0.72;
+  return`<svg width="${size}" height="${h}" viewBox="0 0 ${size} ${h}" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="tspsGG" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#1a472a"/><stop offset="25%" stop-color="#22c55e"/><stop offset="45%" stop-color="#eab308"/><stop offset="65%" stop-color="#f97316"/><stop offset="80%" stop-color="#ef4444"/><stop offset="100%" stop-color="#dc2626"/></linearGradient><filter id="tspsGlow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+    <path d="${arc(sA,eA,r)}" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="14" stroke-linecap="round"/>
+    <path d="${arc(sA,scA,r)}" fill="none" stroke="url(#tspsGG)" stroke-width="14" stroke-linecap="round" filter="url(#tspsGlow)"/>
+    ${ticksHTML}
+    <circle cx="${np.x}" cy="${np.y}" r="5.5" fill="${lv.color}" filter="url(#tspsGlow)"/>
+    <text x="${cx}" y="${cy-16}" fill="${lv.color}" font-size="38" font-weight="800" text-anchor="middle" dominant-baseline="middle" filter="url(#tspsGlow)">${score}</text>
+    <text x="${cx}" y="${cy+10}" fill="${lv.color}" font-size="12" font-weight="700" text-anchor="middle" letter-spacing="3">${lv.label}</text>
+    <text x="${cx}" y="${cy+27}" fill="rgba(255,255,255,0.45)" font-size="8" text-anchor="middle">${lv.desc}</text>
+  </svg>`;
+}
+
+function tspsRenderMain(){
+  const pk=tspsState.peakScore,pkLv=sevLevel(pk),f=tspsState.forecasts,al=tspsState.alerts;
+  const peakWindow=f.length?f.reduce((a,b)=>a.score>b.score?a:b).label:"—";
+  const maxLk=f.length?Math.max(...f.map(x=>x.likelihood)):0;
+
+  if(pk>=50){tspsRoot.classList.add("tsps-threat");tspsPulse.style.background=`linear-gradient(90deg,transparent,${pkLv.color},transparent)`;}
+  else{tspsRoot.classList.remove("tsps-threat");}
+
+  let alertsHTML="";
+  if(al.length>0){
+    let items=al.slice(0,6).map(a=>{
+      const evt=a.properties?.event||"Weather Alert";const col=ALERT_COLORS[evt]||ALERT_COLORS.default;
+      return`<div class="tsps-al-item"><div class="tsps-al-dot" style="background:${col};box-shadow:0 0 6px ${col}"></div><span class="tsps-al-ev">${evt}</span><span class="tsps-al-src">${a.properties?.senderName||"NWS"}</span></div>`;
+    }).join("");
+    alertsHTML=`<div class="tsps-alerts"><div class="tsps-al-hdr"><span>⚠️</span><span>ACTIVE ALERTS — ${al.length}</span></div>${items}</div>`;
+  }
+
+  let cardsHTML=f.map((fc,i)=>{
+    const lv=sevLevel(fc.score),isA=i===tspsState.activeIdx;
+    return`<div class="tsps-fc${isA?" act":""}" data-idx="${i}" style="background:${isA?"rgba("+hexToRgb(lv.color)+",.12)":"rgba(255,255,255,0.025)"};border-color:${isA?lv.color+"77":"rgba(255,255,255,0.05)"}">
+      <div class="fc-lbl">${fc.label}</div>
+      <div><span class="fc-score" style="color:${lv.color}">${fc.score}</span><span class="fc-unit">/100</span></div>
+      <div class="fc-threat" style="color:${lv.color}88">${lv.label} THREAT</div>
+      <div class="fc-lk"><span class="fc-lk-l">Likelihood</span><span class="fc-lk-v" style="color:${lv.color}">${fc.likelihood}%</span></div>
+      <div class="fc-bar"><div class="fc-bar-f" style="width:${fc.likelihood}%;background:${lv.color}"></div></div>
+      <div class="fc-meta">${fc.temp!==undefined?fc.temp+"°F":""}${fc.wind?" · "+fc.wind:""}</div>
+    </div>`;
+  }).join("");
+
+  const af=f[tspsState.activeIdx];const afLv=af?sevLevel(af.score):{color:"#888",label:"—"};
+
+  let detailHTML="";
+  if(af){
+    detailHTML=`<div class="tsps-det">
+      <div class="tsps-det-hdr">
+        <div><div class="tsps-det-per">DETAILED ANALYSIS — ${af.label}</div><div class="tsps-det-fc">${af.shortForecast||"—"}</div></div>
+        <div style="text-align:right"><div class="tsps-det-sc" style="color:${afLv.color}">${af.score}</div><div class="tsps-det-lv" style="color:${afLv.color}">${afLv.label}</div></div>
+      </div>
+      <div class="tsps-det-mg">
+        <div class="tsps-dm"><div class="dm-l">TEMP</div><div class="dm-v">${af.temp!==undefined?af.temp+"°F":"—"}</div></div>
+        <div class="tsps-dm"><div class="dm-l">WIND</div><div class="dm-v">${af.wind||"—"}</div></div>
+        <div class="tsps-dm"><div class="dm-l">PRECIP</div><div class="dm-v">${af.pop??0}%</div></div>
+        <div class="tsps-dm"><div class="dm-l">LIKELIHOOD</div><div class="dm-v">${af.likelihood}%</div></div>
+      </div>
+      ${af.detailedForecast?`<div class="tsps-det-nar" style="border-left-color:${afLv.color}44"><b>NWS Forecast:</b> ${af.detailedForecast}</div>`:""}
+    </div>`;
+  }
+
+  tspsContent.innerHTML=`
+    <div class="tsps-hdr">
+      <div class="tsps-hdr-l">
+        <div class="tsps-tag">PROPRIETARY MODEL</div>
+        <h2><span class="tsps-r">Tuffy's</span> Storm Prediction System</h2>
+        <div class="tsps-loc">📍 ${CFG.name} · Real-time NWS-powered severe weather intelligence</div>
+      </div>
+      <div class="tsps-hdr-r">
+        <div class="tsps-ulbl">LAST UPDATE</div>
+        <div class="tsps-utime">${tspsState.lastUpdate?tspsState.lastUpdate.toLocaleTimeString():"—"}</div>
+        <button class="tsps-rbtn" id="tspsRefBtn">↻ Refresh</button>
+      </div>
+    </div>
+    ${alertsHTML}
+    <div class="tsps-top">
+      <div class="tsps-gauge-w">
+        <div class="tsps-gauge-lbl">PEAK SEVERE WEATHER INDEX</div>
+        ${buildGaugeSVG(pk,230)}
+      </div>
+      <div class="tsps-stats">
+        <div class="tsps-sbox"><div class="tsps-slbl">PEAK WINDOW</div><div class="tsps-sval" style="color:${pkLv.color}">${peakWindow}</div></div>
+        <div class="tsps-sbox"><div class="tsps-slbl">ACTIVE ALERTS</div><div class="tsps-sval" style="color:${al.length>0?"#ef4444":"#22c55e"}">${al.length>0?al.length+" ACTIVE":"ALL CLEAR"}</div></div>
+        <div class="tsps-sbox"><div class="tsps-slbl">MAX LIKELIHOOD</div><div class="tsps-sval" style="color:rgba(255,255,255,.85)">${maxLk}%</div></div>
+      </div>
+    </div>
+    <div class="tsps-sec-lbl">FORECAST PERIODS</div>
+    <div class="tsps-cards" id="tspsCards">${cardsHTML}</div>
+    <div class="tsps-tl-box"><div class="tsps-ct">SEVERITY TIMELINE</div><canvas id="tspsTLChart"></canvas></div>
+    <div class="tsps-ch-row">
+      <div class="tsps-ch-box"><div class="tsps-ct">THREAT RADAR</div><canvas id="tspsRadarChart"></canvas></div>
+      <div class="tsps-ch-box"><div class="tsps-ct">COMPONENT BREAKDOWN</div><canvas id="tspsBarChart"></canvas></div>
+    </div>
+    ${detailHTML}
+    <div class="tsps-foot">
+      <span>Tuffy's Storm Prediction System v2.0 · Proprietary Severe Weather Index · Data: NWS API</span>
+      <span>Auto-refresh every 5 min · Not a replacement for official NWS warnings</span>
+    </div>`;
+
+  document.getElementById("tspsRefBtn").addEventListener("click",()=>tspsRefresh());
+  document.querySelectorAll(".tsps-fc").forEach(c=>{
+    c.addEventListener("click",function(){tspsState.activeIdx=parseInt(this.dataset.idx);tspsRenderMain();tspsCharts();});
+  });
+  tspsCharts();
+}
+
+function hexToRgb(hex){hex=hex.replace("#","");if(hex.length===3)hex=hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];return parseInt(hex.substr(0,2),16)+","+parseInt(hex.substr(2,2),16)+","+parseInt(hex.substr(4,2),16);}
+
+function tspsDestroyCharts(){["tl","radar","bar"].forEach(k=>{if(tspsState.charts[k]){tspsState.charts[k].destroy();tspsState.charts[k]=null;}});}
+
+function tspsCharts(){
+  tspsDestroyCharts();
+  const f=tspsState.forecasts;if(!f.length)return;
+  const af=f[tspsState.activeIdx],labels=f.map(x=>x.label),scores=f.map(x=>x.score),lks=f.map(x=>x.likelihood);
+  const pkLv=sevLevel(tspsState.peakScore),afLv=sevLevel(af?af.score:0);
+
+  Chart.defaults.color="rgba(255,255,255,0.4)";Chart.defaults.borderColor="rgba(255,255,255,0.06)";
+  Chart.defaults.font.family="'Segoe UI',system-ui,sans-serif";Chart.defaults.font.size=10;
+
+  const tlEl=document.getElementById("tspsTLChart");
+  if(tlEl){
+    tspsState.charts.tl=new Chart(tlEl,{type:"line",data:{labels,datasets:[
+      {label:"Severity",data:scores,borderColor:pkLv.color,backgroundColor:pkLv.color+"30",fill:true,tension:.4,borderWidth:2.5,pointRadius:4,pointBackgroundColor:scores.map(s=>sevLevel(s).color)},
+      {label:"Likelihood %",data:lks,borderColor:"#60a5fa",borderDash:[5,4],fill:false,tension:.4,borderWidth:1.8,pointRadius:3,pointBackgroundColor:"#60a5fa"}
+    ]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{min:0,max:100,grid:{color:"rgba(255,255,255,0.04)"}},x:{grid:{display:false}}},plugins:{legend:{labels:{boxWidth:12,padding:16,font:{size:10}}}}}});
+  }
+
+  if(af&&af.breakdown){
+    const bd=af.breakdown;
+    const items=[{k:"wind",l:"Wind",mx:20},{k:"gusts",l:"Gusts",mx:18},{k:"precip",l:"Precip",mx:14},{k:"instability",l:"Instability",mx:16},{k:"textual",l:"Forecast",mx:22},{k:"alerts",l:"Alerts",mx:10}];
+    const radarEl=document.getElementById("tspsRadarChart");
+    if(radarEl){
+      tspsState.charts.radar=new Chart(radarEl,{type:"radar",data:{labels:items.map(x=>x.l),datasets:[{label:"Threat",data:items.map(x=>Math.round((bd[x.k]/x.mx)*100)),borderColor:afLv.color,backgroundColor:afLv.color+"25",borderWidth:2,pointRadius:3,pointBackgroundColor:afLv.color}]},options:{responsive:true,maintainAspectRatio:false,scales:{r:{min:0,max:100,ticks:{display:false,stepSize:25},grid:{color:"rgba(255,255,255,0.06)"},angleLines:{color:"rgba(255,255,255,0.06)"}}},plugins:{legend:{display:false}}}});
+    }
+    const barEl=document.getElementById("tspsBarChart");
+    if(barEl){
+      const pcts=items.map(x=>Math.round((bd[x.k]/x.mx)*100));
+      const barCols=pcts.map(p=>p>70?"#ef4444":p>40?"#f97316":p>20?"#eab308":"#22c55e");
+      tspsState.charts.bar=new Chart(barEl,{type:"bar",data:{labels:items.map(x=>x.l),datasets:[{label:"Score %",data:pcts,backgroundColor:barCols,borderRadius:4,barThickness:14}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:"y",scales:{x:{min:0,max:100,grid:{color:"rgba(255,255,255,0.04)"}},y:{grid:{display:false}}},plugins:{legend:{display:false}}}});
+    }
+  }
+}
+
+async function tspsRefresh(){
+  tspsContent.innerHTML=`<div class="tsps-ld"><div class="tsps-spinner"></div><p>Refreshing predictions...</p><p class="sub">Fetching NWS data for ${CFG.name}</p></div>`;
+  try{
+    const hdr={"User-Agent":"TuffysStormSystem/2.0"};
+    const[ptRes,alRes]=await Promise.all([
+      fetch(`https://api.weather.gov/points/${CFG.lat},${CFG.lon}`,{headers:hdr}),
+      fetch(`https://api.weather.gov/alerts/active?point=${CFG.lat},${CFG.lon}`,{headers:hdr})
+    ]);
+    if(!ptRes.ok)throw new Error("NWS API unavailable ("+ptRes.status+")");
+    const ptData=await ptRes.json();const fcUrl=ptData.properties?.forecastHourly;
+    if(!fcUrl)throw new Error("No hourly forecast endpoint");
+    const fcRes=await fetch(fcUrl,{headers:hdr});
+    if(!fcRes.ok)throw new Error("Forecast data unavailable ("+fcRes.status+")");
+    const fcData=await fcRes.json();const periods=fcData.properties?.periods||[];
+    if(!periods.length)throw new Error("No forecast periods returned");
+
+    let alerts=[];
+    if(alRes.ok){const ad=await alRes.json();alerts=ad.features||[];}
+    tspsState.alerts=alerts;
+
+    const targets=[{h:3,l:"+3 HR"},{h:6,l:"+6 HR"},{h:9,l:"+9 HR"},{h:12,l:"+12 HR"},{h:24,l:"+24 HR"}];
+    const now=Date.now();
+    tspsState.forecasts=targets.map(t=>{
+      const target=now+t.h*3600000;
+      let best=periods[0],bestD=Infinity;
+      for(const p of periods){const d=Math.abs(new Date(p.startTime).getTime()-target);if(d<bestD){bestD=d;best=p;}}
+      const{score,likelihood,breakdown}=computeIndex(best,alerts);
+      return{label:t.l,hours:t.h,score,likelihood,breakdown,temp:best.temperature,
+        wind:(best.windSpeed||"")+" "+(best.windDirection||""),
+        pop:(best.probabilityOfPrecipitation&&best.probabilityOfPrecipitation.value)||0,
+        shortForecast:best.shortForecast||"",detailedForecast:best.detailedForecast||""};
+    });
+    tspsState.peakScore=Math.max(...tspsState.forecasts.map(x=>x.score));
+    tspsState.lastUpdate=new Date();
+    tspsState.activeIdx=0;
+    tspsRenderMain();
+  }catch(e){
+    console.error("TSPS Error:",e);
+    tspsContent.innerHTML=`<div class="tsps-ld"><p style="color:#ef4444">⚠ ${e.message}</p><p class="sub" style="margin-top:10px"><button class="tsps-rbtn" onclick="window.__tspsRetry()">↻ Try Again</button></p></div>`;
+  }
+}
+window.__tspsRetry=tspsRefresh;
+
+// Boot TSPS
+tspsRefresh();
+setInterval(tspsRefresh,CFG.refresh);
+
+})();
+
+
+/* ═══════════════════════════════════════════════════════════════
+   SITE BOOT
+   ═══════════════════════════════════════════════════════════════ */
 seedExtended();
 
 async function refreshAll(){
-  await Promise.allSettled([fetchConditions(),fetchAlerts(),fetchHRRRProxy()]);
+  await Promise.allSettled([fetchConditions()]);
 }
 
 refreshAll();
