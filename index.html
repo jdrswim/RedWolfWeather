@@ -520,7 +520,6 @@ header{padding:6px 10px}
 
 <!-- TUFFY'S STORM PREDICTION SYSTEM -->
 <div style="margin-top:18px">
-  <div class="sec">Tuffy's Storm Prediction System <em>· TSPS v2.0 · NWS-Powered</em> <div class="tip-btn" onclick="openTip('tipTSPS')">?</div></div>
   <div class="card" style="padding:0;overflow:hidden">
     <div id="tsps" style="padding:20px 22px">
       <div class="tsps-pulse" id="tspsPulseBar"></div>
@@ -556,9 +555,9 @@ header{padding:6px 10px}
 
   <div class="sidebar">
     <div class="card" style="padding:14px">
-      <div class="sec" style="margin-bottom:10px">GOES-16 Satellite · Southeast</div>
-      <div class="media-frame" style="height:240px"><img id="goes-img" src="https://cdn.star.nesdis.noaa.gov/GOES16/ABI/SECTOR/se/GEOCOLOR/latest.jpg" alt="GOES-16 GEOCOLOR Southeast" style="width:100%;height:100%;object-fit:cover"/></div>
-      <div class="mfooter"><div class="ldot"></div>NOAA GOES-16 · GeoColor · Updates every 10 min</div>
+      <div class="sec" style="margin-bottom:10px">GOES-19 Satellite · Southeast</div>
+      <div class="media-frame" style="height:240px"><img id="goes-img" src="https://cdn.star.nesdis.noaa.gov/GOES19/ABI/SECTOR/se/GEOCOLOR/latest.jpg" alt="GOES-19 GEOCOLOR Southeast" style="width:100%;height:100%;object-fit:cover"/></div>
+      <div class="mfooter"><div class="ldot"></div>NOAA GOES-19 · GeoColor · Updates every 5 min</div>
     </div>
     <div class="card" style="padding:14px">
       <div class="sec" style="margin-bottom:10px">NWS KRAX Radar · Raleigh-Durham</div>
@@ -588,7 +587,7 @@ header{padding:6px 10px}
 
 <footer>
   <p><strong>Wolfpack Weather</strong> · Station <strong>KNCRALEI761</strong> · Red Wolf Farm - S. Wake County, NC</p>
-  <p>Weather: Open-Meteo · Alerts: NWS api.weather.gov · Satellite: NOAA GOES-16 · Radar: NWS KRAX</p>
+  <p>Weather: Open-Meteo · Alerts: NWS api.weather.gov · Satellite: NOAA GOES-19 · Radar: NWS KRAX</p>
   <p>Tuffy's Storm Prediction System v2.0 · Wolfpack Weather Network · NC State Athletics</p>
 </footer>
 
@@ -636,7 +635,7 @@ function showCamFb(wrapId,imgId,url,label,site){
 function refreshCams(){
   const ts=Date.now();
   const goesImg=G("goes-img");
-  if(goesImg)goesImg.src=`https://cdn.star.nesdis.noaa.gov/GOES16/ABI/SECTOR/se/GEOCOLOR/latest.jpg?t=${ts}`;
+  if(goesImg)goesImg.src=`https://cdn.star.nesdis.noaa.gov/GOES19/ABI/SECTOR/se/GEOCOLOR/latest.jpg?t=${ts}`;
   const s=G("sugar-cam");
   if(s&&s.style.display!=="none"||!G("sugar-wrap").querySelector(".cam-fb")){s.style.display="block";s.src=`https://skisugar.com/webcam/base.jpg?t=${ts}`;}
   const h=G("hat-cam");
