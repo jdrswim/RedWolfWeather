@@ -50,35 +50,35 @@ header{background:var(--off);border-bottom:3px solid var(--red);padding:9px 20px
 .onair .muted{color:rgba(255,255,255,.5);font-weight:400;letter-spacing:1px}
 /* ── LAYOUT ──────────────────────────────────────────── */
 main{max-width:1440px;margin:0 auto;padding:16px}
-.sec{font-size:8px;font-weight:900;letter-spacing:3px;color:var(--red);text-transform:uppercase;border-left:3px solid var(--red);padding-left:9px;margin-bottom:11px;display:flex;align-items:center;gap:8px}
-.sec em{color:var(--mu);font-style:normal;font-weight:400}
+.sec{font-size:11px;font-weight:900;letter-spacing:2px;color:var(--red);text-transform:uppercase;border-left:3px solid var(--red);padding-left:9px;margin-bottom:11px;display:flex;align-items:center;gap:8px}
+.sec em{color:var(--mu);font-style:normal;font-weight:400;font-size:10px}
 .grid2{display:grid;grid-template-columns:1fr 350px;gap:16px}
 @media(max-width:960px){.grid2{grid-template-columns:1fr}}
 /* ── CARD ────────────────────────────────────────────── */
 .card{background:var(--p1);border:1px solid var(--bd);border-top:3px solid var(--red);border-radius:3px;padding:16px}
 /* ── CONDITIONS ──────────────────────────────────────── */
 .ctop{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px}
-.tbig{font-size:90px;font-weight:100;color:var(--white);line-height:1;letter-spacing:-4px;font-variant-numeric:tabular-nums}
-.tsup{font-size:30px;font-weight:300;color:var(--red);margin-top:10px}
+.tbig{font-size:68px;font-weight:200;color:var(--white);line-height:1;letter-spacing:-2px;font-variant-numeric:tabular-nums}
+.tsup{font-size:24px;font-weight:300;color:var(--red);margin-top:8px}
 .cmeta{text-align:right}
-.cdesc{font-size:18px;font-weight:700;color:var(--white);margin-bottom:4px}
-.csub{font-size:11px;color:var(--mu);line-height:1.9}
+.cdesc{font-size:20px;font-weight:700;color:var(--white);margin-bottom:6px}
+.csub{font-size:13px;color:var(--mu);line-height:2}
 .csub strong{color:var(--white);font-weight:600}
-.cupd{font-size:8px;color:var(--mu2);margin-top:7px;letter-spacing:.5px}
+.cupd{font-size:10px;color:var(--mu2);margin-top:7px;letter-spacing:.3px}
 .sgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:9px}
 @media(max-width:520px){.sgrid{grid-template-columns:1fr 1fr}}
 .sbox{background:var(--p2);border:1px solid var(--bd);border-radius:2px;padding:10px 12px}
-.slbl{font-size:8px;font-weight:900;letter-spacing:2px;color:var(--red);text-transform:uppercase;margin-bottom:4px}
-.sval{font-size:20px;font-weight:200;color:var(--white)}
-.sunit{font-size:9px;color:var(--mu);margin-top:2px}
-.hlrow{display:flex;border:1px solid var(--bd);border-radius:2px;overflow:hidden}
-.hlbox{flex:1;padding:10px;text-align:center}
+.slbl{font-size:10px;font-weight:900;letter-spacing:1.5px;color:var(--red);text-transform:uppercase;margin-bottom:5px}
+.sval{font-size:22px;font-weight:300;color:var(--white)}
+.sunit{font-size:11px;color:var(--mu);margin-top:2px}
+.hlrow{display:flex;border:1px solid var(--bd);border-radius:2px;overflow:hidden;margin-top:2px}
+.hlbox{flex:1;padding:12px}
 .hlbox:first-child{background:#130000;border-right:1px solid var(--bd)}
 .hlbox:last-child{background:#001015}
-.hllbl{font-size:8px;font-weight:900;letter-spacing:2px;text-transform:uppercase;margin-bottom:3px}
+.hllbl{font-size:10px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;text-align:center}
 .hlbox:first-child .hllbl{color:#ff7777}
 .hlbox:last-child  .hllbl{color:#77aaff}
-.hlval{font-size:23px;font-weight:200;color:var(--white)}
+.hlval{font-size:26px;font-weight:200;color:var(--white);text-align:center}
 
 /* ═══════════════════════════════════════════════════════
    STORM INTELLIGENCE SYSTEM
@@ -177,7 +177,22 @@ main{max-width:1440px;margin:0 auto;padding:16px}
 .future-box{background:var(--p3);border:1px solid var(--bd);border-radius:2px;padding:13px;text-align:center;color:var(--mu2);font-size:10px;line-height:1.9}
 .future-box strong{display:block;margin-bottom:3px;color:var(--mu);font-size:11px;letter-spacing:1px}
 
-/* ── HOURLY ──────────────────────────────────────────── */
+/* ── 7-DAY FORECAST ──────────────────────────────────── */
+.ext-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
+@media(max-width:700px){.ext-grid{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:440px){.ext-grid{grid-template-columns:repeat(2,1fr)}}
+.ext-day{background:var(--p2);border:1px solid var(--bd);border-radius:3px;padding:12px 8px;text-align:center}
+.ext-day.today{border-color:var(--red);background:#150505}
+.ext-dow{font-size:11px;font-weight:900;color:var(--white);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px}
+.ext-date{font-size:9px;color:var(--mu);margin-bottom:8px}
+.ext-icon{font-size:22px;margin-bottom:6px}
+.ext-desc{font-size:9px;color:var(--mu);margin-bottom:8px;line-height:1.4;min-height:24px}
+.ext-temps{display:flex;justify-content:center;gap:8px;align-items:baseline}
+.ext-hi{font-size:17px;font-weight:600;color:var(--white)}
+.ext-lo{font-size:13px;font-weight:400;color:#77aaff}
+.ext-pop{font-size:9px;color:#77aaff;margin-top:4px}
+.ext-bar{height:3px;background:var(--bd2);border-radius:2px;margin-top:6px;overflow:hidden}
+.ext-bar-fill{height:100%;border-radius:2px}
 .hourly{overflow-x:auto}
 .hr-row{display:flex;gap:9px;min-width:max-content;padding-bottom:2px}
 .hr{background:var(--p2);border:1px solid var(--bd);border-radius:2px;padding:9px 13px;text-align:center;min-width:66px}
@@ -459,32 +474,42 @@ footer strong{color:var(--red)}
       <div class="mfooter"><div class="ldot"></div>NWS KRAX · Raleigh/Durham · Live loop</div>
     </div>
     <div class="card" style="padding:14px">
-      <div class="sec" style="margin-bottom:10px">Live Cam · Sugar Mountain Base <em style="color:var(--mu);font-style:normal;font-size:8px">· Banner Elk, NC</em></div>
-      <div class="media-frame" style="height:210px;position:relative">
-        <iframe
-          src="https://skisugar.com/library/camnew-base.html"
-          title="Sugar Mountain Base Cam"
-          style="width:100%;height:100%;border:none;background:#000"
-          scrolling="no"
-          sandbox="allow-scripts allow-same-origin allow-popups"></iframe>
-        <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.7));padding:6px 10px;pointer-events:none">
-          <span style="font-size:9px;color:#fff;font-weight:700;letter-spacing:1px">⛷ SUGAR MTN · BASE · ELEV 4,000 ft</span>
+      <div class="sec" style="margin-bottom:10px">Live Cam · Sugar Mountain Base <em>· Banner Elk, NC</em></div>
+      <div class="media-frame" style="height:210px;position:relative;background:#111;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px">
+        <img id="sugar-cam" src="" alt="Sugar Mountain Base Cam"
+          style="width:100%;height:100%;object-fit:cover;display:block;border-radius:2px"
+          onerror="this.style.display='none';document.getElementById('sugar-fb').style.display='flex'"/>
+        <div id="sugar-fb" style="display:none;flex-direction:column;align-items:center;gap:10px;width:100%;height:100%;justify-content:center">
+          <div style="font-size:13px;color:var(--mu)">⛷ Sugar Mountain Base Cam</div>
+          <a href="https://skisugar.com/cams/" target="_blank" rel="noopener"
+            style="background:var(--red2);color:#fff;font-size:11px;font-weight:700;padding:7px 18px;border-radius:2px;letter-spacing:1px;border:1px solid var(--red)">
+            VIEW LIVE CAM →
+          </a>
+          <div style="font-size:9px;color:var(--mu2)">Opens skisugar.com in new tab</div>
+        </div>
+        <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.75));padding:6px 10px;pointer-events:none">
+          <span style="font-size:10px;color:#fff;font-weight:700;letter-spacing:1px">⛷ SUGAR MTN · BASE · 4,000 ft</span>
         </div>
       </div>
       <div class="mfooter"><div class="ldot"></div>Sugar Mountain Resort · skisugar.com · Banner Elk, NC</div>
     </div>
 
     <div class="card" style="padding:14px">
-      <div class="sec" style="margin-bottom:10px">Live Cam · Cape Hatteras <em style="color:var(--mu);font-style:normal;font-size:8px">· Outer Banks, NC</em></div>
-      <div class="media-frame" style="height:210px;position:relative">
-        <iframe
-          src="https://www.surfchex.com/cams/hatteras-web-cam/"
-          title="Cape Hatteras Surfchex Cam"
-          style="width:140%;height:140%;border:none;background:#000;margin-left:-20%;margin-top:-8%;pointer-events:auto"
-          scrolling="no"
-          sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe>
+      <div class="sec" style="margin-bottom:10px">Live Cam · Cape Hatteras <em>· Outer Banks, NC</em></div>
+      <div class="media-frame" style="height:210px;position:relative;background:#111;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px">
+        <img id="hatteras-cam" src="" alt="Cape Hatteras Cam"
+          style="width:100%;height:100%;object-fit:cover;display:block;border-radius:2px"
+          onerror="this.style.display='none';document.getElementById('hatteras-fb').style.display='flex'"/>
+        <div id="hatteras-fb" style="display:none;flex-direction:column;align-items:center;gap:10px;width:100%;height:100%;justify-content:center">
+          <div style="font-size:13px;color:var(--mu)">🌊 Cape Hatteras Live Cam</div>
+          <a href="https://www.surfchex.com/cams/hatteras-web-cam/" target="_blank" rel="noopener"
+            style="background:var(--red2);color:#fff;font-size:11px;font-weight:700;padding:7px 18px;border-radius:2px;letter-spacing:1px;border:1px solid var(--red)">
+            VIEW LIVE CAM →
+          </a>
+          <div style="font-size:9px;color:var(--mu2)">Opens surfchex.com in new tab</div>
+        </div>
         <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.75));padding:6px 10px;pointer-events:none">
-          <span style="font-size:9px;color:#fff;font-weight:700;letter-spacing:1px">🌊 CAPE HATTERAS · OUTER BANKS</span>
+          <span style="font-size:10px;color:#fff;font-weight:700;letter-spacing:1px">🌊 CAPE HATTERAS · OUTER BANKS</span>
         </div>
       </div>
       <div class="mfooter"><div class="ldot"></div>Surfchex · surfchex.com · Durant Station, Hatteras NC</div>
@@ -873,15 +898,146 @@ addHist("SIS initialized · Wolfpack Weather v1.0","ok");
 
 
 /* ════════════════════════════════════════════════════
-   BOOT
+   LIVE CAMS — refresh snapshot images
 ════════════════════════════════════════════════════ */
+function refreshCams(){
+  // Sugar Mountain publishes a refreshing JPG snapshot
+  const ts = Date.now();
+  const sugarImg = G("sugar-cam");
+  if(sugarImg){
+    sugarImg.style.display = "block";
+    sugarImg.src = `https://skisugar.com/webcam/base.jpg?t=${ts}`;
+  }
+  // Surfchex Hatteras snapshot
+  const hatImg = G("hatteras-cam");
+  if(hatImg){
+    hatImg.style.display = "block";
+    hatImg.src = `https://www.surfchex.com/webcam-images/hatteras.jpg?t=${ts}`;
+  }
+}
+refreshCams();
+setInterval(refreshCams, 60000); // refresh cams every 60s
+
+/* ════════════════════════════════════════════════════
+   7-DAY EXTENDED FORECAST — NWS API
+════════════════════════════════════════════════════ */
+async function fetchExtended(){
+  const wrap = G("ext-forecast");
+  try{
+    // NWS: get grid point for Garner NC
+    const ptR = await fetch("https://api.weather.gov/points/35.686,-78.614",
+      {headers:{Accept:"application/geo+json","User-Agent":"WolfpackWeather/1.0"}});
+    const ptD = await ptR.json();
+    const fcastUrl = ptD.properties?.forecast;
+    if(!fcastUrl) throw new Error("No forecast URL");
+
+    const fR = await fetch(fcastUrl, {headers:{Accept:"application/geo+json","User-Agent":"WolfpackWeather/1.0"}});
+    const fD = await fR.json();
+    const periods = fD.properties?.periods || [];
+
+    // Pair day+night into single day objects
+    const days = [];
+    for(let i=0; i<periods.length && days.length<7; i++){
+      const p = periods[i];
+      if(p.isDaytime){
+        const night = periods[i+1];
+        days.push({
+          name: p.name,
+          startTime: p.startTime,
+          hiTemp: p.temperature,
+          loTemp: night ? night.temperature : null,
+          icon: p.shortForecast,
+          desc: p.shortForecast,
+          pop: p.probabilityOfPrecipitation?.value || 0,
+          wind: p.windSpeed,
+          windDir: p.windDirection,
+          code: p.weatherCode || 0,
+        });
+      }
+    }
+
+    const today = new Date();
+    wrap.innerHTML = `<div class="ext-grid">${days.map((d,i)=>{
+      const dt = new Date(d.startTime);
+      const dow = i===0 ? "Today" : dt.toLocaleDateString("en-US",{weekday:"short"});
+      const date = dt.toLocaleDateString("en-US",{month:"short",day:"numeric"});
+      const icon = nwsIcon(d.desc);
+      const hiMax = Math.max(...days.map(x=>x.hiTemp));
+      const hiMin = Math.min(...days.map(x=>x.hiTemp));
+      const barPct = hiMax>hiMin ? Math.round((d.hiTemp-hiMin)/(hiMax-hiMin)*100) : 50;
+      const barColor = d.hiTemp>=80?"#ff6600":d.hiTemp>=60?"#ffcc00":"#4488ff";
+      return `<div class="ext-day${i===0?" today":""}">
+        <div class="ext-dow">${dow}</div>
+        <div class="ext-date">${date}</div>
+        <div class="ext-icon">${icon}</div>
+        <div class="ext-desc">${d.desc}</div>
+        <div class="ext-temps">
+          <span class="ext-hi">${d.hiTemp}°</span>
+          ${d.loTemp!==null?`<span class="ext-lo">${d.loTemp}°</span>`:""}
+        </div>
+        ${d.pop>10?`<div class="ext-pop">💧 ${d.pop}%</div>`:""}
+        <div class="ext-bar"><div class="ext-bar-fill" style="width:${barPct}%;background:${barColor}"></div></div>
+        <div style="font-size:9px;color:var(--mu);margin-top:5px">${d.wind} ${d.windDir}</div>
+      </div>`;
+    }).join("")}</div>`;
+
+  }catch(e){
+    console.error("Extended forecast:",e);
+    // Fallback: Open-Meteo 7-day daily
+    try{
+      const r = await fetch("https://api.open-meteo.com/v1/forecast?latitude=35.686&longitude=-78.614&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max,wind_speed_10m_max,wind_direction_10m_dominant&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=7");
+      const d = await r.json();
+      const daily = d.daily;
+      const hiMax = Math.max(...daily.temperature_2m_max);
+      const hiMin = Math.min(...daily.temperature_2m_max);
+      wrap.innerHTML = `<div class="ext-grid">${daily.time.map((t,i)=>{
+        const dt = new Date(t+"T12:00:00");
+        const dow = i===0?"Today":dt.toLocaleDateString("en-US",{weekday:"short"});
+        const date = dt.toLocaleDateString("en-US",{month:"short",day:"numeric"});
+        const hi = Math.round(daily.temperature_2m_max[i]);
+        const lo = Math.round(daily.temperature_2m_min[i]);
+        const pop = daily.precipitation_probability_max[i]||0;
+        const barPct = hiMax>hiMin?Math.round((hi-hiMin)/(hiMax-hiMin)*100):50;
+        const barColor = hi>=80?"#ff6600":hi>=60?"#ffcc00":"#4488ff";
+        return `<div class="ext-day${i===0?" today":""}">
+          <div class="ext-dow">${dow}</div>
+          <div class="ext-date">${date}</div>
+          <div class="ext-icon">${wmoIcon(daily.weather_code[i])}</div>
+          <div class="ext-desc">${wmoDesc(daily.weather_code[i])}</div>
+          <div class="ext-temps"><span class="ext-hi">${hi}°</span><span class="ext-lo">${lo}°</span></div>
+          ${pop>10?`<div class="ext-pop">💧 ${pop}%</div>`:""}
+          <div class="ext-bar"><div class="ext-bar-fill" style="width:${barPct}%;background:${barColor}"></div></div>
+          <div style="font-size:9px;color:var(--mu);margin-top:5px">${Math.round(daily.wind_speed_10m_max[i])} mph</div>
+        </div>`;
+      }).join("")}</div>`;
+    }catch(e2){ wrap.innerHTML='<div style="color:var(--mu);font-size:12px">Extended forecast unavailable</div>'; }
+  }
+}
+
+function nwsIcon(desc=""){
+  const d=desc.toLowerCase();
+  if(d.includes("tornado")||d.includes("hurricane"))return"🌪️";
+  if(d.includes("thunder"))return"⛈️";
+  if(d.includes("snow")||d.includes("blizzard"))return"❄️";
+  if(d.includes("sleet")||d.includes("freezing"))return"🌨️";
+  if(d.includes("rain")||d.includes("shower"))return"🌧️";
+  if(d.includes("drizzle"))return"🌦️";
+  if(d.includes("fog")||d.includes("haze"))return"🌫️";
+  if(d.includes("cloud")||d.includes("overcast"))return"☁️";
+  if(d.includes("partly"))return"🌤️";
+  if(d.includes("mostly sunny")||d.includes("mostly clear"))return"🌤️";
+  if(d.includes("sunny")||d.includes("clear"))return"☀️";
+  return"🌡️";
+}
 connectWS();
 
 async function refreshAll(){
   await Promise.allSettled([fetchConditions(),fetchAlerts(),fetchHRRRProxy()]);
 }
 refreshAll();
+fetchExtended();
 setInterval(refreshAll, 5*60*1000);
+setInterval(fetchExtended, 30*60*1000); // NWS forecast updates every ~30min
 </script>
 </body>
 </html>
