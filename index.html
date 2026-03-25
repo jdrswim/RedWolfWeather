@@ -81,13 +81,14 @@ footer{padding:16px 12px;margin-top:20px}footer p{font-size:9px}
 <div class="tip-overlay" id="tipForecast"><div class="tip-panel"><button class="tip-close" onclick="closeTip('tipForecast')">&times;</button><div class="tip-title">Reading the 7-Day Forecast</div><div class="tip-body"><div class="tip-label">Temperature Range Bar</div>Each bar spans <strong style="color:#77aaff">Low</strong> to <strong style="color:#ffaa55">High</strong>, positioned relative to the full week.<div class="tip-divider"></div><div class="tip-color-row"><div class="tip-swatch" style="background:#ff6600"></div><strong>Orange</strong> 80F+</div><div class="tip-color-row"><div class="tip-swatch" style="background:#ffcc00"></div><strong>Yellow</strong> 60-79F</div><div class="tip-color-row"><div class="tip-swatch" style="background:#4488ff"></div><strong>Blue</strong> Below 60F</div></div></div></div>
 <div class="tip-overlay" id="tipAlmanac"><div class="tip-panel"><button class="tip-close" onclick="closeTip('tipAlmanac')">&times;</button><div class="tip-title">Raleigh Wx Almanac</div><div class="tip-body"><strong>Year-to-date climate stats</strong> vs 30-year normals (1991-2020). Data from <strong>Open-Meteo Archive</strong> (ERA5). Reference: RDU Airport.<div class="tip-divider"></div><div class="tip-color-row"><div class="tip-swatch" style="background:#ff8844"></div><strong>Orange</strong> Above normal</div><div class="tip-color-row"><div class="tip-swatch" style="background:#77aaff"></div><strong>Blue</strong> Below normal</div><div class="tip-color-row"><div class="tip-swatch" style="background:#00d44a"></div><strong>Green</strong> Near normal</div></div></div></div>
 
-<!-- TICKER -->
-
-<div class="ticker-wrap"><div class="ticker-badge">&#11044; WOLFPACK WEATHER</div><div class="ticker-inner"><div class="ticker-track" id="ticker"><span>LIVE CONDITIONS - KNCRALEI761 - RED WOLF FARM - S. WAKE COUNTY, NC</span><span>TUFFY'S STORM PREDICTION SYSTEM ACTIVE</span><span>NC STATE WOLFPACK WEATHER NETWORK - GO PACK</span><span>LIVE CONDITIONS - KNCRALEI761 - RED WOLF FARM - S. WAKE COUNTY, NC</span><span>TUFFY'S STORM PREDICTION SYSTEM ACTIVE</span><span>NC STATE WOLFPACK WEATHER NETWORK - GO PACK</span></div></div></div>
+<!-- ticker removed -->
 
 <header><div class="logo"><svg viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="3" fill="#CC0000"/><polygon points="7,39 14,18 22,30 24,13 26,30 34,18 41,39 35,39 29,23 24,35 19,23 13,39" fill="white"/></svg><div class="logo-text"><h1>Wolfpack Weather</h1><p>Storm Intelligence Network - NC State</p></div></div><div class="hdr-r"><div class="clock" id="clock">--:--:--</div><div class="cdate" id="cdate">Loading...</div></div></header>
 
-<div class="onair"><div class="lpulse"></div><span>ON AIR</span><span style="color:rgba(255,255,255,.3)">|</span><span class="mu">RED WOLF FARM - S. WAKE COUNTY, NC - </span><span id="oatemp">--F</span><span class="net-lbl">WOLFPACK WEATHER NETWORK</span></div>
+<!-- onair removed -->
+
+<span id="oatemp" style="display:none"></span>
+<span id="ticker" style="display:none"></span>
 
 <div class="tab-bar">
 <button class="tab-btn active" id="tabBtnLive" onclick="switchTab('live',this)">Live Weather</button>
