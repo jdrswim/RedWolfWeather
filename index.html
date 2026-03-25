@@ -251,6 +251,27 @@ main{max-width:1100px;margin:0 auto;padding:18px;overflow-x:hidden}
 .alm-note{font-size:9px;color:var(–mu2);text-align:center;margin-top:16px;line-height:1.8}
 .alm-ld{text-align:center;padding:40px;color:var(–mu);font-size:12px}
 
+/* PWS */
+.pws-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.pws-card{background:var(–p1);border:1px solid var(–bd);border-top:3px solid var(–red);border-radius:3px;padding:18px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;transition:border-color .3s}
+.pws-card:hover{border-color:var(–bd2)}
+.pws-card.own{border-top-color:var(–gold);background:linear-gradient(135deg,var(–p1),#1a1500)}
+.pws-left{flex:1;min-width:0}
+.pws-name{font-size:15px;font-weight:800;color:var(–white);letter-spacing:.5px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pws-loc{font-size:11px;color:var(–mu);margin-bottom:2px}
+.pws-id{font-size:9px;color:var(–mu2);letter-spacing:1.5px;font-weight:700;text-transform:uppercase}
+.pws-right{text-align:right;flex-shrink:0}
+.pws-temp{font-size:36px;font-weight:200;color:var(–white);line-height:1}
+.pws-temp sup{font-size:16px;color:var(–red);font-weight:300}
+.pws-updated{font-size:9px;color:var(–mu2);margin-top:4px}
+.pws-details{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.pws-det-item{background:var(–p2);border:1px solid var(–bd);border-radius:2px;padding:8px 10px;text-align:center}
+.pws-det-lbl{font-size:8px;font-weight:800;letter-spacing:1px;color:var(–red);text-transform:uppercase;margin-bottom:3px}
+.pws-det-val{font-size:14px;font-weight:300;color:var(–white)}
+.pws-det-unit{font-size:9px;color:var(–mu2);margin-top:1px}
+.pws-err{font-size:10px;color:var(–mu2);text-align:center;padding:14px;font-style:italic}
+.pws-note{font-size:9px;color:var(–mu2);text-align:center;margin-top:16px;line-height:1.8}
+
 footer{background:var(–off);border-top:3px solid var(–red);padding:20px;margin-top:32px;text-align:center}
 footer p{font-size:10px;color:var(–mu2);letter-spacing:.4px;line-height:2.2}
 footer strong{color:var(–red)}
@@ -262,7 +283,7 @@ footer strong{color:var(–red)}
 ::-webkit-scrollbar-thumb{background:var(–bd2)}
 
 /* RESPONSIVE */
-@media(max-width:960px){.media-row{grid-template-columns:1fr 1fr}.ext-grid{grid-template-columns:repeat(4,1fr)}.alm-grid{grid-template-columns:1fr}}
+@media(max-width:960px){.media-row{grid-template-columns:1fr 1fr}.ext-grid{grid-template-columns:repeat(4,1fr)}.alm-grid{grid-template-columns:1fr}.pws-grid{grid-template-columns:1fr}}
 @media(max-width:760px){.ext-grid{grid-template-columns:repeat(3,1fr)}.sgrid{grid-template-columns:repeat(2,1fr)}.alm-mo-grid{grid-template-columns:repeat(3,1fr)}.media-row{grid-template-columns:1fr}}
 @media(max-width:600px){
 .ticker-wrap{height:28px}.ticker-badge{font-size:9px;padding:0 10px}.ticker-track span{font-size:10px;padding:0 30px}
@@ -280,6 +301,7 @@ main{padding:10px 8px}.sec{font-size:11px;padding-left:8px;margin-bottom:10px}.s
 .ext-grid{grid-template-columns:repeat(2,1fr);gap:8px}.ext-day{padding:12px 8px}.ext-hi{font-size:18px}.ext-lo{font-size:13px}
 .media-row{grid-template-columns:1fr;gap:12px}.media-frame{height:180px}
 .alm-wrap{padding:10px 8px}.alm-summary{grid-template-columns:1fr}.alm-mo-grid{grid-template-columns:repeat(2,1fr)}.alm-big-val{font-size:24px}
+.pws-grid{grid-template-columns:1fr}.pws-details{grid-template-columns:repeat(2,1fr)}.pws-temp{font-size:30px}.pws-name{font-size:13px}
 footer{padding:16px 12px;margin-top:20px}footer p{font-size:9px}
 .tip-panel{padding:18px;margin:10px}
 }
@@ -309,7 +331,7 @@ footer{padding:16px 12px;margin-top:20px}footer p{font-size:9px}
 
 <!-- TAB BAR -->
 
-<div class="tab-bar"><button class="tab-btn active" onclick="switchTab('live')">Live Weather</button><button class="tab-btn" onclick="switchTab('almanac')">Raleigh Wx Almanac</button></div>
+<div class="tab-bar"><button class="tab-btn active" onclick="switchTab('live')">Live Weather</button><button class="tab-btn" onclick="switchTab('almanac')">Raleigh Wx Almanac</button><button class="tab-btn" onclick="switchTab('pws')">Wake PWS Wx</button></div>
 
 <!-- ==================== LIVE WEATHER TAB ==================== -->
 
@@ -356,6 +378,15 @@ footer{padding:16px 12px;margin-top:20px}footer p{font-size:9px}
 </div>
 </div>
 
+<!-- ==================== PWS TAB ==================== -->
+
+<div class="tab-pane" id="tab-pws">
+<div class="alm-wrap">
+  <div class="sec">Wake County PWS Network <em>· Personal Weather Stations · Weather Underground</em></div>
+  <div id="pws-content"><div class="alm-ld"><div class="tsps-spinner"></div>Loading PWS observations...</div></div>
+</div>
+</div>
+
 <footer>
   <p><strong>Wolfpack Weather</strong> · Station <strong>KNCRALEI761</strong> · Red Wolf Farm - S. Wake County, NC</p>
   <p>Weather: Open-Meteo · Alerts: NWS api.weather.gov · Satellite: NOAA GOES-East · Radar: NWS KRAX</p>
@@ -367,7 +398,7 @@ footer{padding:16px 12px;margin-top:20px}footer p{font-size:9px}
 function openTip(id){document.getElementById(id).classList.add("show")}
 function closeTip(id){document.getElementById(id).classList.remove("show")}
 document.querySelectorAll(".tip-overlay").forEach(o=>{o.addEventListener("click",function(e){if(e.target===this)this.classList.remove("show")})});
-function switchTab(t){document.querySelectorAll(".tab-pane").forEach(p=>p.classList.remove("active"));document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));document.getElementById("tab-"+t).classList.add("active");event.target.classList.add("active");if(t==="almanac"&&!window.__almLoaded)fetchAlmanac()}
+function switchTab(t){document.querySelectorAll(".tab-pane").forEach(p=>p.classList.remove("active"));document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));document.getElementById("tab-"+t).classList.add("active");event.target.classList.add("active");if(t==="almanac"&&!window.__almLoaded)fetchAlmanac();if(t==="pws"&&!window.__pwsLoaded)fetchPWS()}
 
 /* CORE */
 const G=id=>document.getElementById(id),NOW=()=>new Date();
@@ -431,6 +462,115 @@ tMo+=`<div class="alm-mo${iC?" current":""}${iF?" future":""}"><div class="alm-m
 const pB=tP!==null?Math.min(100,Math.round(tP/Math.max(RDU_NORMALS_PRECIP[m],.01)*100)):0;const pC=pd!==null?(pd>.25?"#ff8844":pd<-.25?"#4488ff":"#00d44a"):"#333";
 pMo+=`<div class="alm-mo${iC?" current":""}${iF?" future":""}"><div class="alm-mo-name">${MO_NAMES[m]}</div><div class="alm-mo-val">${tP!==null?tP.toFixed(2)+'"':"—"}</div><div class="alm-mo-nrm">Nrm: ${RDU_NORMALS_PRECIP[m].toFixed(2)}"</div>${pd!==null?`<div class="alm-mo-diff ${dCls(pd,.25)}">${Math.abs(pd)<.25?"≈ Normal":(pd>0?"+":"")+pd.toFixed(2)+'"'}</div>`:""}${tP!==null?`<div class="alm-mo-bar"><div class="alm-mo-bar-fill" style="width:${pB}%;background:${pC}"></div></div>`:""}</div>`}
 el.innerHTML=`<div class="alm-summary"><div class="alm-big"><div class="alm-big-lbl">YTD Rainfall</div><div class="alm-big-val">${ytdP.toFixed(2)}"</div><div class="alm-big-sub">Normal: ${nP.toFixed(2)}"</div>${dLbl(pDiff,'"',.25)}</div><div class="alm-big"><div class="alm-big-lbl">YTD Avg Temp</div><div class="alm-big-val">${ytdAT.toFixed(1)}°F</div><div class="alm-big-sub">Normal: ${nAT.toFixed(1)}°F</div>${dLbl(tDiff,"°F",.5)}</div><div class="alm-big"><div class="alm-big-lbl">Days Tracked</div><div class="alm-big-val">${ytdD}</div><div class="alm-big-sub">${yr} Year-to-Date</div></div></div><div class="alm-grid"><div class="alm-card"><h3><span>🌡️</span> Monthly Avg Temperature</h3><div class="alm-mo-grid">${tMo}</div></div><div class="alm-card"><h3><span>🌧️</span> Monthly Rainfall Totals</h3><div class="alm-mo-grid">${pMo}</div></div></div><div class="alm-note">Data: Open-Meteo Historical Archive (ERA5) · RDU Airport · 30-year normals: 1991–2020 NCEI<br>Future months shown as placeholders · Updated on each visit</div>`;window.__almLoaded=true}catch(e){el.innerHTML=`<div class="alm-ld" style="color:#ef4444">⚠ ${e.message}<br><button onclick="fetchAlmanac()" style="margin-top:10px;background:var(--red2);border:1px solid var(--red);color:#fff;padding:6px 16px;border-radius:2px;cursor:pointer">↻ Retry</button></div>`}}
+
+/* ═══ PWS NETWORK ═══ */
+const PWS_STATIONS=[
+  {id:"KNCRALEI761",name:"Red Wolf Farm",loc:"S. Wake County / Garner",own:true},
+  {id:"KNCRALEI828",name:"G. Bragg",loc:"Raleigh"},
+  {id:"KNCRALEI1276",name:"Vorbeck Residence",loc:"Juniper"},
+  {id:"KNCRALEI1175",name:"Grayson Merrill",loc:"Raleigh"},
+  {id:"KNCRALEI668",name:"Jon Wall - near RDU",loc:"Northwest Raleigh"}
+];
+const WU_KEY="6532d6454b8aa370768e63d6ba5a832e";
+
+async function fetchPWS(){
+  const el=G("pws-content");
+  el.innerHTML='<div class="alm-ld"><div class="tsps-spinner"></div>Loading PWS observations...</div>';
+  const results=await Promise.allSettled(PWS_STATIONS.map(async st=>{
+    try{
+      const r=await fetch(`https://api.weather.com/v2/pws/observations/current?stationId=${st.id}&format=json&units=e&apiKey=${WU_KEY}`);
+      if(!r.ok)throw new Error(r.status);
+      const d=await r.json();
+      const obs=d.observations&&d.observations[0];
+      if(!obs)throw new Error("No data");
+      return{...st,obs,ok:true};
+    }catch(e){return{...st,ok:false,err:e.message}}
+  }));
+
+  const data=results.map(r=>r.value);
+  let html='<div class="pws-grid">';
+  data.forEach(st=>{
+    if(!st.ok){
+      html+=`<div class="pws-card${st.own?" own":""}"><div class="pws-left"><div class="pws-name">${st.name}</div><div class="pws-loc">${st.loc}</div><div class="pws-id">${st.id}</div></div><div class="pws-right"><div class="pws-err">Offline or unavailable</div></div></div>`;
+      return;
+    }
+    const o=st.obs,imp=o.imperial||{};
+    const temp=imp.temp!=null?imp.temp:"--";
+    const feels=imp.heatIndex!=null?imp.heatIndex:(imp.windChill!=null?imp.windChill:temp);
+    const humid=o.humidity!=null?o.humidity:"--";
+    const wspd=imp.windSpeed!=null?imp.windSpeed:"--";
+    const wgust=imp.windGust!=null?imp.windGust:"--";
+    const wdir=o.winddir!=null?deg2dir(o.winddir):"--";
+    const pres=imp.pressure!=null?imp.pressure:"--";
+    const precip=imp.precipTotal!=null?imp.precipTotal:"--";
+    const dewpt=imp.dewpt!=null?imp.dewpt:"--";
+    const uvi=o.uv!=null?o.uv:"--";
+    const solar=o.solarRadiation!=null?o.solarRadiation:"--";
+    const obsTime=o.obsTimeLocal?new Date(o.obsTimeLocal).toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit"}):"--";
+
+    html+=`<div class="pws-card${st.own?" own":""}">
+      <div class="pws-left">
+        <div class="pws-name">${st.own?"🐺 ":""}${st.name}</div>
+        <div class="pws-loc">${st.loc}</div>
+        <div class="pws-id">${st.id}</div>
+      </div>
+      <div class="pws-right">
+        <div class="pws-temp">${temp}<sup>°F</sup></div>
+        <div class="pws-updated">Updated ${obsTime}</div>
+      </div>
+    </div>
+    <style>.pws-card:nth-child(${data.indexOf(st)*2+1})+.pws-det-row{display:contents}</style>`;
+
+```
+// We'll append detail row as a full-width spanning element
+```
+
+});
+html+=’</div>’;
+
+// Build detail sections per station
+html+=’<div style="margin-top:18px;display:flex;flex-direction:column;gap:14px">’;
+data.forEach(st=>{
+if(!st.ok)return;
+const o=st.obs,imp=o.imperial||{};
+const temp=imp.temp!=null?imp.temp:”–”;
+const feels=imp.heatIndex!=null?imp.heatIndex:(imp.windChill!=null?imp.windChill:temp);
+const humid=o.humidity!=null?o.humidity:”–”;
+const wspd=imp.windSpeed!=null?imp.windSpeed:”–”;
+const wgust=imp.windGust!=null?imp.windGust:”–”;
+const wdir=o.winddir!=null?deg2dir(o.winddir):”–”;
+const pres=imp.pressure!=null?imp.pressure:”–”;
+const precip=imp.precipTotal!=null?imp.precipTotal:”–”;
+const dewpt=imp.dewpt!=null?imp.dewpt:”–”;
+const uvi=o.uv!=null?o.uv:”–”;
+const solar=o.solarRadiation!=null?o.solarRadiation:”–”;
+
+```
+html+=`<div class="card" style="padding:14px${st.own?";border-top-color:var(--gold)":""}">
+  <div style="font-size:11px;font-weight:900;letter-spacing:1.5px;color:${st.own?"var(--gold)":"var(--red)"};text-transform:uppercase;margin-bottom:10px">${st.own?"🐺 ":""}${st.name} <span style="color:var(--mu);font-weight:500;letter-spacing:1px">· ${st.loc} · ${st.id}</span></div>
+  <div class="pws-details">
+    <div class="pws-det-item"><div class="pws-det-lbl">Temp</div><div class="pws-det-val">${temp}°F</div></div>
+    <div class="pws-det-item"><div class="pws-det-lbl">Feels Like</div><div class="pws-det-val">${feels}°F</div></div>
+    <div class="pws-det-item"><div class="pws-det-lbl">Humidity</div><div class="pws-det-val">${humid}%</div></div>
+    <div class="pws-det-item"><div class="pws-det-lbl">Dew Point</div><div class="pws-det-val">${dewpt}°F</div></div>
+    <div class="pws-det-item"><div class="pws-det-lbl">Wind</div><div class="pws-det-val">${wspd} mph</div><div class="pws-det-unit">${wdir}</div></div>
+    <div class="pws-det-item"><div class="pws-det-lbl">Gusts</div><div class="pws-det-val">${wgust} mph</div></div>
+    <div class="pws-det-item"><div class="pws-det-lbl">Pressure</div><div class="pws-det-val">${pres}</div><div class="pws-det-unit">inHg</div></div>
+    <div class="pws-det-item"><div class="pws-det-lbl">Precip</div><div class="pws-det-val">${precip}"</div><div class="pws-det-unit">today</div></div>
+    <div class="pws-det-item"><div class="pws-det-lbl">UV Index</div><div class="pws-det-val">${uvi}</div></div>
+    <div class="pws-det-item"><div class="pws-det-lbl">Solar Rad</div><div class="pws-det-val">${solar}</div><div class="pws-det-unit">W/m²</div></div>
+  </div>
+</div>`;
+```
+
+});
+html+=’</div>’;
+html+=’<div class="pws-note">Data: Weather Underground Personal Weather Stations · Wake County, NC<br>Your station (Red Wolf Farm) highlighted in gold · Auto-refreshes on tab switch</div>’;
+el.innerHTML=html;
+window.__pwsLoaded=true;
+// Allow re-fetch on subsequent tab switches for fresh data
+setTimeout(()=>{window.__pwsLoaded=false},120000);
+}
 
 /* BOOT */
 seedExtended();async function refreshAll(){await Promise.allSettled([fetchConditions()])}refreshAll();fetchExtended();setInterval(refreshAll,5*60*1000);setInterval(fetchExtended,30*60*1000);
