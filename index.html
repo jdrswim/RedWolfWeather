@@ -14,15 +14,7 @@
         y=e.createElement(n);y.async=!0;y.src='https://cdn.pendo.io/agent/static/'+apiKey+'/pendo.js';
         z=e.getElementsByTagName(n)[0];z.parentNode.insertBefore(y,z);})(window,document,'script','pendo');
 })('d3776cc3-c6a9-47da-ad08-045b5ddf534c');
-
-pendo.initialize({
-  visitor: {
-    id: 'visitor-' + Math.random().toString(36).substr(2, 9)
-  },
-  account: {
-    id: 'redwolfweather'
-  }
-});
+pendo.initialize({visitor:{id:'visitor-'+Math.random().toString(36).substr(2,9)},account:{id:'redwolfweather'}});
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
@@ -31,15 +23,12 @@ pendo.initialize({
 html{scroll-behavior:smooth;overflow-x:hidden}
 body{background:var(--black);color:var(--tx);font-family:var(--font);overflow-x:hidden;max-width:100vw}
 body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.04) 3px,rgba(0,0,0,.04) 4px);pointer-events:none;z-index:9998}
-.ticker-wrap{background:var(--red2);height:32px;display:flex;overflow:hidden;border-bottom:2px solid var(--red3)}.ticker-badge{background:var(--black);color:var(--gold);font-size:11px;font-weight:900;letter-spacing:2px;padding:0 16px;height:100%;display:flex;align-items:center;flex-shrink:0;border-right:2px solid var(--red)}.ticker-inner{overflow:hidden;flex:1}.ticker-track{display:inline-flex;animation:tick 60s linear infinite;white-space:nowrap}.ticker-track span{font-size:12px;font-weight:700;color:#fff;padding:0 52px;letter-spacing:.5px}@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 header{background:var(--off);border-bottom:3px solid var(--red);padding:10px 22px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}.logo{display:flex;align-items:center;gap:12px}.logo svg{width:48px;height:48px;flex-shrink:0}.logo-text h1{font-size:20px;font-weight:900;letter-spacing:2px;color:var(--white);text-transform:uppercase}.logo-text p{font-size:9px;color:var(--red);letter-spacing:4px;font-weight:700;text-transform:uppercase;margin-top:2px}.hdr-r{text-align:right}.clock{font-size:26px;font-weight:200;color:var(--white);letter-spacing:3px;font-variant-numeric:tabular-nums}.cdate{font-size:9px;color:var(--mu);letter-spacing:2px;text-transform:uppercase;margin-top:2px}
-.onair{background:linear-gradient(90deg,var(--red3),var(--red2) 60%,var(--red3));padding:5px 22px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--red3);overflow:hidden}.lpulse{width:7px;height:7px;background:#ff3333;border-radius:50%;animation:pulse 1.2s infinite;flex-shrink:0}@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.7)}}.onair span{font-size:10px;font-weight:800;letter-spacing:2px;color:#fff}.onair .mu{color:rgba(255,255,255,.5);font-weight:400;letter-spacing:1px}.onair .net-lbl{font-size:9px;color:rgba(255,255,255,.4);letter-spacing:2px;margin-left:auto}
 .tab-bar{display:flex;background:var(--off);border-bottom:1px solid var(--bd);padding:0 22px;overflow-x:auto}.tab-btn{background:none;border:none;border-bottom:3px solid transparent;color:var(--mu);font-family:var(--font);font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;padding:10px 20px;cursor:pointer;white-space:nowrap;transition:all .2s}.tab-btn:hover{color:var(--white)}.tab-btn.active{color:var(--red);border-bottom-color:var(--red)}.tab-pane{display:none}.tab-pane.active{display:block}
 main{max-width:1100px;margin:0 auto;padding:18px;overflow-x:hidden}
 .sec{font-size:13px;font-weight:900;letter-spacing:2px;color:var(--red);text-transform:uppercase;border-left:3px solid var(--red);padding-left:10px;margin-bottom:13px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}.sec em{color:var(--mu);font-style:normal;font-weight:500;font-size:11px;letter-spacing:1px}
 .card{background:var(--p1);border:1px solid var(--bd);border-top:3px solid var(--red);border-radius:3px;padding:18px;overflow:hidden}
 .tip-btn{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.5);font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;font-family:var(--font);line-height:1;user-select:none}.tip-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:10000;align-items:center;justify-content:center;padding:20px}.tip-overlay.show{display:flex}.tip-panel{background:#151518;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:24px;max-width:480px;width:100%;max-height:80vh;overflow-y:auto;position:relative}.tip-close{position:absolute;top:12px;right:14px;background:none;border:none;color:rgba(255,255,255,.4);font-size:20px;cursor:pointer;padding:4px 8px;line-height:1}.tip-close:hover{color:#fff}.tip-title{font-size:14px;font-weight:800;color:var(--red);letter-spacing:1px;text-transform:uppercase;margin-bottom:14px;padding-right:30px}.tip-body{font-size:12px;color:rgba(255,255,255,.65);line-height:1.8}.tip-body strong{color:rgba(255,255,255,.85)}.tip-body .tip-divider{height:1px;background:rgba(255,255,255,.06);margin:12px 0}.tip-body .tip-label{font-size:10px;font-weight:700;color:var(--red);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;margin-top:14px}.tip-body .tip-label:first-child{margin-top:0}.tip-body .tip-color-row{display:flex;align-items:center;gap:8px;margin:4px 0}.tip-body .tip-swatch{width:14px;height:8px;border-radius:2px;flex-shrink:0}
-/* WEATHER SCENE — full card background */
 .cond-card{position:relative;background:var(--p1);border:1px solid var(--bd);border-top:3px solid var(--red);border-radius:3px;overflow:hidden}
 .wx-scene{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
 .wx-scene .wx-sky{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;transition:background 1.5s ease}
@@ -50,15 +39,11 @@ main{max-width:1100px;margin:0 auto;padding:18px;overflow-x:hidden}
 .cond-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:14px}
 .cond-temp{font-size:80px;font-weight:200;color:rgba(0,0,0,.75);line-height:1;letter-spacing:-3px;text-shadow:0 1px 4px rgba(255,255,255,.3)}
 .cond-temp sup{font-size:30px;font-weight:300;color:var(--red);text-shadow:none;margin-left:4px}
-.cond-meta{text-align:right}
-.cond-desc{font-size:24px;font-weight:700;color:#fff;margin-bottom:6px;text-shadow:0 2px 12px rgba(0,0,0,.7)}
-.cond-sub{font-size:13px;color:rgba(255,255,255,.8);line-height:2;text-shadow:0 1px 6px rgba(0,0,0,.6)}
-.cond-sub strong{color:#fff;font-weight:600}
+.cond-meta{text-align:right}.cond-desc{font-size:24px;font-weight:700;color:#fff;margin-bottom:6px;text-shadow:0 2px 12px rgba(0,0,0,.7)}
+.cond-sub{font-size:13px;color:rgba(255,255,255,.8);line-height:2;text-shadow:0 1px 6px rgba(0,0,0,.6)}.cond-sub strong{color:#fff;font-weight:600}
 .cond-upd{display:flex;align-items:center;gap:8px;margin-top:6px;justify-content:flex-end;flex-wrap:wrap}
 .cond-upd-txt{font-size:10px;color:rgba(255,255,255,.45);text-shadow:0 1px 4px rgba(0,0,0,.5)}
 .cond-loc{font-size:9px;color:rgba(0,0,0,.6);letter-spacing:1.5px;text-shadow:0 1px 3px rgba(255,255,255,.4);margin-bottom:16px;font-weight:700}
-
-.ctop{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px}.tbig{font-size:72px;font-weight:200;color:var(--white);line-height:1;letter-spacing:-2px;font-variant-numeric:tabular-nums}.tsup{font-size:28px;font-weight:300;color:var(--red);margin-top:10px}.cmeta{text-align:right}.cdesc{font-size:22px;font-weight:700;color:var(--white);margin-bottom:6px}.csub{font-size:14px;color:var(--mu);line-height:2.1}.csub strong{color:var(--white);font-weight:600}.cupd{font-size:11px;color:var(--mu2);margin-top:8px}
 .sgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:4px}.sbox{background:var(--p2);border:1px solid var(--bd);border-radius:2px;padding:12px 14px}.slbl{font-size:11px;font-weight:900;letter-spacing:1.5px;color:var(--red);text-transform:uppercase;margin-bottom:6px}.sval{font-size:24px;font-weight:300;color:var(--white)}.sunit{font-size:12px;color:var(--mu);margin-top:3px}
 .hlrow{display:flex;border:1px solid var(--bd);border-radius:2px;overflow:hidden}.hlbox{flex:1;padding:14px;text-align:center}.hlbox:first-child{background:#130000;border-right:1px solid var(--bd)}.hlbox:last-child{background:#001015}.hllbl{font-size:11px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px}.hlbox:first-child .hllbl{color:#ff7777}.hlbox:last-child .hllbl{color:#77aaff}.hlval{font-size:28px;font-weight:200;color:var(--white)}
 #tsps{font-family:var(--font);position:relative;overflow:hidden}
@@ -71,7 +56,6 @@ main{max-width:1100px;margin:0 auto;padding:18px;overflow-x:hidden}
 .tsps-top{display:flex;justify-content:center;align-items:center;gap:28px;margin-bottom:22px;flex-wrap:wrap}.tsps-gauge-w{text-align:center}.tsps-gauge-w svg{max-width:100%;height:auto}.tsps-gauge-lbl{font-size:8px;font-weight:700;color:rgba(255,255,255,.25);letter-spacing:2px;margin-bottom:4px}.tsps-stats{display:flex;flex-direction:column;gap:7px;min-width:170px}.tsps-sbox{background:rgba(255,255,255,.025);border-radius:8px;padding:9px 13px;border:1px solid rgba(255,255,255,.05)}.tsps-sbox .tsps-slbl{font-size:8px;color:rgba(255,255,255,.25);letter-spacing:1px}.tsps-sbox .tsps-sval{font-size:14px;font-weight:700;margin-top:2px}
 .tsps-sec-lbl{font-size:8px;font-weight:700;color:rgba(255,255,255,.25);letter-spacing:2px;margin-bottom:8px}
 .tsps-cards{display:flex;gap:8px;margin-bottom:8px;overflow-x:auto;padding-bottom:4px}.tsps-fc{min-width:125px;flex:1 1 0;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.05);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all .25s}.tsps-fc.act{transform:scale(1.03)}.tsps-fc .fc-lbl{font-size:9px;color:rgba(255,255,255,.4);font-weight:600;letter-spacing:1px;margin-bottom:5px}.tsps-fc .fc-score{font-size:26px;font-weight:800;line-height:1}.tsps-fc .fc-unit{font-size:10px;color:rgba(255,255,255,.3);margin-left:3px}.tsps-fc .fc-threat{font-size:8px;margin-top:3px}.tsps-fc .fc-lk{display:flex;justify-content:space-between;align-items:center;margin-top:7px}.tsps-fc .fc-lk-l{font-size:8px;color:rgba(255,255,255,.25)}.tsps-fc .fc-lk-v{font-size:12px;font-weight:700}.tsps-fc .fc-bar{height:2px;background:rgba(255,255,255,.05);border-radius:2px;margin-top:5px;overflow:hidden}.tsps-fc .fc-bar-f{height:100%;border-radius:2px;transition:width .5s}.tsps-fc .fc-meta{margin-top:6px;font-size:8px;color:rgba(255,255,255,.25)}
-/* THREAT FINGERPRINT */
 .tf-wrap{background:rgba(255,255,255,.02);border-radius:10px;padding:18px;border:1px solid rgba(255,255,255,.05);margin-top:14px;text-align:center}
 .tf-title{font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1px;margin-bottom:4px}
 .tf-subtitle{font-size:7px;color:rgba(255,255,255,.2);letter-spacing:1.5px;margin-bottom:12px}
@@ -80,7 +64,6 @@ main{max-width:1100px;margin:0 auto;padding:18px;overflow-x:hidden}
 .tf-leg-item{display:flex;align-items:center;gap:4px;font-size:8px;color:rgba(255,255,255,.5)}
 .tf-leg-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
 @keyframes tfPulse{0%,100%{opacity:.6}50%{opacity:1}}
-
 .tsps-tl-box{background:rgba(255,255,255,.02);border-radius:10px;padding:14px;border:1px solid rgba(255,255,255,.05);margin-top:14px}.tsps-tl-box .tsps-ct{font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1px;margin-bottom:10px}.tsps-tl-box canvas{width:100%!important;max-height:155px}
 .tsps-ch-row{display:grid;grid-template-columns:1fr;gap:14px;margin-top:14px}.tsps-ch-box{background:rgba(255,255,255,.02);border-radius:10px;padding:14px;border:1px solid rgba(255,255,255,.05)}.tsps-ch-box .tsps-ct{font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1px;margin-bottom:10px}.tsps-ch-box canvas{width:100%!important;max-height:195px}
 .tsps-det{background:rgba(255,255,255,.02);border-radius:10px;padding:18px;border:1px solid rgba(255,255,255,.05);margin-top:14px}.tsps-det-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px}.tsps-det-per{font-size:10px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px}.tsps-det-fc{font-size:11px;color:rgba(255,255,255,.55);margin-top:3px}.tsps-det-sc{font-size:32px;font-weight:800;line-height:1}.tsps-det-lv{font-size:9px;font-weight:700;letter-spacing:1.5px;margin-top:2px;text-align:right}.tsps-det-mg{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}.tsps-dm{background:rgba(255,255,255,.03);border-radius:6px;padding:9px 10px;text-align:center}.tsps-dm .dm-l{font-size:7px;color:rgba(255,255,255,.25);letter-spacing:1px;margin-bottom:3px}.tsps-dm .dm-v{font-size:15px;font-weight:700;color:rgba(255,255,255,.85)}.tsps-det-nar{font-size:10px;color:rgba(255,255,255,.4);line-height:1.7;padding:10px 12px;background:rgba(255,255,255,.02);border-radius:6px;border-left:3px solid rgba(255,255,255,.06)}.tsps-det-nar b{color:rgba(255,255,255,.55)}
@@ -88,80 +71,61 @@ main{max-width:1100px;margin:0 auto;padding:18px;overflow-x:hidden}
 .tsps-ld{text-align:center;padding:40px 20px}.tsps-spinner{width:36px;height:36px;border:3px solid rgba(255,255,255,.07);border-top-color:#60a5fa;border-radius:50%;margin:0 auto 14px;animation:tspsSpin .8s linear infinite}.tsps-ld p{font-size:11px;color:rgba(255,255,255,.35)}.tsps-ld p.sub{font-size:9px;color:rgba(255,255,255,.18);margin-top:4px}
 .hourly-wrap{overflow-x:auto}.hr-row{display:flex;gap:10px;min-width:max-content;padding-bottom:2px}.hr{background:var(--p2);border:1px solid var(--bd);border-radius:2px;padding:10px 14px;text-align:center;min-width:70px}.hr.now{border-color:var(--red);background:#140404}.hr-t{font-size:10px;color:var(--mu);letter-spacing:1px;margin-bottom:4px;text-transform:uppercase}.hr-i{font-size:19px;margin-bottom:4px}.hr-v{font-size:17px;font-weight:200;color:var(--white)}.hr-p{font-size:10px;color:#77aaff;margin-top:3px}
 .ext-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}.ext-day{background:var(--p2);border:1px solid var(--bd);border-radius:3px;padding:14px 10px;text-align:center;overflow:hidden}.ext-day.today{border-color:var(--red);background:#150505}.ext-dow{font-size:13px;font-weight:900;color:var(--white);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px}.ext-date{font-size:11px;color:var(--mu);margin-bottom:9px}.ext-icon{font-size:26px;margin-bottom:7px}.ext-desc{font-size:11px;color:var(--mu);margin-bottom:9px;line-height:1.5;min-height:32px}.ext-temps{display:flex;justify-content:center;gap:9px;align-items:baseline;margin-bottom:4px}.ext-hi{font-size:20px;font-weight:600;color:var(--white)}.ext-lo{font-size:14px;color:#77aaff}.ext-pop{font-size:11px;color:#77aaff;margin-top:3px}.ext-wind{font-size:10px;color:var(--mu);margin-top:5px}.ext-range{margin-top:10px;position:relative;height:22px}.ext-range-track{position:absolute;top:8px;height:6px;border-radius:3px;opacity:.7}.ext-range-lo,.ext-range-hi{position:absolute;top:0;font-size:9px;font-weight:700;line-height:1}.ext-range-lo{color:#77aaff}.ext-range-hi{color:#ffaa55}
-.media-row{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:18px}.media-card{background:var(--p1);border:1px solid var(--bd);border-top:3px solid var(--red);border-radius:3px;padding:14px;overflow:hidden}.media-frame{width:100%;height:220px;border:1px solid var(--bd);border-radius:2px;overflow:hidden;background:#111;display:flex;align-items:center;justify-content:center}.media-frame iframe{width:100%;height:100%;border:none}.media-frame img{width:100%;height:100%;object-fit:cover}.mfooter{font-size:10px;color:var(--mu2);margin-top:6px;display:flex;align-items:center;gap:6px}.mfooter .ldot{width:5px;height:5px;background:var(--red);border-radius:50%;animation:pulse 1.4s infinite}.cam-fb{display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px}.cam-fb-title{font-size:13px;color:var(--mu)}.cam-fb a{background:var(--red2);color:#fff;font-size:12px;font-weight:700;padding:8px 20px;border-radius:2px;letter-spacing:1px;border:1px solid var(--red);text-decoration:none}.cam-overlay{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.8));padding:7px 10px;pointer-events:none}.cam-overlay span{font-size:11px;color:#fff;font-weight:700;letter-spacing:1px}
+.media-row{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:18px}.media-card{background:var(--p1);border:1px solid var(--bd);border-top:3px solid var(--red);border-radius:3px;padding:14px;overflow:hidden}.media-frame{width:100%;height:220px;border:1px solid var(--bd);border-radius:2px;overflow:hidden;background:#111;display:flex;align-items:center;justify-content:center}.media-frame iframe{width:100%;height:100%;border:none}.media-frame img{width:100%;height:100%;object-fit:cover}.mfooter{font-size:10px;color:var(--mu2);margin-top:6px;display:flex;align-items:center;gap:6px}.mfooter .ldot{width:5px;height:5px;background:var(--red);border-radius:50%;animation:pulse 1.4s infinite}.cam-fb{display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px}.cam-fb a{background:var(--red2);color:#fff;font-size:12px;font-weight:700;padding:8px 20px;border-radius:2px;letter-spacing:1px;border:1px solid var(--red);text-decoration:none}.cam-overlay{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.8));padding:7px 10px;pointer-events:none}.cam-overlay span{font-size:11px;color:#fff;font-weight:700;letter-spacing:1px}
 .alm-wrap{max-width:1100px;margin:0 auto;padding:18px;overflow-x:hidden}.alm-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.alm-card{background:var(--p1);border:1px solid var(--bd);border-top:3px solid var(--red);border-radius:3px;padding:20px;overflow:hidden}.alm-card h3{font-size:13px;font-weight:900;letter-spacing:2px;color:var(--red);text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px}.alm-card h3 span{font-size:16px}.alm-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}.alm-big{background:var(--p2);border:1px solid var(--bd);border-radius:4px;padding:14px;text-align:center}.alm-big-lbl{font-size:9px;font-weight:800;letter-spacing:1.5px;color:var(--red);text-transform:uppercase;margin-bottom:6px}.alm-big-val{font-size:28px;font-weight:200;color:var(--white)}.alm-big-sub{font-size:10px;color:var(--mu);margin-top:4px}.alm-mo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.alm-mo{background:var(--p2);border:1px solid var(--bd);border-radius:3px;padding:10px 8px;text-align:center}.alm-mo.current{border-color:var(--red);background:#150505}.alm-mo.future{opacity:.3}.alm-mo-name{font-size:10px;font-weight:800;color:var(--mu);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}.alm-mo-val{font-size:16px;font-weight:600;color:var(--white)}.alm-mo-nrm{font-size:9px;color:var(--mu2);margin-top:2px}.alm-mo-diff{font-size:9px;font-weight:700;margin-top:2px}.alm-mo-diff.pos{color:#ff8844}.alm-mo-diff.neg{color:#77aaff}.alm-mo-diff.zero{color:var(--green)}.alm-mo-bar{height:4px;background:var(--bd2);border-radius:2px;margin-top:6px;overflow:hidden}.alm-mo-bar-fill{height:100%;border-radius:2px}.alm-cmp{font-size:11px;padding:2px 8px;border-radius:3px;font-weight:700;display:inline-block;margin-top:4px}.alm-cmp.above{background:rgba(255,102,0,.15);color:#ff8844}.alm-cmp.below{background:rgba(68,136,255,.15);color:#77aaff}.alm-cmp.normal{background:rgba(0,212,74,.12);color:var(--green)}.alm-note{font-size:9px;color:var(--mu2);text-align:center;margin-top:16px;line-height:1.8}.alm-ld{text-align:center;padding:40px;color:var(--mu);font-size:12px}
+/* ---- SUNRISE / SUNSET ---- */
+.sun-sec{font-size:13px;font-weight:900;letter-spacing:2px;color:var(--gold);text-transform:uppercase;border-left:3px solid var(--gold);padding-left:10px;margin:18px 0 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.sun-sec em{color:var(--mu);font-style:normal;font-weight:500;font-size:11px;letter-spacing:1px}
+.sun-card{background:linear-gradient(135deg,#1a1500,var(--p1));border:1px solid var(--bd);border-top:3px solid var(--gold);border-radius:3px;padding:20px;overflow:hidden}
+.sun-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
+.sun-stat{background:var(--p2);border:1px solid var(--bd);border-radius:4px;padding:14px;text-align:center}
+.sun-stat-lbl{font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px}
+.sun-stat-val{font-size:20px;font-weight:300;color:var(--white);letter-spacing:-.5px}
+.sun-stat-sub{font-size:10px;color:var(--mu);margin-top:4px}
+.sun-diff-hdr{font-size:10px;font-weight:800;letter-spacing:1.5px;color:var(--gold);text-transform:uppercase;margin-bottom:8px;margin-top:4px}
+.sun-diff-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.sun-diff-card{background:var(--p2);border:1px solid var(--bd);border-radius:4px;padding:12px;text-align:center}
+.sun-diff-lbl{font-size:8px;font-weight:800;letter-spacing:1.5px;color:var(--gold);text-transform:uppercase;margin-bottom:6px}
+.sun-diff-val{font-size:20px;font-weight:700;line-height:1.1}
+.sun-diff-was{font-size:9px;color:var(--mu);margin-top:4px}
+.sun-diff-tag{display:inline-block;font-size:9px;font-weight:700;padding:2px 8px;border-radius:3px;margin-top:5px}
+.sun-diff-tag.gaining{background:rgba(255,136,68,.15);color:#ff8844}
+.sun-diff-tag.losing{background:rgba(100,149,255,.15);color:#77aaff}
+.sun-diff-tag.stable{background:rgba(0,212,74,.1);color:var(--green)}
+/* ---- PWS / MICROCLIMATE ---- */
 .pws-station{background:var(--p1);border:1px solid var(--bd);border-top:3px solid var(--red);border-radius:3px;padding:16px;overflow:hidden}.pws-station.own{border-top-color:var(--gold);background:linear-gradient(135deg,var(--p1),#1a1500)}.pws-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px}.pws-name{font-size:15px;font-weight:800;color:var(--white)}.pws-loc{font-size:11px;color:var(--mu);margin-top:2px}.pws-id{font-size:9px;color:var(--mu2);letter-spacing:1.5px;font-weight:700;margin-top:2px}.pws-temp{font-size:36px;font-weight:200;color:var(--white);line-height:1;text-align:right}.pws-temp sup{font-size:16px;color:var(--red);font-weight:300}.pws-updated{font-size:9px;color:var(--mu2);text-align:right;margin-top:4px}.pws-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.pws-stat{background:var(--p2);border:1px solid var(--bd);border-radius:2px;padding:8px 10px;text-align:center}.pws-stat-lbl{font-size:8px;font-weight:800;letter-spacing:1px;color:var(--red);text-transform:uppercase;margin-bottom:3px}.pws-stat-val{font-size:14px;font-weight:300;color:var(--white)}.pws-stat-unit{font-size:9px;color:var(--mu2);margin-top:1px}.pws-err{color:var(--mu2);font-size:11px;font-style:italic;padding:8px 0}
-
-/* MICROCLIMATE */
-.mc-wrap{margin-top:20px}
-.mc-hdr{font-size:13px;font-weight:900;letter-spacing:2px;color:var(--gold);text-transform:uppercase;border-left:3px solid var(--gold);padding-left:10px;margin-bottom:14px;display:flex;align-items:center;gap:10px}
-.mc-hdr em{color:var(--mu);font-style:normal;font-weight:500;font-size:11px;letter-spacing:1px}
-.mc-now{display:grid;grid-template-columns:1fr auto 1fr;gap:0;margin-bottom:16px;border:1px solid var(--bd);border-radius:4px;overflow:hidden}
-.mc-col{padding:14px 16px}
-.mc-col.rwf{background:linear-gradient(135deg,#1a1500,var(--p1))}
-.mc-col.rdu{background:var(--p1)}
-.mc-vs{display:flex;align-items:center;justify-content:center;padding:0 10px;background:var(--p2);font-size:11px;font-weight:900;color:var(--mu);letter-spacing:2px}
-.mc-col-title{font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px}
-.mc-col.rwf .mc-col-title{color:var(--gold)}
-.mc-col.rdu .mc-col-title{color:var(--cyan)}
-.mc-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04)}
-.mc-row:last-child{border-bottom:none}
-.mc-row-lbl{font-size:9px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px}
-.mc-row-val{font-size:14px;font-weight:600;color:var(--white)}
-.mc-diff-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
-.mc-diff-card{background:var(--p2);border:1px solid var(--bd);border-radius:4px;padding:12px;text-align:center}
-.mc-diff-lbl{font-size:8px;font-weight:800;letter-spacing:1.5px;color:var(--gold);text-transform:uppercase;margin-bottom:6px}
-.mc-diff-val{font-size:22px;font-weight:200;color:var(--white)}
-.mc-diff-note{font-size:9px;color:var(--mu);margin-top:4px}
-.mc-diff-tag{display:inline-block;font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;margin-top:4px}
-.mc-diff-tag.cooler{background:rgba(68,136,255,.15);color:#77aaff}
-.mc-diff-tag.warmer{background:rgba(255,102,0,.15);color:#ff8844}
-.mc-diff-tag.wetter{background:rgba(68,136,255,.15);color:#77aaff}
-.mc-diff-tag.drier{background:rgba(255,160,0,.15);color:#ffaa44}
-.mc-diff-tag.same{background:rgba(0,212,74,.1);color:var(--green)}
-.mc-mo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
-.mc-mo{background:var(--p2);border:1px solid var(--bd);border-radius:3px;padding:8px 6px;text-align:center}
-.mc-mo.current{border-color:var(--gold);background:#1a1500}
-.mc-mo.future{opacity:.25}
-.mc-mo-name{font-size:9px;font-weight:800;color:var(--mu);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px}
-.mc-mo-val{font-size:13px;font-weight:600;color:var(--white)}
-.mc-mo-sub{font-size:8px;color:var(--mu2);margin-top:2px}
-.mc-insight{background:linear-gradient(135deg,#1a1500,var(--p1));border:1px solid rgba(255,215,0,.15);border-radius:6px;padding:14px 16px;margin-top:14px}
-.mc-insight-title{font-size:9px;font-weight:800;letter-spacing:1.5px;color:var(--gold);text-transform:uppercase;margin-bottom:8px}
-.mc-insight-text{font-size:12px;color:rgba(255,255,255,.7);line-height:1.8}
-.mc-insight-text strong{color:var(--white)}
-.mc-note2{font-size:8px;color:var(--mu2);text-align:center;margin-top:12px;line-height:1.7}
-
-@media(max-width:600px){
-.mc-now{grid-template-columns:1fr}.mc-vs{padding:4px 0;font-size:10px}
-.mc-diff-grid{grid-template-columns:1fr}.mc-mo-grid{grid-template-columns:repeat(2,1fr)}
-}
+.mc-wrap{margin-top:20px}.mc-hdr{font-size:13px;font-weight:900;letter-spacing:2px;color:var(--gold);text-transform:uppercase;border-left:3px solid var(--gold);padding-left:10px;margin-bottom:14px;display:flex;align-items:center;gap:10px}.mc-hdr em{color:var(--mu);font-style:normal;font-weight:500;font-size:11px;letter-spacing:1px}
+.mc-now{display:grid;grid-template-columns:1fr auto 1fr;gap:0;margin-bottom:16px;border:1px solid var(--bd);border-radius:4px;overflow:hidden}.mc-col{padding:14px 16px}.mc-col.rwf{background:linear-gradient(135deg,#1a1500,var(--p1))}.mc-col.rdu{background:var(--p1)}.mc-vs{display:flex;align-items:center;justify-content:center;padding:0 10px;background:var(--p2);font-size:11px;font-weight:900;color:var(--mu);letter-spacing:2px}.mc-col-title{font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px}.mc-col.rwf .mc-col-title{color:var(--gold)}.mc-col.rdu .mc-col-title{color:var(--cyan)}
+.mc-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04)}.mc-row:last-child{border-bottom:none}.mc-row-lbl{font-size:9px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px}.mc-row-val{font-size:14px;font-weight:600;color:var(--white)}
+.mc-diff-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}.mc-diff-card{background:var(--p2);border:1px solid var(--bd);border-radius:4px;padding:12px;text-align:center}.mc-diff-lbl{font-size:8px;font-weight:800;letter-spacing:1.5px;color:var(--gold);text-transform:uppercase;margin-bottom:6px}.mc-diff-val{font-size:22px;font-weight:200;color:var(--white)}.mc-diff-note{font-size:9px;color:var(--mu);margin-top:4px}.mc-diff-tag{display:inline-block;font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;margin-top:4px}.mc-diff-tag.cooler{background:rgba(68,136,255,.15);color:#77aaff}.mc-diff-tag.warmer{background:rgba(255,102,0,.15);color:#ff8844}.mc-diff-tag.wetter{background:rgba(68,136,255,.15);color:#77aaff}.mc-diff-tag.drier{background:rgba(255,160,0,.15);color:#ffaa44}.mc-diff-tag.same{background:rgba(0,212,74,.1);color:var(--green)}
+.mc-mo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.mc-mo{background:var(--p2);border:1px solid var(--bd);border-radius:3px;padding:8px 6px;text-align:center}.mc-mo.current{border-color:var(--gold);background:#1a1500}.mc-mo.future{opacity:.25}.mc-mo-name{font-size:9px;font-weight:800;color:var(--mu);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px}.mc-mo-val{font-size:13px;font-weight:600;color:var(--white)}.mc-mo-sub{font-size:8px;color:var(--mu2);margin-top:2px}
+.mc-insight{background:linear-gradient(135deg,#1a1500,var(--p1));border:1px solid rgba(255,215,0,.15);border-radius:6px;padding:14px 16px;margin-top:14px}.mc-insight-title{font-size:9px;font-weight:800;letter-spacing:1.5px;color:var(--gold);text-transform:uppercase;margin-bottom:8px}.mc-insight-text{font-size:12px;color:rgba(255,255,255,.7);line-height:1.8}.mc-insight-text strong{color:var(--white)}.mc-note2{font-size:8px;color:var(--mu2);text-align:center;margin-top:12px;line-height:1.7}
 footer{background:var(--off);border-top:3px solid var(--red);padding:20px;margin-top:32px;text-align:center}footer p{font-size:10px;color:var(--mu2);letter-spacing:.4px;line-height:2.2}footer strong{color:var(--red)}
 .ld{color:var(--mu);animation:blink .9s infinite}@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.7)}}
 ::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-track{background:var(--p1)}::-webkit-scrollbar-thumb{background:var(--bd2)}
 @media(max-width:960px){.media-row{grid-template-columns:1fr 1fr}.ext-grid{grid-template-columns:repeat(4,1fr)}.alm-grid{grid-template-columns:1fr}}
 @media(max-width:760px){.ext-grid{grid-template-columns:repeat(3,1fr)}.sgrid{grid-template-columns:repeat(3,1fr)}.alm-mo-grid{grid-template-columns:repeat(3,1fr)}.media-row{grid-template-columns:1fr}.pws-grid{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:600px){
-.ticker-wrap{height:28px}.ticker-badge{font-size:9px;padding:0 10px}.ticker-track span{font-size:10px;padding:0 30px}
+.sun-diff-grid{grid-template-columns:1fr}
 header{padding:8px 14px}.logo svg{width:36px;height:36px}.logo-text h1{font-size:16px}.logo-text p{font-size:7px}.clock{font-size:20px}.cdate{font-size:8px}
-.onair{padding:4px 12px;gap:6px;flex-wrap:wrap}.onair span{font-size:8px}.onair .mu{font-size:8px}.onair .net-lbl{display:none}
 .tab-btn{font-size:10px;padding:8px 14px;letter-spacing:1px}
-main{padding:10px 8px}.sec{font-size:11px;padding-left:8px;margin-bottom:10px}.sec em{font-size:9px;display:block;width:100%;margin-top:2px}.card{padding:14px 12px}
-.tbig{font-size:54px}.tsup{font-size:22px;margin-top:6px}.cdesc{font-size:18px}.csub{font-size:12px;line-height:1.9}.cmeta{text-align:left;width:100%}
+main{padding:10px 8px}.sec{font-size:11px;padding-left:8px;margin-bottom:10px}.card{padding:14px 12px}
 .sgrid{grid-template-columns:repeat(3,1fr);gap:3px}.sval{font-size:20px}.hlbox{padding:10px}.hllbl{font-size:9px}.hlval{font-size:22px}
 #tsps{padding:14px 12px!important}.tsps-hdr-l h2{font-size:16px}.tsps-top{gap:16px;flex-direction:column}.tsps-gauge-w{width:100%;max-width:280px}
 .tsps-stats{flex-direction:row;flex-wrap:wrap;gap:6px;width:100%}.tsps-sbox{flex:1 1 calc(33% - 4px);min-width:90px;padding:8px 10px}.tsps-sbox .tsps-slbl{font-size:7px}.tsps-sbox .tsps-sval{font-size:13px}
-.tsps-cards{gap:6px;scroll-snap-type:x mandatory}.tsps-fc{min-width:110px;flex:0 0 auto;scroll-snap-align:start;padding:12px}.tsps-fc .fc-score{font-size:24px}.tsps-fc.act{transform:none;border-width:2px}
+.tsps-cards{gap:6px;scroll-snap-type:x mandatory}.tsps-fc{min-width:110px;flex:0 0 auto;scroll-snap-align:start;padding:12px}.tsps-fc .fc-score{font-size:24px}
 .tsps-ch-row{grid-template-columns:1fr}.tsps-det-mg{grid-template-columns:repeat(2,1fr)}.tsps-det-sc{font-size:28px}
 .hr{min-width:64px;padding:8px 10px}.hr-v{font-size:15px}
 .ext-grid{grid-template-columns:repeat(2,1fr);gap:8px}.ext-day{padding:12px 8px}.ext-hi{font-size:18px}.ext-lo{font-size:13px}
 .media-frame{height:180px}
 .alm-wrap{padding:10px 8px}.alm-summary{grid-template-columns:1fr}.alm-mo-grid{grid-template-columns:repeat(2,1fr)}.alm-big-val{font-size:24px}
 .pws-grid{grid-template-columns:repeat(2,1fr)}.pws-temp{font-size:30px}.pws-name{font-size:13px}
+.mc-now{grid-template-columns:1fr}.mc-vs{padding:4px 0;font-size:10px}.mc-diff-grid{grid-template-columns:1fr}.mc-mo-grid{grid-template-columns:repeat(2,1fr)}
 footer{padding:16px 12px;margin-top:20px}footer p{font-size:9px}
 .tip-panel{padding:18px;margin:10px}
 }
-@media(max-width:380px){.tbig{font-size:46px}.logo svg{width:30px;height:30px}.logo-text h1{font-size:14px}.clock{font-size:17px}.tsps-hdr-l h2{font-size:14px}.tsps-fc{min-width:100px}.tsps-sbox{flex:1 1 100%}.tsps-stats{flex-direction:column}}
+@media(max-width:380px){.logo svg{width:30px;height:30px}.logo-text h1{font-size:14px}.clock{font-size:17px}.tsps-hdr-l h2{font-size:14px}.tsps-fc{min-width:100px}.tsps-sbox{flex:1 1 100%}.tsps-stats{flex-direction:column}}
 </style>
 </head>
 <body>
@@ -171,13 +135,10 @@ footer{padding:16px 12px;margin-top:20px}footer p{font-size:9px}
 <div class="tip-overlay" id="tipForecast"><div class="tip-panel"><button class="tip-close" onclick="closeTip('tipForecast')">&times;</button><div class="tip-title">Reading the 7-Day Forecast</div><div class="tip-body"><div class="tip-label">Temperature Range Bar</div>Each bar spans <strong style="color:#77aaff">Low</strong> to <strong style="color:#ffaa55">High</strong>, positioned relative to the full week.<div class="tip-divider"></div><div class="tip-color-row"><div class="tip-swatch" style="background:#ff6600"></div><strong>Orange</strong> 80F+</div><div class="tip-color-row"><div class="tip-swatch" style="background:#ffcc00"></div><strong>Yellow</strong> 60-79F</div><div class="tip-color-row"><div class="tip-swatch" style="background:#4488ff"></div><strong>Blue</strong> Below 60F</div></div></div></div>
 <div class="tip-overlay" id="tipAlmanac"><div class="tip-panel"><button class="tip-close" onclick="closeTip('tipAlmanac')">&times;</button><div class="tip-title">Raleigh Wx Almanac</div><div class="tip-body"><strong>Year-to-date climate stats</strong> vs 30-year normals (1991-2020). Data from <strong>Open-Meteo Archive</strong> (ERA5). Reference: RDU Airport.<div class="tip-divider"></div><div class="tip-color-row"><div class="tip-swatch" style="background:#ff8844"></div><strong>Orange</strong> Above normal</div><div class="tip-color-row"><div class="tip-swatch" style="background:#77aaff"></div><strong>Blue</strong> Below normal</div><div class="tip-color-row"><div class="tip-swatch" style="background:#00d44a"></div><strong>Green</strong> Near normal</div></div></div></div>
 
-<!-- ticker removed -->
-
-<header><div class="logo"><svg viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="3" fill="#CC0000"/><polygon points="7,39 14,18 22,30 24,13 26,30 34,18 41,39 35,39 29,23 24,35 19,23 13,39" fill="white"/></svg><div class="logo-text"><h1>Wolfpack Weather</h1><p>Storm Intelligence Network - NC State</p></div></div><div class="hdr-r"><div class="clock" id="clock">--:--:--</div><div class="cdate" id="cdate">Loading...</div></div></header>
-
-<!-- onair removed -->
 <span id="oatemp" style="display:none"></span>
 <span id="ticker" style="display:none"></span>
+
+<header><div class="logo"><svg viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="3" fill="#CC0000"/><polygon points="7,39 14,18 22,30 24,13 26,30 34,18 41,39 35,39 29,23 24,35 19,23 13,39" fill="white"/></svg><div class="logo-text"><h1>Wolfpack Weather</h1><p>Storm Intelligence Network - NC State</p></div></div><div class="hdr-r"><div class="clock" id="clock">--:--:--</div><div class="cdate" id="cdate">Loading...</div></div></header>
 
 <div class="tab-bar">
 <button class="tab-btn active" id="tabBtnLive" onclick="switchTab('live',this)">Live Weather</button>
@@ -223,7 +184,6 @@ footer{padding:16px 12px;margin-top:20px}footer p{font-size:9px}
       </div>
     </div>
   </div>
-
   <div style="margin-top:18px">
     <div class="card" style="padding:0;overflow:hidden">
       <div id="tsps" style="padding:20px 22px">
@@ -232,17 +192,14 @@ footer{padding:16px 12px;margin-top:20px}footer p{font-size:9px}
       </div>
     </div>
   </div>
-
   <div style="margin-top:18px">
     <div class="sec">12-Hour Forecast</div>
     <div class="card hourly-wrap"><div class="hr-row" id="hr-row"><div class="ld">Loading...</div></div></div>
   </div>
-
   <div style="margin-top:18px">
     <div class="sec">7-Day Extended Forecast <div class="tip-btn" onclick="openTip('tipForecast')">?</div></div>
     <div class="card" style="padding:18px"><div class="ext-grid" id="ext-grid"></div></div>
   </div>
-
   <div class="media-row">
     <div class="media-card"><div class="sec" style="margin-bottom:10px">GOES-East Satellite</div><div class="media-frame" style="height:280px"><img id="goes-img" alt="GOES-East" src="https://cdn.star.nesdis.noaa.gov/GOES16/ABI/SECTOR/eus/GEOCOLOR/latest.jpg"/></div><div class="mfooter"><div class="ldot"></div>NOAA GOES-East - US East Coast - GeoColor</div></div>
     <div class="media-card"><div class="sec" style="margin-bottom:10px">NWS KRAX Radar</div><div class="media-frame" style="height:280px"><iframe src="https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=in&metricTemp=%C2%B0F&metricWind=mph&zoom=8&overlay=radar&product=radar&level=surface&lat=35.78&lon=-78.64&pressure=false&message=false" title="Radar" loading="lazy"></iframe></div><div class="mfooter"><div class="ldot"></div>Radar - Centered on Raleigh-Durham</div></div>
@@ -257,6 +214,7 @@ footer{padding:16px 12px;margin-top:20px}footer p{font-size:9px}
 <div class="alm-wrap">
   <div class="sec">Raleigh Wx Almanac <em>- RDU Airport - Historical Climate Data</em> <div class="tip-btn" onclick="openTip('tipAlmanac')">?</div></div>
   <div id="alm-content"><div class="alm-ld"><div class="tsps-spinner"></div>Loading climate data...</div></div>
+  <div id="sun-dashboard"></div>
   <div id="acc-dashboard"></div>
 </div>
 </div>
@@ -277,543 +235,398 @@ footer{padding:16px 12px;margin-top:20px}footer p{font-size:9px}
 
 <script>
 // ============================================================
-// UTILITY FUNCTIONS
+// UTILITY
 // ============================================================
-function $(id) { return document.getElementById(id); }
+function $(id){return document.getElementById(id);}
+function openTip(id){$(id).classList.add("show");}
+function closeTip(id){$(id).classList.remove("show");}
+document.querySelectorAll(".tip-overlay").forEach(function(o){o.addEventListener("click",function(e){if(e.target===this)this.classList.remove("show");});});
 
-function openTip(id) { $(id).classList.add("show"); }
-function closeTip(id) { $(id).classList.remove("show"); }
-document.querySelectorAll(".tip-overlay").forEach(function(o) {
-  o.addEventListener("click", function(e) { if (e.target === this) this.classList.remove("show"); });
-});
-
-function switchTab(name, btn) {
-  document.querySelectorAll(".tab-pane").forEach(function(p) { p.classList.remove("active"); });
-  document.querySelectorAll(".tab-btn").forEach(function(b) { b.classList.remove("active"); });
-  $("tab-" + name).classList.add("active");
+function switchTab(name,btn){
+  document.querySelectorAll(".tab-pane").forEach(function(p){p.classList.remove("active");});
+  document.querySelectorAll(".tab-btn").forEach(function(b){b.classList.remove("active");});
+  $("tab-"+name).classList.add("active");
   btn.classList.add("active");
-  if (window.pendo) { pendo.pageLoad({url: '/#' + name}); }
-  if (name === "almanac" && !window._almLoaded) { fetchAlmanac(); accFetchAndRender(); }
-  if (name === "almanac" && window._almLoaded) { accFetchAndRender(); }
-  if (name === "pws") { fetchPWS(); }
+  if(window.pendo){pendo.pageLoad({url:'/#'+name});}
+  if(name==="almanac"&&!window._almLoaded){fetchAlmanac();fetchSunData();accFetchAndRender();}
+  if(name==="almanac"&&window._almLoaded){fetchSunData();accFetchAndRender();}
+  if(name==="pws"){fetchPWS();}
 }
 
-var wmoDescMap = {0:"Clear Sky",1:"Mainly Clear",2:"Partly Cloudy",3:"Overcast",45:"Fog",48:"Icy Fog",51:"Light Drizzle",53:"Drizzle",55:"Heavy Drizzle",61:"Light Rain",63:"Rain",65:"Heavy Rain",71:"Light Snow",73:"Snow",75:"Heavy Snow",80:"Rain Showers",81:"Heavy Showers",82:"Violent Showers",95:"Thunderstorms",96:"T-Storm+Hail",99:"Severe T-Storm"};
-function wmoDesc(c) { return wmoDescMap[c] || "Unknown"; }
-function wmoIcon(c) { if(c===0)return"\u2600\uFE0F";if(c<=2)return"\uD83C\uDF24\uFE0F";if(c===3)return"\u2601\uFE0F";if(c<=48)return"\uD83C\uDF2B\uFE0F";if(c<=55)return"\uD83C\uDF26\uFE0F";if(c<=65)return"\uD83C\uDF27\uFE0F";if(c<=75)return"\u2744\uFE0F";if(c<=82)return"\uD83C\uDF26\uFE0F";return"\u26C8\uFE0F"; }
-function deg2dir(d) { var dirs=["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"]; return dirs[Math.round(d/22.5)%16]; }
-function uvLbl(v) { return v<=2?"Low":v<=5?"Moderate":v<=7?"High":v<=10?"Very High":"Extreme"; }
-function nwsIcon(d) { var s=d.toLowerCase(); if(s.indexOf("thunder")>=0)return"\u26C8\uFE0F";if(s.indexOf("snow")>=0)return"\u2744\uFE0F";if(s.indexOf("rain")>=0||s.indexOf("shower")>=0)return"\uD83C\uDF27\uFE0F";if(s.indexOf("fog")>=0)return"\uD83C\uDF2B\uFE0F";if(s.indexOf("cloud")>=0||s.indexOf("overcast")>=0)return"\u2601\uFE0F";if(s.indexOf("partly")>=0)return"\uD83C\uDF24\uFE0F";if(s.indexOf("sunny")>=0||s.indexOf("clear")>=0)return"\u2600\uFE0F";return"\uD83C\uDF21\uFE0F"; }
+var wmoDescMap={0:"Clear Sky",1:"Mainly Clear",2:"Partly Cloudy",3:"Overcast",45:"Fog",48:"Icy Fog",51:"Light Drizzle",53:"Drizzle",55:"Heavy Drizzle",61:"Light Rain",63:"Rain",65:"Heavy Rain",71:"Light Snow",73:"Snow",75:"Heavy Snow",80:"Rain Showers",81:"Heavy Showers",82:"Violent Showers",95:"Thunderstorms",96:"T-Storm+Hail",99:"Severe T-Storm"};
+function wmoDesc(c){return wmoDescMap[c]||"Unknown";}
+function wmoIcon(c){if(c===0)return"\u2600\uFE0F";if(c<=2)return"\uD83C\uDF24\uFE0F";if(c===3)return"\u2601\uFE0F";if(c<=48)return"\uD83C\uDF2B\uFE0F";if(c<=55)return"\uD83C\uDF26\uFE0F";if(c<=65)return"\uD83C\uDF27\uFE0F";if(c<=75)return"\u2744\uFE0F";if(c<=82)return"\uD83C\uDF26\uFE0F";return"\u26C8\uFE0F";}
+function deg2dir(d){var dirs=["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"];return dirs[Math.round(d/22.5)%16];}
+function uvLbl(v){return v<=2?"Low":v<=5?"Moderate":v<=7?"High":v<=10?"Very High":"Extreme";}
 
 // ============================================================
 // CLOCK
 // ============================================================
-function tickClock() {
-  var n = new Date();
-  $("clock").textContent = n.toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
-  $("cdate").textContent = n.toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric",year:"numeric"}).toUpperCase();
-  setTimeout(tickClock, 1000);
+function tickClock(){
+  var n=new Date();
+  $("clock").textContent=n.toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
+  $("cdate").textContent=n.toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric",year:"numeric"}).toUpperCase();
+  setTimeout(tickClock,1000);
 }
 tickClock();
 
 // ============================================================
 // CAMS + GOES
 // ============================================================
-function showCamFb(wrapId, imgId, url) {
-  var wrap = $(wrapId); if (!wrap) return;
-  var img = $(imgId); if (img) img.style.display = "none";
-  if (wrap.querySelector(".cam-fb")) return;
-  var fb = document.createElement("div"); fb.className = "cam-fb";
-  fb.innerHTML = '<a href="' + url + '" target="_blank">VIEW LIVE CAM</a>';
-  wrap.insertBefore(fb, wrap.querySelector(".cam-overlay"));
+function showCamFb(wrapId,imgId,url){
+  var wrap=$(wrapId);if(!wrap)return;
+  var img=$(imgId);if(img)img.style.display="none";
+  if(wrap.querySelector(".cam-fb"))return;
+  var fb=document.createElement("div");fb.className="cam-fb";
+  fb.innerHTML='<a href="'+url+'" target="_blank">VIEW LIVE CAM</a>';
+  wrap.insertBefore(fb,wrap.querySelector(".cam-overlay"));
 }
-function refreshCams() {
-  var ts = Date.now();
-  var gi = $("goes-img");
-  if (gi) gi.src = "https://cdn.star.nesdis.noaa.gov/GOES16/ABI/SECTOR/eus/GEOCOLOR/latest.jpg?t=" + ts;
-  var s = $("sugar-cam");
-  if (s && !$("sugar-wrap").querySelector(".cam-fb")) { s.style.display="block"; s.src="https://skisugar.com/webcam/base.jpg?t="+ts; }
-  var h = $("hat-cam");
-  if (h && !$("hat-wrap").querySelector(".cam-fb")) { h.style.display="block"; h.src="https://www.surfchex.com/webcam-images/hatteras.jpg?t="+ts; }
+function refreshCams(){
+  var ts=Date.now();
+  var gi=$("goes-img");if(gi)gi.src="https://cdn.star.nesdis.noaa.gov/GOES16/ABI/SECTOR/eus/GEOCOLOR/latest.jpg?t="+ts;
+  var s=$("sugar-cam");if(s&&!$("sugar-wrap").querySelector(".cam-fb")){s.style.display="block";s.src="https://skisugar.com/webcam/base.jpg?t="+ts;}
+  var h=$("hat-cam");if(h&&!$("hat-wrap").querySelector(".cam-fb")){h.style.display="block";h.src="https://www.surfchex.com/webcam-images/hatteras.jpg?t="+ts;}
 }
-refreshCams();
-setInterval(refreshCams, 60000);
+refreshCams();setInterval(refreshCams,60000);
 
 // ============================================================
-// CONDITIONS (Open-Meteo)
+// CONDITIONS
 // ============================================================
-function applyConditions(t,feels,dew,humid,wspd,wdir,gust,pres,prec,uv,hi,lo,code,hourly) {
-  $("temp").textContent = t; $("temp").classList.remove("ld");
-  $("oatemp").textContent = t + "F";
-  $("feels").textContent = feels + "F";
-  $("dewpt").textContent = dew + "F";
-  $("humid").textContent = humid + "%";
-  $("wspd").textContent = wspd;
-  $("wdir").textContent = deg2dir(wdir) + " " + wdir;
-  $("gust").textContent = gust;
-  $("pres").textContent = pres;
-  $("prec").textContent = prec;
-  $("uv").textContent = uv;
-  $("uvl").textContent = uvLbl(uv);
-  $("hi").textContent = hi;
-  $("lo").textContent = lo;
-  $("cdesc").textContent = wmoDesc(code);
-  $("cupd").textContent = "KNCRALEI761 - Updated " + new Date().toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit",second:"2-digit"}) + " ET";
-  if (typeof wxSetCondition === "function") wxSetCondition(code, wmoDesc(code));
-  if (hourly) buildHourly(hourly);
+function applyConditions(t,feels,dew,humid,wspd,wdir,gust,pres,prec,uv,hi,lo,code,hourly){
+  $("temp").textContent=t;$("temp").classList.remove("ld");
+  $("oatemp").textContent=t+"F";
+  $("feels").textContent=feels+"F";$("dewpt").textContent=dew+"F";
+  $("humid").textContent=humid+"%";$("wspd").textContent=wspd;
+  $("wdir").textContent=deg2dir(wdir)+" "+wdir;$("gust").textContent=gust;
+  $("pres").textContent=pres;$("prec").textContent=prec;
+  $("uv").textContent=uv;$("uvl").textContent=uvLbl(uv);
+  $("hi").textContent=hi;$("lo").textContent=lo;
+  $("cdesc").textContent=wmoDesc(code);
+  $("cupd").textContent="KNCRALEI761 - Updated "+new Date().toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit",second:"2-digit"})+" ET";
+  if(typeof wxSetCondition==="function")wxSetCondition(code,wmoDesc(code));
+  if(hourly)buildHourly(hourly);
 }
 
-function fetchConditions() {
-  // Primary: Weather Underground PWS KNCRALEI761
-  fetch("https://api.weather.com/v2/pws/observations/current?stationId=KNCRALEI761&format=json&units=e&apiKey=" + WU_COMMUNITY_KEY)
-  .then(function(r) { if (!r.ok) throw new Error("WU error"); return r.json(); })
-  .then(function(d) {
-    var obs = d.observations && d.observations[0];
-    if (!obs) throw new Error("No obs");
-    var imp = obs.imperial || {};
-    var temp = imp.temp != null ? Math.round(imp.temp) : "--";
-    var feels = imp.heatIndex != null ? Math.round(imp.heatIndex) : (imp.windChill != null ? Math.round(imp.windChill) : temp);
-    var dew = imp.dewpt != null ? Math.round(imp.dewpt) : "--";
-    var humid = obs.humidity != null ? Math.round(obs.humidity) : "--";
-    var wspd = imp.windSpeed != null ? Math.round(imp.windSpeed) : "--";
-    var wdir = obs.winddir != null ? obs.winddir : 0;
-    var gust = imp.windGust != null ? Math.round(imp.windGust) : "--";
-    var pres = imp.pressure != null ? Number(imp.pressure).toFixed(2) : "--";
-    var prec = imp.precipTotal != null ? Number(imp.precipTotal).toFixed(2) : "0.00";
-    var uvi = obs.uv != null ? Math.round(obs.uv) : 0;
-
-    // We need weather code for the scene - estimate from conditions
-    var code = 0; // default clear
-    if (humid > 95 && temp < 50) code = 45; // fog
-    // We'll also fetch Open-Meteo just for weather code and hourly
+function fetchConditions(){
+  fetch("https://api.weather.com/v2/pws/observations/current?stationId=KNCRALEI761&format=json&units=e&apiKey="+WU_COMMUNITY_KEY)
+  .then(function(r){if(!r.ok)throw new Error("WU");return r.json();})
+  .then(function(d){
+    var obs=d.observations&&d.observations[0];if(!obs)throw new Error("No obs");
+    var imp=obs.imperial||{};
+    var temp=imp.temp!=null?Math.round(imp.temp):"--";
+    var feels=imp.heatIndex!=null?Math.round(imp.heatIndex):(imp.windChill!=null?Math.round(imp.windChill):temp);
+    var dew=imp.dewpt!=null?Math.round(imp.dewpt):"--";
+    var humid=obs.humidity!=null?Math.round(obs.humidity):"--";
+    var wspd=imp.windSpeed!=null?Math.round(imp.windSpeed):"--";
+    var wdir=obs.winddir!=null?obs.winddir:0;
+    var gust=imp.windGust!=null?Math.round(imp.windGust):"--";
+    var pres=imp.pressure!=null?Number(imp.pressure).toFixed(2):"--";
+    var prec=imp.precipTotal!=null?Number(imp.precipTotal).toFixed(2):"0.00";
+    var uvi=obs.uv!=null?Math.round(obs.uv):0;
+    var code=0;if(humid>95&&temp<50)code=45;
     fetch("https://api.open-meteo.com/v1/forecast?latitude=35.686&longitude=-78.614&current=weather_code&hourly=temperature_2m,weather_code,precipitation_probability&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=America%2FNew_York&forecast_days=2")
-    .then(function(r2) { return r2.json(); })
-    .then(function(d2) {
-      code = d2.current ? d2.current.weather_code : code;
-      var hi = d2.daily ? Math.round(d2.daily.temperature_2m_max[0]) : "--";
-      var lo = d2.daily ? Math.round(d2.daily.temperature_2m_min[0]) : "--";
-      applyConditions(temp, feels, dew, humid, wspd, wdir, gust, pres, prec, uvi, hi, lo, code, d2.hourly || null);
+    .then(function(r2){return r2.json();})
+    .then(function(d2){
+      code=d2.current?d2.current.weather_code:code;
+      var hi=d2.daily?Math.round(d2.daily.temperature_2m_max[0]):"--";
+      var lo=d2.daily?Math.round(d2.daily.temperature_2m_min[0]):"--";
+      applyConditions(temp,feels,dew,humid,wspd,wdir,gust,pres,prec,uvi,hi,lo,code,d2.hourly||null);
     })
-    .catch(function() {
-      // If Open-Meteo fails, still show PWS data without hourly
-      applyConditions(temp, feels, dew, humid, wspd, wdir, gust, pres, prec, uvi, "--", "--", code, null);
-    });
+    .catch(function(){applyConditions(temp,feels,dew,humid,wspd,wdir,gust,pres,prec,uvi,"--","--",code,null);});
   })
-  .catch(function(e) {
-    // Fallback: Open-Meteo if WU is down
+  .catch(function(){
     fetch("https://api.open-meteo.com/v1/forecast?latitude=35.686&longitude=-78.614&current=temperature_2m,apparent_temperature,relative_humidity_2m,dew_point_2m,wind_speed_10m,wind_gusts_10m,wind_direction_10m,surface_pressure,precipitation,weather_code,uv_index&hourly=temperature_2m,weather_code,precipitation_probability&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=America%2FNew_York&forecast_days=2")
-    .then(function(r) { return r.json(); })
-    .then(function(d) {
-      var c = d.current, dl = d.daily;
+    .then(function(r){return r.json();})
+    .then(function(d){
+      var c=d.current,dl=d.daily;
       applyConditions(Math.round(c.temperature_2m),Math.round(c.apparent_temperature),Math.round(c.dew_point_2m),Math.round(c.relative_humidity_2m),Math.round(c.wind_speed_10m),Math.round(c.wind_direction_10m),Math.round(c.wind_gusts_10m),(c.surface_pressure*0.02953).toFixed(2),c.precipitation.toFixed(2),Math.round(c.uv_index),Math.round(dl.temperature_2m_max[0]),Math.round(dl.temperature_2m_min[0]),c.weather_code,d.hourly);
-      $("cupd").textContent = $("cupd").textContent + " (Open-Meteo fallback)";
+      $("cupd").textContent=$("cupd").textContent+" (Open-Meteo fallback)";
     })
-    .catch(function() { $("cupd").textContent = "Data unavailable"; });
+    .catch(function(){$("cupd").textContent="Data unavailable";});
   });
 }
 
-function buildHourly(h) {
-  var row = $("hr-row"); row.innerHTML = "";
-  var n = new Date(); var cnt = 0;
-  for (var i = 0; i < h.time.length && cnt < 14; i++) {
-    var t = new Date(h.time[i]); if (t < n && i > 0) continue;
-    var b = document.createElement("div"); b.className = "hr" + (cnt === 0 ? " now" : "");
-    var lbl = cnt === 0 ? "NOW" : t.toLocaleTimeString("en-US",{hour:"numeric",hour12:true});
-    var pp = (h.precipitation_probability || [])[i] || 0;
-    b.innerHTML = '<div class="hr-t">' + lbl + '</div><div class="hr-i">' + wmoIcon(h.weather_code[i]) + '</div><div class="hr-v">' + Math.round(h.temperature_2m[i]) + '</div>' + (pp > 15 ? '<div class="hr-p">' + pp + '%</div>' : '');
-    row.appendChild(b); cnt++;
+function buildHourly(h){
+  var row=$("hr-row");row.innerHTML="";
+  var n=new Date();var cnt=0;
+  for(var i=0;i<h.time.length&&cnt<14;i++){
+    var t=new Date(h.time[i]);if(t<n&&i>0)continue;
+    var b=document.createElement("div");b.className="hr"+(cnt===0?" now":"");
+    var lbl=cnt===0?"NOW":t.toLocaleTimeString("en-US",{hour:"numeric",hour12:true});
+    var pp=(h.precipitation_probability||[])[i]||0;
+    b.innerHTML='<div class="hr-t">'+lbl+'</div><div class="hr-i">'+wmoIcon(h.weather_code[i])+'</div><div class="hr-v">'+Math.round(h.temperature_2m[i])+'</div>'+(pp>15?'<div class="hr-p">'+pp+'%</div>':'');
+    row.appendChild(b);cnt++;
   }
 }
 
 // ============================================================
 // 7-DAY FORECAST
 // ============================================================
-function seedExtended() {
-  var grid = $("ext-grid"); if (!grid) return;
-  var h = "";
-  for (var i = 0; i < 7; i++) {
-    var dt = new Date(); dt.setDate(dt.getDate() + i);
-    var dow = i === 0 ? "Today" : dt.toLocaleDateString("en-US",{weekday:"short"});
-    var date = dt.toLocaleDateString("en-US",{month:"short",day:"numeric"});
-    h += '<div class="ext-day' + (i===0?' today':'') + '"><div class="ext-dow">' + dow + '</div><div class="ext-date">' + date + '</div><div class="ext-icon ld">--</div><div class="ext-desc" style="color:var(--mu2)">Loading...</div><div class="ext-temps"><span class="ext-hi" style="color:var(--mu2)">--</span><span class="ext-lo">--</span></div></div>';
+function seedExtended(){
+  var grid=$("ext-grid");if(!grid)return;
+  var h="";
+  for(var i=0;i<7;i++){
+    var dt=new Date();dt.setDate(dt.getDate()+i);
+    var dow=i===0?"Today":dt.toLocaleDateString("en-US",{weekday:"short"});
+    var date=dt.toLocaleDateString("en-US",{month:"short",day:"numeric"});
+    h+='<div class="ext-day'+(i===0?' today':'')+'"><div class="ext-dow">'+dow+'</div><div class="ext-date">'+date+'</div><div class="ext-icon ld">--</div><div class="ext-desc" style="color:var(--mu2)">Loading...</div><div class="ext-temps"><span class="ext-hi" style="color:var(--mu2)">--</span><span class="ext-lo">--</span></div></div>';
   }
-  grid.innerHTML = h;
+  grid.innerHTML=h;
 }
 
-function buildRangeBar(hi, lo, mn, mx) {
-  var range = mx - mn || 1;
-  var l = Math.round(((lo - mn) / range) * 100);
-  var w = Math.max(8, Math.round(((hi - lo) / range) * 100));
-  var c = hi >= 80 ? "#ff6600" : hi >= 60 ? "#ffcc00" : "#4488ff";
-  return '<div class="ext-range"><span class="ext-range-lo" style="left:' + Math.max(0,l-1) + '%">' + lo + '</span><div class="ext-range-track" style="left:' + l + '%;width:' + w + '%;background:linear-gradient(90deg,#4488ff,' + c + ')"></div><span class="ext-range-hi" style="left:' + Math.min(88,l+w+1) + '%">' + hi + '</span></div>';
+function buildRangeBar(hi,lo,mn,mx){
+  var range=mx-mn||1;
+  var l=Math.round(((lo-mn)/range)*100);
+  var w=Math.max(8,Math.round(((hi-lo)/range)*100));
+  var c=hi>=80?"#ff6600":hi>=60?"#ffcc00":"#4488ff";
+  return '<div class="ext-range"><span class="ext-range-lo" style="left:'+Math.max(0,l-1)+'%">'+lo+'</span><div class="ext-range-track" style="left:'+l+'%;width:'+w+'%;background:linear-gradient(90deg,#4488ff,'+c+')"></div><span class="ext-range-hi" style="left:'+Math.min(88,l+w+1)+'%">'+hi+'</span></div>';
 }
 
-function fetchExtended() {
-  var grid = $("ext-grid"); if (!grid) return;
+function fetchExtended(){
+  var grid=$("ext-grid");if(!grid)return;
   fetch("https://api.open-meteo.com/v1/forecast?latitude=35.686&longitude=-78.614&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max,wind_speed_10m_max&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=7")
-  .then(function(r) { return r.json(); })
-  .then(function(d) {
-    var dl = d.daily;
-    var allT = dl.temperature_2m_max.concat(dl.temperature_2m_min);
-    var mn = Math.min.apply(null, allT), mx = Math.max.apply(null, allT);
-    var h = "";
-    dl.time.forEach(function(t, i) {
-      var dt = new Date(t + "T12:00:00");
-      var dow = i === 0 ? "Today" : dt.toLocaleDateString("en-US",{weekday:"short"});
-      var date = dt.toLocaleDateString("en-US",{month:"short",day:"numeric"});
-      var hi = Math.round(dl.temperature_2m_max[i]), lo = Math.round(dl.temperature_2m_min[i]);
-      var pop = dl.precipitation_probability_max[i] || 0;
-      h += '<div class="ext-day' + (i===0?' today':'') + '"><div class="ext-dow">' + dow + '</div><div class="ext-date">' + date + '</div><div class="ext-icon">' + wmoIcon(dl.weather_code[i]) + '</div><div class="ext-desc">' + wmoDesc(dl.weather_code[i]) + '</div><div class="ext-temps"><span class="ext-hi">' + hi + '</span><span class="ext-lo">' + lo + '</span></div>' + (pop>10?'<div class="ext-pop">' + pop + '%</div>':'') + buildRangeBar(hi,lo,mn,mx) + '<div class="ext-wind">' + Math.round(dl.wind_speed_10m_max[i]) + ' mph</div></div>';
+  .then(function(r){return r.json();})
+  .then(function(d){
+    var dl=d.daily;
+    var allT=dl.temperature_2m_max.concat(dl.temperature_2m_min);
+    var mn=Math.min.apply(null,allT),mx=Math.max.apply(null,allT);
+    var h="";
+    dl.time.forEach(function(t,i){
+      var dt=new Date(t+"T12:00:00");
+      var dow=i===0?"Today":dt.toLocaleDateString("en-US",{weekday:"short"});
+      var date=dt.toLocaleDateString("en-US",{month:"short",day:"numeric"});
+      var hi=Math.round(dl.temperature_2m_max[i]),lo=Math.round(dl.temperature_2m_min[i]);
+      var pop=dl.precipitation_probability_max[i]||0;
+      h+='<div class="ext-day'+(i===0?' today':'')+'"><div class="ext-dow">'+dow+'</div><div class="ext-date">'+date+'</div><div class="ext-icon">'+wmoIcon(dl.weather_code[i])+'</div><div class="ext-desc">'+wmoDesc(dl.weather_code[i])+'</div><div class="ext-temps"><span class="ext-hi">'+hi+'</span><span class="ext-lo">'+lo+'</span></div>'+(pop>10?'<div class="ext-pop">'+pop+'%</div>':'')+buildRangeBar(hi,lo,mn,mx)+'<div class="ext-wind">'+Math.round(dl.wind_speed_10m_max[i])+' mph</div></div>';
     });
-    grid.innerHTML = h;
+    grid.innerHTML=h;
   })
-  .catch(function() { grid.innerHTML = '<div style="color:var(--mu);padding:16px">Forecast unavailable</div>'; });
+  .catch(function(){grid.innerHTML='<div style="color:var(--mu);padding:16px">Forecast unavailable</div>';});
 }
 
 // ============================================================
 // TUFFY'S STORM PREDICTION SYSTEM
 // ============================================================
-var TSPS_CFG = {lat:35.7113, lon:-78.6141, name:"Red Wolf Farm - S. Wake County, NC", refresh:300000};
-var TSPS_HKW = {tornado:30,tornadoes:30,funnel:25,"tornado watch":22,"tornado warning":30,"damaging wind":20,"destructive wind":25,derecho:28,"large hail":20,"giant hail":25,"golf ball":20,"severe thunderstorm":18,supercell:22,hurricane:30,"tropical storm":22,flooding:15,"flash flood":20,thunder:8,thunderstorm:10,storm:6,lightning:7,hail:12,"heavy rain":8,downpour:7,gusty:6,windy:5};
-var TSPS_ASEV = {Extreme:35,Severe:25,Moderate:15,Minor:8,Unknown:5};
-var TSPS_ACOL = {"Tornado Warning":"#ff0000","Severe Thunderstorm Warning":"#ffa500","Tornado Watch":"#ffff00","Flash Flood Warning":"#8b0000","Flood Warning":"#00ff00","Special Weather Statement":"#ffe4b5"};
-var tspsState = {forecasts:[], alerts:[], activeIdx:0, lastUpdate:null, charts:{}, peakScore:0};
+var TSPS_CFG={lat:35.7113,lon:-78.6141,name:"Red Wolf Farm - S. Wake County, NC",refresh:300000};
+var TSPS_HKW={tornado:30,tornadoes:30,funnel:25,"tornado watch":22,"tornado warning":30,"damaging wind":20,"destructive wind":25,derecho:28,"large hail":20,"giant hail":25,"golf ball":20,"severe thunderstorm":18,supercell:22,hurricane:30,"tropical storm":22,flooding:15,"flash flood":20,thunder:8,thunderstorm:10,storm:6,lightning:7,hail:12,"heavy rain":8,downpour:7,gusty:6,windy:5};
+var TSPS_ASEV={Extreme:35,Severe:25,Moderate:15,Minor:8,Unknown:5};
+var TSPS_ACOL={"Tornado Warning":"#ff0000","Severe Thunderstorm Warning":"#ffa500","Tornado Watch":"#ffff00","Flash Flood Warning":"#8b0000","Flood Warning":"#00ff00","Special Weather Statement":"#ffe4b5"};
+var tspsState={forecasts:[],alerts:[],activeIdx:0,lastUpdate:null,charts:{},peakScore:0};
 
-function tsps_sevLevel(s) {
-  if (s < 10) return {label:"NONE",color:"#1a6b3a",desc:"No severe weather expected"};
-  if (s < 25) return {label:"LOW",color:"#22c55e",desc:"Minimal threat"};
-  if (s < 50) return {label:"GUARDED",color:"#eab308",desc:"Strong storms possible"};
-  if (s < 75) return {label:"ELEVATED",color:"#f97316",desc:"Severe storms likely"};
-  if (s < 90) return {label:"HIGH",color:"#ef4444",desc:"Damaging weather expected"};
-  return {label:"EXTREME",color:"#dc2626",desc:"Life-threatening weather"};
+function tsps_sevLevel(s){if(s<10)return{label:"NONE",color:"#1a6b3a",desc:"No severe weather expected"};if(s<25)return{label:"LOW",color:"#22c55e",desc:"Minimal threat"};if(s<50)return{label:"GUARDED",color:"#eab308",desc:"Strong storms possible"};if(s<75)return{label:"ELEVATED",color:"#f97316",desc:"Severe storms likely"};if(s<90)return{label:"HIGH",color:"#ef4444",desc:"Damaging weather expected"};return{label:"EXTREME",color:"#dc2626",desc:"Life-threatening weather"};}
+
+function tsps_computeIndex(p,alerts){
+  var bd={wind:0,gusts:0,precip:0,instability:0,textual:0,alerts:0};
+  var ws=parseInt(p.windSpeed)||0,wg=parseInt(p.windGust)||0;
+  var pop=(p.probabilityOfPrecipitation&&p.probabilityOfPrecipitation.value)||0;
+  var temp=p.temperature||70;
+  var dpRaw=p.dewpoint&&p.dewpoint.value;
+  var dp=dpRaw!=null?(dpRaw*9/5+32):null;
+  var txt=((p.detailedForecast||"")+" "+(p.shortForecast||"")).toLowerCase();
+  if(ws>=60)bd.wind=20;else if(ws>=45)bd.wind=16;else if(ws>=30)bd.wind=12;else if(ws>=20)bd.wind=7;else if(ws>=15)bd.wind=4;else if(ws>=10)bd.wind=2;
+  var eg=Math.max(wg,ws*1.3);
+  if(eg>=70)bd.gusts=18;else if(eg>=58)bd.gusts=15;else if(eg>=45)bd.gusts=12;else if(eg>=35)bd.gusts=8;else if(eg>=25)bd.gusts=4;else if(eg>=15)bd.gusts=1;
+  if(pop>=90)bd.precip=14;else if(pop>=70)bd.precip=11;else if(pop>=50)bd.precip=8;else if(pop>=30)bd.precip=5;else if(pop>=15)bd.precip=2;
+  if(dp!==null){var sp=temp-dp;if(sp<=3&&temp>=75)bd.instability=16;else if(sp<=5&&temp>=70)bd.instability=13;else if(sp<=8&&temp>=65)bd.instability=9;else if(sp<=12&&temp>=60)bd.instability=6;else if(sp<=15)bd.instability=3;}
+  else if(pop>=50&&temp>=70)bd.instability=8;
+  var maxTxt=0,hits=0;
+  for(var kw in TSPS_HKW){if(txt.indexOf(kw)>=0){maxTxt=Math.max(maxTxt,TSPS_HKW[kw]);hits++;}}
+  bd.textual=Math.min(22,maxTxt+Math.min(hits*1.5,8));
+  if(alerts&&alerts.length>0){var mx=0;alerts.forEach(function(a){mx=Math.max(mx,TSPS_ASEV[a.properties&&a.properties.severity]||5);});bd.alerts=Math.min(10,mx*(1+Math.min(alerts.length-1,3)*0.15));}
+  var score=Math.min(100,Math.round(bd.wind+bd.gusts+bd.precip+bd.instability+bd.textual+bd.alerts));
+  var likelihood=Math.min(99,Math.round((pop*0.35)+(score*0.45)+(bd.textual>10?15:bd.textual>5?8:0)+(alerts&&alerts.length>0?5:0)));
+  return{score:score,likelihood:likelihood,breakdown:bd};
 }
 
-function tsps_computeIndex(p, alerts) {
-  var bd = {wind:0,gusts:0,precip:0,instability:0,textual:0,alerts:0};
-  var ws = parseInt(p.windSpeed) || 0;
-  var wg = parseInt(p.windGust) || 0;
-  var pop = (p.probabilityOfPrecipitation && p.probabilityOfPrecipitation.value) || 0;
-  var temp = p.temperature || 70;
-  var dpRaw = p.dewpoint && p.dewpoint.value;
-  var dp = dpRaw != null ? (dpRaw * 9/5 + 32) : null;
-  var txt = ((p.detailedForecast||"") + " " + (p.shortForecast||"")).toLowerCase();
+function tsps_hexToRgb(hex){hex=hex.replace("#","");return parseInt(hex.substr(0,2),16)+","+parseInt(hex.substr(2,2),16)+","+parseInt(hex.substr(4,2),16);}
+function tsps_gaugeSize(){var w=$("tsps").clientWidth||300;return Math.min(230,Math.max(180,w*0.55));}
 
-  if (ws>=60) bd.wind=20; else if (ws>=45) bd.wind=16; else if (ws>=30) bd.wind=12; else if (ws>=20) bd.wind=7; else if (ws>=15) bd.wind=4; else if (ws>=10) bd.wind=2;
-  var eg = Math.max(wg, ws*1.3);
-  if (eg>=70) bd.gusts=18; else if (eg>=58) bd.gusts=15; else if (eg>=45) bd.gusts=12; else if (eg>=35) bd.gusts=8; else if (eg>=25) bd.gusts=4; else if (eg>=15) bd.gusts=1;
-  if (pop>=90) bd.precip=14; else if (pop>=70) bd.precip=11; else if (pop>=50) bd.precip=8; else if (pop>=30) bd.precip=5; else if (pop>=15) bd.precip=2;
-  if (dp !== null) { var sp=temp-dp; if(sp<=3&&temp>=75) bd.instability=16; else if(sp<=5&&temp>=70) bd.instability=13; else if(sp<=8&&temp>=65) bd.instability=9; else if(sp<=12&&temp>=60) bd.instability=6; else if(sp<=15) bd.instability=3; }
-  else if (pop>=50 && temp>=70) bd.instability=8;
-
-  var maxTxt=0, hits=0;
-  for (var kw in TSPS_HKW) { if (txt.indexOf(kw) >= 0) { maxTxt = Math.max(maxTxt, TSPS_HKW[kw]); hits++; } }
-  bd.textual = Math.min(22, maxTxt + Math.min(hits*1.5, 8));
-
-  if (alerts && alerts.length > 0) { var mx=0; alerts.forEach(function(a){mx=Math.max(mx,TSPS_ASEV[a.properties&&a.properties.severity]||5);}); bd.alerts=Math.min(10,mx*(1+Math.min(alerts.length-1,3)*0.15)); }
-
-  var score = Math.min(100, Math.round(bd.wind+bd.gusts+bd.precip+bd.instability+bd.textual+bd.alerts));
-  var likelihood = Math.min(99, Math.round((pop*0.35)+(score*0.45)+(bd.textual>10?15:bd.textual>5?8:0)+(alerts&&alerts.length>0?5:0)));
-  return {score:score, likelihood:likelihood, breakdown:bd};
-}
-
-function tsps_hexToRgb(hex) {
-  hex = hex.replace("#","");
-  return parseInt(hex.substr(0,2),16)+","+parseInt(hex.substr(2,2),16)+","+parseInt(hex.substr(4,2),16);
-}
-
-function tsps_gaugeSize() {
-  var w = $("tsps").clientWidth || 300;
-  return Math.min(230, Math.max(180, w * 0.55));
-}
-
-function tsps_buildGauge(score, size) {
-  var lv = tsps_sevLevel(score);
-  var r=size*0.38, cx=size/2, cy=size/2+10, sA=-220, eA=40, tot=eA-sA, scA=sA+(score/100)*tot;
+function tsps_buildGauge(score,size){
+  var lv=tsps_sevLevel(score);
+  var r=size*0.38,cx=size/2,cy=size/2+10,sA=-220,eA=40,tot=eA-sA,scA=sA+(score/100)*tot;
   function p2c(a,rd){return{x:cx+rd*Math.cos(a*Math.PI/180),y:cy+rd*Math.sin(a*Math.PI/180)};}
   function arc(a1,a2,rd){var s=p2c(a1,rd),e=p2c(a2,rd);return"M "+s.x+" "+s.y+" A "+rd+" "+rd+" 0 "+(a2-a1>180?1:0)+" 1 "+e.x+" "+e.y;}
-  var ticks=[0,10,25,50,75,90,100], tk="";
-  ticks.forEach(function(t){
-    var a=sA+(t/100)*tot,i=p2c(a,r-12),o=p2c(a,r+12),l=p2c(a,r+22);
-    tk+='<line x1="'+i.x+'" y1="'+i.y+'" x2="'+o.x+'" y2="'+o.y+'" stroke="rgba(255,255,255,.2)" stroke-width="1.5"/>';
-    tk+='<text x="'+l.x+'" y="'+l.y+'" fill="rgba(255,255,255,.35)" font-size="8" text-anchor="middle" dominant-baseline="middle">'+t+'</text>';
-  });
-  var np=p2c(scA,r-2), h=size*0.72;
+  var ticks=[0,10,25,50,75,90,100],tk="";
+  ticks.forEach(function(t){var a=sA+(t/100)*tot,i=p2c(a,r-12),o=p2c(a,r+12),l=p2c(a,r+22);tk+='<line x1="'+i.x+'" y1="'+i.y+'" x2="'+o.x+'" y2="'+o.y+'" stroke="rgba(255,255,255,.2)" stroke-width="1.5"/><text x="'+l.x+'" y="'+l.y+'" fill="rgba(255,255,255,.35)" font-size="8" text-anchor="middle" dominant-baseline="middle">'+t+'</text>';});
+  var np=p2c(scA,r-2),h=size*0.72;
   return '<svg viewBox="0 0 '+size+' '+h+'" style="width:100%;max-width:'+size+'px;height:auto"><defs><linearGradient id="tsG" x1="0%" x2="100%"><stop offset="0%" stop-color="#1a472a"/><stop offset="25%" stop-color="#22c55e"/><stop offset="45%" stop-color="#eab308"/><stop offset="65%" stop-color="#f97316"/><stop offset="80%" stop-color="#ef4444"/><stop offset="100%" stop-color="#dc2626"/></linearGradient><filter id="tsGl"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><path d="'+arc(sA,eA,r)+'" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="14" stroke-linecap="round"/><path d="'+arc(sA,scA,r)+'" fill="none" stroke="url(#tsG)" stroke-width="14" stroke-linecap="round" filter="url(#tsGl)"/>'+tk+'<circle cx="'+np.x+'" cy="'+np.y+'" r="5.5" fill="'+lv.color+'" filter="url(#tsGl)"/><text x="'+cx+'" y="'+(cy-16)+'" fill="'+lv.color+'" font-size="38" font-weight="800" text-anchor="middle" dominant-baseline="middle" filter="url(#tsGl)">'+score+'</text><text x="'+cx+'" y="'+(cy+10)+'" fill="'+lv.color+'" font-size="12" font-weight="700" text-anchor="middle" letter-spacing="3">'+lv.label+'</text><text x="'+cx+'" y="'+(cy+27)+'" fill="rgba(255,255,255,.45)" font-size="8" text-anchor="middle">'+lv.desc+'</text></svg>';
 }
 
-function tsps_buildFingerprint(breakdown, score) {
-  var items = [
-    {k:"wind", label:"WIND", max:20, color:"#00ccff"},
-    {k:"gusts", label:"GUSTS", max:18, color:"#3b82f6"},
-    {k:"precip", label:"PRECIP", max:14, color:"#6366f1"},
-    {k:"instability", label:"INSTABILITY", max:16, color:"#eab308"},
-    {k:"textual", label:"FORECAST", max:22, color:"#f97316"},
-    {k:"alerts", label:"ALERTS", max:10, color:"#ef4444"}
-  ];
-  var cx = 160, cy = 155, R = 110;
-  var n = items.length;
-  var lv = tsps_sevLevel(score);
-
-  function polar(i, r) {
-    var angle = (Math.PI * 2 / n) * i - Math.PI / 2;
-    return {x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle)};
-  }
-
-  var svg = '<svg viewBox="0 0 320 310" class="tf-svg" xmlns="http://www.w3.org/2000/svg">';
-
-  // Defs — glows for each component
-  svg += '<defs>';
-  items.forEach(function(item, i) {
-    svg += '<filter id="tfGlow' + i + '"><feGaussianBlur stdDeviation="4" result="b"/><feFlood flood-color="' + item.color + '" flood-opacity=".5"/><feComposite in2="b" operator="in"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
-  });
-  svg += '<filter id="tfCenterGlow"><feGaussianBlur stdDeviation="8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
-  svg += '</defs>';
-
-  // Background rings
-  [0.25, 0.5, 0.75, 1.0].forEach(function(pct) {
-    var points = [];
-    for (var i = 0; i < n; i++) {
-      var p = polar(i, R * pct);
-      points.push(p.x + "," + p.y);
-    }
-    svg += '<polygon points="' + points.join(" ") + '" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="1"/>';
-  });
-
-  // Axis lines
-  for (var i = 0; i < n; i++) {
-    var p = polar(i, R);
-    svg += '<line x1="' + cx + '" y1="' + cy + '" x2="' + p.x + '" y2="' + p.y + '" stroke="rgba(255,255,255,.08)" stroke-width="1"/>';
-  }
-
-  // Filled threat shape — gradient from center
-  var shapePoints = [];
-  var activeSegments = [];
-  for (var i = 0; i < n; i++) {
-    var val = breakdown[items[i].k] || 0;
-    var pct = Math.max(0.05, val / items[i].max);
-    var p = polar(i, R * pct);
-    shapePoints.push(p.x + "," + p.y);
-    activeSegments.push({idx: i, val: val, pct: pct, x: p.x, y: p.y, color: items[i].color});
-  }
-
-  // Main filled shape
-  svg += '<polygon points="' + shapePoints.join(" ") + '" fill="' + lv.color + '" fill-opacity=".12" stroke="' + lv.color + '" stroke-width="1.5" stroke-opacity=".4"/>';
-
-  // Individual segment lines with their own color + glow
-  for (var i = 0; i < n; i++) {
-    var seg = activeSegments[i];
-    var next = activeSegments[(i + 1) % n];
-    if (seg.pct > 0.1) {
-      // Line from center to point
-      svg += '<line x1="' + cx + '" y1="' + cy + '" x2="' + seg.x + '" y2="' + seg.y + '" stroke="' + seg.color + '" stroke-width="2" stroke-opacity=".5" filter="url(#tfGlow' + i + ')"/>';
-      // Segment edge
-      svg += '<line x1="' + seg.x + '" y1="' + seg.y + '" x2="' + next.x + '" y2="' + next.y + '" stroke="' + seg.color + '" stroke-width="1.5" stroke-opacity=".35"/>';
-    }
-  }
-
-  // Data points — circles at each vertex
-  for (var i = 0; i < n; i++) {
-    var seg = activeSegments[i];
-    var pointPct = seg.val / items[i].max;
-    var pointSize = 3 + pointPct * 4;
-    var pointOpacity = 0.4 + pointPct * 0.6;
-
-    // Outer glow ring
-    if (pointPct > 0.3) {
-      svg += '<circle cx="' + seg.x + '" cy="' + seg.y + '" r="' + (pointSize + 4) + '" fill="' + seg.color + '" fill-opacity=".1" style="animation:tfPulse 2s ease-in-out infinite;animation-delay:' + (i * 0.3) + 's"/>';
-    }
-    // Point
-    svg += '<circle cx="' + seg.x + '" cy="' + seg.y + '" r="' + pointSize + '" fill="' + seg.color + '" fill-opacity="' + pointOpacity + '" filter="url(#tfGlow' + i + ')"/>';
-    // White center dot
-    svg += '<circle cx="' + seg.x + '" cy="' + seg.y + '" r="1.5" fill="white" fill-opacity=".8"/>';
-  }
-
-  // Labels + scores at each axis
-  for (var i = 0; i < n; i++) {
-    var labelR = R + 22;
-    var lp = polar(i, labelR);
-    var val = breakdown[items[i].k] || 0;
-    var pctVal = Math.round(val / items[i].max * 100);
-    var anchor = "middle";
-    if (lp.x < cx - 20) anchor = "end";
-    if (lp.x > cx + 20) anchor = "start";
-
-    // Component name
-    svg += '<text x="' + lp.x + '" y="' + (lp.y - 5) + '" text-anchor="' + anchor + '" fill="' + items[i].color + '" font-size="8" font-weight="800" letter-spacing="1" font-family="Segoe UI,sans-serif">' + items[i].label + '</text>';
-    // Score
-    svg += '<text x="' + lp.x + '" y="' + (lp.y + 7) + '" text-anchor="' + anchor + '" fill="rgba(255,255,255,.6)" font-size="9" font-weight="600" font-family="Segoe UI,sans-serif">' + val + '/' + items[i].max + ' (' + pctVal + '%)</text>';
-  }
-
-  // Center score
-  svg += '<circle cx="' + cx + '" cy="' + cy + '" r="24" fill="' + lv.color + '" fill-opacity=".15" filter="url(#tfCenterGlow)"/>';
-  svg += '<circle cx="' + cx + '" cy="' + cy + '" r="20" fill="rgba(0,0,0,.6)" stroke="' + lv.color + '" stroke-width="2" stroke-opacity=".5"/>';
-  svg += '<text x="' + cx + '" y="' + (cy + 1) + '" text-anchor="middle" dominant-baseline="middle" fill="' + lv.color + '" font-size="16" font-weight="800" font-family="Segoe UI,sans-serif">' + score + '</text>';
-  svg += '<text x="' + cx + '" y="' + (cy + 14) + '" text-anchor="middle" fill="rgba(255,255,255,.3)" font-size="6" font-weight="700" letter-spacing="1.5" font-family="Segoe UI,sans-serif">INDEX</text>';
-
-  svg += '</svg>';
-
-  // Legend
-  var legend = '<div class="tf-legend">';
-  items.forEach(function(item) {
-    var val = breakdown[item.k] || 0;
-    legend += '<div class="tf-leg-item"><div class="tf-leg-dot" style="background:' + item.color + (val > 0 ? '' : ';opacity:.25') + '"></div>' + item.label + '</div>';
-  });
-  legend += '</div>';
-
-  return svg + legend;
+function tsps_buildFingerprint(breakdown,score){
+  var items=[{k:"wind",label:"WIND",max:20,color:"#00ccff"},{k:"gusts",label:"GUSTS",max:18,color:"#3b82f6"},{k:"precip",label:"PRECIP",max:14,color:"#6366f1"},{k:"instability",label:"INSTABILITY",max:16,color:"#eab308"},{k:"textual",label:"FORECAST",max:22,color:"#f97316"},{k:"alerts",label:"ALERTS",max:10,color:"#ef4444"}];
+  var cx=160,cy=155,R=110,n=items.length,lv=tsps_sevLevel(score);
+  function polar(i,r){var a=(Math.PI*2/n)*i-Math.PI/2;return{x:cx+r*Math.cos(a),y:cy+r*Math.sin(a)};}
+  var svg='<svg viewBox="0 0 320 310" class="tf-svg" xmlns="http://www.w3.org/2000/svg"><defs>';
+  items.forEach(function(item,i){svg+='<filter id="tfGlow'+i+'"><feGaussianBlur stdDeviation="4" result="b"/><feFlood flood-color="'+item.color+'" flood-opacity=".5"/><feComposite in2="b" operator="in"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>';});
+  svg+='<filter id="tfCenterGlow"><feGaussianBlur stdDeviation="8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>';
+  [0.25,0.5,0.75,1.0].forEach(function(pct){var pts=[];for(var i=0;i<n;i++){var p=polar(i,R*pct);pts.push(p.x+","+p.y);}svg+='<polygon points="'+pts.join(" ")+'" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="1"/>';});
+  for(var i=0;i<n;i++){var p=polar(i,R);svg+='<line x1="'+cx+'" y1="'+cy+'" x2="'+p.x+'" y2="'+p.y+'" stroke="rgba(255,255,255,.08)" stroke-width="1"/>';}
+  var shapePoints=[],activeSegments=[];
+  for(var i=0;i<n;i++){var val=breakdown[items[i].k]||0;var pct=Math.max(0.05,val/items[i].max);var p=polar(i,R*pct);shapePoints.push(p.x+","+p.y);activeSegments.push({idx:i,val:val,pct:pct,x:p.x,y:p.y,color:items[i].color});}
+  svg+='<polygon points="'+shapePoints.join(" ")+'" fill="'+lv.color+'" fill-opacity=".12" stroke="'+lv.color+'" stroke-width="1.5" stroke-opacity=".4"/>';
+  for(var i=0;i<n;i++){var seg=activeSegments[i],next=activeSegments[(i+1)%n];if(seg.pct>0.1){svg+='<line x1="'+cx+'" y1="'+cy+'" x2="'+seg.x+'" y2="'+seg.y+'" stroke="'+seg.color+'" stroke-width="2" stroke-opacity=".5" filter="url(#tfGlow'+i+')"/>';svg+='<line x1="'+seg.x+'" y1="'+seg.y+'" x2="'+next.x+'" y2="'+next.y+'" stroke="'+seg.color+'" stroke-width="1.5" stroke-opacity=".35"/>';}}
+  for(var i=0;i<n;i++){var seg=activeSegments[i],ppct=seg.val/items[i].max,ps=3+ppct*4,po=0.4+ppct*0.6;if(ppct>0.3)svg+='<circle cx="'+seg.x+'" cy="'+seg.y+'" r="'+(ps+4)+'" fill="'+seg.color+'" fill-opacity=".1"/>';svg+='<circle cx="'+seg.x+'" cy="'+seg.y+'" r="'+ps+'" fill="'+seg.color+'" fill-opacity="'+po+'" filter="url(#tfGlow'+i+')"/>';svg+='<circle cx="'+seg.x+'" cy="'+seg.y+'" r="1.5" fill="white" fill-opacity=".8"/>';}
+  for(var i=0;i<n;i++){var lp=polar(i,R+22),val=breakdown[items[i].k]||0,pctVal=Math.round(val/items[i].max*100),anchor="middle";if(lp.x<cx-20)anchor="end";if(lp.x>cx+20)anchor="start";svg+='<text x="'+lp.x+'" y="'+(lp.y-5)+'" text-anchor="'+anchor+'" fill="'+items[i].color+'" font-size="8" font-weight="800" letter-spacing="1" font-family="Segoe UI,sans-serif">'+items[i].label+'</text>';svg+='<text x="'+lp.x+'" y="'+(lp.y+7)+'" text-anchor="'+anchor+'" fill="rgba(255,255,255,.6)" font-size="9" font-weight="600" font-family="Segoe UI,sans-serif">'+val+'/'+items[i].max+' ('+pctVal+'%)</text>';}
+  svg+='<circle cx="'+cx+'" cy="'+cy+'" r="24" fill="'+lv.color+'" fill-opacity=".15" filter="url(#tfCenterGlow)"/><circle cx="'+cx+'" cy="'+cy+'" r="20" fill="rgba(0,0,0,.6)" stroke="'+lv.color+'" stroke-width="2" stroke-opacity=".5"/><text x="'+cx+'" y="'+(cy+1)+'" text-anchor="middle" dominant-baseline="middle" fill="'+lv.color+'" font-size="16" font-weight="800" font-family="Segoe UI,sans-serif">'+score+'</text><text x="'+cx+'" y="'+(cy+14)+'" text-anchor="middle" fill="rgba(255,255,255,.3)" font-size="6" font-weight="700" letter-spacing="1.5" font-family="Segoe UI,sans-serif">INDEX</text></svg>';
+  var legend='<div class="tf-legend">';items.forEach(function(item){var val=breakdown[item.k]||0;legend+='<div class="tf-leg-item"><div class="tf-leg-dot" style="background:'+item.color+(val>0?'':';opacity:.25')+'"></div>'+item.label+'</div>';});legend+='</div>';
+  return svg+legend;
 }
 
-function tsps_destroyCharts() {
-  ["tl","bar"].forEach(function(k){if(tspsState.charts[k]){tspsState.charts[k].destroy();tspsState.charts[k]=null;}});
-}
+function tsps_destroyCharts(){["tl","bar"].forEach(function(k){if(tspsState.charts[k]){tspsState.charts[k].destroy();tspsState.charts[k]=null;}});}
 
-function tsps_renderMain() {
-  var pk=tspsState.peakScore, pkL=tsps_sevLevel(pk), f=tspsState.forecasts, al=tspsState.alerts;
+function tsps_renderMain(){
+  var pk=tspsState.peakScore,pkL=tsps_sevLevel(pk),f=tspsState.forecasts,al=tspsState.alerts;
   var pw=f.length?f.reduce(function(a,b){return a.score>b.score?a:b;}).label:"--";
   var ml=f.length?Math.max.apply(null,f.map(function(x){return x.likelihood;})):0;
   var gs=tsps_gaugeSize();
-  var root=$("tsps"), pulse=$("tspsPulseBar"), cont=$("tspsContent");
-
+  var root=$("tsps"),pulse=$("tspsPulseBar"),cont=$("tspsContent");
   if(pk>=50){root.classList.add("tsps-threat");pulse.style.background="linear-gradient(90deg,transparent,"+pkL.color+",transparent)";}else{root.classList.remove("tsps-threat");}
-
   var aH="";
-  if(al.length>0){
-    var items="";
-    al.slice(0,6).forEach(function(a){var e=(a.properties&&a.properties.event)||"Alert";var c=TSPS_ACOL[e]||"#7b68ee";items+='<div class="tsps-al-item"><div class="tsps-al-dot" style="background:'+c+';box-shadow:0 0 6px '+c+'"></div><span class="tsps-al-ev">'+e+'</span><span class="tsps-al-src">'+(a.properties&&a.properties.senderName||"NWS")+'</span></div>';});
-    aH='<div class="tsps-alerts"><div class="tsps-al-hdr"><span>!!!</span><span>ACTIVE ALERTS - '+al.length+'</span></div>'+items+'</div>';
-  }
-
-  var cH="";
-  f.forEach(function(fc,i){
-    var lv=tsps_sevLevel(fc.score),isA=i===tspsState.activeIdx;
-    cH+='<div class="tsps-fc'+(isA?" act":"")+'" data-idx="'+i+'" style="background:'+(isA?"rgba("+tsps_hexToRgb(lv.color)+",.12)":"rgba(255,255,255,.025)")+';border-color:'+(isA?lv.color+"77":"rgba(255,255,255,.05)")+'"><div class="fc-lbl">'+fc.label+'</div><div><span class="fc-score" style="color:'+lv.color+'">'+fc.score+'</span><span class="fc-unit">/100</span></div><div class="fc-threat" style="color:'+lv.color+'88">'+lv.label+'</div><div class="fc-lk"><span class="fc-lk-l">Likelihood</span><span class="fc-lk-v" style="color:'+lv.color+'">'+fc.likelihood+'%</span></div><div class="fc-bar"><div class="fc-bar-f" style="width:'+fc.likelihood+'%;background:'+lv.color+'"></div></div><div class="fc-meta">'+(fc.temp!=null?fc.temp+"F":"")+(fc.wind?" - "+fc.wind:"")+'</div></div>';
-  });
-
-  var af=f[tspsState.activeIdx]; var afL=af?tsps_sevLevel(af.score):{color:"#888",label:"--"};
-  var dH="";
-  if(af){
-    dH='<div class="tsps-det"><div class="tsps-det-hdr"><div><div class="tsps-det-per">ANALYSIS - '+af.label+'</div><div class="tsps-det-fc">'+(af.shortForecast||"--")+'</div></div><div style="text-align:right"><div class="tsps-det-sc" style="color:'+afL.color+'">'+af.score+'</div><div class="tsps-det-lv" style="color:'+afL.color+'">'+afL.label+'</div></div></div><div class="tsps-det-mg"><div class="tsps-dm"><div class="dm-l">TEMP</div><div class="dm-v">'+(af.temp!=null?af.temp+"F":"--")+'</div></div><div class="tsps-dm"><div class="dm-l">WIND</div><div class="dm-v">'+(af.wind||"--")+'</div></div><div class="tsps-dm"><div class="dm-l">PRECIP</div><div class="dm-v">'+(af.pop||0)+'%</div></div><div class="tsps-dm"><div class="dm-l">LIKELIHOOD</div><div class="dm-v">'+af.likelihood+'%</div></div></div>'+(af.detailedForecast?'<div class="tsps-det-nar" style="border-left-color:'+afL.color+'44"><b>NWS:</b> '+af.detailedForecast+'</div>':'')+'</div>';
-  }
-
-  var fingerprintHTML = '';
-  if (af && af.breakdown) {
-    fingerprintHTML = '<div class="tf-wrap"><div class="tf-title">THREAT FINGERPRINT</div><div class="tf-subtitle">6-COMPONENT SEVERITY BREAKDOWN</div>' + tsps_buildFingerprint(af.breakdown, af.score) + '</div>';
-  }
-
-  cont.innerHTML = '<div class="tsps-hdr"><div class="tsps-hdr-l"><div class="tsps-tag">PROPRIETARY MODEL</div><h2><span class="tsps-r">Tuffy\'s</span> Storm Prediction System <div class="tip-btn" onclick="openTip(\'tipTSPS\')" style="font-size:10px;width:18px;height:18px">?</div></h2><div class="tsps-loc">'+TSPS_CFG.name+' - NWS-powered intelligence</div></div><div class="tsps-hdr-r"><div class="tsps-ulbl">LAST UPDATE</div><div class="tsps-utime">'+(tspsState.lastUpdate?tspsState.lastUpdate.toLocaleTimeString():"--")+'</div><button class="tsps-rbtn" id="tspsRB">Refresh</button></div></div>'+aH+'<div class="tsps-top"><div class="tsps-gauge-w"><div class="tsps-gauge-lbl">PEAK SEVERE WEATHER INDEX</div>'+tsps_buildGauge(pk,gs)+'</div><div class="tsps-stats"><div class="tsps-sbox"><div class="tsps-slbl">PEAK WINDOW</div><div class="tsps-sval" style="color:'+pkL.color+'">'+pw+'</div></div><div class="tsps-sbox"><div class="tsps-slbl">ACTIVE ALERTS</div><div class="tsps-sval" style="color:'+(al.length>0?"#ef4444":"#22c55e")+'">'+(al.length>0?al.length+" ACTIVE":"ALL CLEAR")+'</div></div><div class="tsps-sbox"><div class="tsps-slbl">MAX LIKELIHOOD</div><div class="tsps-sval" style="color:rgba(255,255,255,.85)">'+ml+'%</div></div></div></div><div class="tsps-sec-lbl">FORECAST PERIODS</div><div class="tsps-cards">'+cH+'</div>'+fingerprintHTML+'<div class="tsps-tl-box"><div class="tsps-ct">SEVERITY TIMELINE</div><canvas id="tsTL"></canvas></div><div class="tsps-ch-row"><div class="tsps-ch-box"><div class="tsps-ct">COMPONENT BREAKDOWN</div><canvas id="tsBA"></canvas></div></div>'+dH+'<div class="tsps-foot"><span>TSPS v2.0 - Proprietary Index - NWS API</span><span>Auto-refresh 5 min</span></div>';
-
-  $("tspsRB").addEventListener("click", function(){ tsps_refresh(); });
-  document.querySelectorAll(".tsps-fc").forEach(function(c){
-    c.addEventListener("click", function(){ tspsState.activeIdx=parseInt(this.getAttribute("data-idx")); tsps_renderMain(); tsps_buildCharts(); });
-  });
+  if(al.length>0){var items="";al.slice(0,6).forEach(function(a){var e=(a.properties&&a.properties.event)||"Alert";var c=TSPS_ACOL[e]||"#7b68ee";items+='<div class="tsps-al-item"><div class="tsps-al-dot" style="background:'+c+';box-shadow:0 0 6px '+c+'"></div><span class="tsps-al-ev">'+e+'</span><span class="tsps-al-src">'+(a.properties&&a.properties.senderName||"NWS")+'</span></div>';});aH='<div class="tsps-alerts"><div class="tsps-al-hdr"><span>!!!</span><span>ACTIVE ALERTS - '+al.length+'</span></div>'+items+'</div>';}
+  var cH="";f.forEach(function(fc,i){var lv=tsps_sevLevel(fc.score),isA=i===tspsState.activeIdx;cH+='<div class="tsps-fc'+(isA?" act":"")+'" data-idx="'+i+'" style="background:'+(isA?"rgba("+tsps_hexToRgb(lv.color)+",.12)":"rgba(255,255,255,.025)")+';border-color:'+(isA?lv.color+"77":"rgba(255,255,255,.05)")+'"><div class="fc-lbl">'+fc.label+'</div><div><span class="fc-score" style="color:'+lv.color+'">'+fc.score+'</span><span class="fc-unit">/100</span></div><div class="fc-threat" style="color:'+lv.color+'88">'+lv.label+'</div><div class="fc-lk"><span class="fc-lk-l">Likelihood</span><span class="fc-lk-v" style="color:'+lv.color+'">'+fc.likelihood+'%</span></div><div class="fc-bar"><div class="fc-bar-f" style="width:'+fc.likelihood+'%;background:'+lv.color+'"></div></div><div class="fc-meta">'+(fc.temp!=null?fc.temp+"F":"")+(fc.wind?" - "+fc.wind:"")+'</div></div>';});
+  var af=f[tspsState.activeIdx],afL=af?tsps_sevLevel(af.score):{color:"#888",label:"--"};
+  var dH="";if(af){dH='<div class="tsps-det"><div class="tsps-det-hdr"><div><div class="tsps-det-per">ANALYSIS - '+af.label+'</div><div class="tsps-det-fc">'+(af.shortForecast||"--")+'</div></div><div style="text-align:right"><div class="tsps-det-sc" style="color:'+afL.color+'">'+af.score+'</div><div class="tsps-det-lv" style="color:'+afL.color+'">'+afL.label+'</div></div></div><div class="tsps-det-mg"><div class="tsps-dm"><div class="dm-l">TEMP</div><div class="dm-v">'+(af.temp!=null?af.temp+"F":"--")+'</div></div><div class="tsps-dm"><div class="dm-l">WIND</div><div class="dm-v">'+(af.wind||"--")+'</div></div><div class="tsps-dm"><div class="dm-l">PRECIP</div><div class="dm-v">'+(af.pop||0)+'%</div></div><div class="tsps-dm"><div class="dm-l">LIKELIHOOD</div><div class="dm-v">'+af.likelihood+'%</div></div></div>'+(af.detailedForecast?'<div class="tsps-det-nar" style="border-left-color:'+afL.color+'44"><b>NWS:</b> '+af.detailedForecast+'</div>':'')+'</div>';}
+  var fpH='';if(af&&af.breakdown){fpH='<div class="tf-wrap"><div class="tf-title">THREAT FINGERPRINT</div><div class="tf-subtitle">6-COMPONENT SEVERITY BREAKDOWN</div>'+tsps_buildFingerprint(af.breakdown,af.score)+'</div>';}
+  cont.innerHTML='<div class="tsps-hdr"><div class="tsps-hdr-l"><div class="tsps-tag">PROPRIETARY MODEL</div><h2><span class="tsps-r">Tuffy\'s</span> Storm Prediction System <div class="tip-btn" onclick="openTip(\'tipTSPS\')" style="font-size:10px;width:18px;height:18px">?</div></h2><div class="tsps-loc">'+TSPS_CFG.name+' - NWS-powered intelligence</div></div><div class="tsps-hdr-r"><div class="tsps-ulbl">LAST UPDATE</div><div class="tsps-utime">'+(tspsState.lastUpdate?tspsState.lastUpdate.toLocaleTimeString():"--")+'</div><button class="tsps-rbtn" id="tspsRB">Refresh</button></div></div>'+aH+'<div class="tsps-top"><div class="tsps-gauge-w"><div class="tsps-gauge-lbl">PEAK SEVERE WEATHER INDEX</div>'+tsps_buildGauge(pk,gs)+'</div><div class="tsps-stats"><div class="tsps-sbox"><div class="tsps-slbl">PEAK WINDOW</div><div class="tsps-sval" style="color:'+pkL.color+'">'+pw+'</div></div><div class="tsps-sbox"><div class="tsps-slbl">ACTIVE ALERTS</div><div class="tsps-sval" style="color:'+(al.length>0?"#ef4444":"#22c55e")+'">'+(al.length>0?al.length+" ACTIVE":"ALL CLEAR")+'</div></div><div class="tsps-sbox"><div class="tsps-slbl">MAX LIKELIHOOD</div><div class="tsps-sval" style="color:rgba(255,255,255,.85)">'+ml+'%</div></div></div></div><div class="tsps-sec-lbl">FORECAST PERIODS</div><div class="tsps-cards">'+cH+'</div>'+fpH+'<div class="tsps-tl-box"><div class="tsps-ct">SEVERITY TIMELINE</div><canvas id="tsTL"></canvas></div><div class="tsps-ch-row"><div class="tsps-ch-box"><div class="tsps-ct">COMPONENT BREAKDOWN</div><canvas id="tsBA"></canvas></div></div>'+dH+'<div class="tsps-foot"><span>TSPS v2.0 - Proprietary Index - NWS API</span><span>Auto-refresh 5 min</span></div>';
+  $("tspsRB").addEventListener("click",function(){tsps_refresh();});
+  document.querySelectorAll(".tsps-fc").forEach(function(c){c.addEventListener("click",function(){tspsState.activeIdx=parseInt(this.getAttribute("data-idx"));tsps_renderMain();tsps_buildCharts();});});
   tsps_buildCharts();
 }
 
-function tsps_buildCharts() {
+function tsps_buildCharts(){
   tsps_destroyCharts();
-  var f=tspsState.forecasts; if(!f.length) return;
-  var af=f[tspsState.activeIdx], labels=f.map(function(x){return x.label;}), scores=f.map(function(x){return x.score;}), lks=f.map(function(x){return x.likelihood;});
-  var pkL=tsps_sevLevel(tspsState.peakScore), afL=tsps_sevLevel(af?af.score:0);
-  var mob=window.innerWidth<600;
-
-  Chart.defaults.color="rgba(255,255,255,.4)"; Chart.defaults.borderColor="rgba(255,255,255,.06)";
-  Chart.defaults.font.family="'Segoe UI',sans-serif"; Chart.defaults.font.size=mob?9:10;
-
+  var f=tspsState.forecasts;if(!f.length)return;
+  var af=f[tspsState.activeIdx],labels=f.map(function(x){return x.label;}),scores=f.map(function(x){return x.score;}),lks=f.map(function(x){return x.likelihood;});
+  var pkL=tsps_sevLevel(tspsState.peakScore);var mob=window.innerWidth<600;
+  Chart.defaults.color="rgba(255,255,255,.4)";Chart.defaults.borderColor="rgba(255,255,255,.06)";Chart.defaults.font.family="'Segoe UI',sans-serif";Chart.defaults.font.size=mob?9:10;
   var tlEl=$("tsTL");
-  if(tlEl) tspsState.charts.tl=new Chart(tlEl,{type:"line",data:{labels:labels,datasets:[{label:"Severity",data:scores,borderColor:pkL.color,backgroundColor:pkL.color+"30",fill:true,tension:.4,borderWidth:2,pointRadius:mob?3:4,pointBackgroundColor:scores.map(function(s){return tsps_sevLevel(s).color;})},{label:"Likelihood",data:lks,borderColor:"#60a5fa",borderDash:[5,4],fill:false,tension:.4,borderWidth:1.5,pointRadius:mob?2:3}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{min:0,max:100,grid:{color:"rgba(255,255,255,.04)"}},x:{grid:{display:false}}},plugins:{legend:{labels:{boxWidth:10,padding:mob?8:16}}}}});
-
-  if(af && af.breakdown){
-    var bd=af.breakdown;
-    var items=[{k:"wind",l:"Wind",m:20},{k:"gusts",l:"Gusts",m:18},{k:"precip",l:"Precip",m:14},{k:"instability",l:"Instab.",m:16},{k:"textual",l:"Fcst Text",m:22},{k:"alerts",l:"Alerts",m:10}];
-
+  if(tlEl)tspsState.charts.tl=new Chart(tlEl,{type:"line",data:{labels:labels,datasets:[{label:"Severity",data:scores,borderColor:pkL.color,backgroundColor:pkL.color+"30",fill:true,tension:.4,borderWidth:2,pointRadius:mob?3:4,pointBackgroundColor:scores.map(function(s){return tsps_sevLevel(s).color;})},{label:"Likelihood",data:lks,borderColor:"#60a5fa",borderDash:[5,4],fill:false,tension:.4,borderWidth:1.5,pointRadius:mob?2:3}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{min:0,max:100,grid:{color:"rgba(255,255,255,.04)"}},x:{grid:{display:false}}},plugins:{legend:{labels:{boxWidth:10,padding:mob?8:16}}}}});
+  if(af&&af.breakdown){
+    var bd=af.breakdown,items=[{k:"wind",l:"Wind",m:20},{k:"gusts",l:"Gusts",m:18},{k:"precip",l:"Precip",m:14},{k:"instability",l:"Instab.",m:16},{k:"textual",l:"Fcst Text",m:22},{k:"alerts",l:"Alerts",m:10}];
     var baEl=$("tsBA");
     if(baEl){var pcts=items.map(function(x){return Math.round(bd[x.k]/x.m*100);});tspsState.charts.bar=new Chart(baEl,{type:"bar",data:{labels:items.map(function(x){return x.l;}),datasets:[{data:pcts,backgroundColor:["#00ccff","#3b82f6","#6366f1","#eab308","#f97316","#ef4444"],borderRadius:4,barThickness:mob?12:14}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:"y",scales:{x:{min:0,max:100,grid:{color:"rgba(255,255,255,.04)"}},y:{grid:{display:false}}},plugins:{legend:{display:false}}}});}
   }
 }
 
-function tsps_refresh() {
-  $("tspsContent").innerHTML = '<div class="tsps-ld"><div class="tsps-spinner"></div><p>Refreshing predictions...</p></div>';
-  var hdr = {"User-Agent":"TSPS/2.0"};
-  Promise.all([
-    fetch("https://api.weather.gov/points/"+TSPS_CFG.lat+","+TSPS_CFG.lon, {headers:hdr}),
-    fetch("https://api.weather.gov/alerts/active?point="+TSPS_CFG.lat+","+TSPS_CFG.lon, {headers:hdr})
-  ]).then(function(responses){
-    if(!responses[0].ok) throw new Error("NWS unavailable");
-    return Promise.all([responses[0].json(), responses[1].ok ? responses[1].json() : {features:[]}]);
-  }).then(function(data){
-    var pD=data[0], aD=data[1];
-    var fUrl=pD.properties && pD.properties.forecastHourly;
-    if(!fUrl) throw new Error("No forecast URL");
-    tspsState.alerts = aD.features || [];
-    return fetch(fUrl, {headers:{"User-Agent":"TSPS/2.0"}});
-  }).then(function(r){
-    if(!r.ok) throw new Error("Forecast unavailable");
-    return r.json();
-  }).then(function(fcData){
-    var periods = fcData.properties && fcData.properties.periods;
-    if(!periods || !periods.length) throw new Error("No data");
-    var now = Date.now();
-    var targets = [{h:3,l:"+3 HR"},{h:6,l:"+6 HR"},{h:9,l:"+9 HR"},{h:12,l:"+12 HR"},{h:24,l:"+24 HR"}];
-    tspsState.forecasts = targets.map(function(t){
-      var tgt = now + t.h*3600000;
-      var best = periods[0], bD = Infinity;
-      periods.forEach(function(p){ var d=Math.abs(new Date(p.startTime).getTime()-tgt); if(d<bD){bD=d;best=p;} });
-      var result = tsps_computeIndex(best, tspsState.alerts);
-      return {label:t.l, score:result.score, likelihood:result.likelihood, breakdown:result.breakdown, temp:best.temperature, wind:(best.windSpeed||"")+" "+(best.windDirection||""), pop:(best.probabilityOfPrecipitation&&best.probabilityOfPrecipitation.value)||0, shortForecast:best.shortForecast||"", detailedForecast:best.detailedForecast||""};
-    });
-    tspsState.peakScore = Math.max.apply(null, tspsState.forecasts.map(function(x){return x.score;}));
-    tspsState.lastUpdate = new Date();
-    tspsState.activeIdx = 0;
-    tsps_renderMain();
-  }).catch(function(e){
-    $("tspsContent").innerHTML = '<div class="tsps-ld"><p style="color:#ef4444">' + e.message + '</p><p class="sub" style="margin-top:10px"><button class="tsps-rbtn" onclick="tsps_refresh()">Retry</button></p></div>';
-  });
+function tsps_refresh(){
+  $("tspsContent").innerHTML='<div class="tsps-ld"><div class="tsps-spinner"></div><p>Refreshing predictions...</p></div>';
+  var hdr={"User-Agent":"TSPS/2.0"};
+  Promise.all([fetch("https://api.weather.gov/points/"+TSPS_CFG.lat+","+TSPS_CFG.lon,{headers:hdr}),fetch("https://api.weather.gov/alerts/active?point="+TSPS_CFG.lat+","+TSPS_CFG.lon,{headers:hdr})])
+  .then(function(responses){if(!responses[0].ok)throw new Error("NWS unavailable");return Promise.all([responses[0].json(),responses[1].ok?responses[1].json():{features:[]}]);})
+  .then(function(data){var pD=data[0],aD=data[1];var fUrl=pD.properties&&pD.properties.forecastHourly;if(!fUrl)throw new Error("No forecast URL");tspsState.alerts=aD.features||[];return fetch(fUrl,{headers:{"User-Agent":"TSPS/2.0"}});})
+  .then(function(r){if(!r.ok)throw new Error("Forecast unavailable");return r.json();})
+  .then(function(fcData){
+    var periods=fcData.properties&&fcData.properties.periods;if(!periods||!periods.length)throw new Error("No data");
+    var now=Date.now();var targets=[{h:3,l:"+3 HR"},{h:6,l:"+6 HR"},{h:9,l:"+9 HR"},{h:12,l:"+12 HR"},{h:24,l:"+24 HR"}];
+    tspsState.forecasts=targets.map(function(t){var tgt=now+t.h*3600000;var best=periods[0],bD=Infinity;periods.forEach(function(p){var d=Math.abs(new Date(p.startTime).getTime()-tgt);if(d<bD){bD=d;best=p;}});var result=tsps_computeIndex(best,tspsState.alerts);return{label:t.l,score:result.score,likelihood:result.likelihood,breakdown:result.breakdown,temp:best.temperature,wind:(best.windSpeed||"")+" "+(best.windDirection||""),pop:(best.probabilityOfPrecipitation&&best.probabilityOfPrecipitation.value)||0,shortForecast:best.shortForecast||"",detailedForecast:best.detailedForecast||""};});
+    tspsState.peakScore=Math.max.apply(null,tspsState.forecasts.map(function(x){return x.score;}));
+    tspsState.lastUpdate=new Date();tspsState.activeIdx=0;tsps_renderMain();
+  }).catch(function(e){$("tspsContent").innerHTML='<div class="tsps-ld"><p style="color:#ef4444">'+e.message+'</p><p class="sub" style="margin-top:10px"><button class="tsps-rbtn" onclick="tsps_refresh()">Retry</button></p></div>';});
 }
+tsps_refresh();setInterval(tsps_refresh,TSPS_CFG.refresh);
+var tspsResizeTimer;window.addEventListener("resize",function(){clearTimeout(tspsResizeTimer);tspsResizeTimer=setTimeout(function(){if(tspsState.forecasts.length)tsps_renderMain();},300);});
 
-tsps_refresh();
-setInterval(tsps_refresh, TSPS_CFG.refresh);
-var tspsResizeTimer;
-window.addEventListener("resize", function(){ clearTimeout(tspsResizeTimer); tspsResizeTimer=setTimeout(function(){ if(tspsState.forecasts.length) tsps_renderMain(); },300); });
+// ============================================================
+// SUNRISE / SUNSET & DAY LENGTH  ← NEW
+// ============================================================
+function fetchSunData(){
+  var el=$("sun-dashboard");if(!el)return;
+  el.innerHTML='<div class="alm-ld"><div class="tsps-spinner"></div>Loading sun data...</div>';
+  fetch("https://api.open-meteo.com/v1/forecast?latitude=35.78&longitude=-78.64&daily=sunrise,sunset&timezone=America%2FNew_York&past_days=31&forecast_days=1")
+  .then(function(r){return r.json();})
+  .then(function(d){
+    var dl=d.daily,byDate={};
+    dl.time.forEach(function(t,i){byDate[t]={rise:new Date(dl.sunrise[i]),set:new Date(dl.sunset[i])};});
+    var now=new Date();
+    function ds(n){var dt=new Date(now.getTime()-n*86400000);return dt.toLocaleDateString("en-CA");}
+    var t0=ds(0),t1=ds(1),t7=ds(7),t30=ds(30);
+    function len(s){return byDate[s]?(byDate[s].set-byDate[s].rise)/60000:null;}
+    function fmtT(dt){return dt.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit",hour12:true});}
+    function fmtL(m){if(m===null)return"--";return Math.floor(m/60)+"h "+Math.round(m%60)+"m";}
+    function fmtD(m){if(m===null)return"--";var abs=Math.abs(m),s=m>=0?"+":"-";if(abs<1/60)return"\u00b10s";if(abs<1)return s+Math.round(abs*60)+"s";var h=Math.floor(abs/60),mn=Math.floor(abs%60),sc=Math.round((abs-Math.floor(abs))*60);if(h>0)return s+h+"h "+mn+"m";return s+mn+"m"+(sc>0&&abs<5?" "+sc+"s":"");}
+    var today=byDate[t0];if(!today){el.innerHTML="";return;}
+    var todayLen=len(t0);
+    var diffs={d:(todayLen!==null&&len(t1)!==null)?todayLen-len(t1):null,w:(todayLen!==null&&len(t7)!==null)?todayLen-len(t7):null,mo:(todayLen!==null&&len(t30)!==null)?todayLen-len(t30):null};
+    // Arc SVG
+    var cx=160,cy=118,rx=128,ry=100;
+    function arcPt(pct){var a=Math.PI*(1-pct);return{x:+(cx+rx*Math.cos(a)).toFixed(2),y:+(cy-ry*Math.sin(a)).toFixed(2)};}
+    var totalDay=today.set-today.rise,elapsed=now-today.rise;
+    var sunPct=Math.max(0,Math.min(1,elapsed/totalDay));
+    var isBefore=now<today.rise,isPast=now>today.set;
+    var arcLen=+(Math.PI*Math.sqrt((rx*rx+ry*ry)/2)).toFixed(0);
+    var arcD="M "+(cx-rx)+","+cy+" A "+rx+","+ry+" 0 0 0 "+(cx+rx)+","+cy;
+    var sunP=arcPt(sunPct);
+    var svg='<svg viewBox="0 0 320 142" style="width:100%;max-width:360px;height:auto;display:block;margin:0 auto">'+
+      '<defs><linearGradient id="sAG" x1="0%" x2="100%"><stop offset="0%" stop-color="#ff8844"/><stop offset="50%" stop-color="#FFD700"/><stop offset="100%" stop-color="#ff9944"/></linearGradient>'+
+      '<filter id="sGl"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'+
+      '<filter id="sSun"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>'+
+      '<line x1="24" y1="'+cy+'" x2="296" y2="'+cy+'" stroke="rgba(255,255,255,.07)" stroke-width="1"/>'+
+      '<path d="'+arcD+'" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="5" stroke-linecap="round"/>'+
+      (!isBefore&&sunPct>0.01?'<path d="'+arcD+'" fill="none" stroke="url(#sAG)" stroke-width="5" stroke-linecap="round" stroke-dasharray="'+arcLen+'" stroke-dashoffset="'+Math.round(arcLen*(1-sunPct))+'" opacity=".85"/>'  :'')+
+      '<circle cx="'+(cx-rx)+'" cy="'+cy+'" r="5" fill="#ff8844" filter="url(#sGl)"/>'+
+      '<circle cx="'+(cx+rx)+'" cy="'+cy+'" r="5" fill="#ff9944" filter="url(#sGl)"/>'+
+      (!isBefore&&!isPast?'<circle cx="'+sunP.x+'" cy="'+sunP.y+'" r="16" fill="rgba(255,215,0,.12)" filter="url(#sSun)"/><circle cx="'+sunP.x+'" cy="'+sunP.y+'" r="8" fill="#FFD700" filter="url(#sGl)"/><circle cx="'+sunP.x+'" cy="'+sunP.y+'" r="3" fill="#fff" fill-opacity=".7"/>':'')+
+      '<text x="'+(cx-rx)+'" y="'+(cy+17)+'" text-anchor="middle" fill="rgba(255,255,255,.4)" font-size="9" font-family="Segoe UI,sans-serif">'+fmtT(today.rise)+'</text>'+
+      '<text x="'+(cx+rx)+'" y="'+(cy+17)+'" text-anchor="middle" fill="rgba(255,255,255,.4)" font-size="9" font-family="Segoe UI,sans-serif">'+fmtT(today.set)+'</text>'+
+      '<text x="'+cx+'" y="'+(cy-52)+'" text-anchor="middle" fill="#FFD700" font-size="22" font-weight="700" font-family="Segoe UI,sans-serif">'+fmtL(todayLen)+'</text>'+
+      '<text x="'+cx+'" y="'+(cy-34)+'" text-anchor="middle" fill="rgba(255,255,255,.28)" font-size="8" letter-spacing="1.5" font-family="Segoe UI,sans-serif">DAYLIGHT TODAY</text>'+
+      '</svg>';
+    function diffCard(label,wasLabel,diff){
+      if(diff===null)return'<div class="sun-diff-card"><div class="sun-diff-lbl">'+label+'</div><div class="sun-diff-val" style="color:var(--mu)">--</div></div>';
+      var pos=diff>0.02,neg=diff<-0.02;
+      var col=pos?"#ff8844":neg?"#77aaff":"#00d44a",tag=pos?"gaining":neg?"losing":"stable",tagL=pos?"GAINING":neg?"LOSING":"STABLE";
+      return'<div class="sun-diff-card"><div class="sun-diff-lbl">'+label+'</div><div class="sun-diff-val" style="color:'+col+'">'+fmtD(diff)+'</div><div class="sun-diff-was">was '+wasLabel+'</div><div class="sun-diff-tag '+tag+'">'+tagL+'</div></div>';
+    }
+    el.innerHTML=
+      '<div class="sun-sec">&#x1F305; Sunrise &amp; Sunset <em>Raleigh, NC &middot; Day Length Analysis</em></div>'+
+      '<div class="sun-card">'+svg+
+        '<div class="sun-stats">'+
+          '<div class="sun-stat" style="border-top:2px solid #ff8844"><div class="sun-stat-lbl" style="color:#ff8844">SUNRISE</div><div class="sun-stat-val">'+fmtT(today.rise)+'</div><div class="sun-stat-sub">Eastern Time</div></div>'+
+          '<div class="sun-stat" style="border-top:2px solid var(--gold)"><div class="sun-stat-lbl" style="color:var(--gold)">DAY LENGTH</div><div class="sun-stat-val">'+fmtL(todayLen)+'</div><div class="sun-stat-sub">Total daylight</div></div>'+
+          '<div class="sun-stat" style="border-top:2px solid #ff9944"><div class="sun-stat-lbl" style="color:#ff9944">SUNSET</div><div class="sun-stat-val">'+fmtT(today.set)+'</div><div class="sun-stat-sub">Eastern Time</div></div>'+
+        '</div>'+
+        '<div class="sun-diff-hdr">Daylight Change</div>'+
+        '<div class="sun-diff-grid">'+
+          diffCard("vs Yesterday",fmtL(len(t1)),diffs.d)+
+          diffCard("vs 7 Days Ago",fmtL(len(t7)),diffs.w)+
+          diffCard("vs 30 Days Ago",fmtL(len(t30)),diffs.mo)+
+        '</div>'+
+        '<div class="alm-note" style="margin-top:14px">Data: Open-Meteo &middot; Raleigh, NC (35.78&deg;N, 78.64&deg;W) &middot; All times Eastern</div>'+
+      '</div>';
+  })
+  .catch(function(){el.innerHTML='<div style="padding:8px;color:var(--mu2);font-size:11px;text-align:center">Sun data temporarily unavailable</div>';});
+}
 
 // ============================================================
 // ALMANAC
 // ============================================================
-var RDU_NTEMP = [40.4,43.2,50.5,60.1,68.8,76.8,80.6,79.0,72.7,61.5,51.0,42.8];
-var RDU_NPREC = [3.55,3.16,3.82,3.18,3.95,4.06,4.67,4.44,4.39,3.42,3.22,3.27];
-var MO_NAMES = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+var RDU_NTEMP=[40.4,43.2,50.5,60.1,68.8,76.8,80.6,79.0,72.7,61.5,51.0,42.8];
+var RDU_NPREC=[3.55,3.16,3.82,3.18,3.95,4.06,4.67,4.44,4.39,3.42,3.22,3.27];
+var MO_NAMES=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
-function fetchAlmanac() {
-  var el = $("alm-content");
-  var yr = new Date().getFullYear();
-  var today = new Date().toISOString().split("T")[0];
+function fetchAlmanac(){
+  var el=$("alm-content");
+  var yr=new Date().getFullYear();
+  var today=new Date().toISOString().split("T")[0];
   fetch("https://archive-api.open-meteo.com/v1/archive?latitude=35.78&longitude=-78.64&start_date="+yr+"-01-01&end_date="+today+"&daily=temperature_2m_mean,precipitation_sum&temperature_unit=fahrenheit&precipitation_unit=inch&timezone=America%2FNew_York")
-  .then(function(r){ return r.json(); })
+  .then(function(r){return r.json();})
   .then(function(d){
-    var dl = d.daily;
-    var moTemp={}, moPrec={}, moCnt={};
-    for(var i=0;i<dl.time.length;i++){
-      var m=new Date(dl.time[i]+"T12:00:00").getMonth();
-      if(!moTemp[m]){moTemp[m]=0;moPrec[m]=0;moCnt[m]=0;}
-      if(dl.temperature_2m_mean[i]!=null){moTemp[m]+=dl.temperature_2m_mean[i];moCnt[m]++;}
-      if(dl.precipitation_sum[i]!=null) moPrec[m]+=dl.precipitation_sum[i];
-    }
+    var dl=d.daily,moTemp={},moPrec={},moCnt={};
+    for(var i=0;i<dl.time.length;i++){var m=new Date(dl.time[i]+"T12:00:00").getMonth();if(!moTemp[m]){moTemp[m]=0;moPrec[m]=0;moCnt[m]=0;}if(dl.temperature_2m_mean[i]!=null){moTemp[m]+=dl.temperature_2m_mean[i];moCnt[m]++;}if(dl.precipitation_sum[i]!=null)moPrec[m]+=dl.precipitation_sum[i];}
     var ytdP=0,ytdTS=0,ytdD=0;
     for(var j=0;j<dl.time.length;j++){if(dl.precipitation_sum[j]!=null)ytdP+=dl.precipitation_sum[j];if(dl.temperature_2m_mean[j]!=null){ytdTS+=dl.temperature_2m_mean[j];ytdD++;}}
     var ytdAT=ytdD?ytdTS/ytdD:0;
-    var curMo=new Date().getMonth(), curDay=new Date().getDate();
+    var curMo=new Date().getMonth(),curDay=new Date().getDate();
     var dim=[31,28+(yr%4===0?1:0),31,30,31,30,31,31,30,31,30,31];
     var nP=0,nTT=0,nD=0;
     for(var m2=0;m2<12;m2++){if(m2<curMo){nP+=RDU_NPREC[m2];nTT+=RDU_NTEMP[m2]*dim[m2];nD+=dim[m2];}else if(m2===curMo){var frac=curDay/dim[m2];nP+=RDU_NPREC[m2]*frac;nTT+=RDU_NTEMP[m2]*curDay;nD+=curDay;}}
-    var nAT=nD?nTT/nD:0;
-    var pDiff=ytdP-nP, tDiff=ytdAT-nAT;
+    var nAT=nD?nTT/nD:0,pDiff=ytdP-nP,tDiff=ytdAT-nAT;
     function dLbl(d,u,th){if(Math.abs(d)<th)return'<span class="alm-cmp normal">NORMAL</span>';return'<span class="alm-cmp '+(d>0?"above":"below")+'">'+(d>0?"+":"")+d.toFixed(1)+u+" "+(d>0?"ABOVE":"BELOW")+'</span>';}
     var tMo="",pMo="";
     for(var m3=0;m3<12;m3++){
       var iC=m3===curMo,iF=m3>curMo;
-      var aT=moCnt[m3]?moTemp[m3]/moCnt[m3]:null;
-      var tP=moPrec[m3]!=null&&moCnt[m3]?moPrec[m3]:null;
-      var td=aT!==null?aT-RDU_NTEMP[m3]:null;
-      var pd=tP!==null?tP-RDU_NPREC[m3]:null;
+      var aT=moCnt[m3]?moTemp[m3]/moCnt[m3]:null,tP=moPrec[m3]!=null&&moCnt[m3]?moPrec[m3]:null;
+      var td=aT!==null?aT-RDU_NTEMP[m3]:null,pd=tP!==null?tP-RDU_NPREC[m3]:null;
       tMo+='<div class="alm-mo'+(iC?" current":"")+(iF?" future":"")+'"><div class="alm-mo-name">'+MO_NAMES[m3]+'</div><div class="alm-mo-val">'+(aT!==null?aT.toFixed(1):"--")+'</div><div class="alm-mo-nrm">Nrm: '+RDU_NTEMP[m3].toFixed(1)+'</div>'+(td!==null?'<div class="alm-mo-diff '+(Math.abs(td)<0.5?"zero":td>0?"pos":"neg")+'">'+(Math.abs(td)<0.5?"Normal":(td>0?"+":"")+td.toFixed(1))+'</div>':'')+'</div>';
       var pB=tP!==null?Math.min(100,Math.round(tP/Math.max(RDU_NPREC[m3],0.01)*100)):0;
       var pC=pd!==null?(pd>0.25?"#ff8844":pd<-0.25?"#4488ff":"#00d44a"):"#333";
@@ -822,1011 +635,212 @@ function fetchAlmanac() {
     el.innerHTML='<div class="alm-summary"><div class="alm-big"><div class="alm-big-lbl">YTD Rainfall</div><div class="alm-big-val">'+ytdP.toFixed(2)+'"</div><div class="alm-big-sub">Normal: '+nP.toFixed(2)+'"</div>'+dLbl(pDiff,'"',0.25)+'</div><div class="alm-big"><div class="alm-big-lbl">YTD Avg Temp</div><div class="alm-big-val">'+ytdAT.toFixed(1)+'F</div><div class="alm-big-sub">Normal: '+nAT.toFixed(1)+'F</div>'+dLbl(tDiff,"F",0.5)+'</div><div class="alm-big"><div class="alm-big-lbl">Days Tracked</div><div class="alm-big-val">'+ytdD+'</div><div class="alm-big-sub">'+yr+' Year-to-Date</div></div></div><div class="alm-grid"><div class="alm-card"><h3><span>T</span> Monthly Avg Temperature</h3><div class="alm-mo-grid">'+tMo+'</div></div><div class="alm-card"><h3><span>R</span> Monthly Rainfall Totals</h3><div class="alm-mo-grid">'+pMo+'</div></div></div><div class="alm-note">Data: Open-Meteo Historical Archive (ERA5) - RDU Airport - 30-year normals: 1991-2020 NCEI</div>';
     window._almLoaded=true;
   })
-  .catch(function(e){ el.innerHTML='<div class="alm-ld" style="color:#ef4444">'+e.message+'<br><button onclick="fetchAlmanac()" style="margin-top:10px;background:var(--red2);border:1px solid var(--red);color:#fff;padding:6px 16px;border-radius:2px;cursor:pointer">Retry</button></div>'; });
+  .catch(function(e){el.innerHTML='<div class="alm-ld" style="color:#ef4444">'+e.message+'<br><button onclick="fetchAlmanac()" style="margin-top:10px;background:var(--red2);border:1px solid var(--red);color:#fff;padding:6px 16px;border-radius:2px;cursor:pointer">Retry</button></div>';});
 }
 
 // ============================================================
 // ACCURACY DASHBOARD
 // ============================================================
-var ACC_SHEET_URL = MC_SHEET_URL; // same Apps Script, different tab
+var ACC_SHEET_URL=MC_SHEET_URL;
 
-function accLogPrediction() {
-  // Get today's NWS predicted high/low
-  var today = new Date().toISOString().split("T")[0];
-
-  // Check if already logged today
-  var lastPred = null;
-  try { lastPred = localStorage.getItem("acc_last_pred"); } catch(e) {}
-  if (lastPred === today) return;
-
+function accLogPrediction(){
+  var today=new Date().toISOString().split("T")[0];
+  var lastPred=null;try{lastPred=localStorage.getItem("acc_last_pred");}catch(e){}
+  if(lastPred===today)return;
   fetch("https://api.open-meteo.com/v1/forecast?latitude=35.686&longitude=-78.614&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&timezone=America%2FNew_York&forecast_days=1")
-  .then(function(r) { return r.json(); })
-  .then(function(d) {
-    var hi = d.daily ? Math.round(d.daily.temperature_2m_max[0]) : null;
-    var lo = d.daily ? Math.round(d.daily.temperature_2m_min[0]) : null;
-    if (hi === null || lo === null) return;
-
-    fetch(ACC_SHEET_URL, {
-      method: "POST",
-      mode: "no-cors",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({
-        tab: "Accuracy",
-        date: today,
-        pred_high: hi,
-        pred_low: lo
-      })
-    }).then(function() {
-      try { localStorage.setItem("acc_last_pred", today); } catch(e) {}
-      console.log("ACC prediction logged: " + today + " H:" + hi + " L:" + lo);
-    });
-  })
-  .catch(function() {});
+  .then(function(r){return r.json();}).then(function(d){
+    var hi=d.daily?Math.round(d.daily.temperature_2m_max[0]):null,lo=d.daily?Math.round(d.daily.temperature_2m_min[0]):null;
+    if(hi===null||lo===null)return;
+    fetch(ACC_SHEET_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify({tab:"Accuracy",date:today,pred_high:hi,pred_low:lo})})
+    .then(function(){try{localStorage.setItem("acc_last_pred",today);}catch(e){}});
+  }).catch(function(){});
 }
 
-function accLogActuals() {
-  // Get yesterday's actual high/low from Open-Meteo archive
-  var yesterday = new Date(Date.now() - 86400000);
-  var yStr = yesterday.toISOString().split("T")[0];
-
-  var lastAct = null;
-  try { lastAct = localStorage.getItem("acc_last_actual"); } catch(e) {}
-  if (lastAct === yStr) return;
-
-  fetch("https://archive-api.open-meteo.com/v1/archive?latitude=35.686&longitude=-78.614&start_date=" + yStr + "&end_date=" + yStr + "&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&timezone=America%2FNew_York")
-  .then(function(r) { return r.json(); })
-  .then(function(d) {
-    var hi = d.daily ? Math.round(d.daily.temperature_2m_max[0]) : null;
-    var lo = d.daily ? Math.round(d.daily.temperature_2m_min[0]) : null;
-    if (hi === null || lo === null) return;
-
-    fetch(ACC_SHEET_URL, {
-      method: "POST",
-      mode: "no-cors",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({
-        tab: "Accuracy",
-        date: yStr,
-        actual_high: hi,
-        actual_low: lo
-      })
-    }).then(function() {
-      try { localStorage.setItem("acc_last_actual", yStr); } catch(e) {}
-      console.log("ACC actuals logged: " + yStr + " H:" + hi + " L:" + lo);
-    });
-  })
-  .catch(function() {});
+function accLogActuals(){
+  var yesterday=new Date(Date.now()-86400000),yStr=yesterday.toISOString().split("T")[0];
+  var lastAct=null;try{lastAct=localStorage.getItem("acc_last_actual");}catch(e){}
+  if(lastAct===yStr)return;
+  fetch("https://archive-api.open-meteo.com/v1/archive?latitude=35.686&longitude=-78.614&start_date="+yStr+"&end_date="+yStr+"&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&timezone=America%2FNew_York")
+  .then(function(r){return r.json();}).then(function(d){
+    var hi=d.daily?Math.round(d.daily.temperature_2m_max[0]):null,lo=d.daily?Math.round(d.daily.temperature_2m_min[0]):null;
+    if(hi===null||lo===null)return;
+    fetch(ACC_SHEET_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify({tab:"Accuracy",date:yStr,actual_high:hi,actual_low:lo})})
+    .then(function(){try{localStorage.setItem("acc_last_actual",yStr);}catch(e){}});
+  }).catch(function(){});
 }
 
-function accFetchAndRender() {
-  var el = $("acc-dashboard");
-  if (!el) return;
-  el.innerHTML = '<div class="acc-wrap"><div class="acc-hdr">Tuffy\'s Accuracy Dashboard <em>- Loading...</em></div><div class="alm-ld"><div class="tsps-spinner"></div></div></div>';
-
-  // Use same fetch pattern as mcFetchHistory which works
-  var url = MC_SHEET_URL + "?tab=Accuracy";
-  var script = document.createElement("script");
-  
-  // Try fetch first
-  fetch(url)
-  .then(function(r) { return r.text(); })
-  .then(function(txt) {
-    console.log("ACC raw response:", txt.substring(0, 200));
-    var d = JSON.parse(txt);
-    accRender(el, d.rows || []);
-  })
-  .catch(function(e) {
-    console.log("ACC error:", e.message);
-    // If fetch fails, show empty state — data IS being logged via POST
-    accRender(el, []);
-  });
+function accFetchAndRender(){
+  var el=$("acc-dashboard");if(!el)return;
+  el.innerHTML='<div class="acc-wrap"><div class="acc-hdr">Tuffy\'s Accuracy Dashboard <em>- Loading...</em></div><div class="alm-ld"><div class="tsps-spinner"></div></div></div>';
+  fetch(MC_SHEET_URL+"?tab=Accuracy").then(function(r){return r.text();})
+  .then(function(txt){var d=JSON.parse(txt);accRender(el,d.rows||[]);})
+  .catch(function(){accRender(el,[]);});
 }
 
-function accRender(el, rows) {
-  if (!rows.length) {
-    el.innerHTML = '<div class="acc-wrap"><div class="acc-hdr">Tuffy\'s Accuracy Dashboard <em>- Forecast vs Actual</em></div><div class="acc-empty">Accuracy tracking has started. Predictions are logged daily — check back tomorrow for your first comparison.</div></div>';
-    return;
-  }
-
-  var now = new Date();
-  var day1 = new Date(now.getTime() - 86400000);
-  var week1 = new Date(now.getTime() - 604800000);
-  var month1 = new Date(now.getTime() - 2592000000);
-
-  // Score calculations
-  function calcAccuracy(rows, cutoff) {
-    var hiErrors = [], loErrors = [], hiHits = 0, loHits = 0, total = 0;
-    rows.forEach(function(r) {
-      var d = new Date(r.date);
-      if (d < cutoff) return;
-      var pH = parseFloat(r.pred_high);
-      var pL = parseFloat(r.pred_low);
-      var aH = parseFloat(r.actual_high);
-      var aL = parseFloat(r.actual_low);
-      if (isNaN(pH) || isNaN(aH) || isNaN(pL) || isNaN(aL)) return;
-      total++;
-      var hiErr = Math.abs(pH - aH);
-      var loErr = Math.abs(pL - aL);
-      hiErrors.push(hiErr);
-      loErrors.push(loErr);
-      if (hiErr <= 3) hiHits++;
-      if (loErr <= 3) loHits++;
-    });
-    if (total === 0) return null;
-    var avgHiErr = hiErrors.reduce(function(a, b) { return a + b; }, 0) / hiErrors.length;
-    var avgLoErr = loErrors.reduce(function(a, b) { return a + b; }, 0) / loErrors.length;
-    var hitPct = Math.round(((hiHits + loHits) / (total * 2)) * 100);
-    return {total: total, hitPct: hitPct, avgHiErr: avgHiErr, avgLoErr: avgLoErr};
-  }
-
-  var accAll = calcAccuracy(rows, new Date(0));
-  var accMonth = calcAccuracy(rows, month1);
-  var accWeek = calcAccuracy(rows, week1);
-  var accYesterday = calcAccuracy(rows, day1);
-
-  function scoreClass(pct) {
-    if (pct === null) return "";
-    if (pct >= 75) return "good";
-    if (pct >= 50) return "ok";
-    return "poor";
-  }
-
-  function renderScoreCard(label, acc) {
-    if (!acc) return '<div class="acc-score-card"><div class="acc-score-lbl">' + label + '</div><div class="acc-score-val">--</div><div class="acc-score-sub">No data yet</div></div>';
-    return '<div class="acc-score-card"><div class="acc-score-lbl">' + label + '</div><div class="acc-score-val ' + scoreClass(acc.hitPct) + '">' + acc.hitPct + '%</div><div class="acc-score-sub">' + acc.total + ' days tracked</div><div class="acc-score-sub">Avg error: Hi ' + acc.avgHiErr.toFixed(1) + 'F / Lo ' + acc.avgLoErr.toFixed(1) + 'F</div></div>';
-  }
-
-  var html = '<div class="acc-wrap">';
-  html += '<div class="acc-hdr">Tuffy\'s Accuracy Dashboard <em>- Forecast vs Actual Temperature</em></div>';
-
-  // Score cards
-  html += '<div class="acc-score-row">';
-  html += renderScoreCard("Yesterday", accYesterday);
-  html += renderScoreCard("Last 7 Days", accWeek);
-  html += renderScoreCard("Last 30 Days", accMonth);
-  html += renderScoreCard("All Time", accAll);
-  html += '</div>';
-
-  // Explanation
-  html += '<div style="font-size:9px;color:var(--mu2);text-align:center;margin-bottom:14px">HIT = prediction within 3F of actual | CLOSE = within 5F | MISS = off by 6F+</div>';
-
-  // Log table — most recent first
-  var sortedRows = rows.slice().reverse();
-  html += '<div class="acc-log">';
-  html += '<div class="acc-log-hdr"><div>Date</div><div>Pred High</div><div>Actual High</div><div>Pred Low</div><div>Actual Low</div><div>Result</div></div>';
-
-  var shown = 0;
-  sortedRows.forEach(function(r) {
-    if (shown >= 30) return;
-    var pH = parseFloat(r.pred_high);
-    var pL = parseFloat(r.pred_low);
-    var aH = parseFloat(r.actual_high);
-    var aL = parseFloat(r.actual_low);
-    var hasActual = !isNaN(aH) && !isNaN(aL);
-    var hasPred = !isNaN(pH) && !isNaN(pL);
-    if (!hasPred) return;
-
-    var dateStr = "";
-    if (r.date instanceof Date) {
-      dateStr = r.date.toLocaleDateString("en-US", {month: "short", day: "numeric"});
-    } else {
-      var dp = new Date(r.date + "T12:00:00");
-      dateStr = dp.toLocaleDateString("en-US", {month: "short", day: "numeric"});
-    }
-
-    var badge = '<span class="acc-badge pending">PENDING</span>';
-    if (hasActual) {
-      var hiErr = Math.abs(pH - aH);
-      var loErr = Math.abs(pL - aL);
-      var avgErr = (hiErr + loErr) / 2;
-      if (avgErr <= 3) badge = '<span class="acc-badge hit">HIT</span>';
-      else if (avgErr <= 5) badge = '<span class="acc-badge close">CLOSE</span>';
-      else badge = '<span class="acc-badge miss">MISS</span>';
-    }
-
-    var hiColor = "";
-    var loColor = "";
-    if (hasActual) {
-      hiColor = Math.abs(pH - aH) <= 3 ? "color:var(--green)" : (Math.abs(pH - aH) <= 5 ? "color:var(--yellow)" : "color:#ef4444");
-      loColor = Math.abs(pL - aL) <= 3 ? "color:var(--green)" : (Math.abs(pL - aL) <= 5 ? "color:var(--yellow)" : "color:#ef4444");
-    }
-
-    html += '<div class="acc-log-row">';
-    html += '<div class="acc-date">' + dateStr + '</div>';
-    html += '<div>' + Math.round(pH) + 'F</div>';
-    html += '<div style="' + hiColor + '">' + (hasActual ? Math.round(aH) + 'F' : '--') + '</div>';
-    html += '<div>' + Math.round(pL) + 'F</div>';
-    html += '<div style="' + loColor + '">' + (hasActual ? Math.round(aL) + 'F' : '--') + '</div>';
-    html += '<div>' + badge + '</div>';
-    html += '</div>';
-    shown++;
-  });
-
-  if (shown === 0) {
-    html += '<div class="acc-empty">No predictions logged yet. Check back tomorrow.</div>';
-  }
-
-  html += '</div>';
-  html += '<div style="font-size:8px;color:var(--mu2);text-align:center;margin-top:10px;line-height:1.7">Predictions: NWS/Open-Meteo daily forecast logged at first page load each day<br>Actuals: Open-Meteo ERA5 verified observations from the previous day<br>Accuracy tracking began ' + (rows.length > 0 ? new Date(rows[0].date + "T12:00:00").toLocaleDateString("en-US", {month: "long", day: "numeric", year: "numeric"}) : "today") + '</div>';
-  html += '</div>';
-
-  el.innerHTML = html;
+function accRender(el,rows){
+  if(!rows.length){el.innerHTML='<div class="acc-wrap"><div class="acc-hdr">Tuffy\'s Accuracy Dashboard <em>- Forecast vs Actual</em></div><div style="padding:20px;color:var(--mu);font-size:12px">Accuracy tracking has started. Check back tomorrow for your first comparison.</div></div>';return;}
+  var now=new Date(),day1=new Date(now.getTime()-86400000),week1=new Date(now.getTime()-604800000),month1=new Date(now.getTime()-2592000000);
+  function calcAccuracy(rows,cutoff){var hiErrors=[],loErrors=[],hiHits=0,loHits=0,total=0;rows.forEach(function(r){var d=new Date(r.date);if(d<cutoff)return;var pH=parseFloat(r.pred_high),pL=parseFloat(r.pred_low),aH=parseFloat(r.actual_high),aL=parseFloat(r.actual_low);if(isNaN(pH)||isNaN(aH)||isNaN(pL)||isNaN(aL))return;total++;var hiErr=Math.abs(pH-aH),loErr=Math.abs(pL-aL);hiErrors.push(hiErr);loErrors.push(loErr);if(hiErr<=3)hiHits++;if(loErr<=3)loHits++;});if(total===0)return null;var avgHiErr=hiErrors.reduce(function(a,b){return a+b;},0)/hiErrors.length,avgLoErr=loErrors.reduce(function(a,b){return a+b;},0)/loErrors.length;return{total:total,hitPct:Math.round(((hiHits+loHits)/(total*2))*100),avgHiErr:avgHiErr,avgLoErr:avgLoErr};}
+  var accAll=calcAccuracy(rows,new Date(0)),accMonth=calcAccuracy(rows,month1),accWeek=calcAccuracy(rows,week1),accYesterday=calcAccuracy(rows,day1);
+  function scoreClass(pct){if(pct===null)return"";if(pct>=75)return"good";if(pct>=50)return"ok";return"poor";}
+  function renderScoreCard(label,acc){if(!acc)return'<div class="acc-score-card"><div class="acc-score-lbl">'+label+'</div><div class="acc-score-val">--</div><div class="acc-score-sub">No data yet</div></div>';return'<div class="acc-score-card"><div class="acc-score-lbl">'+label+'</div><div class="acc-score-val '+scoreClass(acc.hitPct)+'">'+acc.hitPct+'%</div><div class="acc-score-sub">'+acc.total+' days tracked</div><div class="acc-score-sub">Avg error: Hi '+acc.avgHiErr.toFixed(1)+'F / Lo '+acc.avgLoErr.toFixed(1)+'F</div></div>';}
+  var html='<div class="acc-wrap"><div class="acc-hdr">Tuffy\'s Accuracy Dashboard <em>- Forecast vs Actual Temperature</em></div><div class="acc-score-row">'+renderScoreCard("Yesterday",accYesterday)+renderScoreCard("Last 7 Days",accWeek)+renderScoreCard("Last 30 Days",accMonth)+renderScoreCard("All Time",accAll)+'</div><div style="font-size:9px;color:var(--mu2);text-align:center;margin-bottom:14px">HIT = prediction within 3F of actual | CLOSE = within 5F | MISS = off by 6F+</div>';
+  var sortedRows=rows.slice().reverse();
+  html+='<div class="acc-log"><div class="acc-log-hdr"><div>Date</div><div>Pred High</div><div>Actual High</div><div>Pred Low</div><div>Actual Low</div><div>Result</div></div>';
+  var shown=0;sortedRows.forEach(function(r){if(shown>=30)return;var pH=parseFloat(r.pred_high),pL=parseFloat(r.pred_low),aH=parseFloat(r.actual_high),aL=parseFloat(r.actual_low),hasActual=!isNaN(aH)&&!isNaN(aL),hasPred=!isNaN(pH)&&!isNaN(pL);if(!hasPred)return;var dp=new Date(r.date+"T12:00:00"),dateStr=dp.toLocaleDateString("en-US",{month:"short",day:"numeric"});var badge='<span class="acc-badge pending">PENDING</span>';if(hasActual){var hiErr=Math.abs(pH-aH),loErr=Math.abs(pL-aL),avgErr=(hiErr+loErr)/2;if(avgErr<=3)badge='<span class="acc-badge hit">HIT</span>';else if(avgErr<=5)badge='<span class="acc-badge close">CLOSE</span>';else badge='<span class="acc-badge miss">MISS</span>';}var hiColor="",loColor="";if(hasActual){hiColor=Math.abs(pH-aH)<=3?"color:var(--green)":(Math.abs(pH-aH)<=5?"color:var(--yellow)":"color:#ef4444");loColor=Math.abs(pL-aL)<=3?"color:var(--green)":(Math.abs(pL-aL)<=5?"color:var(--yellow)":"color:#ef4444");}html+='<div class="acc-log-row"><div class="acc-date">'+dateStr+'</div><div>'+Math.round(pH)+'F</div><div style="'+hiColor+'">'+(hasActual?Math.round(aH)+'F':'--')+'</div><div>'+Math.round(pL)+'F</div><div style="'+loColor+'">'+(hasActual?Math.round(aL)+'F':'--')+'</div><div>'+badge+'</div></div>';shown++;});
+  if(shown===0)html+='<div style="padding:16px;color:var(--mu);font-size:11px">No predictions logged yet.</div>';
+  html+='</div><div style="font-size:8px;color:var(--mu2);text-align:center;margin-top:10px;line-height:1.7">Predictions: NWS/Open-Meteo daily forecast logged at first page load<br>Actuals: Open-Meteo ERA5 verified observations from the previous day</div></div>';
+  el.innerHTML=html;
 }
-
-// Start logging + load dashboard when almanac tab opens
-setTimeout(function() {
-  accLogPrediction();
-  accLogActuals();
-}, 10000);
+setTimeout(function(){accLogPrediction();accLogActuals();},10000);
 
 // ============================================================
 // PWS NETWORK
 // ============================================================
-var PWS_STATIONS = [
-  {id:"KNCRALEI761", name:"Red Wolf Farm", loc:"S. Wake County / Garner", own:true},
-  {id:"KNCRALEI828", name:"G. Bragg", loc:"Raleigh", own:false},
-  {id:"KNCRALEI1276", name:"Vorbeck Residence", loc:"Juniper", own:false},
-  {id:"KNCRALEI1175", name:"Grayson Merrill", loc:"Raleigh", own:false},
-  {id:"KNCRALEI668", name:"Jon Wall - near RDU", loc:"Northwest Raleigh", own:false}
-];
-var WU_API_KEY = "sqBPSBlo";
-var WU_COMMUNITY_KEY = "6532d6454b8aa370768e63d6ba5a832e";
+var PWS_STATIONS=[{id:"KNCRALEI761",name:"Red Wolf Farm",loc:"S. Wake County / Garner",own:true},{id:"KNCRALEI828",name:"G. Bragg",loc:"Raleigh",own:false},{id:"KNCRALEI1276",name:"Vorbeck Residence",loc:"Juniper",own:false},{id:"KNCRALEI1175",name:"Grayson Merrill",loc:"Raleigh",own:false},{id:"KNCRALEI668",name:"Jon Wall - near RDU",loc:"Northwest Raleigh",own:false}];
+var WU_API_KEY="sqBPSBlo",WU_COMMUNITY_KEY="6532d6454b8aa370768e63d6ba5a832e";
 
-function fetchPWS() {
-  var el = $("pws-content");
-  el.innerHTML = '<div class="alm-ld"><div class="tsps-spinner"></div>Loading PWS data...</div>';
-
-  // Use Open-Meteo as reliable free source for each station's approximate location
-  // WU API requires a key; we'll use a known community endpoint
-  var promises = PWS_STATIONS.map(function(st) {
-    return fetch("https://api.weather.com/v2/pws/observations/current?stationId=" + st.id + "&format=json&units=e&apiKey=" + WU_COMMUNITY_KEY)
-    .then(function(r) { if(!r.ok) throw new Error(r.status); return r.json(); })
-    .then(function(d) {
-      var obs = d.observations && d.observations[0];
-      if (!obs) throw new Error("No data");
-      return {id:st.id, name:st.name, loc:st.loc, own:st.own, obs:obs, ok:true};
-    })
-    .catch(function() { return {id:st.id, name:st.name, loc:st.loc, own:st.own, ok:false}; });
-  });
-
-  Promise.all(promises).then(function(results) {
-    var html = '<div style="display:flex;flex-direction:column;gap:14px">';
-    results.forEach(function(st) {
-      var isOwn = st.own;
-      if (!st.ok) {
-        html += '<div class="pws-station' + (isOwn?" own":"") + '"><div class="pws-top"><div><div class="pws-name">' + (isOwn?"&#x1F43A; ":"") + st.name + '</div><div class="pws-loc">' + st.loc + '</div><div class="pws-id">' + st.id + '</div></div><div><div class="pws-err">Offline or unavailable</div></div></div></div>';
-        return;
-      }
-      var o = st.obs;
-      var imp = o.imperial || {};
-      var temp = imp.temp != null ? imp.temp : "--";
-      var feels = imp.heatIndex != null ? imp.heatIndex : (imp.windChill != null ? imp.windChill : temp);
-      var humid = o.humidity != null ? o.humidity : "--";
-      var wspd = imp.windSpeed != null ? imp.windSpeed : "--";
-      var wgust = imp.windGust != null ? imp.windGust : "--";
-      var wdir = o.winddir != null ? deg2dir(o.winddir) : "--";
-      var pres = imp.pressure != null ? imp.pressure : "--";
-      var precip = imp.precipTotal != null ? imp.precipTotal : "--";
-      var dewpt = imp.dewpt != null ? imp.dewpt : "--";
-      var uvi = o.uv != null ? o.uv : "--";
-      var solar = o.solarRadiation != null ? o.solarRadiation : "--";
-      var obsTime = o.obsTimeLocal ? new Date(o.obsTimeLocal).toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit"}) : "--";
-
-      html += '<div class="pws-station' + (isOwn?" own":"") + '">';
-      html += '<div class="pws-top"><div><div class="pws-name">' + (isOwn?"&#x1F43A; ":"") + st.name + '</div><div class="pws-loc">' + st.loc + '</div><div class="pws-id">' + st.id + '</div></div><div><div class="pws-temp">' + temp + '<sup>F</sup></div><div class="pws-updated">Updated ' + obsTime + '</div></div></div>';
-      html += '<div class="pws-grid">';
-      html += '<div class="pws-stat"><div class="pws-stat-lbl">Feels</div><div class="pws-stat-val">' + feels + 'F</div></div>';
-      html += '<div class="pws-stat"><div class="pws-stat-lbl">Humidity</div><div class="pws-stat-val">' + humid + '%</div></div>';
-      html += '<div class="pws-stat"><div class="pws-stat-lbl">Dewpt</div><div class="pws-stat-val">' + dewpt + 'F</div></div>';
-      html += '<div class="pws-stat"><div class="pws-stat-lbl">Wind</div><div class="pws-stat-val">' + wspd + '</div><div class="pws-stat-unit">' + wdir + '</div></div>';
-      html += '<div class="pws-stat"><div class="pws-stat-lbl">Gusts</div><div class="pws-stat-val">' + wgust + '</div><div class="pws-stat-unit">mph</div></div>';
-      html += '<div class="pws-stat"><div class="pws-stat-lbl">Pressure</div><div class="pws-stat-val">' + pres + '</div><div class="pws-stat-unit">inHg</div></div>';
-      html += '<div class="pws-stat"><div class="pws-stat-lbl">Precip</div><div class="pws-stat-val">' + precip + '"</div><div class="pws-stat-unit">today</div></div>';
-      html += '<div class="pws-stat"><div class="pws-stat-lbl">UV</div><div class="pws-stat-val">' + uvi + '</div></div>';
-      html += '<div class="pws-stat"><div class="pws-stat-lbl">Solar</div><div class="pws-stat-val">' + solar + '</div><div class="pws-stat-unit">W/m2</div></div>';
-      html += '<div class="pws-stat"><div class="pws-stat-lbl">Temp</div><div class="pws-stat-val">' + temp + 'F</div></div>';
-      html += '</div></div>';
+function fetchPWS(){
+  var el=$("pws-content");el.innerHTML='<div class="alm-ld"><div class="tsps-spinner"></div>Loading PWS data...</div>';
+  var promises=PWS_STATIONS.map(function(st){return fetch("https://api.weather.com/v2/pws/observations/current?stationId="+st.id+"&format=json&units=e&apiKey="+WU_COMMUNITY_KEY).then(function(r){if(!r.ok)throw new Error(r.status);return r.json();}).then(function(d){var obs=d.observations&&d.observations[0];if(!obs)throw new Error("No data");return{id:st.id,name:st.name,loc:st.loc,own:st.own,obs:obs,ok:true};}).catch(function(){return{id:st.id,name:st.name,loc:st.loc,own:st.own,ok:false};});});
+  Promise.all(promises).then(function(results){
+    var html='<div style="display:flex;flex-direction:column;gap:14px">';
+    results.forEach(function(st){
+      var isOwn=st.own;
+      if(!st.ok){html+='<div class="pws-station'+(isOwn?" own":"")+'"><div class="pws-top"><div><div class="pws-name">'+(isOwn?"&#x1F43A; ":"")+st.name+'</div><div class="pws-loc">'+st.loc+'</div><div class="pws-id">'+st.id+'</div></div><div><div class="pws-err">Offline or unavailable</div></div></div></div>';return;}
+      var o=st.obs,imp=o.imperial||{};
+      var temp=imp.temp!=null?imp.temp:"--",feels=imp.heatIndex!=null?imp.heatIndex:(imp.windChill!=null?imp.windChill:temp);
+      var humid=o.humidity!=null?o.humidity:"--",wspd=imp.windSpeed!=null?imp.windSpeed:"--",wgust=imp.windGust!=null?imp.windGust:"--";
+      var wdir=o.winddir!=null?deg2dir(o.winddir):"--",pres=imp.pressure!=null?imp.pressure:"--",precip=imp.precipTotal!=null?imp.precipTotal:"--";
+      var dewpt=imp.dewpt!=null?imp.dewpt:"--",uvi=o.uv!=null?o.uv:"--",solar=o.solarRadiation!=null?o.solarRadiation:"--";
+      var obsTime=o.obsTimeLocal?new Date(o.obsTimeLocal).toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit"}):"--";
+      html+='<div class="pws-station'+(isOwn?" own":"")+'"><div class="pws-top"><div><div class="pws-name">'+(isOwn?"&#x1F43A; ":"")+st.name+'</div><div class="pws-loc">'+st.loc+'</div><div class="pws-id">'+st.id+'</div></div><div><div class="pws-temp">'+temp+'<sup>F</sup></div><div class="pws-updated">Updated '+obsTime+'</div></div></div><div class="pws-grid"><div class="pws-stat"><div class="pws-stat-lbl">Feels</div><div class="pws-stat-val">'+feels+'F</div></div><div class="pws-stat"><div class="pws-stat-lbl">Humidity</div><div class="pws-stat-val">'+humid+'%</div></div><div class="pws-stat"><div class="pws-stat-lbl">Dewpt</div><div class="pws-stat-val">'+dewpt+'F</div></div><div class="pws-stat"><div class="pws-stat-lbl">Wind</div><div class="pws-stat-val">'+wspd+'</div><div class="pws-stat-unit">'+wdir+'</div></div><div class="pws-stat"><div class="pws-stat-lbl">Gusts</div><div class="pws-stat-val">'+wgust+'</div><div class="pws-stat-unit">mph</div></div><div class="pws-stat"><div class="pws-stat-lbl">Pressure</div><div class="pws-stat-val">'+pres+'</div><div class="pws-stat-unit">inHg</div></div><div class="pws-stat"><div class="pws-stat-lbl">Precip</div><div class="pws-stat-val">'+precip+'"</div><div class="pws-stat-unit">today</div></div><div class="pws-stat"><div class="pws-stat-lbl">UV</div><div class="pws-stat-val">'+uvi+'</div></div><div class="pws-stat"><div class="pws-stat-lbl">Solar</div><div class="pws-stat-val">'+solar+'</div><div class="pws-stat-unit">W/m2</div></div><div class="pws-stat"><div class="pws-stat-lbl">Temp</div><div class="pws-stat-val">'+temp+'F</div></div></div></div>';
     });
-    html += '</div>';
-    html += '<div class="alm-note">Data: Weather Underground Personal Weather Stations - Wake County, NC<br>Your station (Red Wolf Farm) highlighted in gold - Refreshes each tab switch</div>';
-    html += '<div id="mc-section"></div>';
-    el.innerHTML = html;
-    fetchMicroclimate();
+    html+='</div><div class="alm-note">Data: Weather Underground Personal Weather Stations - Wake County, NC<br>Your station (Red Wolf Farm) highlighted in gold - Refreshes each tab switch</div><div id="mc-section"></div>';
+    el.innerHTML=html;fetchMicroclimate();
   });
 }
 
 // ============================================================
-// MICROCLIMATE INTELLIGENCE — Red Wolf Farm vs RDU
+// MICROCLIMATE INTELLIGENCE
 // ============================================================
-var RDU_LAT = 35.878, RDU_LON = -78.787;
-var RWF_LAT = 35.686, RWF_LON = -78.614;
-
-function fetchMicroclimate() {
-  var mcEl = document.getElementById("mc-section");
-  if (!mcEl) return;
-  mcEl.innerHTML = '<div class="mc-wrap"><div class="mc-hdr">Microclimate Intelligence <em>- Red Wolf Farm vs RDU Airport</em></div><div class="alm-ld"><div class="tsps-spinner"></div>Analyzing microclimate data...</div></div>';
-
-  // Fetch current RDU conditions + both location archives
-  var yr = new Date().getFullYear();
-  var today = new Date().toISOString().split("T")[0];
-
-  // Fetch RDU current — try NWS METAR first (exact readings), fallback to Open-Meteo
-  var rduLive = {temp:"--", humid:"--", dewpt:"--", wind:"--", pres:"--"};
-
-  function fetchRduLive() {
-    return fetch("https://api.weather.gov/stations/KRDU/observations/latest", {headers: {"User-Agent": "WolfpackWeather/2.0", "Accept": "application/geo+json"}})
-    .then(function(r) {
-      if (!r.ok) throw new Error("NWS " + r.status);
-      return r.json();
-    })
-    .then(function(d) {
-      var p = d.properties;
-      if (!p) throw new Error("No properties");
-      if (p.temperature && p.temperature.value != null) rduLive.temp = Math.round(p.temperature.value * 9 / 5 + 32);
-      if (p.relativeHumidity && p.relativeHumidity.value != null) rduLive.humid = Math.round(p.relativeHumidity.value);
-      if (p.dewpoint && p.dewpoint.value != null) rduLive.dewpt = Math.round(p.dewpoint.value * 9 / 5 + 32);
-      if (p.windSpeed && p.windSpeed.value != null) rduLive.wind = Math.round(p.windSpeed.value * 0.621371);
-      if (p.seaLevelPressure && p.seaLevelPressure.value != null) {
-        rduLive.pres = (p.seaLevelPressure.value / 100 * 0.02953).toFixed(2);
-      } else if (p.barometricPressure && p.barometricPressure.value != null) {
-        rduLive.pres = (p.barometricPressure.value / 100 * 0.02953).toFixed(2);
-      }
-    })
-    .catch(function(e) {
-      console.log("NWS KRDU failed: " + e.message + " — trying Open-Meteo");
-      return fetch("https://api.open-meteo.com/v1/forecast?latitude=35.878&longitude=-78.787&current=temperature_2m,relative_humidity_2m,dew_point_2m,wind_speed_10m,pressure_msl&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York")
-      .then(function(r) { return r.json(); })
-      .then(function(d) {
-        var c = d.current || {};
-        if (c.temperature_2m != null) rduLive.temp = Math.round(c.temperature_2m);
-        if (c.relative_humidity_2m != null) rduLive.humid = Math.round(c.relative_humidity_2m);
-        if (c.dew_point_2m != null) rduLive.dewpt = Math.round(c.dew_point_2m);
-        if (c.wind_speed_10m != null) rduLive.wind = Math.round(c.wind_speed_10m);
-        if (c.pressure_msl != null) rduLive.pres = (c.pressure_msl * 0.02953).toFixed(2);
-      })
-      .catch(function() { console.log("Open-Meteo RDU also failed"); });
-    });
+function fetchMicroclimate(){
+  var mcEl=document.getElementById("mc-section");if(!mcEl)return;
+  mcEl.innerHTML='<div class="mc-wrap"><div class="mc-hdr">Microclimate Intelligence <em>- Red Wolf Farm vs RDU Airport</em></div><div class="alm-ld"><div class="tsps-spinner"></div>Analyzing microclimate data...</div></div>';
+  var yr=new Date().getFullYear(),today=new Date().toISOString().split("T")[0];
+  var rduLive={temp:"--",humid:"--",dewpt:"--",wind:"--",pres:"--"};
+  function fetchRduLive(){
+    return fetch("https://api.weather.gov/stations/KRDU/observations/latest",{headers:{"User-Agent":"WolfpackWeather/2.0","Accept":"application/geo+json"}})
+    .then(function(r){if(!r.ok)throw new Error("NWS "+r.status);return r.json();})
+    .then(function(d){var p=d.properties;if(!p)throw new Error("No properties");if(p.temperature&&p.temperature.value!=null)rduLive.temp=Math.round(p.temperature.value*9/5+32);if(p.relativeHumidity&&p.relativeHumidity.value!=null)rduLive.humid=Math.round(p.relativeHumidity.value);if(p.dewpoint&&p.dewpoint.value!=null)rduLive.dewpt=Math.round(p.dewpoint.value*9/5+32);if(p.windSpeed&&p.windSpeed.value!=null)rduLive.wind=Math.round(p.windSpeed.value*0.621371);if(p.seaLevelPressure&&p.seaLevelPressure.value!=null)rduLive.pres=(p.seaLevelPressure.value/100*0.02953).toFixed(2);else if(p.barometricPressure&&p.barometricPressure.value!=null)rduLive.pres=(p.barometricPressure.value/100*0.02953).toFixed(2);})
+    .catch(function(){return fetch("https://api.open-meteo.com/v1/forecast?latitude=35.878&longitude=-78.787&current=temperature_2m,relative_humidity_2m,dew_point_2m,wind_speed_10m,pressure_msl&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York").then(function(r){return r.json();}).then(function(d){var c=d.current||{};if(c.temperature_2m!=null)rduLive.temp=Math.round(c.temperature_2m);if(c.relative_humidity_2m!=null)rduLive.humid=Math.round(c.relative_humidity_2m);if(c.dew_point_2m!=null)rduLive.dewpt=Math.round(c.dew_point_2m);if(c.wind_speed_10m!=null)rduLive.wind=Math.round(c.wind_speed_10m);if(c.pressure_msl!=null)rduLive.pres=(c.pressure_msl*0.02953).toFixed(2);}).catch(function(){});});
   }
-
-  fetchRduLive()
-  .then(function() {
-    // Now fetch archives
+  fetchRduLive().then(function(){
     return Promise.all([
-      // RDU archive YTD
-      fetch("https://archive-api.open-meteo.com/v1/archive?latitude=35.878&longitude=-78.787&start_date=" + yr + "-01-01&end_date=" + today + "&daily=temperature_2m_mean,precipitation_sum&temperature_unit=fahrenheit&precipitation_unit=inch&timezone=America%2FNew_York")
-      .then(function(r) { return r.json(); }),
-
-      // Red Wolf Farm REAL PWS history
-      fetch("https://api.weather.com/v2/pws/dailysummary/all?stationId=KNCRALEI761&format=json&units=e&apiKey=" + WU_API_KEY)
-      .then(function(r) {
-        if (!r.ok) throw new Error("key1");
-        return r.json();
-      })
-      .catch(function() {
-        return fetch("https://api.weather.com/v2/pws/dailysummary/all?stationId=KNCRALEI761&format=json&units=e&apiKey=" + WU_COMMUNITY_KEY)
-        .then(function(r) {
-          if (!r.ok) throw new Error("key2");
-          return r.json();
-        })
-        .catch(function() { return {summaries: []}; });
-      })
+      fetch("https://archive-api.open-meteo.com/v1/archive?latitude=35.878&longitude=-78.787&start_date="+yr+"-01-01&end_date="+today+"&daily=temperature_2m_mean,precipitation_sum&temperature_unit=fahrenheit&precipitation_unit=inch&timezone=America%2FNew_York").then(function(r){return r.json();}),
+      fetch("https://api.weather.com/v2/pws/dailysummary/all?stationId=KNCRALEI761&format=json&units=e&apiKey="+WU_API_KEY).then(function(r){if(!r.ok)throw new Error("k1");return r.json();}).catch(function(){return fetch("https://api.weather.com/v2/pws/dailysummary/all?stationId=KNCRALEI761&format=json&units=e&apiKey="+WU_COMMUNITY_KEY).then(function(r){if(!r.ok)throw new Error("k2");return r.json();}).catch(function(){return{summaries:[]};});})
     ]);
-  })
-  .then(function(results) {
-    var rduArch = results[0].daily;
-    var rduNow = rduLive; // alias for any remaining references
-    var rwfRaw = results[2];
-
-    // Determine if we got real WU data
-    var rwfRaw = results[1];
-    var rwfIsReal = false;
-    var rwfArch = {time: [], temperature_2m_mean: [], precipitation_sum: []};
-
-    if (rwfRaw && rwfRaw.summaries && rwfRaw.summaries.length > 0) {
-      rwfIsReal = true;
-      var times = [], temps = [];
-      rwfRaw.summaries.forEach(function(s) {
-        var dateStr = s.obsTimeLocal ? s.obsTimeLocal.substring(0, 10) : null;
-        if (!dateStr) return;
-        if (dateStr.substring(0, 4) !== String(yr)) return;
-        times.push(dateStr);
-        var imp = s.imperial || {};
-        temps.push(imp.tempAvg != null ? imp.tempAvg : null);
-      });
-      rwfArch = {time: times, temperature_2m_mean: temps};
+  }).then(function(results){
+    var rduArch=results[0].daily,rwfRaw=results[1],rwfIsReal=false;
+    var rwfArch={time:[],temperature_2m_mean:[],precipitation_sum:[]};
+    if(rwfRaw&&rwfRaw.summaries&&rwfRaw.summaries.length>0){rwfIsReal=true;var times=[],temps=[];rwfRaw.summaries.forEach(function(s){var dateStr=s.obsTimeLocal?s.obsTimeLocal.substring(0,10):null;if(!dateStr||dateStr.substring(0,4)!==String(yr))return;times.push(dateStr);var imp=s.imperial||{};temps.push(imp.tempAvg!=null?imp.tempAvg:null);});rwfArch={time:times,temperature_2m_mean:temps};}
+    var rwfTemp=$("temp")?$("temp").textContent:"--",rwfHumid=$("humid")?$("humid").textContent.replace("%",""):"--",rwfDewpt=$("dewpt")?$("dewpt").textContent.replace("F",""):"--",rwfWind=$("wspd")?$("wspd").textContent:"--",rwfPres=$("pres")?$("pres").textContent:"--";
+    var moNames=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],curMo=new Date().getMonth();
+    function aggregateMonthly(arch){var moTemp={},moPrec={},moCnt={};for(var i=0;i<arch.time.length;i++){var m=new Date(arch.time[i]+"T12:00:00").getMonth();if(!moTemp[m]){moTemp[m]=0;moPrec[m]=0;moCnt[m]=0;}if(arch.temperature_2m_mean[i]!=null){moTemp[m]+=arch.temperature_2m_mean[i];moCnt[m]++;}if(arch.precipitation_sum[i]!=null){moPrec[m]+=arch.precipitation_sum[i];}}var result={};for(var mm=0;mm<12;mm++){result[mm]={avgTemp:moCnt[mm]?moTemp[mm]/moCnt[mm]:null,totalPrec:moPrec[mm]!=null&&moCnt[mm]?moPrec[mm]:null,days:moCnt[mm]||0};}return result;}
+    var rduMonthly=aggregateMonthly(rduArch),rwfMonthly=aggregateMonthly(rwfArch);
+    if(!rwfIsReal||rwfArch.time.length===0){
+      mcEl.innerHTML='<div class="mc-wrap"><div class="mc-hdr">Microclimate Intelligence <em>- Red Wolf Farm vs RDU Airport</em></div><div class="mc-now"><div class="mc-col rwf"><div class="mc-col-title">Red Wolf Farm (Live)</div>'+mcRow("Temp",rwfTemp+"F")+mcRow("Humidity",rwfHumid+"%")+mcRow("Dew Point",rwfDewpt+"F")+mcRow("Wind",rwfWind+" mph")+mcRow("Pressure",rwfPres+" inHg")+'</div><div class="mc-vs">VS</div><div class="mc-col rdu"><div class="mc-col-title">RDU Airport (Live)</div>'+mcRow("Temp",rduLive.temp+"F")+mcRow("Humidity",rduLive.humid+"%")+mcRow("Dew Point",rduLive.dewpt+"F")+mcRow("Wind",rduLive.wind+" mph")+mcRow("Pressure",rduLive.pres+" inHg")+'</div></div><div id="mc-history-section"><div class="alm-ld"><div class="tsps-spinner"></div>Loading historical comparison...</div></div><div class="mc-note2">Live data: KNCRALEI761 via Weather Underground - RDU via NWS METAR</div></div>';
+      mcFetchHistory(function(rows){var h=document.getElementById("mc-history-section");if(h)h.innerHTML=mcBuildHistory(rows);});return;
     }
-
-    // Current comparison — get RWF from already-displayed PWS data
-    var rwfTemp = $("temp") ? $("temp").textContent : "--";
-    var rwfHumid = $("humid") ? $("humid").textContent.replace("%", "") : "--";
-    var rwfDewpt = $("dewpt") ? $("dewpt").textContent.replace("F", "") : "--";
-    var rwfWind = $("wspd") ? $("wspd").textContent : "--";
-    var rwfPres = $("pres") ? $("pres").textContent : "--";
-
-    var rduTemp = rduNow.current ? Math.round(rduNow.current.temperature_2m) : "--";
-    var rduHumid = rduNow.current ? Math.round(rduNow.current.relative_humidity_2m) : "--";
-    var rduDewpt = rduNow.current ? Math.round(rduNow.current.dew_point_2m) : "--";
-    var rduWind = rduNow.current ? Math.round(rduNow.current.wind_speed_10m) : "--";
-    var rduPres = rduNow.current ? (rduNow.current.surface_pressure * 0.02953).toFixed(2) : "--";
-
-    // Aggregate archives by month
-    var moNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-    var curMo = new Date().getMonth();
-
-    function aggregateMonthly(arch) {
-      var moTemp = {}, moPrec = {}, moCnt = {};
-      for (var i = 0; i < arch.time.length; i++) {
-        var m = new Date(arch.time[i] + "T12:00:00").getMonth();
-        if (!moTemp[m]) { moTemp[m] = 0; moPrec[m] = 0; moCnt[m] = 0; }
-        if (arch.temperature_2m_mean[i] != null) { moTemp[m] += arch.temperature_2m_mean[i]; moCnt[m]++; }
-        if (arch.precipitation_sum[i] != null) { moPrec[m] += arch.precipitation_sum[i]; }
-      }
-      var result = {};
-      for (var mm = 0; mm < 12; mm++) {
-        result[mm] = {
-          avgTemp: moCnt[mm] ? moTemp[mm] / moCnt[mm] : null,
-          totalPrec: moPrec[mm] != null && moCnt[mm] ? moPrec[mm] : null,
-          days: moCnt[mm] || 0
-        };
-      }
-      return result;
-    }
-
-    var rduMonthly = aggregateMonthly(rduArch);
-    var rwfMonthly = aggregateMonthly(rwfArch);
-
-    // If no real PWS data, show warning
-    if (!rwfIsReal || rwfArch.time.length === 0) {
-      mcEl.innerHTML = '<div class="mc-wrap"><div class="mc-hdr">Microclimate Intelligence <em>- Red Wolf Farm vs RDU Airport</em></div>' +
-        '<div class="mc-now">' +
-        '<div class="mc-col rwf"><div class="mc-col-title">Red Wolf Farm (Live)</div>' +
-        mcRow("Temp", rwfTemp + "F") + mcRow("Humidity", rwfHumid + "%") + mcRow("Dew Point", rwfDewpt + "F") + mcRow("Wind", rwfWind + " mph") + mcRow("Pressure", rwfPres + " inHg") +
-        '</div><div class="mc-vs">VS</div><div class="mc-col rdu"><div class="mc-col-title">RDU Airport (Live)</div>' +
-        mcRow("Temp", rduLive.temp + "F") + mcRow("Humidity", rduLive.humid + "%") + mcRow("Dew Point", rduLive.dewpt + "F") + mcRow("Wind", rduLive.wind + " mph") + mcRow("Pressure", rduLive.pres + " inHg") +
-        '</div></div>' +
-        '<div id="mc-history-section"><div class="alm-ld"><div class="tsps-spinner"></div>Loading historical comparison...</div></div>' +
-        '<div class="mc-note2">Live data: KNCRALEI761 via Weather Underground - RDU via NWS METAR</div></div>';
-      mcFetchHistory(function(rows) {
-        var histEl = document.getElementById("mc-history-section");
-        if (histEl) histEl.innerHTML = mcBuildHistory(rows);
-      });
-      return;
-    }
-
-    // YTD totals
-    var ytdRduTemp = 0, ytdRduDays = 0;
-    var ytdRwfTemp = 0, ytdRwfDays = 0;
-    for (var i = 0; i < rduArch.time.length; i++) {
-      if (rduArch.temperature_2m_mean[i] != null) { ytdRduTemp += rduArch.temperature_2m_mean[i]; ytdRduDays++; }
-    }
-    for (var j = 0; j < rwfArch.time.length; j++) {
-      if (rwfArch.temperature_2m_mean[j] != null) { ytdRwfTemp += rwfArch.temperature_2m_mean[j]; ytdRwfDays++; }
-    }
-
-    var ytdTempDiff = (ytdRwfDays && ytdRduDays) ? (ytdRwfTemp / ytdRwfDays) - (ytdRduTemp / ytdRduDays) : 0;
-
-    // Build HTML
-    var html = '<div class="mc-wrap">';
-    html += '<div class="mc-hdr">Microclimate Intelligence <em>- Red Wolf Farm vs RDU Airport</em></div>';
-
-    // Real-time comparison
-    html += '<div class="mc-now">';
-    html += '<div class="mc-col rwf"><div class="mc-col-title">Red Wolf Farm</div>';
-    html += mcRow("Temp", rwfTemp + "F");
-    html += mcRow("Humidity", rwfHumid + "%");
-    html += mcRow("Dew Point", rwfDewpt + "F");
-    html += mcRow("Wind", rwfWind + " mph");
-    html += mcRow("Pressure", rwfPres + " inHg");
-    html += '</div>';
-    html += '<div class="mc-vs">VS</div>';
-    html += '<div class="mc-col rdu"><div class="mc-col-title">RDU Airport</div>';
-    html += mcRow("Temp", rduTemp + "F");
-    html += mcRow("Humidity", rduHumid + "%");
-    html += mcRow("Dew Point", rduDewpt + "F");
-    html += mcRow("Wind", rduWind + " mph");
-    html += mcRow("Pressure", rduPres + " inHg");
-    html += '</div></div>';
-
-    // YTD differential cards
-    var tempTag = Math.abs(ytdTempDiff) < 0.3 ? "same" : (ytdTempDiff < 0 ? "cooler" : "warmer");
-    var tempTagLbl = Math.abs(ytdTempDiff) < 0.3 ? "SAME" : (ytdTempDiff < 0 ? "COOLER" : "WARMER");
-
-    html += '<div class="mc-diff-grid">';
-    html += '<div class="mc-diff-card"><div class="mc-diff-lbl">YTD Temp Diff</div><div class="mc-diff-val">' + (ytdTempDiff > 0 ? "+" : "") + ytdTempDiff.toFixed(1) + 'F</div><div class="mc-diff-note">vs RDU average</div><div class="mc-diff-tag ' + tempTag + '">' + tempTagLbl + '</div></div>';
-    html += '<div class="mc-diff-card"><div class="mc-diff-lbl">RWF YTD Avg</div><div class="mc-diff-val">' + (ytdRwfDays ? (ytdRwfTemp / ytdRwfDays).toFixed(1) : "--") + 'F</div><div class="mc-diff-note">' + ytdRwfDays + ' days tracked</div></div>';
-    html += '<div class="mc-diff-card"><div class="mc-diff-lbl">RDU YTD Avg</div><div class="mc-diff-val">' + (ytdRduDays ? (ytdRduTemp / ytdRduDays).toFixed(1) : "--") + 'F</div><div class="mc-diff-note">' + ytdRduDays + ' days tracked</div></div>';
-    html += '</div>';
-
-    // Monthly temp differential grid
-    html += '<div style="font-size:10px;font-weight:800;letter-spacing:1.5px;color:var(--gold);text-transform:uppercase;margin-bottom:8px">Monthly Temperature Differential</div>';
-    html += '<div class="mc-mo-grid">';
-    for (var m = 0; m < 12; m++) {
-      var isCur = m === curMo;
-      var isFut = m > curMo;
-      var rwfT = rwfMonthly[m].avgTemp;
-      var rduT = rduMonthly[m].avgTemp;
-      var diff = (rwfT !== null && rduT !== null) ? rwfT - rduT : null;
-      var cls = diff !== null ? (Math.abs(diff) < 0.3 ? "same" : (diff < 0 ? "cooler" : "warmer")) : "";
-      html += '<div class="mc-mo' + (isCur ? " current" : "") + (isFut ? " future" : "") + '">';
-      html += '<div class="mc-mo-name">' + moNames[m] + '</div>';
-      html += '<div class="mc-mo-val">' + (diff !== null ? (diff > 0 ? "+" : "") + diff.toFixed(1) + "F" : "--") + '</div>';
-      html += '<div class="mc-mo-sub">' + (rwfT !== null ? rwfT.toFixed(1) : "--") + " vs " + (rduT !== null ? rduT.toFixed(1) : "--") + '</div>';
-      if (diff !== null) html += '<div class="mc-diff-tag ' + cls + '" style="font-size:7px;margin-top:2px">' + (Math.abs(diff) < 0.3 ? "SAME" : (diff < 0 ? "COOLER" : "WARMER")) + '</div>';
-      html += '</div>';
-    }
-    html += '</div>';
-
-    // Monthly precip differential grid
-    html += '<div style="font-size:10px;font-weight:800;letter-spacing:1.5px;color:var(--gold);text-transform:uppercase;margin:14px 0 8px">Monthly Precipitation Differential</div>';
-    html += '<div class="mc-mo-grid">';
-    for (var m2 = 0; m2 < 12; m2++) {
-      var isCur2 = m2 === curMo;
-      var isFut2 = m2 > curMo;
-      var rwfP = rwfMonthly[m2].totalPrec;
-      var rduP = rduMonthly[m2].totalPrec;
-      var pDiff = (rwfP !== null && rduP !== null) ? rwfP - rduP : null;
-      var pCls = pDiff !== null ? (Math.abs(pDiff) < 0.1 ? "same" : (pDiff > 0 ? "wetter" : "drier")) : "";
-      html += '<div class="mc-mo' + (isCur2 ? " current" : "") + (isFut2 ? " future" : "") + '">';
-      html += '<div class="mc-mo-name">' + moNames[m2] + '</div>';
-      html += '<div class="mc-mo-val">' + (pDiff !== null ? (pDiff > 0 ? "+" : "") + pDiff.toFixed(2) + '"' : "--") + '</div>';
-      html += '<div class="mc-mo-sub">' + (rwfP !== null ? rwfP.toFixed(2) : "--") + '" vs ' + (rduP !== null ? rduP.toFixed(2) : "--") + '"</div>';
-      if (pDiff !== null) html += '<div class="mc-diff-tag ' + pCls + '" style="font-size:7px;margin-top:2px">' + (Math.abs(pDiff) < 0.1 ? "SAME" : (pDiff > 0 ? "WETTER" : "DRIER")) + '</div>';
-      html += '</div>';
-    }
-    html += '</div>';
-
-    // Insight box
-    var insightTemp = Math.abs(ytdTempDiff) < 0.3 ? "nearly identical temperatures to" : (ytdTempDiff < 0 ? (Math.abs(ytdTempDiff).toFixed(1) + "F cooler than") : (ytdTempDiff.toFixed(1) + "F warmer than"));
-
-    html += '<div id="mc-history-section"><div class="alm-ld"><div class="tsps-spinner"></div>Loading historical comparison...</div></div>';
-
-    html += '<div class="mc-note2">RDU Airport: NWS METAR observation (KRDU) — Temperature only (rain gauge offline)</div>';
-    html += '</div>';
-
-    mcEl.innerHTML = html;
-
-    // Load history from Google Sheet
-    mcFetchHistory(function(rows) {
-      var histEl = document.getElementById("mc-history-section");
-      if (histEl) histEl.innerHTML = mcBuildHistory(rows);
-    });
-  })
-  .catch(function(e) {
-    mcEl.innerHTML = '<div class="mc-wrap"><div class="mc-hdr">Microclimate Intelligence</div><div class="alm-ld" style="color:#ef4444">Could not load comparison data: ' + e.message + '<br><button onclick="fetchMicroclimate()" style="margin-top:10px;background:var(--red2);border:1px solid var(--red);color:#fff;padding:5px 14px;border-radius:2px;cursor:pointer">Retry</button></div></div>';
-  });
+    var ytdRduTemp=0,ytdRduDays=0,ytdRwfTemp=0,ytdRwfDays=0;
+    for(var i=0;i<rduArch.time.length;i++){if(rduArch.temperature_2m_mean[i]!=null){ytdRduTemp+=rduArch.temperature_2m_mean[i];ytdRduDays++;}}
+    for(var j=0;j<rwfArch.time.length;j++){if(rwfArch.temperature_2m_mean[j]!=null){ytdRwfTemp+=rwfArch.temperature_2m_mean[j];ytdRwfDays++;}}
+    var ytdTempDiff=(ytdRwfDays&&ytdRduDays)?(ytdRwfTemp/ytdRwfDays)-(ytdRduTemp/ytdRduDays):0;
+    var tempTag=Math.abs(ytdTempDiff)<0.3?"same":(ytdTempDiff<0?"cooler":"warmer"),tempTagLbl=Math.abs(ytdTempDiff)<0.3?"SAME":(ytdTempDiff<0?"COOLER":"WARMER");
+    var html='<div class="mc-wrap"><div class="mc-hdr">Microclimate Intelligence <em>- Red Wolf Farm vs RDU Airport</em></div>';
+    html+='<div class="mc-now"><div class="mc-col rwf"><div class="mc-col-title">Red Wolf Farm</div>'+mcRow("Temp",rwfTemp+"F")+mcRow("Humidity",rwfHumid+"%")+mcRow("Dew Point",rwfDewpt+"F")+mcRow("Wind",rwfWind+" mph")+mcRow("Pressure",rwfPres+" inHg")+'</div><div class="mc-vs">VS</div><div class="mc-col rdu"><div class="mc-col-title">RDU Airport</div>'+mcRow("Temp",rduLive.temp+"F")+mcRow("Humidity",rduLive.humid+"%")+mcRow("Dew Point",rduLive.dewpt+"F")+mcRow("Wind",rduLive.wind+" mph")+mcRow("Pressure",rduLive.pres+" inHg")+'</div></div>';
+    html+='<div class="mc-diff-grid"><div class="mc-diff-card"><div class="mc-diff-lbl">YTD Temp Diff</div><div class="mc-diff-val">'+(ytdTempDiff>0?"+":"")+ytdTempDiff.toFixed(1)+'F</div><div class="mc-diff-note">vs RDU average</div><div class="mc-diff-tag '+tempTag+'">'+tempTagLbl+'</div></div><div class="mc-diff-card"><div class="mc-diff-lbl">RWF YTD Avg</div><div class="mc-diff-val">'+(ytdRwfDays?(ytdRwfTemp/ytdRwfDays).toFixed(1):"--")+'F</div><div class="mc-diff-note">'+ytdRwfDays+' days tracked</div></div><div class="mc-diff-card"><div class="mc-diff-lbl">RDU YTD Avg</div><div class="mc-diff-val">'+(ytdRduDays?(ytdRduTemp/ytdRduDays).toFixed(1):"--")+'F</div><div class="mc-diff-note">'+ytdRduDays+' days tracked</div></div></div>';
+    html+='<div style="font-size:10px;font-weight:800;letter-spacing:1.5px;color:var(--gold);text-transform:uppercase;margin-bottom:8px">Monthly Temperature Differential</div><div class="mc-mo-grid">';
+    for(var m=0;m<12;m++){var isCur=m===curMo,isFut=m>curMo,rwfT=rwfMonthly[m].avgTemp,rduT=rduMonthly[m].avgTemp,diff=(rwfT!==null&&rduT!==null)?rwfT-rduT:null,cls=diff!==null?(Math.abs(diff)<0.3?"same":(diff<0?"cooler":"warmer")):"";html+='<div class="mc-mo'+(isCur?" current":"")+(isFut?" future":"")+'"><div class="mc-mo-name">'+moNames[m]+'</div><div class="mc-mo-val">'+(diff!==null?(diff>0?"+":"")+diff.toFixed(1)+"F":"--")+'</div><div class="mc-mo-sub">'+(rwfT!==null?rwfT.toFixed(1):"--")+" vs "+(rduT!==null?rduT.toFixed(1):"--")+'</div>'+(diff!==null?'<div class="mc-diff-tag '+cls+'" style="font-size:7px;margin-top:2px">'+(Math.abs(diff)<0.3?"SAME":(diff<0?"COOLER":"WARMER"))+'</div>':'')+'</div>';}
+    html+='</div><div style="font-size:10px;font-weight:800;letter-spacing:1.5px;color:var(--gold);text-transform:uppercase;margin:14px 0 8px">Monthly Precipitation Differential</div><div class="mc-mo-grid">';
+    for(var m2=0;m2<12;m2++){var isCur2=m2===curMo,isFut2=m2>curMo,rwfP=rwfMonthly[m2].totalPrec,rduP=rduMonthly[m2].totalPrec,pDiff=(rwfP!==null&&rduP!==null)?rwfP-rduP:null,pCls=pDiff!==null?(Math.abs(pDiff)<0.1?"same":(pDiff>0?"wetter":"drier")):"";html+='<div class="mc-mo'+(isCur2?" current":"")+(isFut2?" future":"")+'"><div class="mc-mo-name">'+moNames[m2]+'</div><div class="mc-mo-val">'+(pDiff!==null?(pDiff>0?"+":"")+pDiff.toFixed(2)+'"':"--")+'</div><div class="mc-mo-sub">'+(rwfP!==null?rwfP.toFixed(2):"--")+'" vs '+(rduP!==null?rduP.toFixed(2):"--")+'"</div>'+(pDiff!==null?'<div class="mc-diff-tag '+pCls+'" style="font-size:7px;margin-top:2px">'+(Math.abs(pDiff)<0.1?"SAME":(pDiff>0?"WETTER":"DRIER"))+'</div>':'')+'</div>';}
+    html+='</div><div id="mc-history-section"><div class="alm-ld"><div class="tsps-spinner"></div>Loading historical comparison...</div></div>';
+    html+='<div class="mc-note2">RDU Airport: NWS METAR observation (KRDU) — Temperature only (rain gauge offline)</div></div>';
+    mcEl.innerHTML=html;
+    mcFetchHistory(function(rows){var histEl=document.getElementById("mc-history-section");if(histEl)histEl.innerHTML=mcBuildHistory(rows);});
+  }).catch(function(e){mcEl.innerHTML='<div class="mc-wrap"><div class="mc-hdr">Microclimate Intelligence</div><div class="alm-ld" style="color:#ef4444">Could not load data: '+e.message+'<br><button onclick="fetchMicroclimate()" style="margin-top:10px;background:var(--red2);border:1px solid var(--red);color:#fff;padding:5px 14px;border-radius:2px;cursor:pointer">Retry</button></div></div>';});
 }
 
-function mcRow(lbl, val) {
-  return '<div class="mc-row"><span class="mc-row-lbl">' + lbl + '</span><span class="mc-row-val">' + val + '</span></div>';
-}
+function mcRow(lbl,val){return'<div class="mc-row"><span class="mc-row-lbl">'+lbl+'</span><span class="mc-row-val">'+val+'</span></div>';}
 
 // ============================================================
 // MICROCLIMATE DATA LOGGING + HISTORY
 // ============================================================
-var MC_SHEET_URL = "https://script.google.com/macros/s/AKfycbzgcFyiIsyyYlXnUPVekTGin4N-_GIJ6qlsq9kPZg1oMbuaGnwF-mZ-xp8-4rTGPZLP/exec";
+var MC_SHEET_URL="https://script.google.com/macros/s/AKfycbzgcFyiIsyyYlXnUPVekTGin4N-_GIJ6qlsq9kPZg1oMbuaGnwF-mZ-xp8-4rTGPZLP/exec";
 
-function mcLogTemps() {
-  // Get current temps from the page
-  var rwfTemp = $("temp") ? parseFloat($("temp").textContent) : null;
-  if (rwfTemp === null || isNaN(rwfTemp)) return;
-
-  // Get RDU temp — fetch fresh
-  fetch("https://api.weather.gov/stations/KRDU/observations/latest", {headers: {"User-Agent": "WolfpackWeather/2.0", "Accept": "application/geo+json"}})
-  .then(function(r) { return r.json(); })
-  .then(function(d) {
-    var p = d.properties;
-    var rduTemp = null;
-    if (p && p.temperature && p.temperature.value != null) {
-      rduTemp = Math.round(p.temperature.value * 9 / 5 + 32);
-    }
-    if (rduTemp === null) return;
-
-    // Check last log time to avoid duplicate logging
-    var lastLog = null;
-    try { lastLog = localStorage.getItem("mc_last_log"); } catch(e) {}
-    var now = new Date();
-    if (lastLog) {
-      var diff = now.getTime() - parseInt(lastLog);
-      if (diff < 3500000) return; // less than ~58 minutes, skip
-    }
-
-    // Log to Google Sheet
-    fetch(MC_SHEET_URL, {
-      method: "POST",
-      mode: "no-cors",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({
-        timestamp: now.toISOString(),
-        rwf_temp: rwfTemp,
-        rdu_temp: rduTemp
-      })
-    }).then(function() {
-      try { localStorage.setItem("mc_last_log", String(now.getTime())); } catch(e) {}
-      console.log("MC logged: RWF=" + rwfTemp + " RDU=" + rduTemp);
-    }).catch(function(e) {
-      console.log("MC log error: " + e.message);
-    });
-  })
-  .catch(function() {});
+function mcLogTemps(){
+  var rwfTemp=$("temp")?parseFloat($("temp").textContent):null;if(rwfTemp===null||isNaN(rwfTemp))return;
+  fetch("https://api.weather.gov/stations/KRDU/observations/latest",{headers:{"User-Agent":"WolfpackWeather/2.0","Accept":"application/geo+json"}})
+  .then(function(r){return r.json();}).then(function(d){
+    var p=d.properties,rduTemp=null;if(p&&p.temperature&&p.temperature.value!=null)rduTemp=Math.round(p.temperature.value*9/5+32);
+    if(rduTemp===null)return;
+    var lastLog=null;try{lastLog=localStorage.getItem("mc_last_log");}catch(e){}
+    var now=new Date();if(lastLog&&now.getTime()-parseInt(lastLog)<3500000)return;
+    fetch(MC_SHEET_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify({timestamp:now.toISOString(),rwf_temp:rwfTemp,rdu_temp:rduTemp})})
+    .then(function(){try{localStorage.setItem("mc_last_log",String(now.getTime()));}catch(e){}});
+  }).catch(function(){});
 }
 
-function mcFetchHistory(callback) {
-  fetch(MC_SHEET_URL)
-  .then(function(r) { return r.json(); })
-  .then(function(d) {
-    callback(d.rows || []);
-  })
-  .catch(function() {
-    callback([]);
-  });
-}
+function mcFetchHistory(callback){fetch(MC_SHEET_URL).then(function(r){return r.json();}).then(function(d){callback(d.rows||[]);}).catch(function(){callback([]);});}
 
-function mcBuildHistory(rows) {
-  if (!rows.length) return '<div class="mc-insight"><div class="mc-insight-title">Historical Comparison</div><div class="mc-insight-text">Data collection has started. Check back in 24 hours for your first day of comparison data. The system logs temperatures hourly.</div></div>';
-
-  var now = new Date();
-  var day1 = new Date(now.getTime() - 86400000);
-  var week1 = new Date(now.getTime() - 604800000);
-  var month1 = new Date(now.getTime() - 2592000000);
-
-  var periods = [
-    {label: "24 Hours", cutoff: day1, rwfSum: 0, rduSum: 0, count: 0},
-    {label: "7 Days", cutoff: week1, rwfSum: 0, rduSum: 0, count: 0},
-    {label: "30 Days", cutoff: month1, rwfSum: 0, rduSum: 0, count: 0},
-    {label: "All Time", cutoff: new Date(0), rwfSum: 0, rduSum: 0, count: 0}
-  ];
-
-  rows.forEach(function(r) {
-    var ts = new Date(r.timestamp);
-    var rwf = parseFloat(r.rwf_temp);
-    var rdu = parseFloat(r.rdu_temp);
-    if (isNaN(rwf) || isNaN(rdu)) return;
-
-    periods.forEach(function(p) {
-      if (ts >= p.cutoff) {
-        p.rwfSum += rwf;
-        p.rduSum += rdu;
-        p.count++;
-      }
-    });
-  });
-
-  var html = '<div style="font-size:10px;font-weight:800;letter-spacing:1.5px;color:var(--gold);text-transform:uppercase;margin:16px 0 8px">Temperature Differential — Logged History</div>';
-  html += '<div class="mc-diff-grid" style="grid-template-columns:repeat(4,1fr)">';
-
-  periods.forEach(function(p) {
-    if (p.count === 0) {
-      html += '<div class="mc-diff-card"><div class="mc-diff-lbl">' + p.label + '</div><div class="mc-diff-val">--</div><div class="mc-diff-note">No data yet</div></div>';
-      return;
-    }
-    var rwfAvg = p.rwfSum / p.count;
-    var rduAvg = p.rduSum / p.count;
-    var diff = rwfAvg - rduAvg;
-    var tag = Math.abs(diff) < 0.3 ? "same" : (diff < 0 ? "cooler" : "warmer");
-    var tagLbl = Math.abs(diff) < 0.3 ? "SAME" : (diff < 0 ? "COOLER" : "WARMER");
-
-    html += '<div class="mc-diff-card">';
-    html += '<div class="mc-diff-lbl">' + p.label + '</div>';
-    html += '<div class="mc-diff-val">' + (diff > 0 ? "+" : "") + diff.toFixed(1) + 'F</div>';
-    html += '<div class="mc-diff-note">' + p.count + ' readings</div>';
-    html += '<div class="mc-diff-note" style="margin-top:2px">RWF ' + rwfAvg.toFixed(1) + ' vs RDU ' + rduAvg.toFixed(1) + '</div>';
-    html += '<div class="mc-diff-tag ' + tag + '">' + tagLbl + '</div>';
-    html += '</div>';
-  });
-
-  html += '</div>';
-
-  // Daily breakdown for last 7 days
-  var dayMap = {};
-  rows.forEach(function(r) {
-    var ts = new Date(r.timestamp);
-    if (ts < week1) return;
-    var dayKey = ts.toLocaleDateString("en-US", {weekday: "short", month: "short", day: "numeric"});
-    if (!dayMap[dayKey]) dayMap[dayKey] = {rwfSum: 0, rduSum: 0, count: 0};
-    var rwf = parseFloat(r.rwf_temp);
-    var rdu = parseFloat(r.rdu_temp);
-    if (isNaN(rwf) || isNaN(rdu)) return;
-    dayMap[dayKey].rwfSum += rwf;
-    dayMap[dayKey].rduSum += rdu;
-    dayMap[dayKey].count++;
-  });
-
-  var dayKeys = Object.keys(dayMap);
-  if (dayKeys.length > 1) {
-    html += '<div style="font-size:10px;font-weight:800;letter-spacing:1.5px;color:var(--gold);text-transform:uppercase;margin:14px 0 8px">Daily Breakdown — Last 7 Days</div>';
-    html += '<div class="mc-mo-grid" style="grid-template-columns:repeat(' + Math.min(dayKeys.length, 7) + ',1fr)">';
-    dayKeys.forEach(function(k) {
-      var d = dayMap[k];
-      var rwfAvg = d.rwfSum / d.count;
-      var rduAvg = d.rduSum / d.count;
-      var diff = rwfAvg - rduAvg;
-      var tag = Math.abs(diff) < 0.3 ? "same" : (diff < 0 ? "cooler" : "warmer");
-      var tagLbl = Math.abs(diff) < 0.3 ? "SAME" : (diff < 0 ? "COOLER" : "WARMER");
-      html += '<div class="mc-mo">';
-      html += '<div class="mc-mo-name">' + k + '</div>';
-      html += '<div class="mc-mo-val">' + (diff > 0 ? "+" : "") + diff.toFixed(1) + 'F</div>';
-      html += '<div class="mc-mo-sub">RWF ' + rwfAvg.toFixed(0) + ' / RDU ' + rduAvg.toFixed(0) + '</div>';
-      html += '<div class="mc-diff-tag ' + tag + '" style="font-size:7px;margin-top:2px">' + tagLbl + '</div>';
-      html += '</div>';
-    });
-    html += '</div>';
-  }
-
-  html += '<div class="mc-note2">Based on ' + rows.length + ' hourly readings logged since ' + new Date(rows[0].timestamp).toLocaleDateString("en-US", {month: "short", day: "numeric", year: "numeric"}) + '<br>Data collection is ongoing — accuracy improves over time</div>';
-
+function mcBuildHistory(rows){
+  if(!rows.length)return'<div class="mc-insight"><div class="mc-insight-title">Historical Comparison</div><div class="mc-insight-text">Data collection has started. Check back in 24 hours for your first comparison data.</div></div>';
+  var now=new Date(),day1=new Date(now.getTime()-86400000),week1=new Date(now.getTime()-604800000),month1=new Date(now.getTime()-2592000000);
+  var periods=[{label:"24 Hours",cutoff:day1,rwfSum:0,rduSum:0,count:0},{label:"7 Days",cutoff:week1,rwfSum:0,rduSum:0,count:0},{label:"30 Days",cutoff:month1,rwfSum:0,rduSum:0,count:0},{label:"All Time",cutoff:new Date(0),rwfSum:0,rduSum:0,count:0}];
+  rows.forEach(function(r){var ts=new Date(r.timestamp),rwf=parseFloat(r.rwf_temp),rdu=parseFloat(r.rdu_temp);if(isNaN(rwf)||isNaN(rdu))return;periods.forEach(function(p){if(ts>=p.cutoff){p.rwfSum+=rwf;p.rduSum+=rdu;p.count++;}});});
+  var html='<div style="font-size:10px;font-weight:800;letter-spacing:1.5px;color:var(--gold);text-transform:uppercase;margin:16px 0 8px">Temperature Differential — Logged History</div><div class="mc-diff-grid" style="grid-template-columns:repeat(4,1fr)">';
+  periods.forEach(function(p){if(p.count===0){html+='<div class="mc-diff-card"><div class="mc-diff-lbl">'+p.label+'</div><div class="mc-diff-val">--</div><div class="mc-diff-note">No data yet</div></div>';return;}var rwfAvg=p.rwfSum/p.count,rduAvg=p.rduSum/p.count,diff=rwfAvg-rduAvg,tag=Math.abs(diff)<0.3?"same":(diff<0?"cooler":"warmer"),tagLbl=Math.abs(diff)<0.3?"SAME":(diff<0?"COOLER":"WARMER");html+='<div class="mc-diff-card"><div class="mc-diff-lbl">'+p.label+'</div><div class="mc-diff-val">'+(diff>0?"+":"")+diff.toFixed(1)+'F</div><div class="mc-diff-note">'+p.count+' readings</div><div class="mc-diff-note" style="margin-top:2px">RWF '+rwfAvg.toFixed(1)+' vs RDU '+rduAvg.toFixed(1)+'</div><div class="mc-diff-tag '+tag+'">'+tagLbl+'</div></div>';});
+  html+='</div>';
+  var dayMap={};rows.forEach(function(r){var ts=new Date(r.timestamp);if(ts<week1)return;var dayKey=ts.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});if(!dayMap[dayKey])dayMap[dayKey]={rwfSum:0,rduSum:0,count:0};var rwf=parseFloat(r.rwf_temp),rdu=parseFloat(r.rdu_temp);if(isNaN(rwf)||isNaN(rdu))return;dayMap[dayKey].rwfSum+=rwf;dayMap[dayKey].rduSum+=rdu;dayMap[dayKey].count++;});
+  var dayKeys=Object.keys(dayMap);if(dayKeys.length>1){html+='<div style="font-size:10px;font-weight:800;letter-spacing:1.5px;color:var(--gold);text-transform:uppercase;margin:14px 0 8px">Daily Breakdown — Last 7 Days</div><div class="mc-mo-grid" style="grid-template-columns:repeat('+Math.min(dayKeys.length,7)+',1fr)">';dayKeys.forEach(function(k){var d=dayMap[k],rwfAvg=d.rwfSum/d.count,rduAvg=d.rduSum/d.count,diff=rwfAvg-rduAvg,tag=Math.abs(diff)<0.3?"same":(diff<0?"cooler":"warmer"),tagLbl=Math.abs(diff)<0.3?"SAME":(diff<0?"COOLER":"WARMER");html+='<div class="mc-mo"><div class="mc-mo-name">'+k+'</div><div class="mc-mo-val">'+(diff>0?"+":"")+diff.toFixed(1)+'F</div><div class="mc-mo-sub">RWF '+rwfAvg.toFixed(0)+' / RDU '+rduAvg.toFixed(0)+'</div><div class="mc-diff-tag '+tag+'" style="font-size:7px;margin-top:2px">'+tagLbl+'</div></div>';});html+='</div>';}
+  html+='<div class="mc-note2">Based on '+rows.length+' hourly readings logged since '+new Date(rows[0].timestamp).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})+'<br>Data collection is ongoing — accuracy improves over time</div>';
   return html;
 }
-
-// Start logging on page load (after conditions have loaded), then every hour
-setTimeout(mcLogTemps, 15000);
-setInterval(mcLogTemps, 3600000);
+setTimeout(mcLogTemps,15000);setInterval(mcLogTemps,3600000);
 
 // ============================================================
 // WEATHER SCENE ENGINE
 // ============================================================
-var wxSceneEl = document.getElementById("wxScene");
-var wxSkyEl = document.getElementById("wxSky");
-var wxTintEl = document.getElementById("wxTint");
-var wxImgEl = document.getElementById("wxImg");
-var wxSCanvas = document.getElementById("wxSceneCanvas");
-var wxSCtx = wxSCanvas.getContext("2d");
-var wxW = 0, wxH = 0;
-var wxCurrent = "sunny";
-var wxParticles = [];
-var wxClouds = [];
-var wxFogLayers = [];
-var wxLightningTimer = 0;
-var wxLightningFlash = 0;
-var wxSunAngle = 0;
-var wxTime = 0;
-
-var WX_SKY = {
-  sunny:  {bg:"linear-gradient(180deg,#1565a8 0%,#60b5e8 40%,#c6e4f5 100%)",tint:"rgba(0,0,0,0)",filter:"brightness(1.1) saturate(1.15)"},
-  partly: {bg:"linear-gradient(180deg,#1a5580 0%,#5098c0 40%,#b0cee0 100%)",tint:"rgba(0,0,0,0.02)",filter:"brightness(1.0) saturate(1.0)"},
-  cloudy: {bg:"linear-gradient(180deg,#3a3e4a 0%,#5a5e6a 40%,#7a7e88 100%)",tint:"rgba(40,42,50,0.3)",filter:"brightness(0.65) saturate(0.45) contrast(0.9)"},
-  rain:   {bg:"linear-gradient(180deg,#1a1e2e 0%,#2a3040 40%,#3a4050 100%)",tint:"rgba(20,25,40,0.45)",filter:"brightness(0.45) saturate(0.3) contrast(0.85)"},
-  storm:  {bg:"linear-gradient(180deg,#08080f 0%,#141422 40%,#1e1e30 100%)",tint:"rgba(10,10,20,0.55)",filter:"brightness(0.25) saturate(0.15) contrast(0.8)"},
-  fog:    {bg:"linear-gradient(180deg,#4a4e56 0%,#606468 40%,#7a7e82 100%)",tint:"rgba(150,155,165,0.35)",filter:"brightness(0.7) saturate(0.25) contrast(0.85)"},
-  snow:   {bg:"linear-gradient(180deg,#2e3542 0%,#4a5565 40%,#8090a0 100%)",tint:"rgba(180,190,210,0.18)",filter:"brightness(0.75) saturate(0.35) contrast(0.9)"},
-  night:  {bg:"linear-gradient(180deg,#030308 0%,#080812 40%,#10101e 100%)",tint:"rgba(5,5,15,0.65)",filter:"brightness(0.12) saturate(0.08) contrast(0.7)"}
-};
-
-function wxResize() {
-  if (!wxSceneEl) return;
-  wxW = wxSceneEl.clientWidth;
-  wxH = wxSceneEl.clientHeight;
-  wxSCanvas.width = wxW;
-  wxSCanvas.height = wxH;
-  wxInitClouds();
-  wxInitFog();
-}
-
-function wxApplyTheme() {
-  var s = WX_SKY[wxCurrent] || WX_SKY.sunny;
-  wxSkyEl.style.background = s.bg;
-  wxTintEl.style.background = s.tint;
-  wxImgEl.style.filter = s.filter;
-}
-
-function wxInitClouds() {
-  wxClouds = [];
-  var count = 0;
-  if (wxCurrent === "cloudy") count = 12;
-  else if (wxCurrent === "rain" || wxCurrent === "storm") count = 14;
-  else if (wxCurrent === "partly") count = 5;
-  else if (wxCurrent === "snow") count = 8;
-  for (var i = 0; i < count; i++) {
-    wxClouds.push({x:Math.random()*wxW*1.5-wxW*0.25, y:3+Math.random()*(wxH*0.32), w:80+Math.random()*160, h:15+Math.random()*30, speed:0.1+Math.random()*0.22, opacity:0.45+Math.random()*0.4});
-  }
-}
-
-function wxDrawClouds() {
-  if (!wxClouds.length) return;
-  var isDark = wxCurrent === "storm" || wxCurrent === "rain";
-  wxClouds.forEach(function(c) {
-    c.x += c.speed;
-    if (c.x > wxW + 200) c.x = -c.w - 60;
-    wxSCtx.save();
-    wxSCtx.globalAlpha = c.opacity;
-    var rgb = isDark ? "30,32,45" : (wxCurrent === "snow" ? "160,170,185" : "210,218,228");
-    var a = isDark ? 0.85 : 0.6;
-    [{dx:0,dy:0,rx:0.3,ry:0.5},{dx:0.25,dy:-0.3,rx:0.28,ry:0.6},{dx:0.5,dy:-0.1,rx:0.32,ry:0.55},{dx:0.72,dy:0.05,rx:0.25,ry:0.45}].forEach(function(p){
-      wxSCtx.beginPath();
-      wxSCtx.ellipse(c.x+c.w*p.dx, c.y+c.h*p.dy, c.w*p.rx, c.h*p.ry, 0, 0, Math.PI*2);
-      wxSCtx.fillStyle = "rgba("+rgb+","+a+")";
-      wxSCtx.fill();
-    });
-    wxSCtx.restore();
-  });
-}
-
-function wxDrawSun() {
-  if (wxCurrent !== "sunny" && wxCurrent !== "partly") return;
-  wxSunAngle += 0.004;
-  var sx = wxW * 0.78, sy = 40 + Math.sin(wxSunAngle) * 3;
-  var grad = wxSCtx.createRadialGradient(sx, sy, 6, sx, sy, 70);
-  grad.addColorStop(0, "rgba(255,240,80,.55)");
-  grad.addColorStop(0.4, "rgba(255,200,50,.12)");
-  grad.addColorStop(1, "rgba(255,200,50,0)");
-  wxSCtx.fillStyle = grad;
-  wxSCtx.beginPath(); wxSCtx.arc(sx, sy, 70, 0, Math.PI*2); wxSCtx.fill();
-  wxSCtx.beginPath(); wxSCtx.arc(sx, sy, 16, 0, Math.PI*2);
-  wxSCtx.fillStyle = "#ffe44d"; wxSCtx.fill();
-  wxSCtx.save(); wxSCtx.strokeStyle = "rgba(255,230,60,.22)"; wxSCtx.lineWidth = 2;
-  for (var i = 0; i < 12; i++) {
-    var a = wxSunAngle*1.5 + i*(Math.PI/6);
-    var pulse = 30 + Math.sin(wxTime*0.03+i)*4;
-    wxSCtx.beginPath();
-    wxSCtx.moveTo(sx+Math.cos(a)*20, sy+Math.sin(a)*20);
-    wxSCtx.lineTo(sx+Math.cos(a)*pulse, sy+Math.sin(a)*pulse);
-    wxSCtx.stroke();
-  }
-  wxSCtx.restore();
-}
-
-function wxDrawNight() {
-  if (wxCurrent !== "night") return;
-  for (var i = 0; i < 80; i++) {
-    var sx = (i*137.508)%wxW, sy = (i*91.37)%(wxH*0.5);
-    var tw = 0.2+Math.sin(wxTime*0.015+i*2.3)*0.25;
-    wxSCtx.fillStyle = "rgba(255,255,255,"+tw+")";
-    wxSCtx.fillRect(sx, sy, 1.5, 1.5);
-  }
-  var mx = wxW*0.8, my = 35;
-  wxSCtx.beginPath(); wxSCtx.arc(mx, my, 13, 0, Math.PI*2);
-  wxSCtx.fillStyle = "#dde4ee"; wxSCtx.fill();
-  wxSCtx.beginPath(); wxSCtx.arc(mx+5, my-2, 10, 0, Math.PI*2);
-  wxSCtx.fillStyle = "#060610"; wxSCtx.fill();
-  var mg = wxSCtx.createRadialGradient(mx, my, 4, mx, my, 45);
-  mg.addColorStop(0, "rgba(180,200,230,.1)"); mg.addColorStop(1, "rgba(180,200,230,0)");
-  wxSCtx.fillStyle = mg; wxSCtx.beginPath(); wxSCtx.arc(mx, my, 45, 0, Math.PI*2); wxSCtx.fill();
-  var cg = wxSCtx.createLinearGradient(0, wxH, 0, wxH*0.6);
-  cg.addColorStop(0, "rgba(255,180,80,.06)"); cg.addColorStop(1, "rgba(255,180,80,0)");
-  wxSCtx.fillStyle = cg; wxSCtx.fillRect(0, wxH*0.6, wxW, wxH*0.4);
-}
-
-function wxSpawnRain() {
-  if (wxCurrent !== "rain" && wxCurrent !== "storm") return;
-  var rate = wxCurrent === "storm" ? 10 : 4;
-  for (var i = 0; i < rate; i++) {
-    wxParticles.push({type:"rain",x:Math.random()*(wxW+100)-50,y:-10-Math.random()*30,vx:-1.5-Math.random(),vy:12+Math.random()*8,len:12+Math.random()*14,opacity:0.15+Math.random()*0.35});
-  }
-}
-
-function wxSpawnSnow() {
-  if (wxCurrent !== "snow" || Math.random() > 0.45) return;
-  wxParticles.push({type:"snow",x:Math.random()*(wxW+30)-15,y:-4,vx:0,vy:0.7+Math.random()*1.6,r:1.2+Math.random()*3,opacity:0.4+Math.random()*0.4,wobble:Math.random()*Math.PI*2,ws:0.01+Math.random()*0.02});
-}
-
-function wxInitFog() {
-  wxFogLayers = [];
-  if (wxCurrent !== "fog") return;
-  for (var i = 0; i < 5; i++) {
-    wxFogLayers.push({x:-150+Math.random()*wxW,y:wxH*0.2+i*(wxH*0.14),w:wxW*0.5+Math.random()*wxW*0.5,h:25+Math.random()*40,speed:0.12+Math.random()*0.25,opacity:0.14+Math.random()*0.18});
-  }
-}
-
-function wxDrawFog() {
-  if (wxCurrent !== "fog") return;
-  wxFogLayers.forEach(function(f) {
-    f.x += f.speed;
-    if (f.x > wxW+120) f.x = -f.w-40;
-    wxSCtx.save();
-    wxSCtx.globalAlpha = f.opacity+Math.sin(wxTime*0.008+f.y*0.01)*0.04;
-    var grad = wxSCtx.createRadialGradient(f.x+f.w/2, f.y, 15, f.x+f.w/2, f.y, f.w/2);
-    grad.addColorStop(0, "rgba(195,200,208,.5)"); grad.addColorStop(0.6, "rgba(195,200,208,.15)"); grad.addColorStop(1, "rgba(195,200,208,0)");
-    wxSCtx.fillStyle = grad; wxSCtx.fillRect(f.x, f.y-f.h, f.w, f.h*2.5);
-    wxSCtx.restore();
-  });
-  wxSCtx.save();
-  wxSCtx.globalAlpha = 0.3+Math.sin(wxTime*0.005)*0.05;
-  var gf = wxSCtx.createLinearGradient(0, wxH, 0, wxH*0.35);
-  gf.addColorStop(0, "rgba(190,195,205,.55)"); gf.addColorStop(0.4, "rgba(190,195,205,.2)"); gf.addColorStop(1, "rgba(190,195,205,0)");
-  wxSCtx.fillStyle = gf; wxSCtx.fillRect(0, wxH*0.35, wxW, wxH*0.65);
-  wxSCtx.restore();
-}
-
-function wxDrawLightning() {
-  if (wxCurrent !== "storm") return;
-  wxLightningTimer++;
-  if (wxLightningTimer > 80+Math.random()*150) {
-    wxLightningFlash = 7; wxLightningTimer = 0;
-    var bx = wxW*0.15+Math.random()*wxW*0.7, by = 8;
-    wxSCtx.save(); wxSCtx.beginPath(); wxSCtx.moveTo(bx, by);
-    for (var s = 0; s < 6; s++) {
-      bx += (Math.random()-0.5)*30; by += 10+Math.random()*18; wxSCtx.lineTo(bx, by);
-      if (Math.random() > 0.55) { var rx=bx,ry=by; wxSCtx.moveTo(bx,by); for(var b=0;b<2;b++){rx+=(Math.random()-0.5)*16;ry+=6+Math.random()*10;wxSCtx.lineTo(rx,ry);} wxSCtx.moveTo(bx,by); }
-    }
-    wxSCtx.strokeStyle="rgba(210,210,255,.85)"; wxSCtx.lineWidth=2; wxSCtx.stroke();
-    wxSCtx.strokeStyle="rgba(255,255,255,.3)"; wxSCtx.lineWidth=5; wxSCtx.stroke();
-    wxSCtx.restore();
-  }
-  if (wxLightningFlash > 0) {
-    wxSCtx.fillStyle = "rgba(200,200,255,"+(wxLightningFlash*0.025)+")";
-    wxSCtx.fillRect(0, 0, wxW, wxH); wxLightningFlash--;
-  }
-}
-
-function wxUpdateParticles() {
-  for (var i = wxParticles.length-1; i >= 0; i--) {
-    var p = wxParticles[i];
-    p.x += p.vx||0; p.y += p.vy||0;
-    if (p.type === "snow") { p.wobble += p.ws; p.x += Math.sin(p.wobble)*0.5; }
-    if (p.y > wxH+10 || p.x < -50 || p.x > wxW+50) wxParticles.splice(i, 1);
-  }
-  if (wxParticles.length > 500) wxParticles.splice(0, 50);
-}
-
-function wxDrawParticles() {
-  wxParticles.forEach(function(p) {
-    wxSCtx.save(); wxSCtx.globalAlpha = p.opacity;
-    if (p.type === "rain") {
-      wxSCtx.beginPath(); wxSCtx.moveTo(p.x, p.y); wxSCtx.lineTo(p.x+p.vx*0.7, p.y+p.len);
-      wxSCtx.strokeStyle = "rgba(160,185,220,.5)"; wxSCtx.lineWidth = 1.2; wxSCtx.stroke();
-    } else if (p.type === "snow") {
-      wxSCtx.beginPath(); wxSCtx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-      wxSCtx.fillStyle = "rgba(235,240,250,.85)"; wxSCtx.fill();
-    }
-    wxSCtx.restore();
-  });
-}
-
-function wxAnimate() {
-  wxTime++;
-  if (wxW === 0) { wxResize(); }
-  wxSCtx.clearRect(0, 0, wxW, wxH);
-  wxDrawNight(); wxDrawSun(); wxDrawClouds();
-  wxSpawnRain(); wxSpawnSnow(); wxUpdateParticles(); wxDrawParticles();
-  wxDrawFog(); wxDrawLightning();
-  requestAnimationFrame(wxAnimate);
-}
-
-// Map Open-Meteo weather codes to scene types
-function wxCodeToScene(code) {
-  if (code === 0) return "sunny";
-  if (code <= 2) return "partly";
-  if (code === 3) return "cloudy";
-  if (code >= 45 && code <= 48) return "fog";
-  if (code >= 51 && code <= 65) return "rain";
-  if (code >= 71 && code <= 77) return "snow";
-  if (code >= 80 && code <= 82) return "rain";
-  if (code >= 95) return "storm";
-  return "partly";
-}
-
-// Also check if it's nighttime
-function wxIsNight() {
-  var h = new Date().getHours();
-  return h < 6 || h >= 20;
-}
-
-function wxSetCondition(code, desc) {
-  var scene = wxCodeToScene(code);
-  if (wxIsNight() && (scene === "sunny" || scene === "partly")) scene = "night";
-  wxCurrent = scene;
-  wxParticles = [];
-  wxLightningTimer = 0; wxLightningFlash = 0;
-  wxInitClouds(); wxInitFog(); wxApplyTheme();
-}
-
-wxResize();
-wxApplyTheme();
-wxAnimate();
-window.addEventListener("resize", function() { wxResize(); });
+var wxSceneEl=document.getElementById("wxScene"),wxSkyEl=document.getElementById("wxSky"),wxTintEl=document.getElementById("wxTint"),wxImgEl=document.getElementById("wxImg"),wxSCanvas=document.getElementById("wxSceneCanvas"),wxSCtx=wxSCanvas.getContext("2d");
+var wxW=0,wxH=0,wxCurrent="sunny",wxParticles=[],wxClouds=[],wxFogLayers=[],wxLightningTimer=0,wxLightningFlash=0,wxSunAngle=0,wxTime=0;
+var WX_SKY={sunny:{bg:"linear-gradient(180deg,#1565a8 0%,#60b5e8 40%,#c6e4f5 100%)",tint:"rgba(0,0,0,0)",filter:"brightness(1.1) saturate(1.15)"},partly:{bg:"linear-gradient(180deg,#1a5580 0%,#5098c0 40%,#b0cee0 100%)",tint:"rgba(0,0,0,0.02)",filter:"brightness(1.0) saturate(1.0)"},cloudy:{bg:"linear-gradient(180deg,#3a3e4a 0%,#5a5e6a 40%,#7a7e88 100%)",tint:"rgba(40,42,50,0.3)",filter:"brightness(0.65) saturate(0.45) contrast(0.9)"},rain:{bg:"linear-gradient(180deg,#1a1e2e 0%,#2a3040 40%,#3a4050 100%)",tint:"rgba(20,25,40,0.45)",filter:"brightness(0.45) saturate(0.3) contrast(0.85)"},storm:{bg:"linear-gradient(180deg,#08080f 0%,#141422 40%,#1e1e30 100%)",tint:"rgba(10,10,20,0.55)",filter:"brightness(0.25) saturate(0.15) contrast(0.8)"},fog:{bg:"linear-gradient(180deg,#4a4e56 0%,#606468 40%,#7a7e82 100%)",tint:"rgba(150,155,165,0.35)",filter:"brightness(0.7) saturate(0.25) contrast(0.85)"},snow:{bg:"linear-gradient(180deg,#2e3542 0%,#4a5565 40%,#8090a0 100%)",tint:"rgba(180,190,210,0.18)",filter:"brightness(0.75) saturate(0.35) contrast(0.9)"},night:{bg:"linear-gradient(180deg,#030308 0%,#080812 40%,#10101e 100%)",tint:"rgba(5,5,15,0.65)",filter:"brightness(0.12) saturate(0.08) contrast(0.7)"}};
+function wxResize(){if(!wxSceneEl)return;wxW=wxSceneEl.clientWidth;wxH=wxSceneEl.clientHeight;wxSCanvas.width=wxW;wxSCanvas.height=wxH;wxInitClouds();wxInitFog();}
+function wxApplyTheme(){var s=WX_SKY[wxCurrent]||WX_SKY.sunny;wxSkyEl.style.background=s.bg;wxTintEl.style.background=s.tint;wxImgEl.style.filter=s.filter;}
+function wxInitClouds(){wxClouds=[];var count=0;if(wxCurrent==="cloudy")count=12;else if(wxCurrent==="rain"||wxCurrent==="storm")count=14;else if(wxCurrent==="partly")count=5;else if(wxCurrent==="snow")count=8;for(var i=0;i<count;i++){wxClouds.push({x:Math.random()*wxW*1.5-wxW*0.25,y:3+Math.random()*(wxH*0.32),w:80+Math.random()*160,h:15+Math.random()*30,speed:0.1+Math.random()*0.22,opacity:0.45+Math.random()*0.4});}}
+function wxDrawClouds(){if(!wxClouds.length)return;var isDark=wxCurrent==="storm"||wxCurrent==="rain";wxClouds.forEach(function(c){c.x+=c.speed;if(c.x>wxW+200)c.x=-c.w-60;wxSCtx.save();wxSCtx.globalAlpha=c.opacity;var rgb=isDark?"30,32,45":(wxCurrent==="snow"?"160,170,185":"210,218,228"),a=isDark?0.85:0.6;[{dx:0,dy:0,rx:0.3,ry:0.5},{dx:0.25,dy:-0.3,rx:0.28,ry:0.6},{dx:0.5,dy:-0.1,rx:0.32,ry:0.55},{dx:0.72,dy:0.05,rx:0.25,ry:0.45}].forEach(function(p){wxSCtx.beginPath();wxSCtx.ellipse(c.x+c.w*p.dx,c.y+c.h*p.dy,c.w*p.rx,c.h*p.ry,0,0,Math.PI*2);wxSCtx.fillStyle="rgba("+rgb+","+a+")";wxSCtx.fill();});wxSCtx.restore();});}
+function wxDrawSun(){if(wxCurrent!=="sunny"&&wxCurrent!=="partly")return;wxSunAngle+=0.004;var sx=wxW*0.78,sy=40+Math.sin(wxSunAngle)*3;var grad=wxSCtx.createRadialGradient(sx,sy,6,sx,sy,70);grad.addColorStop(0,"rgba(255,240,80,.55)");grad.addColorStop(0.4,"rgba(255,200,50,.12)");grad.addColorStop(1,"rgba(255,200,50,0)");wxSCtx.fillStyle=grad;wxSCtx.beginPath();wxSCtx.arc(sx,sy,70,0,Math.PI*2);wxSCtx.fill();wxSCtx.beginPath();wxSCtx.arc(sx,sy,16,0,Math.PI*2);wxSCtx.fillStyle="#ffe44d";wxSCtx.fill();wxSCtx.save();wxSCtx.strokeStyle="rgba(255,230,60,.22)";wxSCtx.lineWidth=2;for(var i=0;i<12;i++){var a=wxSunAngle*1.5+i*(Math.PI/6),pulse=30+Math.sin(wxTime*0.03+i)*4;wxSCtx.beginPath();wxSCtx.moveTo(sx+Math.cos(a)*20,sy+Math.sin(a)*20);wxSCtx.lineTo(sx+Math.cos(a)*pulse,sy+Math.sin(a)*pulse);wxSCtx.stroke();}wxSCtx.restore();}
+function wxDrawNight(){if(wxCurrent!=="night")return;for(var i=0;i<80;i++){var sx=(i*137.508)%wxW,sy=(i*91.37)%(wxH*0.5),tw=0.2+Math.sin(wxTime*0.015+i*2.3)*0.25;wxSCtx.fillStyle="rgba(255,255,255,"+tw+")";wxSCtx.fillRect(sx,sy,1.5,1.5);}var mx=wxW*0.8,my=35;wxSCtx.beginPath();wxSCtx.arc(mx,my,13,0,Math.PI*2);wxSCtx.fillStyle="#dde4ee";wxSCtx.fill();wxSCtx.beginPath();wxSCtx.arc(mx+5,my-2,10,0,Math.PI*2);wxSCtx.fillStyle="#060610";wxSCtx.fill();}
+function wxSpawnRain(){if(wxCurrent!=="rain"&&wxCurrent!=="storm")return;var rate=wxCurrent==="storm"?10:4;for(var i=0;i<rate;i++){wxParticles.push({type:"rain",x:Math.random()*(wxW+100)-50,y:-10-Math.random()*30,vx:-1.5-Math.random(),vy:12+Math.random()*8,len:12+Math.random()*14,opacity:0.15+Math.random()*0.35});}}
+function wxSpawnSnow(){if(wxCurrent!=="snow"||Math.random()>0.45)return;wxParticles.push({type:"snow",x:Math.random()*(wxW+30)-15,y:-4,vx:0,vy:0.7+Math.random()*1.6,r:1.2+Math.random()*3,opacity:0.4+Math.random()*0.4,wobble:Math.random()*Math.PI*2,ws:0.01+Math.random()*0.02});}
+function wxInitFog(){wxFogLayers=[];if(wxCurrent!=="fog")return;for(var i=0;i<5;i++){wxFogLayers.push({x:-150+Math.random()*wxW,y:wxH*0.2+i*(wxH*0.14),w:wxW*0.5+Math.random()*wxW*0.5,h:25+Math.random()*40,speed:0.12+Math.random()*0.25,opacity:0.14+Math.random()*0.18});}}
+function wxDrawFog(){if(wxCurrent!=="fog")return;wxFogLayers.forEach(function(f){f.x+=f.speed;if(f.x>wxW+120)f.x=-f.w-40;wxSCtx.save();wxSCtx.globalAlpha=f.opacity+Math.sin(wxTime*0.008+f.y*0.01)*0.04;var grad=wxSCtx.createRadialGradient(f.x+f.w/2,f.y,15,f.x+f.w/2,f.y,f.w/2);grad.addColorStop(0,"rgba(195,200,208,.5)");grad.addColorStop(0.6,"rgba(195,200,208,.15)");grad.addColorStop(1,"rgba(195,200,208,0)");wxSCtx.fillStyle=grad;wxSCtx.fillRect(f.x,f.y-f.h,f.w,f.h*2.5);wxSCtx.restore();});}
+function wxDrawLightning(){if(wxCurrent!=="storm")return;wxLightningTimer++;if(wxLightningTimer>80+Math.random()*150){wxLightningFlash=7;wxLightningTimer=0;var bx=wxW*0.15+Math.random()*wxW*0.7,by=8;wxSCtx.save();wxSCtx.beginPath();wxSCtx.moveTo(bx,by);for(var s=0;s<6;s++){bx+=(Math.random()-0.5)*30;by+=10+Math.random()*18;wxSCtx.lineTo(bx,by);}wxSCtx.strokeStyle="rgba(210,210,255,.85)";wxSCtx.lineWidth=2;wxSCtx.stroke();wxSCtx.strokeStyle="rgba(255,255,255,.3)";wxSCtx.lineWidth=5;wxSCtx.stroke();wxSCtx.restore();}if(wxLightningFlash>0){wxSCtx.fillStyle="rgba(200,200,255,"+(wxLightningFlash*0.025)+")";wxSCtx.fillRect(0,0,wxW,wxH);wxLightningFlash--;}}
+function wxUpdateParticles(){for(var i=wxParticles.length-1;i>=0;i--){var p=wxParticles[i];p.x+=p.vx||0;p.y+=p.vy||0;if(p.type==="snow"){p.wobble+=p.ws;p.x+=Math.sin(p.wobble)*0.5;}if(p.y>wxH+10||p.x<-50||p.x>wxW+50)wxParticles.splice(i,1);}if(wxParticles.length>500)wxParticles.splice(0,50);}
+function wxDrawParticles(){wxParticles.forEach(function(p){wxSCtx.save();wxSCtx.globalAlpha=p.opacity;if(p.type==="rain"){wxSCtx.beginPath();wxSCtx.moveTo(p.x,p.y);wxSCtx.lineTo(p.x+p.vx*0.7,p.y+p.len);wxSCtx.strokeStyle="rgba(160,185,220,.5)";wxSCtx.lineWidth=1.2;wxSCtx.stroke();}else if(p.type==="snow"){wxSCtx.beginPath();wxSCtx.arc(p.x,p.y,p.r,0,Math.PI*2);wxSCtx.fillStyle="rgba(235,240,250,.85)";wxSCtx.fill();}wxSCtx.restore();});}
+function wxAnimate(){wxTime++;if(wxW===0)wxResize();wxSCtx.clearRect(0,0,wxW,wxH);wxDrawNight();wxDrawSun();wxDrawClouds();wxSpawnRain();wxSpawnSnow();wxUpdateParticles();wxDrawParticles();wxDrawFog();wxDrawLightning();requestAnimationFrame(wxAnimate);}
+function wxCodeToScene(code){if(code===0)return"sunny";if(code<=2)return"partly";if(code===3)return"cloudy";if(code>=45&&code<=48)return"fog";if(code>=51&&code<=65)return"rain";if(code>=71&&code<=77)return"snow";if(code>=80&&code<=82)return"rain";if(code>=95)return"storm";return"partly";}
+function wxIsNight(){var h=new Date().getHours();return h<6||h>=20;}
+function wxSetCondition(code,desc){var scene=wxCodeToScene(code);if(wxIsNight()&&(scene==="sunny"||scene==="partly"))scene="night";wxCurrent=scene;wxParticles=[];wxLightningTimer=0;wxLightningFlash=0;wxInitClouds();wxInitFog();wxApplyTheme();}
+wxResize();wxApplyTheme();wxAnimate();
+window.addEventListener("resize",function(){wxResize();});
 
 // ============================================================
 // BOOT
 // ============================================================
 seedExtended();
-
-function refreshAll() {
-  fetchConditions();
-}
-
-refreshAll();
-fetchExtended();
-setInterval(refreshAll, 300000);
-setInterval(fetchExtended, 1800000);
+function refreshAll(){fetchConditions();}
+refreshAll();fetchExtended();
+setInterval(refreshAll,300000);setInterval(fetchExtended,1800000);
 </script>
 </body>
 </html>
