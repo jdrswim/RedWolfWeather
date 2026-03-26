@@ -71,8 +71,18 @@ main{max-width:1100px;margin:0 auto;padding:18px;overflow-x:hidden}
 .tsps-top{display:flex;justify-content:center;align-items:center;gap:28px;margin-bottom:22px;flex-wrap:wrap}.tsps-gauge-w{text-align:center}.tsps-gauge-w svg{max-width:100%;height:auto}.tsps-gauge-lbl{font-size:8px;font-weight:700;color:rgba(255,255,255,.25);letter-spacing:2px;margin-bottom:4px}.tsps-stats{display:flex;flex-direction:column;gap:7px;min-width:170px}.tsps-sbox{background:rgba(255,255,255,.025);border-radius:8px;padding:9px 13px;border:1px solid rgba(255,255,255,.05)}.tsps-sbox .tsps-slbl{font-size:8px;color:rgba(255,255,255,.25);letter-spacing:1px}.tsps-sbox .tsps-sval{font-size:14px;font-weight:700;margin-top:2px}
 .tsps-sec-lbl{font-size:8px;font-weight:700;color:rgba(255,255,255,.25);letter-spacing:2px;margin-bottom:8px}
 .tsps-cards{display:flex;gap:8px;margin-bottom:8px;overflow-x:auto;padding-bottom:4px}.tsps-fc{min-width:125px;flex:1 1 0;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.05);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all .25s}.tsps-fc.act{transform:scale(1.03)}.tsps-fc .fc-lbl{font-size:9px;color:rgba(255,255,255,.4);font-weight:600;letter-spacing:1px;margin-bottom:5px}.tsps-fc .fc-score{font-size:26px;font-weight:800;line-height:1}.tsps-fc .fc-unit{font-size:10px;color:rgba(255,255,255,.3);margin-left:3px}.tsps-fc .fc-threat{font-size:8px;margin-top:3px}.tsps-fc .fc-lk{display:flex;justify-content:space-between;align-items:center;margin-top:7px}.tsps-fc .fc-lk-l{font-size:8px;color:rgba(255,255,255,.25)}.tsps-fc .fc-lk-v{font-size:12px;font-weight:700}.tsps-fc .fc-bar{height:2px;background:rgba(255,255,255,.05);border-radius:2px;margin-top:5px;overflow:hidden}.tsps-fc .fc-bar-f{height:100%;border-radius:2px;transition:width .5s}.tsps-fc .fc-meta{margin-top:6px;font-size:8px;color:rgba(255,255,255,.25)}
+/* THREAT FINGERPRINT */
+.tf-wrap{background:rgba(255,255,255,.02);border-radius:10px;padding:18px;border:1px solid rgba(255,255,255,.05);margin-top:14px;text-align:center}
+.tf-title{font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1px;margin-bottom:4px}
+.tf-subtitle{font-size:7px;color:rgba(255,255,255,.2);letter-spacing:1.5px;margin-bottom:12px}
+.tf-svg{max-width:320px;margin:0 auto;display:block}
+.tf-legend{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:14px}
+.tf-leg-item{display:flex;align-items:center;gap:4px;font-size:8px;color:rgba(255,255,255,.5)}
+.tf-leg-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+@keyframes tfPulse{0%,100%{opacity:.6}50%{opacity:1}}
+
 .tsps-tl-box{background:rgba(255,255,255,.02);border-radius:10px;padding:14px;border:1px solid rgba(255,255,255,.05);margin-top:14px}.tsps-tl-box .tsps-ct{font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1px;margin-bottom:10px}.tsps-tl-box canvas{width:100%!important;max-height:155px}
-.tsps-ch-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}.tsps-ch-box{background:rgba(255,255,255,.02);border-radius:10px;padding:14px;border:1px solid rgba(255,255,255,.05)}.tsps-ch-box .tsps-ct{font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1px;margin-bottom:10px}.tsps-ch-box canvas{width:100%!important;max-height:195px}
+.tsps-ch-row{display:grid;grid-template-columns:1fr;gap:14px;margin-top:14px}.tsps-ch-box{background:rgba(255,255,255,.02);border-radius:10px;padding:14px;border:1px solid rgba(255,255,255,.05)}.tsps-ch-box .tsps-ct{font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1px;margin-bottom:10px}.tsps-ch-box canvas{width:100%!important;max-height:195px}
 .tsps-det{background:rgba(255,255,255,.02);border-radius:10px;padding:18px;border:1px solid rgba(255,255,255,.05);margin-top:14px}.tsps-det-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px}.tsps-det-per{font-size:10px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px}.tsps-det-fc{font-size:11px;color:rgba(255,255,255,.55);margin-top:3px}.tsps-det-sc{font-size:32px;font-weight:800;line-height:1}.tsps-det-lv{font-size:9px;font-weight:700;letter-spacing:1.5px;margin-top:2px;text-align:right}.tsps-det-mg{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}.tsps-dm{background:rgba(255,255,255,.03);border-radius:6px;padding:9px 10px;text-align:center}.tsps-dm .dm-l{font-size:7px;color:rgba(255,255,255,.25);letter-spacing:1px;margin-bottom:3px}.tsps-dm .dm-v{font-size:15px;font-weight:700;color:rgba(255,255,255,.85)}.tsps-det-nar{font-size:10px;color:rgba(255,255,255,.4);line-height:1.7;padding:10px 12px;background:rgba(255,255,255,.02);border-radius:6px;border-left:3px solid rgba(255,255,255,.06)}.tsps-det-nar b{color:rgba(255,255,255,.55)}
 .tsps-foot{margin-top:18px;padding-top:12px;border-top:1px solid rgba(255,255,255,.04);display:flex;justify-content:space-between;flex-wrap:wrap;gap:5px}.tsps-foot span{font-size:7px;color:rgba(255,255,255,.15)}
 .tsps-ld{text-align:center;padding:40px 20px}.tsps-spinner{width:36px;height:36px;border:3px solid rgba(255,255,255,.07);border-top-color:#60a5fa;border-radius:50%;margin:0 auto 14px;animation:tspsSpin .8s linear infinite}.tsps-ld p{font-size:11px;color:rgba(255,255,255,.35)}.tsps-ld p.sub{font-size:9px;color:rgba(255,255,255,.18);margin-top:4px}
@@ -247,6 +257,7 @@ footer{padding:16px 12px;margin-top:20px}footer p{font-size:9px}
 <div class="alm-wrap">
   <div class="sec">Raleigh Wx Almanac <em>- RDU Airport - Historical Climate Data</em> <div class="tip-btn" onclick="openTip('tipAlmanac')">?</div></div>
   <div id="alm-content"><div class="alm-ld"><div class="tsps-spinner"></div>Loading climate data...</div></div>
+  <div id="acc-dashboard"></div>
 </div>
 </div>
 
@@ -282,7 +293,8 @@ function switchTab(name, btn) {
   $("tab-" + name).classList.add("active");
   btn.classList.add("active");
   if (window.pendo) { pendo.pageLoad({url: '/#' + name}); }
-  if (name === "almanac" && !window._almLoaded) { fetchAlmanac(); }
+  if (name === "almanac" && !window._almLoaded) { fetchAlmanac(); accFetchAndRender(); }
+  if (name === "almanac" && window._almLoaded) { accFetchAndRender(); }
   if (name === "pws") { fetchPWS(); }
 }
 
@@ -529,8 +541,130 @@ function tsps_buildGauge(score, size) {
   return '<svg viewBox="0 0 '+size+' '+h+'" style="width:100%;max-width:'+size+'px;height:auto"><defs><linearGradient id="tsG" x1="0%" x2="100%"><stop offset="0%" stop-color="#1a472a"/><stop offset="25%" stop-color="#22c55e"/><stop offset="45%" stop-color="#eab308"/><stop offset="65%" stop-color="#f97316"/><stop offset="80%" stop-color="#ef4444"/><stop offset="100%" stop-color="#dc2626"/></linearGradient><filter id="tsGl"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><path d="'+arc(sA,eA,r)+'" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="14" stroke-linecap="round"/><path d="'+arc(sA,scA,r)+'" fill="none" stroke="url(#tsG)" stroke-width="14" stroke-linecap="round" filter="url(#tsGl)"/>'+tk+'<circle cx="'+np.x+'" cy="'+np.y+'" r="5.5" fill="'+lv.color+'" filter="url(#tsGl)"/><text x="'+cx+'" y="'+(cy-16)+'" fill="'+lv.color+'" font-size="38" font-weight="800" text-anchor="middle" dominant-baseline="middle" filter="url(#tsGl)">'+score+'</text><text x="'+cx+'" y="'+(cy+10)+'" fill="'+lv.color+'" font-size="12" font-weight="700" text-anchor="middle" letter-spacing="3">'+lv.label+'</text><text x="'+cx+'" y="'+(cy+27)+'" fill="rgba(255,255,255,.45)" font-size="8" text-anchor="middle">'+lv.desc+'</text></svg>';
 }
 
+function tsps_buildFingerprint(breakdown, score) {
+  var items = [
+    {k:"wind", label:"WIND", max:20, color:"#00ccff"},
+    {k:"gusts", label:"GUSTS", max:18, color:"#3b82f6"},
+    {k:"precip", label:"PRECIP", max:14, color:"#6366f1"},
+    {k:"instability", label:"INSTABILITY", max:16, color:"#eab308"},
+    {k:"textual", label:"FORECAST", max:22, color:"#f97316"},
+    {k:"alerts", label:"ALERTS", max:10, color:"#ef4444"}
+  ];
+  var cx = 160, cy = 155, R = 110;
+  var n = items.length;
+  var lv = tsps_sevLevel(score);
+
+  function polar(i, r) {
+    var angle = (Math.PI * 2 / n) * i - Math.PI / 2;
+    return {x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle)};
+  }
+
+  var svg = '<svg viewBox="0 0 320 310" class="tf-svg" xmlns="http://www.w3.org/2000/svg">';
+
+  // Defs — glows for each component
+  svg += '<defs>';
+  items.forEach(function(item, i) {
+    svg += '<filter id="tfGlow' + i + '"><feGaussianBlur stdDeviation="4" result="b"/><feFlood flood-color="' + item.color + '" flood-opacity=".5"/><feComposite in2="b" operator="in"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
+  });
+  svg += '<filter id="tfCenterGlow"><feGaussianBlur stdDeviation="8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
+  svg += '</defs>';
+
+  // Background rings
+  [0.25, 0.5, 0.75, 1.0].forEach(function(pct) {
+    var points = [];
+    for (var i = 0; i < n; i++) {
+      var p = polar(i, R * pct);
+      points.push(p.x + "," + p.y);
+    }
+    svg += '<polygon points="' + points.join(" ") + '" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="1"/>';
+  });
+
+  // Axis lines
+  for (var i = 0; i < n; i++) {
+    var p = polar(i, R);
+    svg += '<line x1="' + cx + '" y1="' + cy + '" x2="' + p.x + '" y2="' + p.y + '" stroke="rgba(255,255,255,.08)" stroke-width="1"/>';
+  }
+
+  // Filled threat shape — gradient from center
+  var shapePoints = [];
+  var activeSegments = [];
+  for (var i = 0; i < n; i++) {
+    var val = breakdown[items[i].k] || 0;
+    var pct = Math.max(0.05, val / items[i].max);
+    var p = polar(i, R * pct);
+    shapePoints.push(p.x + "," + p.y);
+    activeSegments.push({idx: i, val: val, pct: pct, x: p.x, y: p.y, color: items[i].color});
+  }
+
+  // Main filled shape
+  svg += '<polygon points="' + shapePoints.join(" ") + '" fill="' + lv.color + '" fill-opacity=".12" stroke="' + lv.color + '" stroke-width="1.5" stroke-opacity=".4"/>';
+
+  // Individual segment lines with their own color + glow
+  for (var i = 0; i < n; i++) {
+    var seg = activeSegments[i];
+    var next = activeSegments[(i + 1) % n];
+    if (seg.pct > 0.1) {
+      // Line from center to point
+      svg += '<line x1="' + cx + '" y1="' + cy + '" x2="' + seg.x + '" y2="' + seg.y + '" stroke="' + seg.color + '" stroke-width="2" stroke-opacity=".5" filter="url(#tfGlow' + i + ')"/>';
+      // Segment edge
+      svg += '<line x1="' + seg.x + '" y1="' + seg.y + '" x2="' + next.x + '" y2="' + next.y + '" stroke="' + seg.color + '" stroke-width="1.5" stroke-opacity=".35"/>';
+    }
+  }
+
+  // Data points — circles at each vertex
+  for (var i = 0; i < n; i++) {
+    var seg = activeSegments[i];
+    var pointPct = seg.val / items[i].max;
+    var pointSize = 3 + pointPct * 4;
+    var pointOpacity = 0.4 + pointPct * 0.6;
+
+    // Outer glow ring
+    if (pointPct > 0.3) {
+      svg += '<circle cx="' + seg.x + '" cy="' + seg.y + '" r="' + (pointSize + 4) + '" fill="' + seg.color + '" fill-opacity=".1" style="animation:tfPulse 2s ease-in-out infinite;animation-delay:' + (i * 0.3) + 's"/>';
+    }
+    // Point
+    svg += '<circle cx="' + seg.x + '" cy="' + seg.y + '" r="' + pointSize + '" fill="' + seg.color + '" fill-opacity="' + pointOpacity + '" filter="url(#tfGlow' + i + ')"/>';
+    // White center dot
+    svg += '<circle cx="' + seg.x + '" cy="' + seg.y + '" r="1.5" fill="white" fill-opacity=".8"/>';
+  }
+
+  // Labels + scores at each axis
+  for (var i = 0; i < n; i++) {
+    var labelR = R + 22;
+    var lp = polar(i, labelR);
+    var val = breakdown[items[i].k] || 0;
+    var pctVal = Math.round(val / items[i].max * 100);
+    var anchor = "middle";
+    if (lp.x < cx - 20) anchor = "end";
+    if (lp.x > cx + 20) anchor = "start";
+
+    // Component name
+    svg += '<text x="' + lp.x + '" y="' + (lp.y - 5) + '" text-anchor="' + anchor + '" fill="' + items[i].color + '" font-size="8" font-weight="800" letter-spacing="1" font-family="Segoe UI,sans-serif">' + items[i].label + '</text>';
+    // Score
+    svg += '<text x="' + lp.x + '" y="' + (lp.y + 7) + '" text-anchor="' + anchor + '" fill="rgba(255,255,255,.6)" font-size="9" font-weight="600" font-family="Segoe UI,sans-serif">' + val + '/' + items[i].max + ' (' + pctVal + '%)</text>';
+  }
+
+  // Center score
+  svg += '<circle cx="' + cx + '" cy="' + cy + '" r="24" fill="' + lv.color + '" fill-opacity=".15" filter="url(#tfCenterGlow)"/>';
+  svg += '<circle cx="' + cx + '" cy="' + cy + '" r="20" fill="rgba(0,0,0,.6)" stroke="' + lv.color + '" stroke-width="2" stroke-opacity=".5"/>';
+  svg += '<text x="' + cx + '" y="' + (cy + 1) + '" text-anchor="middle" dominant-baseline="middle" fill="' + lv.color + '" font-size="16" font-weight="800" font-family="Segoe UI,sans-serif">' + score + '</text>';
+  svg += '<text x="' + cx + '" y="' + (cy + 14) + '" text-anchor="middle" fill="rgba(255,255,255,.3)" font-size="6" font-weight="700" letter-spacing="1.5" font-family="Segoe UI,sans-serif">INDEX</text>';
+
+  svg += '</svg>';
+
+  // Legend
+  var legend = '<div class="tf-legend">';
+  items.forEach(function(item) {
+    var val = breakdown[item.k] || 0;
+    legend += '<div class="tf-leg-item"><div class="tf-leg-dot" style="background:' + item.color + (val > 0 ? '' : ';opacity:.25') + '"></div>' + item.label + '</div>';
+  });
+  legend += '</div>';
+
+  return svg + legend;
+}
+
 function tsps_destroyCharts() {
-  ["tl","radar","bar"].forEach(function(k){if(tspsState.charts[k]){tspsState.charts[k].destroy();tspsState.charts[k]=null;}});
+  ["tl","bar"].forEach(function(k){if(tspsState.charts[k]){tspsState.charts[k].destroy();tspsState.charts[k]=null;}});
 }
 
 function tsps_renderMain() {
@@ -561,7 +695,12 @@ function tsps_renderMain() {
     dH='<div class="tsps-det"><div class="tsps-det-hdr"><div><div class="tsps-det-per">ANALYSIS - '+af.label+'</div><div class="tsps-det-fc">'+(af.shortForecast||"--")+'</div></div><div style="text-align:right"><div class="tsps-det-sc" style="color:'+afL.color+'">'+af.score+'</div><div class="tsps-det-lv" style="color:'+afL.color+'">'+afL.label+'</div></div></div><div class="tsps-det-mg"><div class="tsps-dm"><div class="dm-l">TEMP</div><div class="dm-v">'+(af.temp!=null?af.temp+"F":"--")+'</div></div><div class="tsps-dm"><div class="dm-l">WIND</div><div class="dm-v">'+(af.wind||"--")+'</div></div><div class="tsps-dm"><div class="dm-l">PRECIP</div><div class="dm-v">'+(af.pop||0)+'%</div></div><div class="tsps-dm"><div class="dm-l">LIKELIHOOD</div><div class="dm-v">'+af.likelihood+'%</div></div></div>'+(af.detailedForecast?'<div class="tsps-det-nar" style="border-left-color:'+afL.color+'44"><b>NWS:</b> '+af.detailedForecast+'</div>':'')+'</div>';
   }
 
-  cont.innerHTML = '<div class="tsps-hdr"><div class="tsps-hdr-l"><div class="tsps-tag">PROPRIETARY MODEL</div><h2><span class="tsps-r">Tuffy\'s</span> Storm Prediction System <div class="tip-btn" onclick="openTip(\'tipTSPS\')" style="font-size:10px;width:18px;height:18px">?</div></h2><div class="tsps-loc">'+TSPS_CFG.name+' - NWS-powered intelligence</div></div><div class="tsps-hdr-r"><div class="tsps-ulbl">LAST UPDATE</div><div class="tsps-utime">'+(tspsState.lastUpdate?tspsState.lastUpdate.toLocaleTimeString():"--")+'</div><button class="tsps-rbtn" id="tspsRB">Refresh</button></div></div>'+aH+'<div class="tsps-top"><div class="tsps-gauge-w"><div class="tsps-gauge-lbl">PEAK SEVERE WEATHER INDEX</div>'+tsps_buildGauge(pk,gs)+'</div><div class="tsps-stats"><div class="tsps-sbox"><div class="tsps-slbl">PEAK WINDOW</div><div class="tsps-sval" style="color:'+pkL.color+'">'+pw+'</div></div><div class="tsps-sbox"><div class="tsps-slbl">ACTIVE ALERTS</div><div class="tsps-sval" style="color:'+(al.length>0?"#ef4444":"#22c55e")+'">'+(al.length>0?al.length+" ACTIVE":"ALL CLEAR")+'</div></div><div class="tsps-sbox"><div class="tsps-slbl">MAX LIKELIHOOD</div><div class="tsps-sval" style="color:rgba(255,255,255,.85)">'+ml+'%</div></div></div></div><div class="tsps-sec-lbl">FORECAST PERIODS</div><div class="tsps-cards">'+cH+'</div><div class="tsps-tl-box"><div class="tsps-ct">SEVERITY TIMELINE</div><canvas id="tsTL"></canvas></div><div class="tsps-ch-row"><div class="tsps-ch-box"><div class="tsps-ct">THREAT RADAR</div><canvas id="tsRD"></canvas></div><div class="tsps-ch-box"><div class="tsps-ct">COMPONENT BREAKDOWN</div><canvas id="tsBA"></canvas></div></div>'+dH+'<div class="tsps-foot"><span>TSPS v2.0 - Proprietary Index - NWS API</span><span>Auto-refresh 5 min</span></div>';
+  var fingerprintHTML = '';
+  if (af && af.breakdown) {
+    fingerprintHTML = '<div class="tf-wrap"><div class="tf-title">THREAT FINGERPRINT</div><div class="tf-subtitle">6-COMPONENT SEVERITY BREAKDOWN</div>' + tsps_buildFingerprint(af.breakdown, af.score) + '</div>';
+  }
+
+  cont.innerHTML = '<div class="tsps-hdr"><div class="tsps-hdr-l"><div class="tsps-tag">PROPRIETARY MODEL</div><h2><span class="tsps-r">Tuffy\'s</span> Storm Prediction System <div class="tip-btn" onclick="openTip(\'tipTSPS\')" style="font-size:10px;width:18px;height:18px">?</div></h2><div class="tsps-loc">'+TSPS_CFG.name+' - NWS-powered intelligence</div></div><div class="tsps-hdr-r"><div class="tsps-ulbl">LAST UPDATE</div><div class="tsps-utime">'+(tspsState.lastUpdate?tspsState.lastUpdate.toLocaleTimeString():"--")+'</div><button class="tsps-rbtn" id="tspsRB">Refresh</button></div></div>'+aH+'<div class="tsps-top"><div class="tsps-gauge-w"><div class="tsps-gauge-lbl">PEAK SEVERE WEATHER INDEX</div>'+tsps_buildGauge(pk,gs)+'</div><div class="tsps-stats"><div class="tsps-sbox"><div class="tsps-slbl">PEAK WINDOW</div><div class="tsps-sval" style="color:'+pkL.color+'">'+pw+'</div></div><div class="tsps-sbox"><div class="tsps-slbl">ACTIVE ALERTS</div><div class="tsps-sval" style="color:'+(al.length>0?"#ef4444":"#22c55e")+'">'+(al.length>0?al.length+" ACTIVE":"ALL CLEAR")+'</div></div><div class="tsps-sbox"><div class="tsps-slbl">MAX LIKELIHOOD</div><div class="tsps-sval" style="color:rgba(255,255,255,.85)">'+ml+'%</div></div></div></div><div class="tsps-sec-lbl">FORECAST PERIODS</div><div class="tsps-cards">'+cH+'</div>'+fingerprintHTML+'<div class="tsps-tl-box"><div class="tsps-ct">SEVERITY TIMELINE</div><canvas id="tsTL"></canvas></div><div class="tsps-ch-row"><div class="tsps-ch-box"><div class="tsps-ct">COMPONENT BREAKDOWN</div><canvas id="tsBA"></canvas></div></div>'+dH+'<div class="tsps-foot"><span>TSPS v2.0 - Proprietary Index - NWS API</span><span>Auto-refresh 5 min</span></div>';
 
   $("tspsRB").addEventListener("click", function(){ tsps_refresh(); });
   document.querySelectorAll(".tsps-fc").forEach(function(c){
@@ -586,11 +725,9 @@ function tsps_buildCharts() {
   if(af && af.breakdown){
     var bd=af.breakdown;
     var items=[{k:"wind",l:"Wind",m:20},{k:"gusts",l:"Gusts",m:18},{k:"precip",l:"Precip",m:14},{k:"instability",l:"Instab.",m:16},{k:"textual",l:"Fcst Text",m:22},{k:"alerts",l:"Alerts",m:10}];
-    var rdEl=$("tsRD");
-    if(rdEl) tspsState.charts.radar=new Chart(rdEl,{type:"radar",data:{labels:items.map(function(x){return x.l;}),datasets:[{data:items.map(function(x){return Math.round(bd[x.k]/x.m*100);}),borderColor:afL.color,backgroundColor:afL.color+"25",borderWidth:2,pointRadius:mob?2:3,pointBackgroundColor:afL.color}]},options:{responsive:true,maintainAspectRatio:false,scales:{r:{min:0,max:100,ticks:{display:false,stepSize:25},grid:{color:"rgba(255,255,255,.06)"},angleLines:{color:"rgba(255,255,255,.06)"},pointLabels:{font:{size:mob?8:10}}}},plugins:{legend:{display:false}}}});
 
     var baEl=$("tsBA");
-    if(baEl){var pcts=items.map(function(x){return Math.round(bd[x.k]/x.m*100);});tspsState.charts.bar=new Chart(baEl,{type:"bar",data:{labels:items.map(function(x){return x.l;}),datasets:[{data:pcts,backgroundColor:pcts.map(function(p){return p>70?"#ef4444":p>40?"#f97316":p>20?"#eab308":"#22c55e";}),borderRadius:4,barThickness:mob?12:14}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:"y",scales:{x:{min:0,max:100,grid:{color:"rgba(255,255,255,.04)"}},y:{grid:{display:false}}},plugins:{legend:{display:false}}}});}
+    if(baEl){var pcts=items.map(function(x){return Math.round(bd[x.k]/x.m*100);});tspsState.charts.bar=new Chart(baEl,{type:"bar",data:{labels:items.map(function(x){return x.l;}),datasets:[{data:pcts,backgroundColor:["#00ccff","#3b82f6","#6366f1","#eab308","#f97316","#ef4444"],borderRadius:4,barThickness:mob?12:14}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:"y",scales:{x:{min:0,max:100,grid:{color:"rgba(255,255,255,.04)"}},y:{grid:{display:false}}},plugins:{legend:{display:false}}}});}
   }
 }
 
@@ -687,6 +824,249 @@ function fetchAlmanac() {
   })
   .catch(function(e){ el.innerHTML='<div class="alm-ld" style="color:#ef4444">'+e.message+'<br><button onclick="fetchAlmanac()" style="margin-top:10px;background:var(--red2);border:1px solid var(--red);color:#fff;padding:6px 16px;border-radius:2px;cursor:pointer">Retry</button></div>'; });
 }
+
+// ============================================================
+// ACCURACY DASHBOARD
+// ============================================================
+var ACC_SHEET_URL = MC_SHEET_URL; // same Apps Script, different tab
+
+function accLogPrediction() {
+  // Get today's NWS predicted high/low
+  var today = new Date().toISOString().split("T")[0];
+
+  // Check if already logged today
+  var lastPred = null;
+  try { lastPred = localStorage.getItem("acc_last_pred"); } catch(e) {}
+  if (lastPred === today) return;
+
+  fetch("https://api.open-meteo.com/v1/forecast?latitude=35.686&longitude=-78.614&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&timezone=America%2FNew_York&forecast_days=1")
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    var hi = d.daily ? Math.round(d.daily.temperature_2m_max[0]) : null;
+    var lo = d.daily ? Math.round(d.daily.temperature_2m_min[0]) : null;
+    if (hi === null || lo === null) return;
+
+    fetch(ACC_SHEET_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        tab: "Accuracy",
+        date: today,
+        pred_high: hi,
+        pred_low: lo
+      })
+    }).then(function() {
+      try { localStorage.setItem("acc_last_pred", today); } catch(e) {}
+      console.log("ACC prediction logged: " + today + " H:" + hi + " L:" + lo);
+    });
+  })
+  .catch(function() {});
+}
+
+function accLogActuals() {
+  // Get yesterday's actual high/low from Open-Meteo archive
+  var yesterday = new Date(Date.now() - 86400000);
+  var yStr = yesterday.toISOString().split("T")[0];
+
+  var lastAct = null;
+  try { lastAct = localStorage.getItem("acc_last_actual"); } catch(e) {}
+  if (lastAct === yStr) return;
+
+  fetch("https://archive-api.open-meteo.com/v1/archive?latitude=35.686&longitude=-78.614&start_date=" + yStr + "&end_date=" + yStr + "&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&timezone=America%2FNew_York")
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    var hi = d.daily ? Math.round(d.daily.temperature_2m_max[0]) : null;
+    var lo = d.daily ? Math.round(d.daily.temperature_2m_min[0]) : null;
+    if (hi === null || lo === null) return;
+
+    fetch(ACC_SHEET_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        tab: "Accuracy",
+        date: yStr,
+        actual_high: hi,
+        actual_low: lo
+      })
+    }).then(function() {
+      try { localStorage.setItem("acc_last_actual", yStr); } catch(e) {}
+      console.log("ACC actuals logged: " + yStr + " H:" + hi + " L:" + lo);
+    });
+  })
+  .catch(function() {});
+}
+
+function accFetchAndRender() {
+  var el = $("acc-dashboard");
+  if (!el) return;
+  el.innerHTML = '<div class="acc-wrap"><div class="acc-hdr">Tuffy\'s Accuracy Dashboard <em>- Loading...</em></div><div class="alm-ld"><div class="tsps-spinner"></div></div></div>';
+
+  var url = ACC_SHEET_URL + "?tab=Accuracy";
+  fetch(url, {redirect: "follow"})
+  .then(function(r) {
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    return r.text();
+  })
+  .then(function(txt) {
+    try {
+      var d = JSON.parse(txt);
+      accRender(el, d.rows || []);
+    } catch(e) {
+      // Apps Script sometimes returns HTML redirect — try JSONP-style
+      throw new Error("Parse error");
+    }
+  })
+  .catch(function(e) {
+    console.log("ACC fetch error: " + e.message + " — trying alternate method");
+    // Alternate: use script injection to bypass CORS
+    var cbName = "accCallback" + Date.now();
+    window[cbName] = function(data) {
+      accRender(el, data.rows || []);
+      delete window[cbName];
+    };
+    // Try fetching via no-cors and render empty if needed
+    accRender(el, []);
+  });
+}
+
+function accRender(el, rows) {
+  if (!rows.length) {
+    el.innerHTML = '<div class="acc-wrap"><div class="acc-hdr">Tuffy\'s Accuracy Dashboard <em>- Forecast vs Actual</em></div><div class="acc-empty">Accuracy tracking has started. Predictions are logged daily — check back tomorrow for your first comparison.</div></div>';
+    return;
+  }
+
+  var now = new Date();
+  var day1 = new Date(now.getTime() - 86400000);
+  var week1 = new Date(now.getTime() - 604800000);
+  var month1 = new Date(now.getTime() - 2592000000);
+
+  // Score calculations
+  function calcAccuracy(rows, cutoff) {
+    var hiErrors = [], loErrors = [], hiHits = 0, loHits = 0, total = 0;
+    rows.forEach(function(r) {
+      var d = new Date(r.date);
+      if (d < cutoff) return;
+      var pH = parseFloat(r.pred_high);
+      var pL = parseFloat(r.pred_low);
+      var aH = parseFloat(r.actual_high);
+      var aL = parseFloat(r.actual_low);
+      if (isNaN(pH) || isNaN(aH) || isNaN(pL) || isNaN(aL)) return;
+      total++;
+      var hiErr = Math.abs(pH - aH);
+      var loErr = Math.abs(pL - aL);
+      hiErrors.push(hiErr);
+      loErrors.push(loErr);
+      if (hiErr <= 3) hiHits++;
+      if (loErr <= 3) loHits++;
+    });
+    if (total === 0) return null;
+    var avgHiErr = hiErrors.reduce(function(a, b) { return a + b; }, 0) / hiErrors.length;
+    var avgLoErr = loErrors.reduce(function(a, b) { return a + b; }, 0) / loErrors.length;
+    var hitPct = Math.round(((hiHits + loHits) / (total * 2)) * 100);
+    return {total: total, hitPct: hitPct, avgHiErr: avgHiErr, avgLoErr: avgLoErr};
+  }
+
+  var accAll = calcAccuracy(rows, new Date(0));
+  var accMonth = calcAccuracy(rows, month1);
+  var accWeek = calcAccuracy(rows, week1);
+  var accYesterday = calcAccuracy(rows, day1);
+
+  function scoreClass(pct) {
+    if (pct === null) return "";
+    if (pct >= 75) return "good";
+    if (pct >= 50) return "ok";
+    return "poor";
+  }
+
+  function renderScoreCard(label, acc) {
+    if (!acc) return '<div class="acc-score-card"><div class="acc-score-lbl">' + label + '</div><div class="acc-score-val">--</div><div class="acc-score-sub">No data yet</div></div>';
+    return '<div class="acc-score-card"><div class="acc-score-lbl">' + label + '</div><div class="acc-score-val ' + scoreClass(acc.hitPct) + '">' + acc.hitPct + '%</div><div class="acc-score-sub">' + acc.total + ' days tracked</div><div class="acc-score-sub">Avg error: Hi ' + acc.avgHiErr.toFixed(1) + 'F / Lo ' + acc.avgLoErr.toFixed(1) + 'F</div></div>';
+  }
+
+  var html = '<div class="acc-wrap">';
+  html += '<div class="acc-hdr">Tuffy\'s Accuracy Dashboard <em>- Forecast vs Actual Temperature</em></div>';
+
+  // Score cards
+  html += '<div class="acc-score-row">';
+  html += renderScoreCard("Yesterday", accYesterday);
+  html += renderScoreCard("Last 7 Days", accWeek);
+  html += renderScoreCard("Last 30 Days", accMonth);
+  html += renderScoreCard("All Time", accAll);
+  html += '</div>';
+
+  // Explanation
+  html += '<div style="font-size:9px;color:var(--mu2);text-align:center;margin-bottom:14px">HIT = prediction within 3F of actual | CLOSE = within 5F | MISS = off by 6F+</div>';
+
+  // Log table — most recent first
+  var sortedRows = rows.slice().reverse();
+  html += '<div class="acc-log">';
+  html += '<div class="acc-log-hdr"><div>Date</div><div>Pred High</div><div>Actual High</div><div>Pred Low</div><div>Actual Low</div><div>Result</div></div>';
+
+  var shown = 0;
+  sortedRows.forEach(function(r) {
+    if (shown >= 30) return;
+    var pH = parseFloat(r.pred_high);
+    var pL = parseFloat(r.pred_low);
+    var aH = parseFloat(r.actual_high);
+    var aL = parseFloat(r.actual_low);
+    var hasActual = !isNaN(aH) && !isNaN(aL);
+    var hasPred = !isNaN(pH) && !isNaN(pL);
+    if (!hasPred) return;
+
+    var dateStr = "";
+    if (r.date instanceof Date) {
+      dateStr = r.date.toLocaleDateString("en-US", {month: "short", day: "numeric"});
+    } else {
+      var dp = new Date(r.date + "T12:00:00");
+      dateStr = dp.toLocaleDateString("en-US", {month: "short", day: "numeric"});
+    }
+
+    var badge = '<span class="acc-badge pending">PENDING</span>';
+    if (hasActual) {
+      var hiErr = Math.abs(pH - aH);
+      var loErr = Math.abs(pL - aL);
+      var avgErr = (hiErr + loErr) / 2;
+      if (avgErr <= 3) badge = '<span class="acc-badge hit">HIT</span>';
+      else if (avgErr <= 5) badge = '<span class="acc-badge close">CLOSE</span>';
+      else badge = '<span class="acc-badge miss">MISS</span>';
+    }
+
+    var hiColor = "";
+    var loColor = "";
+    if (hasActual) {
+      hiColor = Math.abs(pH - aH) <= 3 ? "color:var(--green)" : (Math.abs(pH - aH) <= 5 ? "color:var(--yellow)" : "color:#ef4444");
+      loColor = Math.abs(pL - aL) <= 3 ? "color:var(--green)" : (Math.abs(pL - aL) <= 5 ? "color:var(--yellow)" : "color:#ef4444");
+    }
+
+    html += '<div class="acc-log-row">';
+    html += '<div class="acc-date">' + dateStr + '</div>';
+    html += '<div>' + Math.round(pH) + 'F</div>';
+    html += '<div style="' + hiColor + '">' + (hasActual ? Math.round(aH) + 'F' : '--') + '</div>';
+    html += '<div>' + Math.round(pL) + 'F</div>';
+    html += '<div style="' + loColor + '">' + (hasActual ? Math.round(aL) + 'F' : '--') + '</div>';
+    html += '<div>' + badge + '</div>';
+    html += '</div>';
+    shown++;
+  });
+
+  if (shown === 0) {
+    html += '<div class="acc-empty">No predictions logged yet. Check back tomorrow.</div>';
+  }
+
+  html += '</div>';
+  html += '<div style="font-size:8px;color:var(--mu2);text-align:center;margin-top:10px;line-height:1.7">Predictions: NWS/Open-Meteo daily forecast logged at first page load each day<br>Actuals: Open-Meteo ERA5 verified observations from the previous day<br>Accuracy tracking began ' + (rows.length > 0 ? new Date(rows[0].date + "T12:00:00").toLocaleDateString("en-US", {month: "long", day: "numeric", year: "numeric"}) : "today") + '</div>';
+  html += '</div>';
+
+  el.innerHTML = html;
+}
+
+// Start logging + load dashboard when almanac tab opens
+setTimeout(function() {
+  accLogPrediction();
+  accLogActuals();
+}, 10000);
 
 // ============================================================
 // PWS NETWORK
