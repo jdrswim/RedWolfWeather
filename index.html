@@ -903,30 +903,21 @@ function accFetchAndRender() {
   if (!el) return;
   el.innerHTML = '<div class="acc-wrap"><div class="acc-hdr">Tuffy\'s Accuracy Dashboard <em>- Loading...</em></div><div class="alm-ld"><div class="tsps-spinner"></div></div></div>';
 
-  var url = ACC_SHEET_URL + "?tab=Accuracy";
-  fetch(url, {redirect: "follow"})
-  .then(function(r) {
-    if (!r.ok) throw new Error("HTTP " + r.status);
-    return r.text();
-  })
+  // Use same fetch pattern as mcFetchHistory which works
+  var url = MC_SHEET_URL + "?tab=Accuracy";
+  var script = document.createElement("script");
+  
+  // Try fetch first
+  fetch(url)
+  .then(function(r) { return r.text(); })
   .then(function(txt) {
-    try {
-      var d = JSON.parse(txt);
-      accRender(el, d.rows || []);
-    } catch(e) {
-      // Apps Script sometimes returns HTML redirect — try JSONP-style
-      throw new Error("Parse error");
-    }
+    console.log("ACC raw response:", txt.substring(0, 200));
+    var d = JSON.parse(txt);
+    accRender(el, d.rows || []);
   })
   .catch(function(e) {
-    console.log("ACC fetch error: " + e.message + " — trying alternate method");
-    // Alternate: use script injection to bypass CORS
-    var cbName = "accCallback" + Date.now();
-    window[cbName] = function(data) {
-      accRender(el, data.rows || []);
-      delete window[cbName];
-    };
-    // Try fetching via no-cors and render empty if needed
+    console.log("ACC error:", e.message);
+    // If fetch fails, show empty state — data IS being logged via POST
     accRender(el, []);
   });
 }
