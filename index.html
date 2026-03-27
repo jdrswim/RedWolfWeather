@@ -12,9 +12,11 @@
     v=['initialize','identify','updateOptions','pageLoad','track','trackAgent'];for(w=0,x=v.length;w<x;++w)(function(m){
         o[m]=o[m]||function(){o._q[m===v[0]?'unshift':'push']([m].concat([].slice.call(arguments,0)));};})(v[w]);
         y=e.createElement(n);y.async=!0;y.src='https://cdn.pendo.io/agent/static/'+apiKey+'/pendo.js';
+        y.onload=function(){
+          pendo.initialize({visitor:{id:'visitor-'+Math.random().toString(36).substr(2,9)},account:{id:'redwolfweather'}});
+        };
         z=e.getElementsByTagName(n)[0];z.parentNode.insertBefore(y,z);})(window,document,'script','pendo');
 })('d3776cc3-c6a9-47da-ad08-045b5ddf534c');
-pendo.initialize({visitor:{id:'visitor-'+Math.random().toString(36).substr(2,9)},account:{id:'redwolfweather'}});
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
