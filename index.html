@@ -161,11 +161,37 @@ main{max-width:1100px;margin:0 auto;padding:18px;overflow-x:hidden}
 .mmci-stats{flex-direction:column}
 }
 
+/* Generic spinner (used by almanac/sun/pws) */
+@keyframes mmciSpin{to{transform:rotate(360deg)}}
 .tsps-spinner{width:36px;height:36px;border:3px solid rgba(255,255,255,.07);border-top-color:#ef4444;border-radius:50%;margin:0 auto 14px;animation:mmciSpin .8s linear infinite}
 .tsps-ld{text-align:center;padding:40px 20px}
 .tsps-ld p{font-size:11px;color:rgba(255,255,255,.35)}
 .tsps-ld p.sub{font-size:9px;color:rgba(255,255,255,.18);margin-top:4px}
-
+/* Accuracy Dashboard */
+.acc-wrap{margin-top:20px}
+.acc-hdr{font-size:13px;font-weight:900;letter-spacing:2px;color:var(–red);text-transform:uppercase;border-left:3px solid var(–red);padding-left:10px;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.acc-hdr em{color:var(–mu);font-style:normal;font-weight:500;font-size:11px;letter-spacing:1px}
+.acc-score-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.acc-score-card{background:var(–p2);border:1px solid var(–bd);border-radius:4px;padding:14px;text-align:center}
+.acc-score-lbl{font-size:9px;font-weight:800;letter-spacing:1.5px;color:var(–red);text-transform:uppercase;margin-bottom:6px}
+.acc-score-val{font-size:28px;font-weight:200;color:var(–white)}
+.acc-score-val.good{color:var(–green)}
+.acc-score-val.ok{color:var(–yellow)}
+.acc-score-val.poor{color:#ef4444}
+.acc-score-sub{font-size:10px;color:var(–mu);margin-top:4px}
+.acc-log{background:var(–p2);border:1px solid var(–bd);border-radius:4px;overflow:hidden}
+.acc-log-hdr{display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr 1fr .8fr;gap:4px;padding:10px 14px;background:var(–p1);border-bottom:1px solid var(–bd);font-size:9px;font-weight:800;letter-spacing:1px;color:var(–red);text-transform:uppercase}
+.acc-log-row{display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr 1fr .8fr;gap:4px;padding:8px 14px;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px;color:var(–white);align-items:center}
+.acc-log-row:last-child{border-bottom:none}
+.acc-log-row:hover{background:rgba(255,255,255,.02)}
+.acc-date{font-size:11px;color:var(–mu);font-weight:600}
+.acc-badge{font-size:9px;font-weight:800;padding:2px 8px;border-radius:3px;letter-spacing:1px;text-transform:uppercase}
+.acc-badge.hit{background:rgba(0,212,74,.15);color:var(–green)}
+.acc-badge.close{background:rgba(255,204,0,.15);color:var(–yellow)}
+.acc-badge.miss{background:rgba(239,68,68,.15);color:#ef4444}
+.acc-badge.pending{background:rgba(255,255,255,.06);color:var(–mu)}
+@media(max-width:760px){.acc-score-row{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.acc-score-row{grid-template-columns:1fr}.acc-log-hdr,.acc-log-row{grid-template-columns:1.2fr 1fr 1fr 1fr 1fr .8fr;font-size:10px;padding:6px 10px}}
 .hourly-wrap{overflow-x:auto}.hr-row{display:flex;gap:10px;min-width:max-content;padding-bottom:2px}.hr{background:var(–p2);border:1px solid var(–bd);border-radius:2px;padding:10px 14px;text-align:center;min-width:70px}.hr-t{font-size:10px;color:var(–mu);letter-spacing:1px;margin-bottom:4px;text-transform:uppercase}.hr-i{font-size:19px;margin-bottom:4px}.hr-v{font-size:17px;font-weight:200;color:var(–white)}.hr-p{font-size:10px;color:#77aaff;margin-top:3px}
 .ext-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}.ext-day{background:var(–p2);border:1px solid var(–bd);border-radius:3px;padding:14px 10px;text-align:center;overflow:hidden}.ext-day.today{border-color:var(–red);background:#150505}.ext-dow{font-size:13px;font-weight:900;color:var(–white);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px}.ext-date{font-size:11px;color:var(–mu);margin-bottom:9px}.ext-icon{font-size:26px;margin-bottom:7px}.ext-desc{font-size:11px;color:var(–mu);margin-bottom:9px;line-height:1.5;min-height:32px}.ext-temps{display:flex;justify-content:center;gap:9px;align-items:baseline;margin-bottom:4px}.ext-hi{font-size:20px;font-weight:600;color:var(–white)}.ext-lo{font-size:14px;color:#77aaff}.ext-pop{font-size:11px;color:#77aaff;margin-top:3px}.ext-wind{font-size:10px;color:var(–mu);margin-top:5px}.ext-range{margin-top:10px;position:relative;height:22px}.ext-range-track{position:absolute;top:8px;height:6px;border-radius:3px;opacity:.7}.ext-range-lo,.ext-range-hi{position:absolute;top:0;font-size:9px;font-weight:700;line-height:1}.ext-range-lo{color:#77aaff}.ext-range-hi{color:#ffaa55}
 .media-row{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:18px}.media-card{background:var(–p1);border:1px solid var(–bd);border-top:3px solid var(–red);border-radius:3px;padding:14px;overflow:hidden}.media-frame{width:100%;height:220px;border:1px solid var(–bd);border-radius:2px;overflow:hidden;background:#111;display:flex;align-items:center;justify-content:center}.media-frame iframe{width:100%;height:100%;border:none}.media-frame img{width:100%;height:100%;object-fit:cover}.mfooter{font-size:10px;color:var(–mu2);margin-top:6px;display:flex;align-items:center;gap:6px}.mfooter .ldot{width:5px;height:5px;background:var(–red);border-radius:50%;animation:pulse 1.4s infinite}.cam-fb{display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px}.cam-fb a{background:var(–red2);color:#fff;font-size:12px;font-weight:700;padding:8px 20px;border-radius:2px;letter-spacing:1px;border:1px solid var(–red);text-decoration:none}.cam-overlay{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.8));padding:7px 10px;pointer-events:none}.cam-overlay span{font-size:11px;color:#fff;font-weight:700;letter-spacing:1px}
@@ -226,7 +252,7 @@ footer{padding:16px 12px;margin-top:20px}footer p{font-size:9px}
 
 <!-- TOOLTIPS -->
 
-<div class="tip-overlay" id="tipVCTI"><div class="tip-panel"><button class="tip-close" onclick="closeTip('tipVCTI')">&times;</button><div class="tip-title">About the Valvano Convective Threat Index</div><div class="tip-body"><div class="tip-label">What Is This?</div>A <strong>proprietary multi-model convective intelligence engine</strong> generating a <strong>Convective Threat Index (0-100)</strong> by blending instability data from three world-class NWP models.<div class="tip-divider"></div><div class="tip-label">Data Sources</div><strong>HRRR</strong> (3km, NOAA), <strong>GFS</strong> (25km, NCEP), <strong>ECMWF IFS</strong> (9km, European Centre) — all via Open-Meteo API.<div class="tip-divider"></div><div class="tip-label">4-Component Algorithm</div><strong>CAPE</strong> (0-40): Convective Available Potential Energy<br><strong>CIN</strong> (0-20): Convective Inhibition (capping strength)<br><strong>Lifted Index</strong> (0-25): Atmospheric stability measure<br><strong>Agreement</strong> (0-15): Multi-model convergence bonus<div class="tip-divider"></div><div class="tip-label">Threat Levels</div><div class="tip-color-row"><div class="tip-swatch" style="background:#1a6b3a"></div><strong>0-9 STABLE</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#22c55e"></div><strong>10-24 MARGINAL</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#eab308"></div><strong>25-44 SLIGHT</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#f97316"></div><strong>45-64 ENHANCED</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#ef4444"></div><strong>65-84 MODERATE</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#dc2626"></div><strong>85-100 HIGH RISK</strong></div><div class="tip-divider"></div><div class="tip-label">Model Weights</div><strong>HRRR: 50%</strong> — Primary CAM, highest resolution<br><strong>GFS: 25%</strong> — Global model, extended range<br><strong>ECMWF: 25%</strong> — European model, independent verification</div></div></div>
+<div class="tip-overlay" id="tipVCTI"><div class="tip-panel"><button class="tip-close" onclick="closeTip('tipVCTI')">&times;</button><div class="tip-title">About the Valvano Convective Threat Index</div><div class="tip-body"><div class="tip-label">What Is This?</div>A <strong>proprietary multi-model convective intelligence engine</strong> blending <strong>7 world-class NWP models</strong> (HRRR, GFS, ECMWF, ICON, UKMO, GEM, ARPEGE) into a unified <strong>Convective Threat Index (0-100)</strong>.<div class="tip-divider"></div><div class="tip-label">Parameters</div><strong>CAPE</strong> (0-40 pts): Convective Available Potential Energy<br><strong>CIN</strong> (0-20 pts): Capping strength<br><strong>Lifted Index</strong> (0-25 pts): Atmospheric stability<br><strong>Agreement</strong> (0-15 pts): Multi-model convergence<div class="tip-divider"></div><div class="tip-label">Threat Levels</div><div class="tip-color-row"><div class="tip-swatch" style="background:#1a6b3a"></div><strong>0-9 STABLE</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#22c55e"></div><strong>10-24 MARGINAL</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#eab308"></div><strong>25-44 SLIGHT</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#f97316"></div><strong>45-64 ENHANCED</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#ef4444"></div><strong>65-84 MODERATE</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#dc2626"></div><strong>85-100 HIGH RISK</strong></div></div></div></div>
 <div class="tip-overlay" id="tipForecast"><div class="tip-panel"><button class="tip-close" onclick="closeTip('tipForecast')">&times;</button><div class="tip-title">Reading the 7-Day Forecast</div><div class="tip-body"><div class="tip-label">Temperature Range Bar</div>Each bar spans <strong style="color:#77aaff">Low</strong> to <strong style="color:#ffaa55">High</strong>, positioned relative to the full week.<div class="tip-divider"></div><div class="tip-color-row"><div class="tip-swatch" style="background:#ff6600"></div><strong>Orange</strong> 80F+</div><div class="tip-color-row"><div class="tip-swatch" style="background:#ffcc00"></div><strong>Yellow</strong> 60-79F</div><div class="tip-color-row"><div class="tip-swatch" style="background:#4488ff"></div><strong>Blue</strong> Below 60F</div></div></div></div>
 <div class="tip-overlay" id="tipAlmanac"><div class="tip-panel"><button class="tip-close" onclick="closeTip('tipAlmanac')">&times;</button><div class="tip-title">Raleigh Wx Almanac</div><div class="tip-body"><strong>Year-to-date climate stats</strong> vs 30-year normals (1991-2020). Data from <strong>Open-Meteo Archive</strong> (ERA5). Reference: RDU Airport.<div class="tip-divider"></div><div class="tip-color-row"><div class="tip-swatch" style="background:#ff8844"></div><strong>Orange</strong> Above normal</div><div class="tip-color-row"><div class="tip-swatch" style="background:#77aaff"></div><strong>Blue</strong> Below normal</div><div class="tip-color-row"><div class="tip-swatch" style="background:#00d44a"></div><strong>Green</strong> Near normal</div></div></div></div>
 
@@ -280,7 +306,7 @@ footer{padding:16px 12px;margin-top:20px}footer p{font-size:9px}
     </div>
   </div>
   <div style="margin-top:18px">
-    <div class="sec">Valvano Convective Threat Index <em>- HRRR + GFS + ECMWF IFS — Multi-Model Instability Analysis</em></div>
+    <div class="sec">Valvano Convective Threat Index <em>- 7-Model Convective Consensus — HRRR · GFS · ECMWF · ICON · UKMO · GEM · Météo-France</em></div>
 <div class="card" style="padding:0;overflow:hidden" id="mmci-root">
   <div class="mmci-wrap" id="mmci" style="padding:20px 22px">
     <div class="mmci-pulse" id="mmciPulse"></div>
@@ -288,7 +314,7 @@ footer{padding:16px 12px;margin-top:20px}footer p{font-size:9px}
       <div class="mmci-ld">
         <div class="mmci-spinner"></div>
         <p>Initializing Valvano Convective Threat Index...</p>
-        <p class="sub">Querying HRRR · GFS · ECMWF</p>
+        <p class="sub">Querying 7 models — HRRR · GFS · ECMWF · ICON · UKMO · GEM · ARPEGE</p>
       </div>
     </div>
   </div>
@@ -296,459 +322,207 @@ footer{padding:16px 12px;margin-top:20px}footer p{font-size:9px}
 
 <script>
 // ================================================================
-// WOLFPACK WEATHER — VALVANO CONVECTIVE THREAT INDEX (VCTI)
+// WOLFPACK WEATHER — VALVANO CONVECTIVE THREAT INDEX (VCTI) v2.0
 // ================================================================
-// Valvano Convective Threat Index: 3 world-class NWP models → 1 VCTI score
-// All data via Open-Meteo (CORS-enabled, no API key)
+// 7-Model Convective Consensus Engine
+// Primary (full instability): HRRR 3km, GFS 25km
+// Secondary (CAPE+CIN): ECMWF IFS 9km, UK Met Office 10km
+// Tertiary (CAPE only): ICON 11km, GEM/HRDPS 2.5km, Météo-France 25km
+// All via Open-Meteo — CORS-enabled, no API key
 // ================================================================
 (function(){
 "use strict";
 
-// ---- CONFIGURATION ----
 var MMCI = {
-  lat: 35.686,
-  lon: -78.614,
+  lat: 35.686, lon: -78.614,
   name: "Red Wolf Farm — S. Wake County, NC",
-  refresh: 600000, // 10 min
-  // Model definitions with weights for the blended CTI
+  refresh: 600000,
   models: [
-    {
-      id: "hrrr",
-      name: "HRRR",
-      full: "High-Resolution Rapid Refresh",
-      res: "3km / Hourly / 48h",
-      color: "#ef4444",
-      // HRRR gets highest weight: it's THE convection-allowing model
-      weight: 0.50,
-      apiModel: "hrrr_conus",
-      days: 2
-    },
-    {
-      id: "gfs",
-      name: "GFS",
-      full: "Global Forecast System",
-      res: "25km / 3-Hourly / 16d",
-      color: "#3b82f6",
-      weight: 0.25,
-      apiModel: "gfs_seamless",
-      days: 3
-    },
-    {
-      id: "ecmwf",
-      name: "ECMWF IFS",
-      full: "European Centre for Medium-Range",
-      res: "9km / 6-Hourly / 10d",
-      color: "#a855f7",
-      weight: 0.25,
-      apiModel: "ecmwf_ifs025",
-      days: 3
-    }
+    // TIER 1: Full instability (CAPE + CIN + Lifted Index)
+    {id:"hrrr",  name:"HRRR",     full:"High-Resolution Rapid Refresh",   res:"3km",  color:"#ef4444", weight:0.30, tier:1, apiModel:"hrrr_conus",  days:2, hasCin:true,  hasLi:true},
+    {id:"gfs",   name:"GFS",      full:"Global Forecast System",          res:"25km", color:"#3b82f6", weight:0.15, tier:1, apiModel:"gfs_seamless", days:3, hasCin:true,  hasLi:true},
+    // TIER 2: CAPE + CIN (no Lifted Index)
+    {id:"ecmwf", name:"ECMWF",    full:"European Centre (IFS)",           res:"9km",  color:"#a855f7", weight:0.15, tier:2, apiModel:"ecmwf_ifs025", days:3, hasCin:true,  hasLi:false},
+    {id:"ukmo",  name:"UKMO",     full:"UK Met Office (Global)",          res:"10km", color:"#06b6d4", weight:0.10, tier:2, apiModel:"ukmo_global_10km", days:3, hasCin:true, hasLi:false},
+    // TIER 3: CAPE only
+    {id:"icon",  name:"ICON",     full:"DWD ICON (Global)",               res:"11km", color:"#22c55e", weight:0.10, tier:3, apiModel:"icon_global",  days:3, hasCin:false, hasLi:false},
+    {id:"gem",   name:"GEM",      full:"Canadian GEM/HRDPS",              res:"2.5km",color:"#f59e0b", weight:0.10, tier:3, apiModel:"gem_seamless", days:3, hasCin:false, hasLi:false},
+    {id:"mf",    name:"ARPEGE",   full:"Météo-France ARPEGE",             res:"25km", color:"#ec4899", weight:0.10, tier:3, apiModel:"meteofrance_arpege_world", days:3, hasCin:false, hasLi:false}
   ]
 };
 
-// ---- STATE ----
-var state = {
-  modelData: {},    // keyed by model id
-  blended: null,    // blended CTI object
-  activeModel: 0,   // index into MMCI.models for detail view
-  lastUpdate: null,
-  charts: {},
-  peakCTI: 0
-};
+var state = {modelData:{}, blended:null, activeModel:0, lastUpdate:null, charts:{}, peakCTI:0};
 
-// ---- CAPE THREAT LEVELS ----
-// Based on SPC operational thresholds
-function capeThreat(cape){
-  if(cape<250) return {label:"NEGLIGIBLE",color:"#1a6b3a",desc:"No convective threat"};
-  if(cape<1000) return {label:"MARGINAL",color:"#22c55e",desc:"Isolated weak storms possible"};
-  if(cape<2000) return {label:"MODERATE",color:"#eab308",desc:"Organized storms possible"};
-  if(cape<3000) return {label:"HIGH",color:"#f97316",desc:"Strong-to-severe storms likely"};
-  if(cape<4500) return {label:"EXTREME",color:"#ef4444",desc:"Significant severe potential"};
-  return {label:"CRITICAL",color:"#dc2626",desc:"Violent storms possible"};
+function capeThreat(c){
+  if(c<250) return{label:"NEGLIGIBLE",color:"#1a6b3a",desc:"No convective threat"};
+  if(c<1000) return{label:"MARGINAL",color:"#22c55e",desc:"Isolated weak storms possible"};
+  if(c<2000) return{label:"MODERATE",color:"#eab308",desc:"Organized storms possible"};
+  if(c<3000) return{label:"HIGH",color:"#f97316",desc:"Strong-to-severe storms likely"};
+  if(c<4500) return{label:"EXTREME",color:"#ef4444",desc:"Significant severe potential"};
+  return{label:"CRITICAL",color:"#dc2626",desc:"Violent storms possible"};
 }
 
-// ---- VCTI (Valvano Convective Threat Index) 0-100 ----
-// Proprietary composite: CAPE (0-40) + CIN (0-20) + LI (0-25) + Agreement (0-15)
-function computeCTI(cape, cin, li, agreement){
-  var capeScore = 0;
-  if(cape>=5000) capeScore=40;
-  else if(cape>=4000) capeScore=36;
-  else if(cape>=3000) capeScore=32;
-  else if(cape>=2500) capeScore=28;
-  else if(cape>=2000) capeScore=24;
-  else if(cape>=1500) capeScore=20;
-  else if(cape>=1000) capeScore=15;
-  else if(cape>=750) capeScore=11;
-  else if(cape>=500) capeScore=7;
-  else if(cape>=250) capeScore=4;
-  else capeScore=Math.round(cape/250*4);
-
-  // CIN: negative values indicate convective inhibition
-  // Less negative (closer to 0) = easier trigger = higher threat
-  var cinAbs = Math.abs(cin||0);
-  var cinScore = 0;
-  if(cinAbs<=10) cinScore=20;       // uncapped — storms fire freely
-  else if(cinAbs<=25) cinScore=17;
-  else if(cinAbs<=50) cinScore=14;
-  else if(cinAbs<=100) cinScore=10;
-  else if(cinAbs<=200) cinScore=6;
-  else if(cinAbs<=300) cinScore=3;
-  else cinScore=1;
-  // If CAPE is near zero, CIN doesn't matter
-  if(cape<100) cinScore=Math.round(cinScore*0.1);
-
-  // Lifted Index: negative = unstable, positive = stable
-  var liScore = 0;
-  if(li<=-8) liScore=25;
-  else if(li<=-6) liScore=22;
-  else if(li<=-4) liScore=18;
-  else if(li<=-2) liScore=14;
-  else if(li<=-1) liScore=10;
-  else if(li<=0) liScore=6;
-  else if(li<=2) liScore=3;
-  else liScore=0;
-
-  // Agreement bonus: 0-15 based on how well models agree
-  var agreeScore = Math.round(agreement * 15);
-
-  return Math.min(100, capeScore + cinScore + liScore + agreeScore);
+function computeCTI(cape,cin,li,agreement){
+  var cs=0;
+  if(cape>=5000)cs=40;else if(cape>=4000)cs=36;else if(cape>=3000)cs=32;else if(cape>=2500)cs=28;else if(cape>=2000)cs=24;else if(cape>=1500)cs=20;else if(cape>=1000)cs=15;else if(cape>=750)cs=11;else if(cape>=500)cs=7;else if(cape>=250)cs=4;else cs=Math.round(cape/250*4);
+  var ca=Math.abs(cin||0),cis=0;
+  if(ca<=10)cis=20;else if(ca<=25)cis=17;else if(ca<=50)cis=14;else if(ca<=100)cis=10;else if(ca<=200)cis=6;else if(ca<=300)cis=3;else cis=1;
+  if(cape<100)cis=Math.round(cis*0.1);
+  var ls=0;
+  if(li<=-8)ls=25;else if(li<=-6)ls=22;else if(li<=-4)ls=18;else if(li<=-2)ls=14;else if(li<=-1)ls=10;else if(li<=0)ls=6;else if(li<=2)ls=3;
+  return Math.min(100,cs+cis+ls+Math.round(agreement*15));
 }
 
-// ---- CTI THREAT LEVEL ----
-function ctiLevel(score){
-  if(score<10) return {label:"STABLE",color:"#1a6b3a",desc:"No convective threat"};
-  if(score<25) return {label:"MARGINAL",color:"#22c55e",desc:"Weak instability present"};
-  if(score<45) return {label:"SLIGHT",color:"#eab308",desc:"Isolated storms possible"};
-  if(score<65) return {label:"ENHANCED",color:"#f97316",desc:"Organized convection likely"};
-  if(score<85) return {label:"MODERATE",color:"#ef4444",desc:"Widespread severe potential"};
-  return {label:"HIGH RISK",color:"#dc2626",desc:"Significant severe outbreak"};
+function ctiLevel(s){
+  if(s<10) return{label:"STABLE",color:"#1a6b3a",desc:"No convective threat"};
+  if(s<25) return{label:"MARGINAL",color:"#22c55e",desc:"Weak instability present"};
+  if(s<45) return{label:"SLIGHT",color:"#eab308",desc:"Isolated storms possible"};
+  if(s<65) return{label:"ENHANCED",color:"#f97316",desc:"Organized convection likely"};
+  if(s<85) return{label:"MODERATE",color:"#ef4444",desc:"Widespread severe potential"};
+  return{label:"HIGH RISK",color:"#dc2626",desc:"Significant severe outbreak"};
 }
 
-// ---- FETCH ALL MODELS ----
+// ---- FETCH ----
 function fetchAllModels(){
-  var cont = document.getElementById("mmciContent");
-  cont.innerHTML = '<div class="mmci-ld"><div class="mmci-spinner"></div><p>Querying convection-allowing models...</p><p class="sub">HRRR · GFS · ECMWF IFS — Open-Meteo API</p></div>';
-
-  var promises = MMCI.models.map(function(m){
-    var url = "https://api.open-meteo.com/v1/forecast?latitude="+MMCI.lat+"&longitude="+MMCI.lon
-      +"&hourly=cape,lifted_index,convective_inhibition"
-      +"&models="+m.apiModel
+  var cont=document.getElementById("mmciContent");
+  cont.innerHTML='<div class="mmci-ld"><div class="mmci-spinner"></div><p>Querying 7 convective models...</p><p class="sub">HRRR · GFS · ECMWF · ICON · UKMO · GEM · ARPEGE</p></div>';
+  var promises=MMCI.models.map(function(m){
+    // Build variable list based on what the model supports
+    var vars="cape";
+    if(m.hasCin) vars+=",convective_inhibition";
+    if(m.hasLi) vars+=",lifted_index";
+    var url="https://api.open-meteo.com/v1/forecast?latitude="+MMCI.lat+"&longitude="+MMCI.lon
+      +"&hourly="+vars+"&models="+m.apiModel
       +"&timezone=America%2FNew_York&forecast_days="+m.days
       +"&temperature_unit=fahrenheit&wind_speed_unit=mph";
     return fetch(url)
-      .then(function(r){if(!r.ok) throw new Error(m.name+" API "+r.status);return r.json();})
+      .then(function(r){if(!r.ok)throw new Error(m.name+" "+r.status);return r.json();})
       .then(function(d){
-        // Open-Meteo nests model data under hourly_units and hourly
-        // with model suffix keys like cape_hrrr_conus
-        var hourly = d.hourly || {};
-        var times = hourly.time || [];
-        // Find the right keys — they may be suffixed with model name or not
-        var capeKey=null,cinKey=null,liKey=null;
-        for(var k in hourly){
-          if(k.indexOf("cape")===0) capeKey=k;
-          if(k.indexOf("convective_inhibition")===0) cinKey=k;
-          if(k.indexOf("lifted_index")===0) liKey=k;
-        }
-        var capeArr = capeKey?hourly[capeKey]:[];
-        var cinArr = cinKey?hourly[cinKey]:[];
-        var liArr = liKey?hourly[liKey]:[];
-        return {id:m.id,ok:true,times:times,cape:capeArr,cin:cinArr,li:liArr};
+        var h=d.hourly||{},cK=null,ciK=null,lK=null;
+        for(var k in h){if(k.indexOf("cape")===0)cK=k;if(k.indexOf("convective_inhibition")===0)ciK=k;if(k.indexOf("lifted_index")===0)lK=k;}
+        return{id:m.id,ok:true,times:h.time||[],cape:cK?h[cK]:[],cin:ciK?h[ciK]:[],li:lK?h[lK]:[]};
       })
-      .catch(function(e){
-        console.warn("MMCI: "+m.name+" failed:",e.message);
-        return {id:m.id,ok:false,times:[],cape:[],cin:[],li:[],error:e.message};
-      });
+      .catch(function(e){console.warn("VCTI: "+m.name+" failed:",e.message);return{id:m.id,ok:false,times:[],cape:[],cin:[],li:[]};});
   });
-
-  Promise.all(promises).then(function(results){
-    // Store raw data
-    results.forEach(function(r){state.modelData[r.id]=r;});
-    processAndRender();
-  });
+  Promise.all(promises).then(function(res){res.forEach(function(r){state.modelData[r.id]=r;});processAndRender();});
 }
 
-// ---- PROCESS DATA + COMPUTE BLENDED CTI ----
+// ---- PROCESS ----
 function processAndRender(){
-  var now = new Date();
-  var models = MMCI.models;
-  var blendedTimeline = [];
-
-  // Find current + next 24h indices for each model
+  var now=new Date(), models=MMCI.models;
   models.forEach(function(m){
-    var d = state.modelData[m.id];
-    if(!d||!d.ok) return;
-    // Find current hour data
-    var nowIdx = -1, bestDiff = Infinity;
-    for(var i=0;i<d.times.length;i++){
-      var t = new Date(d.times[i]);
-      var diff = Math.abs(t - now);
-      if(diff < bestDiff){bestDiff=diff;nowIdx=i;}
-    }
-    d.currentIdx = nowIdx;
-    d.currentCape = (nowIdx>=0 && d.cape[nowIdx]!=null) ? d.cape[nowIdx] : 0;
-    d.currentCin = (nowIdx>=0 && d.cin[nowIdx]!=null) ? d.cin[nowIdx] : 0;
-    d.currentLi = (nowIdx>=0 && d.li[nowIdx]!=null) ? d.li[nowIdx] : 0;
-    // Peak CAPE in next 24h
-    var peakCape=0, peakIdx=nowIdx;
-    var limit = now.getTime() + 24*3600000;
-    for(var j=Math.max(0,nowIdx);j<d.times.length;j++){
-      if(new Date(d.times[j]).getTime()>limit) break;
-      if(d.cape[j]!=null && d.cape[j]>peakCape){peakCape=d.cape[j];peakIdx=j;}
-    }
-    d.peakCape24 = peakCape;
-    d.peakIdx24 = peakIdx;
-    d.peakCin24 = (d.cin[peakIdx]!=null)?d.cin[peakIdx]:0;
-    d.peakLi24 = (d.li[peakIdx]!=null)?d.li[peakIdx]:0;
-    d.peakTime24 = d.times[peakIdx]||null;
+    var d=state.modelData[m.id]; if(!d||!d.ok)return;
+    var nI=-1,bD=Infinity;
+    for(var i=0;i<d.times.length;i++){var df=Math.abs(new Date(d.times[i])-now);if(df<bD){bD=df;nI=i;}}
+    d.currentIdx=nI;
+    d.currentCape=(nI>=0&&d.cape[nI]!=null)?d.cape[nI]:0;
+    d.currentCin=(nI>=0&&d.cin[nI]!=null)?d.cin[nI]:0;
+    d.currentLi=(nI>=0&&d.li[nI]!=null)?d.li[nI]:0;
+    var pk=0,pI=nI,lim=now.getTime()+24*3600000;
+    for(var j=Math.max(0,nI);j<d.times.length;j++){if(new Date(d.times[j]).getTime()>lim)break;if(d.cape[j]!=null&&d.cape[j]>pk){pk=d.cape[j];pI=j;}}
+    d.peakCape24=pk; d.peakIdx24=pI;
+    d.peakCin24=(d.cin[pI]!=null)?d.cin[pI]:0;
+    d.peakLi24=(d.li[pI]!=null)?d.li[pI]:0;
+    d.peakTime24=d.times[pI]||null;
   });
-
-  // Compute blended current values using weights
-  var bCape=0, bCin=0, bLi=0, totalWeight=0;
-  var validModels = [];
+  // Weighted blend
+  var bC=0,bCi=0,bL=0,tW=0,vm=[],cinW=0,liW=0,bCiW=0,bLW=0;
   models.forEach(function(m){
-    var d = state.modelData[m.id];
-    if(!d||!d.ok) return;
-    validModels.push(m);
-    bCape += d.currentCape * m.weight;
-    bCin += d.currentCin * m.weight;
-    bLi += d.currentLi * m.weight;
-    totalWeight += m.weight;
+    var d=state.modelData[m.id]; if(!d||!d.ok)return;
+    vm.push(m);
+    bC+=d.currentCape*m.weight; tW+=m.weight;
+    if(m.hasCin){bCi+=d.currentCin*m.weight; cinW+=m.weight;}
+    if(m.hasLi){bL+=d.currentLi*m.weight; liW+=m.weight;}
   });
-  if(totalWeight>0){bCape/=totalWeight;bCin/=totalWeight;bLi/=totalWeight;}
-
-  // Model agreement: how closely do they agree on CAPE?
-  var agreement = 0;
-  if(validModels.length>=2){
-    var capeValues = validModels.map(function(m){return state.modelData[m.id].currentCape;});
-    var maxC = Math.max.apply(null,capeValues), minC = Math.min.apply(null,capeValues);
-    var meanC = capeValues.reduce(function(a,b){return a+b;},0)/capeValues.length;
-    var spread = maxC - minC;
-    // Agreement = 1.0 when models are within 10% of each other
-    if(meanC<50) agreement=1.0; // all models say negligible = perfect agreement
-    else agreement = Math.max(0, 1.0 - (spread / (meanC * 2)));
-  } else {
-    agreement = 0.5;
-  }
-
-  // Blended CTI
-  var currentCTI = computeCTI(bCape, bCin, bLi, agreement);
-
-  // Peak CTI in next 24h (using peak from each model)
-  var pCape=0,pCin=0,pLi=0,pTW=0;
-  validModels.forEach(function(m){
-    var d=state.modelData[m.id];
-    pCape += d.peakCape24*m.weight;
-    pCin += d.peakCin24*m.weight;
-    pLi += d.peakLi24*m.weight;
-    pTW += m.weight;
-  });
-  if(pTW>0){pCape/=pTW;pCin/=pTW;pLi/=pTW;}
-  var peakCTI = computeCTI(pCape, pCin, pLi, agreement);
-
-  state.blended = {
-    cape: Math.round(bCape),
-    cin: Math.round(bCin),
-    li: +bLi.toFixed(1),
-    cti: currentCTI,
-    peakCTI: peakCTI,
-    peakCape: Math.round(pCape),
-    agreement: agreement
-  };
-  state.peakCTI = Math.max(currentCTI, peakCTI);
-  state.lastUpdate = new Date();
-
+  if(tW>0)bC/=tW;
+  if(cinW>0)bCi/=cinW; // only average CIN across models that have it
+  if(liW>0)bL/=liW;    // only average LI across models that have it
+  // Agreement
+  var ag=0;
+  if(vm.length>=2){
+    var cv=vm.map(function(m){return state.modelData[m.id].currentCape;});
+    var mx=Math.max.apply(null,cv),mn=Math.min.apply(null,cv);
+    var me=cv.reduce(function(a,b){return a+b;},0)/cv.length;
+    ag=me<50?1.0:Math.max(0,1-(mx-mn)/(me*2));
+  }else ag=0.5;
+  var cCTI=computeCTI(bC,bCi,bL,ag);
+  // Peak 24h
+  var pC=0,pCi=0,pL=0,pW=0,pCiW=0,pLW=0;
+  vm.forEach(function(m){var d=state.modelData[m.id];pC+=d.peakCape24*m.weight;pW+=m.weight;if(m.hasCin){pCi+=d.peakCin24*m.weight;pCiW+=m.weight;}if(m.hasLi){pL+=d.peakLi24*m.weight;pLW+=m.weight;}});
+  if(pW>0)pC/=pW;if(pCiW>0)pCi/=pCiW;if(pLW>0)pL/=pLW;
+  var pCTI=computeCTI(pC,pCi,pL,ag);
+  state.blended={cape:Math.round(bC),cin:Math.round(bCi),li:+bL.toFixed(1),cti:cCTI,peakCTI:pCTI,peakCape:Math.round(pC),agreement:ag,modelsOnline:vm.length,modelsTotal:models.length};
+  state.peakCTI=Math.max(cCTI,pCTI);
+  state.lastUpdate=new Date();
   renderDashboard();
 }
 
 // ---- GAUGE SVG ----
-function buildGauge(score, size){
-  var lv = ctiLevel(score);
-  var r=size*0.38, cx=size/2, cy=size/2+10;
-  var sA=-220, eA=40, tot=eA-sA;
-  var scA = sA + (score/100)*tot;
+function buildGauge(score,size){
+  var lv=ctiLevel(score),r=size*0.38,cx=size/2,cy=size/2+10,sA=-220,eA=40,tot=eA-sA,scA=sA+(score/100)*tot;
   function p2c(a,rd){return{x:cx+rd*Math.cos(a*Math.PI/180),y:cy+rd*Math.sin(a*Math.PI/180)};}
   function arc(a1,a2,rd){var s=p2c(a1,rd),e=p2c(a2,rd);return"M "+s.x+" "+s.y+" A "+rd+" "+rd+" 0 "+(a2-a1>180?1:0)+" 1 "+e.x+" "+e.y;}
-  var ticks=[0,10,25,45,65,85,100],tk="";
-  ticks.forEach(function(t){
-    var a=sA+(t/100)*tot,i=p2c(a,r-12),o=p2c(a,r+12),l=p2c(a,r+22);
-    tk+='<line x1="'+i.x+'" y1="'+i.y+'" x2="'+o.x+'" y2="'+o.y+'" stroke="rgba(255,255,255,.18)" stroke-width="1.5"/>';
-    tk+='<text x="'+l.x+'" y="'+l.y+'" fill="rgba(255,255,255,.3)" font-size="7.5" text-anchor="middle" dominant-baseline="middle" font-family="Segoe UI,sans-serif">'+t+'</text>';
-  });
+  var tks=[0,10,25,45,65,85,100],tk="";
+  tks.forEach(function(t){var a=sA+(t/100)*tot,i=p2c(a,r-12),o=p2c(a,r+12),l=p2c(a,r+22);tk+='<line x1="'+i.x+'" y1="'+i.y+'" x2="'+o.x+'" y2="'+o.y+'" stroke="rgba(255,255,255,.18)" stroke-width="1.5"/><text x="'+l.x+'" y="'+l.y+'" fill="rgba(255,255,255,.3)" font-size="7.5" text-anchor="middle" dominant-baseline="middle" font-family="Segoe UI,sans-serif">'+t+'</text>';});
   var np=p2c(scA,r-2),h=size*0.72;
-  return '<svg viewBox="0 0 '+size+' '+h+'" style="width:100%;max-width:'+size+'px;height:auto">'+
-    '<defs>'+
-    '<linearGradient id="mmciG" x1="0%" x2="100%"><stop offset="0%" stop-color="#1a472a"/><stop offset="20%" stop-color="#22c55e"/><stop offset="40%" stop-color="#eab308"/><stop offset="60%" stop-color="#f97316"/><stop offset="80%" stop-color="#ef4444"/><stop offset="100%" stop-color="#dc2626"/></linearGradient>'+
-    '<filter id="mmciGl"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'+
-    '</defs>'+
-    '<path d="'+arc(sA,eA,r)+'" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="14" stroke-linecap="round"/>'+
-    '<path d="'+arc(sA,scA,r)+'" fill="none" stroke="url(#mmciG)" stroke-width="14" stroke-linecap="round" filter="url(#mmciGl)"/>'+
-    tk+
-    '<circle cx="'+np.x+'" cy="'+np.y+'" r="5.5" fill="'+lv.color+'" filter="url(#mmciGl)"/>'+
-    '<text x="'+cx+'" y="'+(cy-18)+'" fill="'+lv.color+'" font-size="36" font-weight="800" text-anchor="middle" dominant-baseline="middle" filter="url(#mmciGl)" font-family="Segoe UI,sans-serif">'+score+'</text>'+
-    '<text x="'+cx+'" y="'+(cy+8)+'" fill="'+lv.color+'" font-size="11" font-weight="700" text-anchor="middle" letter-spacing="3" font-family="Segoe UI,sans-serif">'+lv.label+'</text>'+
-    '<text x="'+cx+'" y="'+(cy+24)+'" fill="rgba(255,255,255,.4)" font-size="7.5" text-anchor="middle" font-family="Segoe UI,sans-serif">'+lv.desc+'</text>'+
-    '</svg>';
+  return'<svg viewBox="0 0 '+size+' '+h+'" style="width:100%;max-width:'+size+'px;height:auto"><defs><linearGradient id="mmciG" x1="0%" x2="100%"><stop offset="0%" stop-color="#1a472a"/><stop offset="20%" stop-color="#22c55e"/><stop offset="40%" stop-color="#eab308"/><stop offset="60%" stop-color="#f97316"/><stop offset="80%" stop-color="#ef4444"/><stop offset="100%" stop-color="#dc2626"/></linearGradient><filter id="mmciGl"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><path d="'+arc(sA,eA,r)+'" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="14" stroke-linecap="round"/><path d="'+arc(sA,scA,r)+'" fill="none" stroke="url(#mmciG)" stroke-width="14" stroke-linecap="round" filter="url(#mmciGl)"/>'+tk+'<circle cx="'+np.x+'" cy="'+np.y+'" r="5.5" fill="'+lv.color+'" filter="url(#mmciGl)"/><text x="'+cx+'" y="'+(cy-18)+'" fill="'+lv.color+'" font-size="36" font-weight="800" text-anchor="middle" dominant-baseline="middle" filter="url(#mmciGl)" font-family="Segoe UI,sans-serif">'+score+'</text><text x="'+cx+'" y="'+(cy+8)+'" fill="'+lv.color+'" font-size="11" font-weight="700" text-anchor="middle" letter-spacing="3" font-family="Segoe UI,sans-serif">'+lv.label+'</text><text x="'+cx+'" y="'+(cy+24)+'" fill="rgba(255,255,255,.4)" font-size="7.5" text-anchor="middle" font-family="Segoe UI,sans-serif">'+lv.desc+'</text></svg>';
 }
 
-// ---- MODEL CONVERGENCE RADAR (radar chart SVG) ----
-function buildConvergenceRadar(){
-  var models = MMCI.models;
-  var axes = [
-    {key:"cape",label:"CAPE",max:5000},
-    {key:"cin",label:"CIN",max:300,invert:true},
-    {key:"li",label:"LIFTED IDX",max:10,invert:true}
-  ];
-  var cx=160,cy=130,R=95,n=axes.length;
-  function polar(i,r){var a=(Math.PI*2/n)*i-Math.PI/2;return{x:cx+r*Math.cos(a),y:cy+r*Math.sin(a)};}
-
-  var svg='<svg viewBox="0 0 320 270" class="mmci-radar-svg" xmlns="http://www.w3.org/2000/svg">';
-  svg+='<defs>';
-  models.forEach(function(m,i){
-    svg+='<filter id="mmciRG'+i+'"><feGaussianBlur stdDeviation="3" result="b"/><feFlood flood-color="'+m.color+'" flood-opacity=".5"/><feComposite in2="b" operator="in"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
-  });
-  svg+='</defs>';
-
-  // Grid rings
-  [0.25,0.5,0.75,1.0].forEach(function(pct){
-    var pts=[];
-    for(var i=0;i<n;i++){var p=polar(i,R*pct);pts.push(p.x+","+p.y);}
-    svg+='<polygon points="'+pts.join(" ")+'" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="1"/>';
-  });
-  // Axis lines + labels
-  for(var i=0;i<n;i++){
-    var p=polar(i,R),lp=polar(i,R+18);
-    svg+='<line x1="'+cx+'" y1="'+cy+'" x2="'+p.x+'" y2="'+p.y+'" stroke="rgba(255,255,255,.08)" stroke-width="1"/>';
-    svg+='<text x="'+lp.x+'" y="'+lp.y+'" text-anchor="middle" fill="rgba(255,255,255,.35)" font-size="7.5" font-weight="700" letter-spacing="1" font-family="Segoe UI,sans-serif">'+axes[i].label+'</text>';
-  }
-
-  // Plot each model
-  models.forEach(function(m,mi){
-    var d = state.modelData[m.id];
-    if(!d||!d.ok) return;
-    var pts=[];
-    axes.forEach(function(ax,ai){
-      var raw;
-      if(ax.key==="cape") raw=d.currentCape;
-      else if(ax.key==="cin") raw=Math.abs(d.currentCin||0);
-      else raw=d.currentLi!=null?-d.currentLi:0; // negate so more negative LI = higher
-      if(ax.invert && ax.key==="cin") raw=Math.abs(d.currentCin||0); // already abs
-      if(ax.invert && ax.key==="li") raw=d.currentLi!=null?Math.max(0,-d.currentLi):0;
-      var pct=Math.max(0.05, Math.min(1, raw/ax.max));
-      var p=polar(ai,R*pct);
-      pts.push({x:p.x,y:p.y,pct:pct});
-    });
-    // Shape fill
-    svg+='<polygon points="'+pts.map(function(p){return p.x+","+p.y;}).join(" ")+'" fill="'+m.color+'" fill-opacity=".08" stroke="'+m.color+'" stroke-width="1.5" stroke-opacity=".5"/>';
-    // Dots
-    pts.forEach(function(p,pi){
-      var sz = 3+p.pct*3;
-      svg+='<circle cx="'+p.x+'" cy="'+p.y+'" r="'+sz+'" fill="'+m.color+'" fill-opacity="'+(0.5+p.pct*0.4)+'" filter="url(#mmciRG'+mi+')"/>';
-      svg+='<circle cx="'+p.x+'" cy="'+p.y+'" r="1.5" fill="white" fill-opacity=".7"/>';
-    });
-  });
-
-  // Center score
-  var b=state.blended, bLv=ctiLevel(b.cti);
-  svg+='<circle cx="'+cx+'" cy="'+cy+'" r="20" fill="rgba(0,0,0,.6)" stroke="'+bLv.color+'" stroke-width="2" stroke-opacity=".5"/>';
-  svg+='<text x="'+cx+'" y="'+(cy+1)+'" text-anchor="middle" dominant-baseline="middle" fill="'+bLv.color+'" font-size="14" font-weight="800" font-family="Segoe UI,sans-serif">'+b.cti+'</text>';
-  svg+='<text x="'+cx+'" y="'+(cy+12)+'" text-anchor="middle" fill="rgba(255,255,255,.25)" font-size="5.5" font-weight="700" letter-spacing="1.5" font-family="Segoe UI,sans-serif">VCTI</text>';
-  svg+='</svg>';
-
-  // Legend
-  var legend='<div class="mmci-radar-legend">';
-  models.forEach(function(m){
-    var d=state.modelData[m.id];
-    legend+='<div class="mmci-radar-leg"><div class="mmci-radar-dot" style="background:'+m.color+(d&&d.ok?'':';opacity:.2')+'"></div>'+m.name+'</div>';
-  });
-  legend+='</div>';
-  return svg+legend;
-}
-
-// ---- RENDER DASHBOARD ----
+// ---- RENDER ----
 function renderDashboard(){
-  var cont = document.getElementById("mmciContent");
-  var wrap = document.getElementById("mmci");
-  var pulse = document.getElementById("mmciPulse");
-  var b = state.blended;
-  var bLv = ctiLevel(b.cti);
-  var pkLv = ctiLevel(state.peakCTI);
+  var cont=document.getElementById("mmciContent"),wrap=document.getElementById("mmci"),pulse=document.getElementById("mmciPulse");
+  var b=state.blended,bLv=ctiLevel(b.cti),pkLv=ctiLevel(state.peakCTI);
+  if(state.peakCTI>=45){wrap.classList.add("mmci-active");pulse.style.background="linear-gradient(90deg,transparent,"+pkLv.color+",transparent)";}else wrap.classList.remove("mmci-active");
+  var gs=Math.min(230,Math.max(180,wrap.clientWidth*0.5));
+  var hasData=MMCI.models.some(function(m){var d=state.modelData[m.id];return d&&d.ok&&d.cape.length>0;});
+  var agP=Math.round(b.agreement*100),agC=agP>=80?"#22c55e":(agP>=50?"#eab308":"#ef4444"),agL=agP>=80?"HIGH":(agP>=50?"MODERATE":"LOW");
 
-  // Pulse bar for elevated threat
-  if(state.peakCTI >= 45){
-    wrap.classList.add("mmci-active");
-    pulse.style.background = "linear-gradient(90deg,transparent,"+pkLv.color+",transparent)";
-  } else {
-    wrap.classList.remove("mmci-active");
-  }
-
-  var gaugeSize = Math.min(230, Math.max(180, wrap.clientWidth * 0.5));
-
-  // Agreement display
-  var agPct = Math.round(b.agreement*100);
-  var agCol = agPct>=80?"#22c55e":(agPct>=50?"#eab308":"#ef4444");
-  var agLbl = agPct>=80?"HIGH":(agPct>=50?"MODERATE":"LOW");
-
-  // Model cards
-  var cardsH = "";
-  MMCI.models.forEach(function(m, idx){
-    var d = state.modelData[m.id];
-    var isAct = idx === state.activeModel;
-    if(!d||!d.ok){
-      cardsH += '<div class="mmci-mc'+(isAct?' act':'')+'" data-idx="'+idx+'"><div class="mmci-mc-stripe" style="background:'+m.color+'"></div><div class="mmci-mc-name" style="color:'+m.color+'">'+m.name+'</div><div style="color:rgba(255,255,255,.25);font-size:10px;padding:20px 0">Offline</div></div>';
-      return;
+  // ---- MODEL CONSENSUS STRIP: compact horizontal bar showing all 7 models ----
+  var stripH='<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:16px">';
+  MMCI.models.forEach(function(m,idx){
+    var d=state.modelData[m.id],ok=d&&d.ok,cape=ok?Math.round(d.currentCape):0;
+    var lv=ok?capeThreat(cape):{color:"#333",label:"--"};
+    var isAct=idx===state.activeModel;
+    stripH+='<div data-idx="'+idx+'" style="flex:1;min-width:80px;background:'+(isAct?'rgba('+hexRgb(m.color)+',.15)':'rgba(255,255,255,.025)')+';border:1px solid '+(isAct?m.color+'55':'rgba(255,255,255,.06)')+';border-top:3px solid '+m.color+';border-radius:6px;padding:8px 6px;text-align:center;cursor:pointer;transition:all .2s">';
+    stripH+='<div style="font-size:8px;font-weight:800;letter-spacing:1px;color:'+m.color+';text-transform:uppercase">'+m.name+'</div>';
+    stripH+='<div style="font-size:7px;color:rgba(255,255,255,.2);margin-top:1px">'+m.res+'</div>';
+    if(ok){
+      stripH+='<div style="font-size:20px;font-weight:200;color:#fff;margin-top:4px;line-height:1">'+cape+'</div>';
+      stripH+='<div style="font-size:6px;color:rgba(255,255,255,.2);letter-spacing:1px">J/kg</div>';
+      stripH+='<div style="height:2px;background:rgba(255,255,255,.04);border-radius:1px;margin-top:4px;overflow:hidden"><div style="height:100%;width:'+Math.min(100,Math.round(cape/5000*100))+'%;background:'+lv.color+';border-radius:1px"></div></div>';
+      stripH+='<div style="font-size:6px;color:'+lv.color+';margin-top:2px;letter-spacing:.5px">'+lv.label+'</div>';
+    } else {
+      stripH+='<div style="font-size:10px;color:rgba(255,255,255,.15);padding:8px 0">—</div>';
     }
-    var capePct = Math.min(100, Math.round(d.currentCape/5000*100));
-    var capeLv = capeThreat(d.currentCape);
-    cardsH += '<div class="mmci-mc'+(isAct?' act':'')+'" data-idx="'+idx+'">'+
-      '<div class="mmci-mc-stripe" style="background:'+m.color+'"></div>'+
-      '<div class="mmci-mc-name" style="color:'+m.color+'">'+m.name+'</div>'+
-      '<div class="mmci-mc-cape">'+Math.round(d.currentCape)+'<span class="mmci-mc-cape-unit">J/kg</span></div>'+
-      '<div class="mmci-mc-cape-lbl">Surface CAPE</div>'+
-      '<div class="mmci-mc-params">'+
-        '<div class="mmci-mc-p"><div class="mmci-mc-p-lbl">CIN</div><div class="mmci-mc-p-val">'+Math.round(d.currentCin||0)+'</div></div>'+
-        '<div class="mmci-mc-p"><div class="mmci-mc-p-lbl">Lifted Idx</div><div class="mmci-mc-p-val">'+(d.currentLi!=null?d.currentLi.toFixed(1):"--")+'</div></div>'+
-      '</div>'+
-      '<div class="mmci-mc-bar"><div class="mmci-mc-bar-f" style="width:'+capePct+'%;background:'+capeLv.color+'"></div></div>'+
-      '<div class="mmci-mc-meta"><span>'+capeLv.label+'</span><span>Peak 24h: '+Math.round(d.peakCape24)+' J/kg</span></div>'+
-      '<div class="mmci-mc-weight">BLEND WEIGHT: '+Math.round(m.weight*100)+'%</div>'+
-    '</div>';
+    stripH+='</div>';
   });
+  stripH+='</div>';
 
-  // Active model detail
-  var am = MMCI.models[state.activeModel];
-  var ad = state.modelData[am.id];
-  var detH = "";
-  if(ad && ad.ok){
-    var mCTI = computeCTI(ad.currentCape, ad.currentCin, ad.currentLi, 0.5);
-    var mLv = ctiLevel(mCTI);
-    var peakLv = capeThreat(ad.peakCape24);
-    detH = '<div class="mmci-detail">'+
-      '<div class="mmci-det-hdr">'+
-        '<div><div class="mmci-det-model" style="color:'+am.color+'">'+am.full+'</div><div class="mmci-det-res">'+am.res+'</div></div>'+
-        '<div style="text-align:right"><div class="mmci-det-score" style="color:'+mLv.color+'">'+mCTI+'</div><div class="mmci-det-lv" style="color:'+mLv.color+'">'+mLv.label+'</div></div>'+
+  // ---- DETAIL PANEL for active model ----
+  var am=MMCI.models[state.activeModel],ad=state.modelData[am.id],detH="";
+  if(ad&&ad.ok){
+    var mCTI=computeCTI(ad.currentCape,ad.currentCin,ad.currentLi,0.5),mLv=ctiLevel(mCTI);
+    detH='<div class="mmci-detail" style="margin-bottom:16px">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">'+
+        '<div><div style="font-size:10px;font-weight:800;letter-spacing:1.5px;color:'+am.color+';text-transform:uppercase">'+am.full+'</div><div style="font-size:8px;color:rgba(255,255,255,.25);margin-top:2px">'+am.res+' · Tier '+am.tier+' · Weight '+Math.round(am.weight*100)+'%'+(am.hasCin?' · CIN':'')+(am.hasLi?' · LI':'')+'</div></div>'+
+        '<div style="text-align:right"><div style="font-size:28px;font-weight:800;color:'+mLv.color+';line-height:1">'+mCTI+'</div><div style="font-size:7px;font-weight:700;letter-spacing:1.5px;color:'+mLv.color+';text-transform:uppercase">'+mLv.label+'</div></div>'+
       '</div>'+
-      '<div class="mmci-det-grid">'+
-        '<div class="mmci-det-cell"><div class="mmci-det-cell-lbl">CAPE NOW</div><div class="mmci-det-cell-val">'+Math.round(ad.currentCape)+'</div><div class="mmci-det-cell-unit">J/kg</div></div>'+
-        '<div class="mmci-det-cell"><div class="mmci-det-cell-lbl">CIN NOW</div><div class="mmci-det-cell-val">'+Math.round(ad.currentCin||0)+'</div><div class="mmci-det-cell-unit">J/kg</div></div>'+
-        '<div class="mmci-det-cell"><div class="mmci-det-cell-lbl">LIFTED INDEX</div><div class="mmci-det-cell-val">'+(ad.currentLi!=null?ad.currentLi.toFixed(1):"--")+'</div><div class="mmci-det-cell-unit">&deg;C</div></div>'+
-        '<div class="mmci-det-cell"><div class="mmci-det-cell-lbl">PEAK CAPE 24H</div><div class="mmci-det-cell-val" style="color:'+peakLv.color+'">'+Math.round(ad.peakCape24)+'</div><div class="mmci-det-cell-unit">J/kg</div></div>'+
-      '</div>'+
-      '<div class="mmci-det-nar" style="border-left-color:'+am.color+'44">'+
-        '<b>'+am.name+' Analysis:</b> Current CAPE of <b>'+Math.round(ad.currentCape)+' J/kg</b> indicates <b>'+capeThreat(ad.currentCape).desc.toLowerCase()+'</b>. '+
-        (ad.currentCin<-100?'Strong capping inversion (CIN '+Math.round(ad.currentCin)+' J/kg) is suppressing convective initiation. ':'CIN of '+Math.round(ad.currentCin||0)+' J/kg suggests '+(Math.abs(ad.currentCin||0)<50?'minimal capping — storms can fire freely. ':'moderate inhibition present. '))+
-        'Lifted Index of <b>'+(ad.currentLi!=null?ad.currentLi.toFixed(1):"--")+'</b> '+(ad.currentLi!=null?(ad.currentLi<=-4?'strongly supports deep moist convection.':ad.currentLi<=-1?'indicates conditional instability.':'shows a generally stable atmosphere.'):'is unavailable.')+
-        ' Peak CAPE reaches <b>'+Math.round(ad.peakCape24)+' J/kg</b> within 24 hours'+(ad.peakTime24?' near <b>'+new Date(ad.peakTime24).toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit",hour12:true})+' ET</b>':'')+'.'+
+      '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">'+
+        '<div class="mmci-det-cell"><div class="mmci-det-cell-lbl">CAPE</div><div class="mmci-det-cell-val">'+Math.round(ad.currentCape)+'</div><div class="mmci-det-cell-unit">J/kg</div></div>'+
+        '<div class="mmci-det-cell"><div class="mmci-det-cell-lbl">CIN</div><div class="mmci-det-cell-val">'+(am.hasCin?Math.round(ad.currentCin):"N/A")+'</div><div class="mmci-det-cell-unit">'+(am.hasCin?"J/kg":"")+'</div></div>'+
+        '<div class="mmci-det-cell"><div class="mmci-det-cell-lbl">LIFTED IDX</div><div class="mmci-det-cell-val">'+(am.hasLi&&ad.currentLi!=null?ad.currentLi.toFixed(1):"N/A")+'</div><div class="mmci-det-cell-unit">'+(am.hasLi?"°C":"")+'</div></div>'+
+        '<div class="mmci-det-cell"><div class="mmci-det-cell-lbl">PEAK 24H</div><div class="mmci-det-cell-val" style="color:'+capeThreat(ad.peakCape24).color+'">'+Math.round(ad.peakCape24)+'</div><div class="mmci-det-cell-unit">J/kg</div></div>'+
       '</div>'+
     '</div>';
   }
 
-  // Assemble
-  cont.innerHTML =
+  // ---- ASSEMBLE ----
+  cont.innerHTML=
     '<div class="mmci-hdr">'+
       '<div class="mmci-hdr-l">'+
-        '<div class="mmci-tag">VALVANO CONVECTIVE THREAT INDEX</div>'+
+        '<div class="mmci-tag">7-MODEL CONVECTIVE CONSENSUS</div>'+
         '<h2><span class="mmci-accent">Valvano</span> Convective Threat Index</h2>'+
-        '<div class="mmci-sub">'+MMCI.name+' — HRRR + GFS + ECMWF IFS blended instability analysis</div>'+
+        '<div class="mmci-sub">'+MMCI.name+' — '+b.modelsOnline+'/'+b.modelsTotal+' models reporting</div>'+
       '</div>'+
       '<div class="mmci-hdr-r">'+
         '<div class="mmci-ulbl">LAST UPDATE</div>'+
@@ -760,177 +534,88 @@ function renderDashboard(){
     '<div class="mmci-top">'+
       '<div class="mmci-gauge-w">'+
         '<div class="mmci-gauge-lbl">VALVANO CONVECTIVE THREAT INDEX</div>'+
-        buildGauge(b.cti, gaugeSize)+
+        buildGauge(b.cti,gs)+
       '</div>'+
       '<div class="mmci-stats">'+
-        '<div class="mmci-sbox"><div class="mmci-slbl">BLENDED CAPE</div><div class="mmci-sval" style="color:'+capeThreat(b.cape).color+'">'+b.cape+' <span style="font-size:10px;color:rgba(255,255,255,.3)">J/kg</span></div></div>'+
-        '<div class="mmci-sbox"><div class="mmci-slbl">BLENDED CIN</div><div class="mmci-sval">'+b.cin+' <span style="font-size:10px;color:rgba(255,255,255,.3)">J/kg</span></div></div>'+
-        '<div class="mmci-sbox"><div class="mmci-slbl">BLENDED LIFTED IDX</div><div class="mmci-sval">'+(b.li>0?"+":"")+b.li+'<span style="font-size:10px;color:rgba(255,255,255,.3)"> &deg;C</span></div></div>'+
-        '<div class="mmci-sbox"><div class="mmci-slbl">MODEL AGREEMENT</div><div class="mmci-sval" style="color:'+agCol+'">'+agPct+'% <span style="font-size:10px;color:rgba(255,255,255,.3)">'+agLbl+'</span></div></div>'+
+        '<div class="mmci-sbox"><div class="mmci-slbl">BLENDED CAPE (7-MODEL)</div><div class="mmci-sval" style="color:'+capeThreat(b.cape).color+'">'+b.cape+' <span style="font-size:10px;color:rgba(255,255,255,.3)">J/kg</span></div></div>'+
+        '<div class="mmci-sbox"><div class="mmci-slbl">BLENDED CIN (HRRR/GFS/ECMWF/UKMO)</div><div class="mmci-sval">'+b.cin+' <span style="font-size:10px;color:rgba(255,255,255,.3)">J/kg</span></div></div>'+
+        '<div class="mmci-sbox"><div class="mmci-slbl">LIFTED INDEX (HRRR/GFS)</div><div class="mmci-sval">'+(b.li>0?"+":"")+b.li+'<span style="font-size:10px;color:rgba(255,255,255,.3)"> °C</span></div></div>'+
+        '<div class="mmci-sbox"><div class="mmci-slbl">MODEL AGREEMENT</div><div class="mmci-sval" style="color:'+agC+'">'+agP+'% <span style="font-size:10px;color:rgba(255,255,255,.3)">'+agL+' ('+b.modelsOnline+' models)</span></div></div>'+
         '<div class="mmci-sbox"><div class="mmci-slbl">PEAK VCTI (24H)</div><div class="mmci-sval" style="color:'+pkLv.color+'">'+state.peakCTI+' <span style="font-size:10px;color:rgba(255,255,255,.3)">'+pkLv.label+'</span></div></div>'+
       '</div>'+
     '</div>'+
 
-    '<div class="mmci-models-lbl">INDIVIDUAL MODEL OUTPUT — Click to explore</div>'+
-    '<div class="mmci-model-cards">'+cardsH+'</div>'+
-
-    '<div class="mmci-radar-wrap">'+
-      '<div class="mmci-radar-title">MODEL CONVERGENCE RADAR</div>'+
-      '<div class="mmci-radar-sub">3-MODEL INSTABILITY PARAMETER OVERLAY</div>'+
-      buildConvergenceRadar()+
-    '</div>'+
-
-    '<div class="mmci-tl-wrap"><div class="mmci-tl-title">CAPE TIMELINE — ALL MODELS (NEXT 48H)</div><canvas id="mmciTL"></canvas></div>'+
-
-    '<div class="mmci-ch-row">'+
-      '<div class="mmci-ch-box"><div class="mmci-ct">CIN TIMELINE — CAPPING STRENGTH</div><canvas id="mmciCIN"></canvas></div>'+
-      '<div class="mmci-ch-box"><div class="mmci-ct">LIFTED INDEX TIMELINE — STABILITY</div><canvas id="mmciLI"></canvas></div>'+
-    '</div>'+
-
+    '<div style="font-size:7px;font-weight:700;color:rgba(255,255,255,.2);letter-spacing:2.5px;margin-bottom:8px;text-transform:uppercase">MODEL CONSENSUS — TAP TO EXPLORE</div>'+
+    stripH+
     detH+
 
+    (hasData?
+      '<div class="mmci-tl-wrap"><div class="mmci-tl-title">CAPE TIMELINE — 7-MODEL OVERLAY (NEXT 48H)</div><canvas id="mmciTL"></canvas></div>'+
+      '<div class="mmci-ch-row">'+
+        '<div class="mmci-ch-box"><div class="mmci-ct">CIN TIMELINE (4 MODELS)</div><canvas id="mmciCIN"></canvas></div>'+
+        '<div class="mmci-ch-box"><div class="mmci-ct">LIFTED INDEX (HRRR + GFS)</div><canvas id="mmciLI"></canvas></div>'+
+      '</div>'
+    :'<div style="text-align:center;padding:16px;color:rgba(255,255,255,.2);font-size:10px">Awaiting model data for charts...</div>')+
+
     '<div class="mmci-foot">'+
-      '<span>VCTI v1.0 — Valvano Convective Threat Index — Wolfpack Weather</span>'+
-      '<span>HRRR 3km · GFS 0.25° · ECMWF IFS 9km — via Open-Meteo</span>'+
+      '<span>VCTI v2.0 — Valvano Convective Threat Index — Wolfpack Weather</span>'+
+      '<span>HRRR · GFS · ECMWF · ICON · UKMO · GEM · ARPEGE — via Open-Meteo</span>'+
       '<span>Auto-refresh 10 min</span>'+
     '</div>';
 
-  // Bind events
-  document.getElementById("mmciRefresh").addEventListener("click", function(){fetchAllModels();});
-  document.querySelectorAll(".mmci-mc").forEach(function(c){
-    c.addEventListener("click", function(){
-      state.activeModel = parseInt(this.getAttribute("data-idx"));
-      renderDashboard();
-    });
+  // Bind
+  document.getElementById("mmciRefresh").addEventListener("click",function(){fetchAllModels();});
+  cont.querySelectorAll("[data-idx]").forEach(function(el){
+    el.addEventListener("click",function(){state.activeModel=parseInt(this.getAttribute("data-idx"));renderDashboard();});
   });
-
-  // Build charts
-  buildCharts();
+  if(hasData) buildCharts();
 }
+
+function hexRgb(hex){hex=hex.replace("#","");return parseInt(hex.substr(0,2),16)+","+parseInt(hex.substr(2,2),16)+","+parseInt(hex.substr(4,2),16);}
 
 // ---- CHARTS ----
-function destroyCharts(){
-  ["tl","cin","li"].forEach(function(k){
-    if(state.charts[k]){state.charts[k].destroy();state.charts[k]=null;}
-  });
-}
+function destroyCharts(){["tl","cin","li"].forEach(function(k){if(state.charts[k]){state.charts[k].destroy();state.charts[k]=null;}});}
 
 function buildCharts(){
-  destroyCharts();
-  if(typeof Chart==="undefined") return;
-
-  var mob = window.innerWidth < 600;
-  Chart.defaults.color = "rgba(255,255,255,.35)";
-  Chart.defaults.borderColor = "rgba(255,255,255,.05)";
-  Chart.defaults.font.family = "'Segoe UI',sans-serif";
-  Chart.defaults.font.size = mob?9:10;
-
-  var now = new Date();
-  var limit48 = now.getTime() + 48*3600000;
-
-  // Build aligned time labels from HRRR (finest resolution)
-  var hrrrD = state.modelData["hrrr"];
-  if(!hrrrD||!hrrrD.ok) return;
-
-  var labels = [], labelDates = [];
-  for(var i=0;i<hrrrD.times.length;i++){
-    var t = new Date(hrrrD.times[i]);
-    if(t < now) continue;
-    if(t.getTime() > limit48) break;
-    labels.push(t.toLocaleTimeString("en-US",{hour:"numeric",hour12:true,month:"short",day:"numeric"}));
-    labelDates.push(t.getTime());
+  destroyCharts();if(typeof Chart==="undefined")return;
+  var mob=window.innerWidth<600;
+  Chart.defaults.color="rgba(255,255,255,.35)";Chart.defaults.borderColor="rgba(255,255,255,.05)";Chart.defaults.font.family="'Segoe UI',sans-serif";Chart.defaults.font.size=mob?9:10;
+  var now=new Date(),lim=now.getTime()+48*3600000;
+  // Use HRRR as timeline reference
+  var hrD=state.modelData["hrrr"];if(!hrD||!hrD.ok)return;
+  var labels=[],labelDates=[];
+  for(var i=0;i<hrD.times.length;i++){var t=new Date(hrD.times[i]);if(t<now)continue;if(t.getTime()>lim)break;labels.push(t.toLocaleTimeString("en-US",{hour:"numeric",hour12:true,month:"short",day:"numeric"}));labelDates.push(t.getTime());}
+  function align(mid,param){
+    var d=state.modelData[mid];if(!d||!d.ok)return labels.map(function(){return null;});
+    var mt=d.times.map(function(t){return new Date(t).getTime();}),arr=param==="cape"?d.cape:(param==="cin"?d.cin:d.li);
+    return labelDates.map(function(tgt){var bI=0,bD=Infinity;for(var j=0;j<mt.length;j++){var df=Math.abs(mt[j]-tgt);if(df<bD){bD=df;bI=j;}}if(bD>4*3600000)return null;return arr[bI]!=null?arr[bI]:null;});
   }
-
-  // For each model, interpolate to the HRRR timeline
-  function alignModel(modelId, param){
-    var d = state.modelData[modelId];
-    if(!d||!d.ok) return labels.map(function(){return null;});
-    var mTimes = d.times.map(function(t){return new Date(t).getTime();});
-    var arr = param==="cape"?d.cape:(param==="cin"?d.cin:d.li);
-    return labelDates.map(function(target){
-      // Find nearest model time
-      var bestIdx=0, bestDiff=Infinity;
-      for(var j=0;j<mTimes.length;j++){
-        var diff=Math.abs(mTimes[j]-target);
-        if(diff<bestDiff){bestDiff=diff;bestIdx=j;}
-      }
-      // Only use if within 3 hours
-      if(bestDiff>3*3600000) return null;
-      return arr[bestIdx]!=null?arr[bestIdx]:null;
+  // CAPE timeline — all 7 models
+  var tlE=document.getElementById("mmciTL");
+  if(tlE){
+    var ds=MMCI.models.map(function(m){
+      return{label:m.name,data:align(m.id,"cape"),borderColor:m.color,backgroundColor:m.id==="hrrr"?m.color+"20":"transparent",fill:m.id==="hrrr",tension:.35,borderWidth:m.tier===1?2.5:(m.tier===2?1.8:1.2),pointRadius:mob?0:1,borderDash:m.tier===3?[3,3]:[]};
     });
+    state.charts.tl=new Chart(tlE,{type:"line",data:{labels:labels,datasets:ds},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:"index",intersect:false},scales:{y:{min:0,grid:{color:"rgba(255,255,255,.04)"},title:{display:!mob,text:"CAPE (J/kg)",font:{size:9}}},x:{grid:{display:false},ticks:{maxTicksLimit:mob?6:12,maxRotation:45}}},plugins:{legend:{labels:{boxWidth:8,padding:mob?4:8,font:{size:mob?8:10}}}}}});
   }
-
-  // CAPE Timeline
-  var tlEl = document.getElementById("mmciTL");
-  if(tlEl){
-    var datasets = MMCI.models.map(function(m){
-      return {
-        label: m.name,
-        data: alignModel(m.id,"cape"),
-        borderColor: m.color,
-        backgroundColor: m.color+"20",
-        fill: m.id==="hrrr",
-        tension: 0.35,
-        borderWidth: m.id==="hrrr"?2.5:1.5,
-        pointRadius: mob?1:2,
-        borderDash: m.id==="hrrr"?[]:[4,3]
-      };
-    });
-    state.charts.tl = new Chart(tlEl, {
-      type:"line",
-      data:{labels:labels,datasets:datasets},
-      options:{responsive:true,maintainAspectRatio:false,
-        interaction:{mode:"index",intersect:false},
-        scales:{y:{min:0,grid:{color:"rgba(255,255,255,.04)"},title:{display:!mob,text:"CAPE (J/kg)",font:{size:9}}},x:{grid:{display:false},ticks:{maxTicksLimit:mob?6:12,maxRotation:45}}},
-        plugins:{legend:{labels:{boxWidth:10,padding:mob?6:12}},tooltip:{callbacks:{label:function(ctx){return ctx.dataset.label+": "+Math.round(ctx.parsed.y)+" J/kg";}}}}}
-    });
+  // CIN — only models with CIN
+  var cinE=document.getElementById("mmciCIN");
+  if(cinE){
+    var cinModels=MMCI.models.filter(function(m){return m.hasCin;});
+    state.charts.cin=new Chart(cinE,{type:"line",data:{labels:labels,datasets:cinModels.map(function(m){return{label:m.name,data:align(m.id,"cin"),borderColor:m.color,fill:false,tension:.35,borderWidth:1.5,pointRadius:mob?0:1};})},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:"index",intersect:false},scales:{y:{grid:{color:"rgba(255,255,255,.04)"},title:{display:!mob,text:"CIN (J/kg)",font:{size:9}}},x:{grid:{display:false},ticks:{maxTicksLimit:mob?5:8,maxRotation:45}}},plugins:{legend:{labels:{boxWidth:8,padding:mob?4:8}}}}});
   }
-
-  // CIN Timeline
-  var cinEl = document.getElementById("mmciCIN");
-  if(cinEl){
-    state.charts.cin = new Chart(cinEl, {
-      type:"line",
-      data:{labels:labels,datasets:MMCI.models.map(function(m){
-        return {label:m.name,data:alignModel(m.id,"cin"),borderColor:m.color,backgroundColor:m.color+"15",fill:false,tension:.35,borderWidth:1.5,pointRadius:mob?1:2};
-      })},
-      options:{responsive:true,maintainAspectRatio:false,
-        interaction:{mode:"index",intersect:false},
-        scales:{y:{grid:{color:"rgba(255,255,255,.04)"},title:{display:!mob,text:"CIN (J/kg)",font:{size:9}}},x:{grid:{display:false},ticks:{maxTicksLimit:mob?5:8,maxRotation:45}}},
-        plugins:{legend:{labels:{boxWidth:8,padding:mob?5:10}},tooltip:{callbacks:{label:function(ctx){return ctx.dataset.label+": "+Math.round(ctx.parsed.y)+" J/kg";}}}}}
-    });
-  }
-
-  // LI Timeline
-  var liEl = document.getElementById("mmciLI");
-  if(liEl){
-    state.charts.li = new Chart(liEl, {
-      type:"line",
-      data:{labels:labels,datasets:MMCI.models.map(function(m){
-        return {label:m.name,data:alignModel(m.id,"li"),borderColor:m.color,fill:false,tension:.35,borderWidth:1.5,pointRadius:mob?1:2};
-      })},
-      options:{responsive:true,maintainAspectRatio:false,
-        interaction:{mode:"index",intersect:false},
-        scales:{y:{reverse:true,grid:{color:"rgba(255,255,255,.04)"},title:{display:!mob,text:"Lifted Index (°C)",font:{size:9}}},x:{grid:{display:false},ticks:{maxTicksLimit:mob?5:8,maxRotation:45}}},
-        plugins:{legend:{labels:{boxWidth:8,padding:mob?5:10}},
-          annotation:liEl?undefined:undefined, // LI=0 line handled by grid
-          tooltip:{callbacks:{label:function(ctx){return ctx.dataset.label+": "+(ctx.parsed.y!=null?ctx.parsed.y.toFixed(1):"--")+"°C";}}}}}
-    });
+  // LI — only HRRR + GFS
+  var liE=document.getElementById("mmciLI");
+  if(liE){
+    var liModels=MMCI.models.filter(function(m){return m.hasLi;});
+    state.charts.li=new Chart(liE,{type:"line",data:{labels:labels,datasets:liModels.map(function(m){return{label:m.name,data:align(m.id,"li"),borderColor:m.color,fill:false,tension:.35,borderWidth:1.5,pointRadius:mob?0:1};})},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:"index",intersect:false},scales:{y:{reverse:true,grid:{color:"rgba(255,255,255,.04)"},title:{display:!mob,text:"Lifted Index (°C)",font:{size:9}}},x:{grid:{display:false},ticks:{maxTicksLimit:mob?5:8,maxRotation:45}}},plugins:{legend:{labels:{boxWidth:8,padding:mob?4:8}}}}});
   }
 }
 
 // ---- INIT ----
 fetchAllModels();
 setInterval(fetchAllModels, MMCI.refresh);
-
-// Handle resize for chart responsiveness
-var mmciResizeTimer;
-window.addEventListener("resize", function(){
-  clearTimeout(mmciResizeTimer);
-  mmciResizeTimer = setTimeout(function(){
-    if(state.blended) renderDashboard();
-  }, 300);
-});
+var mmciRT;window.addEventListener("resize",function(){clearTimeout(mmciRT);mmciRT=setTimeout(function(){if(state.blended)renderDashboard();},300);});
 
 })();
 </script>
@@ -1062,7 +747,7 @@ function fetchConditions(){
   .then(function(d){
     var obs=d.observations&&d.observations[0];if(!obs)throw new Error("No obs");
     var imp=obs.imperial||{};
-    var temp=imp.temp!=null?Math.round(imp.temp):"--";
+    var temp=(imp.temp!=null&&imp.temp>-50&&imp.temp<130)?Math.round(imp.temp):"--";
     var feels=imp.heatIndex!=null?Math.round(imp.heatIndex):(imp.windChill!=null?Math.round(imp.windChill):temp);
     var dew=imp.dewpt!=null?Math.round(imp.dewpt):"--";
     var humid=obs.humidity!=null?Math.round(obs.humidity):"--";
