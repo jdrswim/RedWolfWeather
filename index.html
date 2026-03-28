@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -12,11 +13,9 @@
     v=['initialize','identify','updateOptions','pageLoad','track','trackAgent'];for(w=0,x=v.length;w<x;++w)(function(m){
         o[m]=o[m]||function(){o._q[m===v[0]?'unshift':'push']([m].concat([].slice.call(arguments,0)));};})(v[w]);
         y=e.createElement(n);y.async=!0;y.src='https://cdn.pendo.io/agent/static/'+apiKey+'/pendo.js';
-        y.onload=function(){
-          pendo.initialize({visitor:{id:'visitor-'+Math.random().toString(36).substr(2,9)},account:{id:'redwolfweather'}});
-        };
         z=e.getElementsByTagName(n)[0];z.parentNode.insertBefore(y,z);})(window,document,'script','pendo');
 })('d3776cc3-c6a9-47da-ad08-045b5ddf534c');
+pendo.initialize({visitor:{id:'visitor-'+Math.random().toString(36).substr(2,9)},account:{id:'redwolfweather'}});
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
@@ -48,64 +47,160 @@ main{max-width:1100px;margin:0 auto;padding:18px;overflow-x:hidden}
 .cond-loc{font-size:9px;color:rgba(0,0,0,.6);letter-spacing:1.5px;text-shadow:0 1px 3px rgba(255,255,255,.4);margin-bottom:16px;font-weight:700}
 .sgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:4px}.sbox{background:var(--p2);border:1px solid var(--bd);border-radius:2px;padding:12px 14px}.slbl{font-size:11px;font-weight:900;letter-spacing:1.5px;color:var(--red);text-transform:uppercase;margin-bottom:6px}.sval{font-size:24px;font-weight:300;color:var(--white)}.sunit{font-size:12px;color:var(--mu);margin-top:3px}
 .hlrow{display:flex;border:1px solid var(--bd);border-radius:2px;overflow:hidden}.hlbox{flex:1;padding:14px;text-align:center}.hlbox:first-child{background:#130000;border-right:1px solid var(--bd)}.hlbox:last-child{background:#001015}.hllbl{font-size:11px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px}.hlbox:first-child .hllbl{color:#ff7777}.hlbox:last-child .hllbl{color:#77aaff}.hlval{font-size:28px;font-weight:200;color:var(--white)}
-#tsps{font-family:var(--font);position:relative;overflow:hidden}
-#tsps .tsps-pulse{position:absolute;top:0;left:0;right:0;height:2px;opacity:0;transition:opacity .5s}
-#tsps.tsps-threat .tsps-pulse{animation:tspsPulse 2s ease-in-out infinite}
-@keyframes tspsPulse{0%,100%{opacity:.35}50%{opacity:1}}
-@keyframes tspsSpin{to{transform:rotate(360deg)}}
-.tsps-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;flex-wrap:wrap;gap:12px}.tsps-hdr-l .tsps-tag{font-size:9px;font-weight:700;color:rgba(255,255,255,.25);letter-spacing:2.5px}.tsps-hdr-l h2{font-size:20px;font-weight:800;margin-top:3px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}.tsps-hdr-l h2 .tsps-r{color:#ef4444}.tsps-hdr-l .tsps-loc{font-size:10px;color:rgba(255,255,255,.3);margin-top:4px}.tsps-hdr-r{text-align:right}.tsps-hdr-r .tsps-ulbl{font-size:8px;color:rgba(255,255,255,.2);letter-spacing:1px}.tsps-hdr-r .tsps-utime{font-size:10px;color:rgba(255,255,255,.45);margin-top:2px}.tsps-hdr-r .tsps-rbtn{font-size:9px;color:#60a5fa;cursor:pointer;margin-top:4px;background:none;border:none;font-family:inherit;padding:6px 10px}
-.tsps-alerts{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:10px 14px;margin-bottom:18px}.tsps-al-hdr{display:flex;align-items:center;gap:8px;margin-bottom:6px}.tsps-al-hdr span:last-child{font-size:11px;font-weight:700;color:#ef4444;letter-spacing:1.5px}.tsps-al-item{display:flex;align-items:center;gap:8px;padding:4px 0;border-top:1px solid rgba(255,255,255,.04)}.tsps-al-item:first-child{border-top:none}.tsps-al-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}.tsps-al-ev{font-size:10px;color:rgba(255,255,255,.8);font-weight:600}.tsps-al-src{font-size:9px;color:rgba(255,255,255,.25);margin-left:auto}
-.tsps-top{display:flex;justify-content:center;align-items:center;gap:28px;margin-bottom:22px;flex-wrap:wrap}.tsps-gauge-w{text-align:center}.tsps-gauge-w svg{max-width:100%;height:auto}.tsps-gauge-lbl{font-size:8px;font-weight:700;color:rgba(255,255,255,.25);letter-spacing:2px;margin-bottom:4px}.tsps-stats{display:flex;flex-direction:column;gap:7px;min-width:170px}.tsps-sbox{background:rgba(255,255,255,.025);border-radius:8px;padding:9px 13px;border:1px solid rgba(255,255,255,.05)}.tsps-sbox .tsps-slbl{font-size:8px;color:rgba(255,255,255,.25);letter-spacing:1px}.tsps-sbox .tsps-sval{font-size:14px;font-weight:700;margin-top:2px}
-.tsps-sec-lbl{font-size:8px;font-weight:700;color:rgba(255,255,255,.25);letter-spacing:2px;margin-bottom:8px}
-.tsps-cards{display:flex;gap:8px;margin-bottom:8px;overflow-x:auto;padding-bottom:4px}.tsps-fc{min-width:125px;flex:1 1 0;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.05);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all .25s}.tsps-fc.act{transform:scale(1.03)}.tsps-fc .fc-lbl{font-size:9px;color:rgba(255,255,255,.4);font-weight:600;letter-spacing:1px;margin-bottom:5px}.tsps-fc .fc-score{font-size:26px;font-weight:800;line-height:1}.tsps-fc .fc-unit{font-size:10px;color:rgba(255,255,255,.3);margin-left:3px}.tsps-fc .fc-threat{font-size:8px;margin-top:3px}.tsps-fc .fc-lk{display:flex;justify-content:space-between;align-items:center;margin-top:7px}.tsps-fc .fc-lk-l{font-size:8px;color:rgba(255,255,255,.25)}.tsps-fc .fc-lk-v{font-size:12px;font-weight:700}.tsps-fc .fc-bar{height:2px;background:rgba(255,255,255,.05);border-radius:2px;margin-top:5px;overflow:hidden}.tsps-fc .fc-bar-f{height:100%;border-radius:2px;transition:width .5s}.tsps-fc .fc-meta{margin-top:6px;font-size:8px;color:rgba(255,255,255,.25)}
-.tf-wrap{background:rgba(255,255,255,.02);border-radius:10px;padding:18px;border:1px solid rgba(255,255,255,.05);margin-top:14px;text-align:center}
-.tf-title{font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1px;margin-bottom:4px}
-.tf-subtitle{font-size:7px;color:rgba(255,255,255,.2);letter-spacing:1.5px;margin-bottom:12px}
-.tf-svg{max-width:320px;margin:0 auto;display:block}
-.tf-legend{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:14px}
-.tf-leg-item{display:flex;align-items:center;gap:4px;font-size:8px;color:rgba(255,255,255,.5)}
-.tf-leg-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
-@keyframes tfPulse{0%,100%{opacity:.6}50%{opacity:1}}
-.tsps-tl-box{background:rgba(255,255,255,.02);border-radius:10px;padding:14px;border:1px solid rgba(255,255,255,.05);margin-top:14px}.tsps-tl-box .tsps-ct{font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1px;margin-bottom:10px}.tsps-tl-box canvas{width:100%!important;max-height:155px}
-.tsps-ch-row{display:grid;grid-template-columns:1fr;gap:14px;margin-top:14px}.tsps-ch-box{background:rgba(255,255,255,.02);border-radius:10px;padding:14px;border:1px solid rgba(255,255,255,.05)}.tsps-ch-box .tsps-ct{font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:1px;margin-bottom:10px}.tsps-ch-box canvas{width:100%!important;max-height:195px}
-.tsps-det{background:rgba(255,255,255,.02);border-radius:10px;padding:18px;border:1px solid rgba(255,255,255,.05);margin-top:14px}.tsps-det-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px}.tsps-det-per{font-size:10px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px}.tsps-det-fc{font-size:11px;color:rgba(255,255,255,.55);margin-top:3px}.tsps-det-sc{font-size:32px;font-weight:800;line-height:1}.tsps-det-lv{font-size:9px;font-weight:700;letter-spacing:1.5px;margin-top:2px;text-align:right}.tsps-det-mg{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}.tsps-dm{background:rgba(255,255,255,.03);border-radius:6px;padding:9px 10px;text-align:center}.tsps-dm .dm-l{font-size:7px;color:rgba(255,255,255,.25);letter-spacing:1px;margin-bottom:3px}.tsps-dm .dm-v{font-size:15px;font-weight:700;color:rgba(255,255,255,.85)}.tsps-det-nar{font-size:10px;color:rgba(255,255,255,.4);line-height:1.7;padding:10px 12px;background:rgba(255,255,255,.02);border-radius:6px;border-left:3px solid rgba(255,255,255,.06)}.tsps-det-nar b{color:rgba(255,255,255,.55)}
-.tsps-foot{margin-top:18px;padding-top:12px;border-top:1px solid rgba(255,255,255,.04);display:flex;justify-content:space-between;flex-wrap:wrap;gap:5px}.tsps-foot span{font-size:7px;color:rgba(255,255,255,.15)}
-.tsps-ld{text-align:center;padding:40px 20px}.tsps-spinner{width:36px;height:36px;border:3px solid rgba(255,255,255,.07);border-top-color:#60a5fa;border-radius:50%;margin:0 auto 14px;animation:tspsSpin .8s linear infinite}.tsps-ld p{font-size:11px;color:rgba(255,255,255,.35)}.tsps-ld p.sub{font-size:9px;color:rgba(255,255,255,.18);margin-top:4px}
-.hourly-wrap{overflow-x:auto}.hr-row{display:flex;gap:10px;min-width:max-content;padding-bottom:2px}.hr{background:var(--p2);border:1px solid var(--bd);border-radius:2px;padding:10px 14px;text-align:center;min-width:70px}.hr-t{font-size:10px;color:var(--mu);letter-spacing:1px;margin-bottom:4px;text-transform:uppercase}.hr-i{font-size:19px;margin-bottom:4px}.hr-v{font-size:17px;font-weight:200;color:var(--white)}.hr-p{font-size:10px;color:#77aaff;margin-top:3px}
-.ext-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}.ext-day{background:var(--p2);border:1px solid var(--bd);border-radius:3px;padding:14px 10px;text-align:center;overflow:hidden}.ext-day.today{border-color:var(--red);background:#150505}.ext-dow{font-size:13px;font-weight:900;color:var(--white);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px}.ext-date{font-size:11px;color:var(--mu);margin-bottom:9px}.ext-icon{font-size:26px;margin-bottom:7px}.ext-desc{font-size:11px;color:var(--mu);margin-bottom:9px;line-height:1.5;min-height:32px}.ext-temps{display:flex;justify-content:center;gap:9px;align-items:baseline;margin-bottom:4px}.ext-hi{font-size:20px;font-weight:600;color:var(--white)}.ext-lo{font-size:14px;color:#77aaff}.ext-pop{font-size:11px;color:#77aaff;margin-top:3px}.ext-wind{font-size:10px;color:var(--mu);margin-top:5px}.ext-range{margin-top:10px;position:relative;height:22px}.ext-range-track{position:absolute;top:8px;height:6px;border-radius:3px;opacity:.7}.ext-range-lo,.ext-range-hi{position:absolute;top:0;font-size:9px;font-weight:700;line-height:1}.ext-range-lo{color:#77aaff}.ext-range-hi{color:#ffaa55}
-.media-row{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:18px}.media-card{background:var(--p1);border:1px solid var(--bd);border-top:3px solid var(--red);border-radius:3px;padding:14px;overflow:hidden}.media-frame{width:100%;height:220px;border:1px solid var(--bd);border-radius:2px;overflow:hidden;background:#111;display:flex;align-items:center;justify-content:center}.media-frame iframe{width:100%;height:100%;border:none}.media-frame img{width:100%;height:100%;object-fit:cover}.mfooter{font-size:10px;color:var(--mu2);margin-top:6px;display:flex;align-items:center;gap:6px}.mfooter .ldot{width:5px;height:5px;background:var(--red);border-radius:50%;animation:pulse 1.4s infinite}.cam-fb{display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px}.cam-fb a{background:var(--red2);color:#fff;font-size:12px;font-weight:700;padding:8px 20px;border-radius:2px;letter-spacing:1px;border:1px solid var(--red);text-decoration:none}.cam-overlay{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.8));padding:7px 10px;pointer-events:none}.cam-overlay span{font-size:11px;color:#fff;font-weight:700;letter-spacing:1px}
-.alm-wrap{max-width:1100px;margin:0 auto;padding:18px;overflow-x:hidden}.alm-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.alm-card{background:var(--p1);border:1px solid var(--bd);border-top:3px solid var(--red);border-radius:3px;padding:20px;overflow:hidden}.alm-card h3{font-size:13px;font-weight:900;letter-spacing:2px;color:var(--red);text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px}.alm-card h3 span{font-size:16px}.alm-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}.alm-big{background:var(--p2);border:1px solid var(--bd);border-radius:4px;padding:14px;text-align:center}.alm-big-lbl{font-size:9px;font-weight:800;letter-spacing:1.5px;color:var(--red);text-transform:uppercase;margin-bottom:6px}.alm-big-val{font-size:28px;font-weight:200;color:var(--white)}.alm-big-sub{font-size:10px;color:var(--mu);margin-top:4px}.alm-mo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.alm-mo{background:var(--p2);border:1px solid var(--bd);border-radius:3px;padding:10px 8px;text-align:center}.alm-mo.current{border-color:var(--red);background:#150505}.alm-mo.future{opacity:.3}.alm-mo-name{font-size:10px;font-weight:800;color:var(--mu);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}.alm-mo-val{font-size:16px;font-weight:600;color:var(--white)}.alm-mo-nrm{font-size:9px;color:var(--mu2);margin-top:2px}.alm-mo-diff{font-size:9px;font-weight:700;margin-top:2px}.alm-mo-diff.pos{color:#ff8844}.alm-mo-diff.neg{color:#77aaff}.alm-mo-diff.zero{color:var(--green)}.alm-mo-bar{height:4px;background:var(--bd2);border-radius:2px;margin-top:6px;overflow:hidden}.alm-mo-bar-fill{height:100%;border-radius:2px}.alm-cmp{font-size:11px;padding:2px 8px;border-radius:3px;font-weight:700;display:inline-block;margin-top:4px}.alm-cmp.above{background:rgba(255,102,0,.15);color:#ff8844}.alm-cmp.below{background:rgba(68,136,255,.15);color:#77aaff}.alm-cmp.normal{background:rgba(0,212,74,.12);color:var(--green)}.alm-note{font-size:9px;color:var(--mu2);text-align:center;margin-top:16px;line-height:1.8}.alm-ld{text-align:center;padding:40px;color:var(--mu);font-size:12px}
+/* === VCTI MODULE STYLES === */
+
+/* ========== MMCI MODULE STYLES ========== */
+/* All prefixed with .mmci to avoid collisions */
+
+.mmci-wrap{font-family:‘Segoe UI’,system-ui,sans-serif;position:relative;overflow:hidden}
+.mmci-pulse{position:absolute;top:0;left:0;right:0;height:2px;opacity:0;transition:opacity .5s}
+.mmci-wrap.mmci-active .mmci-pulse{animation:mmciPulse 2.5s ease-in-out infinite}
+@keyframes mmciPulse{0%,100%{opacity:.3}50%{opacity:1}}
+@keyframes mmciSpin{to{transform:rotate(360deg)}}
+@keyframes mmciGlow{0%,100%{filter:brightness(1)}50%{filter:brightness(1.4)}}
+@keyframes mmciFadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.mmci-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+.mmci-hdr-l .mmci-tag{font-size:8px;font-weight:700;color:rgba(255,255,255,.2);letter-spacing:2.5px}
+.mmci-hdr-l h2{font-size:19px;font-weight:800;margin-top:3px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;color:#fff}
+.mmci-hdr-l h2 .mmci-accent{color:#ef4444}
+.mmci-hdr-l .mmci-sub{font-size:9px;color:rgba(255,255,255,.25);margin-top:4px;letter-spacing:.5px}
+.mmci-hdr-r{text-align:right}
+.mmci-hdr-r .mmci-ulbl{font-size:7px;color:rgba(255,255,255,.18);letter-spacing:1.5px;text-transform:uppercase}
+.mmci-hdr-r .mmci-utime{font-size:10px;color:rgba(255,255,255,.4);margin-top:2px}
+.mmci-hdr-r .mmci-rbtn{font-size:9px;color:#60a5fa;cursor:pointer;margin-top:4px;background:none;border:none;font-family:inherit;padding:5px 10px;letter-spacing:.5px}
+.mmci-hdr-r .mmci-rbtn:hover{color:#93c5fd}
+
+/* –– TOP SECTION: Gauge + Stats –– */
+.mmci-top{display:flex;justify-content:center;align-items:center;gap:28px;margin-bottom:22px;flex-wrap:wrap}
+.mmci-gauge-w{text-align:center}
+.mmci-gauge-w svg{max-width:100%;height:auto}
+.mmci-gauge-lbl{font-size:7px;font-weight:700;color:rgba(255,255,255,.2);letter-spacing:2.5px;margin-bottom:4px;text-transform:uppercase}
+.mmci-stats{display:flex;flex-direction:column;gap:7px;min-width:170px}
+.mmci-sbox{background:rgba(255,255,255,.025);border-radius:8px;padding:9px 13px;border:1px solid rgba(255,255,255,.05)}
+.mmci-sbox .mmci-slbl{font-size:7px;color:rgba(255,255,255,.2);letter-spacing:1.5px;text-transform:uppercase}
+.mmci-sbox .mmci-sval{font-size:14px;font-weight:700;margin-top:2px;color:rgba(255,255,255,.85)}
+
+/* –– MODEL CARDS –– */
+.mmci-models-lbl{font-size:7px;font-weight:700;color:rgba(255,255,255,.2);letter-spacing:2.5px;margin-bottom:8px;text-transform:uppercase}
+.mmci-model-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.mmci-mc{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:14px;position:relative;overflow:hidden;transition:all .25s}
+.mmci-mc:hover{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.1)}
+.mmci-mc.act{border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.06)}
+.mmci-mc-stripe{position:absolute;top:0;left:0;right:0;height:3px;border-radius:10px 10px 0 0}
+.mmci-mc-name{font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;margin-top:4px;margin-bottom:10px}
+.mmci-mc-cape{font-size:28px;font-weight:200;color:#fff;line-height:1}
+.mmci-mc-cape-unit{font-size:10px;color:rgba(255,255,255,.3);margin-left:3px}
+.mmci-mc-cape-lbl{font-size:7px;color:rgba(255,255,255,.2);letter-spacing:1.5px;margin-top:2px;text-transform:uppercase}
+.mmci-mc-params{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
+.mmci-mc-p{background:rgba(255,255,255,.03);border-radius:5px;padding:6px 8px;text-align:center}
+.mmci-mc-p-lbl{font-size:6px;color:rgba(255,255,255,.2);letter-spacing:1px;text-transform:uppercase}
+.mmci-mc-p-val{font-size:13px;font-weight:600;color:rgba(255,255,255,.8);margin-top:1px}
+.mmci-mc-bar{height:3px;background:rgba(255,255,255,.04);border-radius:2px;margin-top:8px;overflow:hidden}
+.mmci-mc-bar-f{height:100%;border-radius:2px;transition:width .6s ease}
+.mmci-mc-meta{margin-top:6px;font-size:7px;color:rgba(255,255,255,.18);display:flex;justify-content:space-between}
+.mmci-mc-weight{font-size:7px;color:rgba(255,255,255,.25);letter-spacing:1px;margin-top:6px;text-transform:uppercase}
+
+/* –– CONVERGENCE RADAR (SVG) –– */
+.mmci-radar-wrap{background:rgba(255,255,255,.02);border-radius:10px;padding:18px;border:1px solid rgba(255,255,255,.05);margin-bottom:16px;text-align:center}
+.mmci-radar-title{font-size:8px;font-weight:700;color:rgba(255,255,255,.3);letter-spacing:1.5px;margin-bottom:2px;text-transform:uppercase}
+.mmci-radar-sub{font-size:7px;color:rgba(255,255,255,.15);letter-spacing:1px;margin-bottom:12px}
+.mmci-radar-svg{max-width:340px;margin:0 auto;display:block}
+.mmci-radar-legend{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:14px}
+.mmci-radar-leg{display:flex;align-items:center;gap:4px;font-size:8px;color:rgba(255,255,255,.45)}
+.mmci-radar-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+
+/* –– TIMELINE CHART –– */
+.mmci-tl-wrap{background:rgba(255,255,255,.02);border-radius:10px;padding:14px;border:1px solid rgba(255,255,255,.05);margin-bottom:16px}
+.mmci-tl-title{font-size:8px;font-weight:700;color:rgba(255,255,255,.3);letter-spacing:1.5px;margin-bottom:10px;text-transform:uppercase}
+.mmci-tl-wrap canvas{width:100%!important;max-height:170px}
+
+/* –– CHARTS ROW –– */
+.mmci-ch-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+.mmci-ch-box{background:rgba(255,255,255,.02);border-radius:10px;padding:14px;border:1px solid rgba(255,255,255,.05)}
+.mmci-ch-box .mmci-ct{font-size:8px;font-weight:700;color:rgba(255,255,255,.3);letter-spacing:1.5px;margin-bottom:10px;text-transform:uppercase}
+.mmci-ch-box canvas{width:100%!important;max-height:180px}
+
+/* –– DETAIL PANEL –– */
+.mmci-detail{background:rgba(255,255,255,.02);border-radius:10px;padding:18px;border:1px solid rgba(255,255,255,.05);animation:mmciFadeIn .4s ease}
+.mmci-det-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px}
+.mmci-det-model{font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}
+.mmci-det-res{font-size:9px;color:rgba(255,255,255,.3);margin-top:2px}
+.mmci-det-score{font-size:32px;font-weight:800;line-height:1}
+.mmci-det-lv{font-size:8px;font-weight:700;letter-spacing:1.5px;margin-top:2px;text-align:right;text-transform:uppercase}
+.mmci-det-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.mmci-det-cell{background:rgba(255,255,255,.03);border-radius:6px;padding:9px 10px;text-align:center}
+.mmci-det-cell-lbl{font-size:6px;color:rgba(255,255,255,.2);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px}
+.mmci-det-cell-val{font-size:16px;font-weight:700;color:rgba(255,255,255,.85)}
+.mmci-det-cell-unit{font-size:8px;color:rgba(255,255,255,.25);margin-top:1px}
+.mmci-det-nar{font-size:10px;color:rgba(255,255,255,.35);line-height:1.8;padding:10px 12px;background:rgba(255,255,255,.02);border-radius:6px;border-left:3px solid rgba(255,255,255,.06)}
+.mmci-det-nar b{color:rgba(255,255,255,.55)}
+
+/* –– FOOTER –– */
+.mmci-foot{margin-top:18px;padding-top:12px;border-top:1px solid rgba(255,255,255,.04);display:flex;justify-content:space-between;flex-wrap:wrap;gap:5px}
+.mmci-foot span{font-size:7px;color:rgba(255,255,255,.12)}
+
+/* –– LOADING –– */
+.mmci-ld{text-align:center;padding:40px 20px}
+.mmci-spinner{width:36px;height:36px;border:3px solid rgba(255,255,255,.07);border-top-color:#ef4444;border-radius:50%;margin:0 auto 14px;animation:mmciSpin .8s linear infinite}
+.mmci-ld p{font-size:11px;color:rgba(255,255,255,.3)}
+.mmci-ld p.sub{font-size:9px;color:rgba(255,255,255,.15);margin-top:4px}
+
+/* –– RESPONSIVE –– */
+@media(max-width:760px){
+.mmci-model-cards{grid-template-columns:1fr}
+.mmci-ch-row{grid-template-columns:1fr}
+.mmci-det-grid{grid-template-columns:repeat(2,1fr)}
+.mmci-top{flex-direction:column;gap:16px}
+.mmci-stats{flex-direction:row;flex-wrap:wrap;gap:6px;width:100%}
+.mmci-sbox{flex:1 1 calc(33% - 4px);min-width:90px;padding:8px 10px}
+}
+@media(max-width:480px){
+.mmci-mc-cape{font-size:24px}
+.mmci-sbox{flex:1 1 100%}
+.mmci-stats{flex-direction:column}
+}
+
+.tsps-spinner{width:36px;height:36px;border:3px solid rgba(255,255,255,.07);border-top-color:#ef4444;border-radius:50%;margin:0 auto 14px;animation:mmciSpin .8s linear infinite}
+.tsps-ld{text-align:center;padding:40px 20px}
+.tsps-ld p{font-size:11px;color:rgba(255,255,255,.35)}
+.tsps-ld p.sub{font-size:9px;color:rgba(255,255,255,.18);margin-top:4px}
+
+.hourly-wrap{overflow-x:auto}.hr-row{display:flex;gap:10px;min-width:max-content;padding-bottom:2px}.hr{background:var(–p2);border:1px solid var(–bd);border-radius:2px;padding:10px 14px;text-align:center;min-width:70px}.hr-t{font-size:10px;color:var(–mu);letter-spacing:1px;margin-bottom:4px;text-transform:uppercase}.hr-i{font-size:19px;margin-bottom:4px}.hr-v{font-size:17px;font-weight:200;color:var(–white)}.hr-p{font-size:10px;color:#77aaff;margin-top:3px}
+.ext-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}.ext-day{background:var(–p2);border:1px solid var(–bd);border-radius:3px;padding:14px 10px;text-align:center;overflow:hidden}.ext-day.today{border-color:var(–red);background:#150505}.ext-dow{font-size:13px;font-weight:900;color:var(–white);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px}.ext-date{font-size:11px;color:var(–mu);margin-bottom:9px}.ext-icon{font-size:26px;margin-bottom:7px}.ext-desc{font-size:11px;color:var(–mu);margin-bottom:9px;line-height:1.5;min-height:32px}.ext-temps{display:flex;justify-content:center;gap:9px;align-items:baseline;margin-bottom:4px}.ext-hi{font-size:20px;font-weight:600;color:var(–white)}.ext-lo{font-size:14px;color:#77aaff}.ext-pop{font-size:11px;color:#77aaff;margin-top:3px}.ext-wind{font-size:10px;color:var(–mu);margin-top:5px}.ext-range{margin-top:10px;position:relative;height:22px}.ext-range-track{position:absolute;top:8px;height:6px;border-radius:3px;opacity:.7}.ext-range-lo,.ext-range-hi{position:absolute;top:0;font-size:9px;font-weight:700;line-height:1}.ext-range-lo{color:#77aaff}.ext-range-hi{color:#ffaa55}
+.media-row{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:18px}.media-card{background:var(–p1);border:1px solid var(–bd);border-top:3px solid var(–red);border-radius:3px;padding:14px;overflow:hidden}.media-frame{width:100%;height:220px;border:1px solid var(–bd);border-radius:2px;overflow:hidden;background:#111;display:flex;align-items:center;justify-content:center}.media-frame iframe{width:100%;height:100%;border:none}.media-frame img{width:100%;height:100%;object-fit:cover}.mfooter{font-size:10px;color:var(–mu2);margin-top:6px;display:flex;align-items:center;gap:6px}.mfooter .ldot{width:5px;height:5px;background:var(–red);border-radius:50%;animation:pulse 1.4s infinite}.cam-fb{display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px}.cam-fb a{background:var(–red2);color:#fff;font-size:12px;font-weight:700;padding:8px 20px;border-radius:2px;letter-spacing:1px;border:1px solid var(–red);text-decoration:none}.cam-overlay{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.8));padding:7px 10px;pointer-events:none}.cam-overlay span{font-size:11px;color:#fff;font-weight:700;letter-spacing:1px}
+.alm-wrap{max-width:1100px;margin:0 auto;padding:18px;overflow-x:hidden}.alm-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.alm-card{background:var(–p1);border:1px solid var(–bd);border-top:3px solid var(–red);border-radius:3px;padding:20px;overflow:hidden}.alm-card h3{font-size:13px;font-weight:900;letter-spacing:2px;color:var(–red);text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px}.alm-card h3 span{font-size:16px}.alm-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}.alm-big{background:var(–p2);border:1px solid var(–bd);border-radius:4px;padding:14px;text-align:center}.alm-big-lbl{font-size:9px;font-weight:800;letter-spacing:1.5px;color:var(–red);text-transform:uppercase;margin-bottom:6px}.alm-big-val{font-size:28px;font-weight:200;color:var(–white)}.alm-big-sub{font-size:10px;color:var(–mu);margin-top:4px}.alm-mo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.alm-mo{background:var(–p2);border:1px solid var(–bd);border-radius:3px;padding:10px 8px;text-align:center}.alm-mo.current{border-color:var(–red);background:#150505}.alm-mo.future{opacity:.3}.alm-mo-name{font-size:10px;font-weight:800;color:var(–mu);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}.alm-mo-val{font-size:16px;font-weight:600;color:var(–white)}.alm-mo-nrm{font-size:9px;color:var(–mu2);margin-top:2px}.alm-mo-diff{font-size:9px;font-weight:700;margin-top:2px}.alm-mo-diff.pos{color:#ff8844}.alm-mo-diff.neg{color:#77aaff}.alm-mo-diff.zero{color:var(–green)}.alm-mo-bar{height:4px;background:var(–bd2);border-radius:2px;margin-top:6px;overflow:hidden}.alm-mo-bar-fill{height:100%;border-radius:2px}.alm-cmp{font-size:11px;padding:2px 8px;border-radius:3px;font-weight:700;display:inline-block;margin-top:4px}.alm-cmp.above{background:rgba(255,102,0,.15);color:#ff8844}.alm-cmp.below{background:rgba(68,136,255,.15);color:#77aaff}.alm-cmp.normal{background:rgba(0,212,74,.12);color:var(–green)}.alm-note{font-size:9px;color:var(–mu2);text-align:center;margin-top:16px;line-height:1.8}.alm-ld{text-align:center;padding:40px;color:var(–mu);font-size:12px}
 /* SUN */
-.sun-sec{font-size:13px;font-weight:900;letter-spacing:2px;color:var(--gold);text-transform:uppercase;border-left:3px solid var(--gold);padding-left:10px;margin:18px 0 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.sun-sec em{color:var(--mu);font-style:normal;font-weight:500;font-size:11px;letter-spacing:1px}
-.sun-card{background:linear-gradient(135deg,#1a1500,var(--p1));border:1px solid var(--bd);border-top:3px solid var(--gold);border-radius:3px;padding:20px;overflow:hidden}
+.sun-sec{font-size:13px;font-weight:900;letter-spacing:2px;color:var(–gold);text-transform:uppercase;border-left:3px solid var(–gold);padding-left:10px;margin:18px 0 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.sun-sec em{color:var(–mu);font-style:normal;font-weight:500;font-size:11px;letter-spacing:1px}
+.sun-card{background:linear-gradient(135deg,#1a1500,var(–p1));border:1px solid var(–bd);border-top:3px solid var(–gold);border-radius:3px;padding:20px;overflow:hidden}
 .sun-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
-.sun-stat{background:var(--p2);border:1px solid var(--bd);border-radius:4px;padding:14px;text-align:center}
+.sun-stat{background:var(–p2);border:1px solid var(–bd);border-radius:4px;padding:14px;text-align:center}
 .sun-stat-lbl{font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px}
-.sun-stat-val{font-size:20px;font-weight:300;color:var(--white);letter-spacing:-.5px}
-.sun-stat-sub{font-size:10px;color:var(--mu);margin-top:4px}
-.sun-diff-hdr{font-size:10px;font-weight:800;letter-spacing:1.5px;color:var(--gold);text-transform:uppercase;margin-bottom:8px;margin-top:4px}
+.sun-stat-val{font-size:20px;font-weight:300;color:var(–white);letter-spacing:-.5px}
+.sun-stat-sub{font-size:10px;color:var(–mu);margin-top:4px}
+.sun-diff-hdr{font-size:10px;font-weight:800;letter-spacing:1.5px;color:var(–gold);text-transform:uppercase;margin-bottom:8px;margin-top:4px}
 .sun-diff-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.sun-diff-card{background:var(--p2);border:1px solid var(--bd);border-radius:4px;padding:12px;text-align:center}
-.sun-diff-lbl{font-size:8px;font-weight:800;letter-spacing:1.5px;color:var(--gold);text-transform:uppercase;margin-bottom:6px}
+.sun-diff-card{background:var(–p2);border:1px solid var(–bd);border-radius:4px;padding:12px;text-align:center}
+.sun-diff-lbl{font-size:8px;font-weight:800;letter-spacing:1.5px;color:var(–gold);text-transform:uppercase;margin-bottom:6px}
 .sun-diff-val{font-size:20px;font-weight:700;line-height:1.1}
-.sun-diff-was{font-size:9px;color:var(--mu);margin-top:4px}
+.sun-diff-was{font-size:9px;color:var(–mu);margin-top:4px}
 .sun-diff-tag{display:inline-block;font-size:9px;font-weight:700;padding:2px 8px;border-radius:3px;margin-top:5px}
 .sun-diff-tag.gaining{background:rgba(255,136,68,.15);color:#ff8844}
 .sun-diff-tag.losing{background:rgba(100,149,255,.15);color:#77aaff}
-.sun-diff-tag.stable{background:rgba(0,212,74,.1);color:var(--green)}
+.sun-diff-tag.stable{background:rgba(0,212,74,.1);color:var(–green)}
 /* PWS / MC */
-.pws-station{background:var(--p1);border:1px solid var(--bd);border-top:3px solid var(--red);border-radius:3px;padding:16px;overflow:hidden}.pws-station.own{border-top-color:var(--gold);background:linear-gradient(135deg,var(--p1),#1a1500)}.pws-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px}.pws-name{font-size:15px;font-weight:800;color:var(--white)}.pws-loc{font-size:11px;color:var(--mu);margin-top:2px}.pws-id{font-size:9px;color:var(--mu2);letter-spacing:1.5px;font-weight:700;margin-top:2px}.pws-temp{font-size:36px;font-weight:200;color:var(--white);line-height:1;text-align:right}.pws-temp sup{font-size:16px;color:var(--red);font-weight:300}.pws-updated{font-size:9px;color:var(--mu2);text-align:right;margin-top:4px}.pws-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.pws-stat{background:var(--p2);border:1px solid var(--bd);border-radius:2px;padding:8px 10px;text-align:center}.pws-stat-lbl{font-size:8px;font-weight:800;letter-spacing:1px;color:var(--red);text-transform:uppercase;margin-bottom:3px}.pws-stat-val{font-size:14px;font-weight:300;color:var(--white)}.pws-stat-unit{font-size:9px;color:var(--mu2);margin-top:1px}.pws-err{color:var(--mu2);font-size:11px;font-style:italic;padding:8px 0}
-.mc-wrap{margin-top:20px}.mc-hdr{font-size:13px;font-weight:900;letter-spacing:2px;color:var(--gold);text-transform:uppercase;border-left:3px solid var(--gold);padding-left:10px;margin-bottom:14px;display:flex;align-items:center;gap:10px}.mc-hdr em{color:var(--mu);font-style:normal;font-weight:500;font-size:11px;letter-spacing:1px}
-.mc-now{display:grid;grid-template-columns:1fr auto 1fr;gap:0;margin-bottom:16px;border:1px solid var(--bd);border-radius:4px;overflow:hidden}.mc-col{padding:14px 16px}.mc-col.rwf{background:linear-gradient(135deg,#1a1500,var(--p1))}.mc-col.rdu{background:var(--p1)}.mc-vs{display:flex;align-items:center;justify-content:center;padding:0 10px;background:var(--p2);font-size:11px;font-weight:900;color:var(--mu);letter-spacing:2px}.mc-col-title{font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px}.mc-col.rwf .mc-col-title{color:var(--gold)}.mc-col.rdu .mc-col-title{color:var(--cyan)}
-.mc-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04)}.mc-row:last-child{border-bottom:none}.mc-row-lbl{font-size:9px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px}.mc-row-val{font-size:14px;font-weight:600;color:var(--white)}
-.mc-diff-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}.mc-diff-card{background:var(--p2);border:1px solid var(--bd);border-radius:4px;padding:12px;text-align:center}.mc-diff-lbl{font-size:8px;font-weight:800;letter-spacing:1.5px;color:var(--gold);text-transform:uppercase;margin-bottom:6px}.mc-diff-val{font-size:22px;font-weight:200;color:var(--white)}.mc-diff-note{font-size:9px;color:var(--mu);margin-top:4px}.mc-diff-tag{display:inline-block;font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;margin-top:4px}.mc-diff-tag.cooler{background:rgba(68,136,255,.15);color:#77aaff}.mc-diff-tag.warmer{background:rgba(255,102,0,.15);color:#ff8844}.mc-diff-tag.wetter{background:rgba(68,136,255,.15);color:#77aaff}.mc-diff-tag.drier{background:rgba(255,160,0,.15);color:#ffaa44}.mc-diff-tag.same{background:rgba(0,212,74,.1);color:var(--green)}
-.mc-mo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.mc-mo{background:var(--p2);border:1px solid var(--bd);border-radius:3px;padding:8px 6px;text-align:center}.mc-mo.current{border-color:var(--gold);background:#1a1500}.mc-mo.future{opacity:.25}.mc-mo-name{font-size:9px;font-weight:800;color:var(--mu);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px}.mc-mo-val{font-size:13px;font-weight:600;color:var(--white)}.mc-mo-sub{font-size:8px;color:var(--mu2);margin-top:2px}
-.mc-insight{background:linear-gradient(135deg,#1a1500,var(--p1));border:1px solid rgba(255,215,0,.15);border-radius:6px;padding:14px 16px;margin-top:14px}.mc-insight-title{font-size:9px;font-weight:800;letter-spacing:1.5px;color:var(--gold);text-transform:uppercase;margin-bottom:8px}.mc-insight-text{font-size:12px;color:rgba(255,255,255,.7);line-height:1.8}.mc-insight-text strong{color:var(--white)}.mc-note2{font-size:8px;color:var(--mu2);text-align:center;margin-top:12px;line-height:1.7}
-footer{background:var(--off);border-top:3px solid var(--red);padding:20px;margin-top:32px;text-align:center}footer p{font-size:10px;color:var(--mu2);letter-spacing:.4px;line-height:2.2}footer strong{color:var(--red)}
-.ld{color:var(--mu);animation:blink .9s infinite}@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.pws-station{background:var(–p1);border:1px solid var(–bd);border-top:3px solid var(–red);border-radius:3px;padding:16px;overflow:hidden}.pws-station.own{border-top-color:var(–gold);background:linear-gradient(135deg,var(–p1),#1a1500)}.pws-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px}.pws-name{font-size:15px;font-weight:800;color:var(–white)}.pws-loc{font-size:11px;color:var(–mu);margin-top:2px}.pws-id{font-size:9px;color:var(–mu2);letter-spacing:1.5px;font-weight:700;margin-top:2px}.pws-temp{font-size:36px;font-weight:200;color:var(–white);line-height:1;text-align:right}.pws-temp sup{font-size:16px;color:var(–red);font-weight:300}.pws-updated{font-size:9px;color:var(–mu2);text-align:right;margin-top:4px}.pws-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.pws-stat{background:var(–p2);border:1px solid var(–bd);border-radius:2px;padding:8px 10px;text-align:center}.pws-stat-lbl{font-size:8px;font-weight:800;letter-spacing:1px;color:var(–red);text-transform:uppercase;margin-bottom:3px}.pws-stat-val{font-size:14px;font-weight:300;color:var(–white)}.pws-stat-unit{font-size:9px;color:var(–mu2);margin-top:1px}.pws-err{color:var(–mu2);font-size:11px;font-style:italic;padding:8px 0}
+.mc-wrap{margin-top:20px}.mc-hdr{font-size:13px;font-weight:900;letter-spacing:2px;color:var(–gold);text-transform:uppercase;border-left:3px solid var(–gold);padding-left:10px;margin-bottom:14px;display:flex;align-items:center;gap:10px}.mc-hdr em{color:var(–mu);font-style:normal;font-weight:500;font-size:11px;letter-spacing:1px}
+.mc-now{display:grid;grid-template-columns:1fr auto 1fr;gap:0;margin-bottom:16px;border:1px solid var(–bd);border-radius:4px;overflow:hidden}.mc-col{padding:14px 16px}.mc-col.rwf{background:linear-gradient(135deg,#1a1500,var(–p1))}.mc-col.rdu{background:var(–p1)}.mc-vs{display:flex;align-items:center;justify-content:center;padding:0 10px;background:var(–p2);font-size:11px;font-weight:900;color:var(–mu);letter-spacing:2px}.mc-col-title{font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px}.mc-col.rwf .mc-col-title{color:var(–gold)}.mc-col.rdu .mc-col-title{color:var(–cyan)}
+.mc-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04)}.mc-row:last-child{border-bottom:none}.mc-row-lbl{font-size:9px;color:var(–mu);text-transform:uppercase;letter-spacing:.5px}.mc-row-val{font-size:14px;font-weight:600;color:var(–white)}
+.mc-diff-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}.mc-diff-card{background:var(–p2);border:1px solid var(–bd);border-radius:4px;padding:12px;text-align:center}.mc-diff-lbl{font-size:8px;font-weight:800;letter-spacing:1.5px;color:var(–gold);text-transform:uppercase;margin-bottom:6px}.mc-diff-val{font-size:22px;font-weight:200;color:var(–white)}.mc-diff-note{font-size:9px;color:var(–mu);margin-top:4px}.mc-diff-tag{display:inline-block;font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;margin-top:4px}.mc-diff-tag.cooler{background:rgba(68,136,255,.15);color:#77aaff}.mc-diff-tag.warmer{background:rgba(255,102,0,.15);color:#ff8844}.mc-diff-tag.wetter{background:rgba(68,136,255,.15);color:#77aaff}.mc-diff-tag.drier{background:rgba(255,160,0,.15);color:#ffaa44}.mc-diff-tag.same{background:rgba(0,212,74,.1);color:var(–green)}
+.mc-mo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.mc-mo{background:var(–p2);border:1px solid var(–bd);border-radius:3px;padding:8px 6px;text-align:center}.mc-mo.current{border-color:var(–gold);background:#1a1500}.mc-mo.future{opacity:.25}.mc-mo-name{font-size:9px;font-weight:800;color:var(–mu);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px}.mc-mo-val{font-size:13px;font-weight:600;color:var(–white)}.mc-mo-sub{font-size:8px;color:var(–mu2);margin-top:2px}
+.mc-insight{background:linear-gradient(135deg,#1a1500,var(–p1));border:1px solid rgba(255,215,0,.15);border-radius:6px;padding:14px 16px;margin-top:14px}.mc-insight-title{font-size:9px;font-weight:800;letter-spacing:1.5px;color:var(–gold);text-transform:uppercase;margin-bottom:8px}.mc-insight-text{font-size:12px;color:rgba(255,255,255,.7);line-height:1.8}.mc-insight-text strong{color:var(–white)}.mc-note2{font-size:8px;color:var(–mu2);text-align:center;margin-top:12px;line-height:1.7}
+footer{background:var(–off);border-top:3px solid var(–red);padding:20px;margin-top:32px;text-align:center}footer p{font-size:10px;color:var(–mu2);letter-spacing:.4px;line-height:2.2}footer strong{color:var(–red)}
+.ld{color:var(–mu);animation:blink .9s infinite}@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.7)}}
-::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-track{background:var(--p1)}::-webkit-scrollbar-thumb{background:var(--bd2)}
+::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-track{background:var(–p1)}::-webkit-scrollbar-thumb{background:var(–bd2)}
 @media(max-width:960px){.media-row{grid-template-columns:1fr 1fr}.ext-grid{grid-template-columns:repeat(4,1fr)}.alm-grid{grid-template-columns:1fr}}
 @media(max-width:760px){.ext-grid{grid-template-columns:repeat(3,1fr)}.sgrid{grid-template-columns:repeat(3,1fr)}.alm-mo-grid{grid-template-columns:repeat(3,1fr)}.media-row{grid-template-columns:1fr}.pws-grid{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:600px){
@@ -114,10 +209,6 @@ header{padding:8px 14px}.logo svg{width:36px;height:36px}.logo-text h1{font-size
 .tab-btn{font-size:10px;padding:8px 14px;letter-spacing:1px}
 main{padding:10px 8px}.sec{font-size:11px;padding-left:8px;margin-bottom:10px}.card{padding:14px 12px}
 .sgrid{grid-template-columns:repeat(3,1fr);gap:3px}.sval{font-size:20px}.hlbox{padding:10px}.hllbl{font-size:9px}.hlval{font-size:22px}
-#tsps{padding:14px 12px!important}.tsps-hdr-l h2{font-size:16px}.tsps-top{gap:16px;flex-direction:column}.tsps-gauge-w{width:100%;max-width:280px}
-.tsps-stats{flex-direction:row;flex-wrap:wrap;gap:6px;width:100%}.tsps-sbox{flex:1 1 calc(33% - 4px);min-width:90px;padding:8px 10px}.tsps-sbox .tsps-slbl{font-size:7px}.tsps-sbox .tsps-sval{font-size:13px}
-.tsps-cards{gap:6px;scroll-snap-type:x mandatory}.tsps-fc{min-width:110px;flex:0 0 auto;scroll-snap-align:start;padding:12px}.tsps-fc .fc-score{font-size:24px}
-.tsps-ch-row{grid-template-columns:1fr}.tsps-det-mg{grid-template-columns:repeat(2,1fr)}.tsps-det-sc{font-size:28px}
 .hr{min-width:64px;padding:8px 10px}.hr-v{font-size:15px}
 .ext-grid{grid-template-columns:repeat(2,1fr);gap:8px}.ext-day{padding:12px 8px}.ext-hi{font-size:18px}.ext-lo{font-size:13px}
 .media-frame{height:180px}
@@ -127,38 +218,15 @@ main{padding:10px 8px}.sec{font-size:11px;padding-left:8px;margin-bottom:10px}.c
 footer{padding:16px 12px;margin-top:20px}footer p{font-size:9px}
 .tip-panel{padding:18px;margin:10px}
 }
-@media(max-width:380px){.logo svg{width:30px;height:30px}.logo-text h1{font-size:14px}.clock{font-size:17px}.tsps-hdr-l h2{font-size:14px}.tsps-fc{min-width:100px}.tsps-sbox{flex:1 1 100%}.tsps-stats{flex-direction:column}}
-/* ── Tuffy's Accuracy Dashboard ── */
-.acc-wrap{margin-top:20px}
-.acc-hdr{font-size:13px;font-weight:900;letter-spacing:2px;color:var(--red);text-transform:uppercase;border-left:3px solid var(--red);padding-left:10px;margin-bottom:14px}
-.acc-hdr em{color:var(--mu);font-style:italic;font-weight:500;font-size:11px;letter-spacing:1px;text-transform:none}
-.acc-score-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
-.acc-score-card{background:var(--p2);border:1px solid var(--bd);border-radius:4px;padding:14px;text-align:center}
-.acc-score-lbl{font-size:9px;font-weight:800;letter-spacing:1.5px;color:var(--red);text-transform:uppercase;margin-bottom:6px}
-.acc-score-val{font-size:28px;font-weight:200;color:var(--white);line-height:1.1}
-.acc-score-val.good{color:var(--green)}
-.acc-score-val.ok{color:var(--yellow)}
-.acc-score-val.poor{color:#ef4444}
-.acc-score-sub{font-size:10px;color:var(--mu);margin-top:4px}
-.acc-log{border:1px solid var(--bd);border-radius:3px;overflow:hidden;margin-bottom:10px}
-.acc-log-hdr{display:grid;grid-template-columns:80px repeat(4,1fr) 70px;background:var(--p2);border-bottom:1px solid var(--bd);padding:8px 12px;font-size:9px;font-weight:800;letter-spacing:1.5px;color:var(--red);text-transform:uppercase}
-.acc-log-row{display:grid;grid-template-columns:80px repeat(4,1fr) 70px;padding:8px 12px;border-bottom:1px solid var(--bd);font-size:12px;color:var(--tx);align-items:center}
-.acc-log-row:last-child{border-bottom:none}
-.acc-log-row:nth-child(even){background:rgba(255,255,255,.02)}
-.acc-date{color:var(--mu);font-size:11px}
-.acc-badge{display:inline-block;font-size:9px;font-weight:800;letter-spacing:1px;padding:2px 7px;border-radius:3px;text-transform:uppercase}
-.acc-badge.hit{background:rgba(0,212,74,.15);color:var(--green)}
-.acc-badge.close{background:rgba(255,204,0,.12);color:var(--yellow)}
-.acc-badge.miss{background:rgba(239,68,68,.15);color:#ef4444}
-.acc-badge.pending{background:rgba(255,255,255,.06);color:var(--mu)}
-@media(max-width:760px){.acc-score-row{grid-template-columns:repeat(2,1fr)}.acc-log-hdr,.acc-log-row{grid-template-columns:60px repeat(4,1fr) 60px;font-size:10px;padding:7px 8px}}
-@media(max-width:500px){.acc-score-row{grid-template-columns:1fr 1fr}.acc-log-hdr,.acc-log-row{grid-template-columns:50px 1fr 1fr 60px;font-size:9px}.acc-log-hdr div:nth-child(4),.acc-log-hdr div:nth-child(5),.acc-log-row div:nth-child(4),.acc-log-row div:nth-child(5){display:none}}
+@media(max-width:380px){.logo svg{width:30px;height:30px}.logo-text h1{font-size:14px}.clock{font-size:17px}}
 </style>
+
 </head>
 <body>
 
 <!-- TOOLTIPS -->
-<div class="tip-overlay" id="tipTSPS"><div class="tip-panel"><button class="tip-close" onclick="closeTip('tipTSPS')">&times;</button><div class="tip-title">About Tuffy's Storm Prediction System</div><div class="tip-body"><div class="tip-label">What Is This?</div>A <strong>proprietary severe weather intelligence engine</strong> generating a <strong>Severe Weather Index (0-100)</strong> and occurrence likelihood for +3, +6, +9, +12, and +24 hour windows.<div class="tip-divider"></div><div class="tip-label">Data Sources</div>All data from the <strong>National Weather Service (NWS) API</strong>: hourly forecast and active alerts.<div class="tip-divider"></div><div class="tip-label">6-Component Algorithm</div><strong>Wind</strong> (0-20), <strong>Gusts</strong> (0-18), <strong>Precip</strong> (0-14), <strong>Instability</strong> (0-16), <strong>Forecast Text</strong> (0-14), <strong>Alerts</strong> (0-10).<div class="tip-divider"></div><div class="tip-label">Forecast Text Scoring</div>Scans NWS forecast text for severity keywords. Qualifying language like &ldquo;marginal,&rdquo; &ldquo;isolated,&rdquo; or &ldquo;slight chance&rdquo; reduces keyword scores by 65%. Co-occurrence bonus only fires when the base keyword score is high.<div class="tip-divider"></div><div class="tip-label">Threat Levels</div><div class="tip-color-row"><div class="tip-swatch" style="background:#1a6b3a"></div><strong>0-9 NONE</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#22c55e"></div><strong>10-24 LOW</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#eab308"></div><strong>25-49 GUARDED</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#f97316"></div><strong>50-74 ELEVATED</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#ef4444"></div><strong>75-89 HIGH</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#dc2626"></div><strong>90-100 EXTREME</strong></div></div></div></div>
+
+<div class="tip-overlay" id="tipVCTI"><div class="tip-panel"><button class="tip-close" onclick="closeTip('tipVCTI')">&times;</button><div class="tip-title">About the Valvano Convective Threat Index</div><div class="tip-body"><div class="tip-label">What Is This?</div>A <strong>proprietary multi-model convective intelligence engine</strong> generating a <strong>Convective Threat Index (0-100)</strong> by blending instability data from three world-class NWP models.<div class="tip-divider"></div><div class="tip-label">Data Sources</div><strong>HRRR</strong> (3km, NOAA), <strong>GFS</strong> (25km, NCEP), <strong>ECMWF IFS</strong> (9km, European Centre) — all via Open-Meteo API.<div class="tip-divider"></div><div class="tip-label">4-Component Algorithm</div><strong>CAPE</strong> (0-40): Convective Available Potential Energy<br><strong>CIN</strong> (0-20): Convective Inhibition (capping strength)<br><strong>Lifted Index</strong> (0-25): Atmospheric stability measure<br><strong>Agreement</strong> (0-15): Multi-model convergence bonus<div class="tip-divider"></div><div class="tip-label">Threat Levels</div><div class="tip-color-row"><div class="tip-swatch" style="background:#1a6b3a"></div><strong>0-9 STABLE</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#22c55e"></div><strong>10-24 MARGINAL</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#eab308"></div><strong>25-44 SLIGHT</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#f97316"></div><strong>45-64 ENHANCED</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#ef4444"></div><strong>65-84 MODERATE</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#dc2626"></div><strong>85-100 HIGH RISK</strong></div><div class="tip-divider"></div><div class="tip-label">Model Weights</div><strong>HRRR: 50%</strong> — Primary CAM, highest resolution<br><strong>GFS: 25%</strong> — Global model, extended range<br><strong>ECMWF: 25%</strong> — European model, independent verification</div></div></div>
 <div class="tip-overlay" id="tipForecast"><div class="tip-panel"><button class="tip-close" onclick="closeTip('tipForecast')">&times;</button><div class="tip-title">Reading the 7-Day Forecast</div><div class="tip-body"><div class="tip-label">Temperature Range Bar</div>Each bar spans <strong style="color:#77aaff">Low</strong> to <strong style="color:#ffaa55">High</strong>, positioned relative to the full week.<div class="tip-divider"></div><div class="tip-color-row"><div class="tip-swatch" style="background:#ff6600"></div><strong>Orange</strong> 80F+</div><div class="tip-color-row"><div class="tip-swatch" style="background:#ffcc00"></div><strong>Yellow</strong> 60-79F</div><div class="tip-color-row"><div class="tip-swatch" style="background:#4488ff"></div><strong>Blue</strong> Below 60F</div></div></div></div>
 <div class="tip-overlay" id="tipAlmanac"><div class="tip-panel"><button class="tip-close" onclick="closeTip('tipAlmanac')">&times;</button><div class="tip-title">Raleigh Wx Almanac</div><div class="tip-body"><strong>Year-to-date climate stats</strong> vs 30-year normals (1991-2020). Data from <strong>Open-Meteo Archive</strong> (ERA5). Reference: RDU Airport.<div class="tip-divider"></div><div class="tip-color-row"><div class="tip-swatch" style="background:#ff8844"></div><strong>Orange</strong> Above normal</div><div class="tip-color-row"><div class="tip-swatch" style="background:#77aaff"></div><strong>Blue</strong> Below normal</div><div class="tip-color-row"><div class="tip-swatch" style="background:#00d44a"></div><strong>Green</strong> Near normal</div></div></div></div>
 
@@ -173,6 +241,7 @@ footer{padding:16px 12px;margin-top:20px}footer p{font-size:9px}
 </div>
 
 <!-- LIVE TAB -->
+
 <div class="tab-pane active" id="tab-live">
 <main>
   <div class="sec">Current Conditions <em>- Red Wolf Farm - S. Wake County, NC - KNCRALEI761</em></div>
@@ -211,17 +280,665 @@ footer{padding:16px 12px;margin-top:20px}footer p{font-size:9px}
     </div>
   </div>
   <div style="margin-top:18px">
-    <div class="card" style="padding:0;overflow:hidden">
-      <div id="tsps" style="padding:20px 22px">
-        <div class="tsps-pulse" id="tspsPulseBar"></div>
-        <div id="tspsContent"><div class="tsps-ld"><div class="tsps-spinner"></div><p>Initializing Storm Prediction System...</p></div></div>
+    <div class="sec">Valvano Convective Threat Index <em>- HRRR + GFS + ECMWF IFS — Multi-Model Instability Analysis</em></div>
+<div class="card" style="padding:0;overflow:hidden" id="mmci-root">
+  <div class="mmci-wrap" id="mmci" style="padding:20px 22px">
+    <div class="mmci-pulse" id="mmciPulse"></div>
+    <div id="mmciContent">
+      <div class="mmci-ld">
+        <div class="mmci-spinner"></div>
+        <p>Initializing Valvano Convective Threat Index...</p>
+        <p class="sub">Querying HRRR · GFS · ECMWF</p>
       </div>
     </div>
   </div>
+</div>
+
+<script>
+// ================================================================
+// WOLFPACK WEATHER — VALVANO CONVECTIVE THREAT INDEX (VCTI)
+// ================================================================
+// Valvano Convective Threat Index: 3 world-class NWP models → 1 VCTI score
+// All data via Open-Meteo (CORS-enabled, no API key)
+// ================================================================
+(function(){
+"use strict";
+
+// ---- CONFIGURATION ----
+var MMCI = {
+  lat: 35.686,
+  lon: -78.614,
+  name: "Red Wolf Farm — S. Wake County, NC",
+  refresh: 600000, // 10 min
+  // Model definitions with weights for the blended CTI
+  models: [
+    {
+      id: "hrrr",
+      name: "HRRR",
+      full: "High-Resolution Rapid Refresh",
+      res: "3km / Hourly / 48h",
+      color: "#ef4444",
+      // HRRR gets highest weight: it's THE convection-allowing model
+      weight: 0.50,
+      apiModel: "hrrr_conus",
+      days: 2
+    },
+    {
+      id: "gfs",
+      name: "GFS",
+      full: "Global Forecast System",
+      res: "25km / 3-Hourly / 16d",
+      color: "#3b82f6",
+      weight: 0.25,
+      apiModel: "gfs_seamless",
+      days: 3
+    },
+    {
+      id: "ecmwf",
+      name: "ECMWF IFS",
+      full: "European Centre for Medium-Range",
+      res: "9km / 6-Hourly / 10d",
+      color: "#a855f7",
+      weight: 0.25,
+      apiModel: "ecmwf_ifs025",
+      days: 3
+    }
+  ]
+};
+
+// ---- STATE ----
+var state = {
+  modelData: {},    // keyed by model id
+  blended: null,    // blended CTI object
+  activeModel: 0,   // index into MMCI.models for detail view
+  lastUpdate: null,
+  charts: {},
+  peakCTI: 0
+};
+
+// ---- CAPE THREAT LEVELS ----
+// Based on SPC operational thresholds
+function capeThreat(cape){
+  if(cape<250) return {label:"NEGLIGIBLE",color:"#1a6b3a",desc:"No convective threat"};
+  if(cape<1000) return {label:"MARGINAL",color:"#22c55e",desc:"Isolated weak storms possible"};
+  if(cape<2000) return {label:"MODERATE",color:"#eab308",desc:"Organized storms possible"};
+  if(cape<3000) return {label:"HIGH",color:"#f97316",desc:"Strong-to-severe storms likely"};
+  if(cape<4500) return {label:"EXTREME",color:"#ef4444",desc:"Significant severe potential"};
+  return {label:"CRITICAL",color:"#dc2626",desc:"Violent storms possible"};
+}
+
+// ---- VCTI (Valvano Convective Threat Index) 0-100 ----
+// Proprietary composite: CAPE (0-40) + CIN (0-20) + LI (0-25) + Agreement (0-15)
+function computeCTI(cape, cin, li, agreement){
+  var capeScore = 0;
+  if(cape>=5000) capeScore=40;
+  else if(cape>=4000) capeScore=36;
+  else if(cape>=3000) capeScore=32;
+  else if(cape>=2500) capeScore=28;
+  else if(cape>=2000) capeScore=24;
+  else if(cape>=1500) capeScore=20;
+  else if(cape>=1000) capeScore=15;
+  else if(cape>=750) capeScore=11;
+  else if(cape>=500) capeScore=7;
+  else if(cape>=250) capeScore=4;
+  else capeScore=Math.round(cape/250*4);
+
+  // CIN: negative values indicate convective inhibition
+  // Less negative (closer to 0) = easier trigger = higher threat
+  var cinAbs = Math.abs(cin||0);
+  var cinScore = 0;
+  if(cinAbs<=10) cinScore=20;       // uncapped — storms fire freely
+  else if(cinAbs<=25) cinScore=17;
+  else if(cinAbs<=50) cinScore=14;
+  else if(cinAbs<=100) cinScore=10;
+  else if(cinAbs<=200) cinScore=6;
+  else if(cinAbs<=300) cinScore=3;
+  else cinScore=1;
+  // If CAPE is near zero, CIN doesn't matter
+  if(cape<100) cinScore=Math.round(cinScore*0.1);
+
+  // Lifted Index: negative = unstable, positive = stable
+  var liScore = 0;
+  if(li<=-8) liScore=25;
+  else if(li<=-6) liScore=22;
+  else if(li<=-4) liScore=18;
+  else if(li<=-2) liScore=14;
+  else if(li<=-1) liScore=10;
+  else if(li<=0) liScore=6;
+  else if(li<=2) liScore=3;
+  else liScore=0;
+
+  // Agreement bonus: 0-15 based on how well models agree
+  var agreeScore = Math.round(agreement * 15);
+
+  return Math.min(100, capeScore + cinScore + liScore + agreeScore);
+}
+
+// ---- CTI THREAT LEVEL ----
+function ctiLevel(score){
+  if(score<10) return {label:"STABLE",color:"#1a6b3a",desc:"No convective threat"};
+  if(score<25) return {label:"MARGINAL",color:"#22c55e",desc:"Weak instability present"};
+  if(score<45) return {label:"SLIGHT",color:"#eab308",desc:"Isolated storms possible"};
+  if(score<65) return {label:"ENHANCED",color:"#f97316",desc:"Organized convection likely"};
+  if(score<85) return {label:"MODERATE",color:"#ef4444",desc:"Widespread severe potential"};
+  return {label:"HIGH RISK",color:"#dc2626",desc:"Significant severe outbreak"};
+}
+
+// ---- FETCH ALL MODELS ----
+function fetchAllModels(){
+  var cont = document.getElementById("mmciContent");
+  cont.innerHTML = '<div class="mmci-ld"><div class="mmci-spinner"></div><p>Querying convection-allowing models...</p><p class="sub">HRRR · GFS · ECMWF IFS — Open-Meteo API</p></div>';
+
+  var promises = MMCI.models.map(function(m){
+    var url = "https://api.open-meteo.com/v1/forecast?latitude="+MMCI.lat+"&longitude="+MMCI.lon
+      +"&hourly=cape,lifted_index,convective_inhibition"
+      +"&models="+m.apiModel
+      +"&timezone=America%2FNew_York&forecast_days="+m.days
+      +"&temperature_unit=fahrenheit&wind_speed_unit=mph";
+    return fetch(url)
+      .then(function(r){if(!r.ok) throw new Error(m.name+" API "+r.status);return r.json();})
+      .then(function(d){
+        // Open-Meteo nests model data under hourly_units and hourly
+        // with model suffix keys like cape_hrrr_conus
+        var hourly = d.hourly || {};
+        var times = hourly.time || [];
+        // Find the right keys — they may be suffixed with model name or not
+        var capeKey=null,cinKey=null,liKey=null;
+        for(var k in hourly){
+          if(k.indexOf("cape")===0) capeKey=k;
+          if(k.indexOf("convective_inhibition")===0) cinKey=k;
+          if(k.indexOf("lifted_index")===0) liKey=k;
+        }
+        var capeArr = capeKey?hourly[capeKey]:[];
+        var cinArr = cinKey?hourly[cinKey]:[];
+        var liArr = liKey?hourly[liKey]:[];
+        return {id:m.id,ok:true,times:times,cape:capeArr,cin:cinArr,li:liArr};
+      })
+      .catch(function(e){
+        console.warn("MMCI: "+m.name+" failed:",e.message);
+        return {id:m.id,ok:false,times:[],cape:[],cin:[],li:[],error:e.message};
+      });
+  });
+
+  Promise.all(promises).then(function(results){
+    // Store raw data
+    results.forEach(function(r){state.modelData[r.id]=r;});
+    processAndRender();
+  });
+}
+
+// ---- PROCESS DATA + COMPUTE BLENDED CTI ----
+function processAndRender(){
+  var now = new Date();
+  var models = MMCI.models;
+  var blendedTimeline = [];
+
+  // Find current + next 24h indices for each model
+  models.forEach(function(m){
+    var d = state.modelData[m.id];
+    if(!d||!d.ok) return;
+    // Find current hour data
+    var nowIdx = -1, bestDiff = Infinity;
+    for(var i=0;i<d.times.length;i++){
+      var t = new Date(d.times[i]);
+      var diff = Math.abs(t - now);
+      if(diff < bestDiff){bestDiff=diff;nowIdx=i;}
+    }
+    d.currentIdx = nowIdx;
+    d.currentCape = (nowIdx>=0 && d.cape[nowIdx]!=null) ? d.cape[nowIdx] : 0;
+    d.currentCin = (nowIdx>=0 && d.cin[nowIdx]!=null) ? d.cin[nowIdx] : 0;
+    d.currentLi = (nowIdx>=0 && d.li[nowIdx]!=null) ? d.li[nowIdx] : 0;
+    // Peak CAPE in next 24h
+    var peakCape=0, peakIdx=nowIdx;
+    var limit = now.getTime() + 24*3600000;
+    for(var j=Math.max(0,nowIdx);j<d.times.length;j++){
+      if(new Date(d.times[j]).getTime()>limit) break;
+      if(d.cape[j]!=null && d.cape[j]>peakCape){peakCape=d.cape[j];peakIdx=j;}
+    }
+    d.peakCape24 = peakCape;
+    d.peakIdx24 = peakIdx;
+    d.peakCin24 = (d.cin[peakIdx]!=null)?d.cin[peakIdx]:0;
+    d.peakLi24 = (d.li[peakIdx]!=null)?d.li[peakIdx]:0;
+    d.peakTime24 = d.times[peakIdx]||null;
+  });
+
+  // Compute blended current values using weights
+  var bCape=0, bCin=0, bLi=0, totalWeight=0;
+  var validModels = [];
+  models.forEach(function(m){
+    var d = state.modelData[m.id];
+    if(!d||!d.ok) return;
+    validModels.push(m);
+    bCape += d.currentCape * m.weight;
+    bCin += d.currentCin * m.weight;
+    bLi += d.currentLi * m.weight;
+    totalWeight += m.weight;
+  });
+  if(totalWeight>0){bCape/=totalWeight;bCin/=totalWeight;bLi/=totalWeight;}
+
+  // Model agreement: how closely do they agree on CAPE?
+  var agreement = 0;
+  if(validModels.length>=2){
+    var capeValues = validModels.map(function(m){return state.modelData[m.id].currentCape;});
+    var maxC = Math.max.apply(null,capeValues), minC = Math.min.apply(null,capeValues);
+    var meanC = capeValues.reduce(function(a,b){return a+b;},0)/capeValues.length;
+    var spread = maxC - minC;
+    // Agreement = 1.0 when models are within 10% of each other
+    if(meanC<50) agreement=1.0; // all models say negligible = perfect agreement
+    else agreement = Math.max(0, 1.0 - (spread / (meanC * 2)));
+  } else {
+    agreement = 0.5;
+  }
+
+  // Blended CTI
+  var currentCTI = computeCTI(bCape, bCin, bLi, agreement);
+
+  // Peak CTI in next 24h (using peak from each model)
+  var pCape=0,pCin=0,pLi=0,pTW=0;
+  validModels.forEach(function(m){
+    var d=state.modelData[m.id];
+    pCape += d.peakCape24*m.weight;
+    pCin += d.peakCin24*m.weight;
+    pLi += d.peakLi24*m.weight;
+    pTW += m.weight;
+  });
+  if(pTW>0){pCape/=pTW;pCin/=pTW;pLi/=pTW;}
+  var peakCTI = computeCTI(pCape, pCin, pLi, agreement);
+
+  state.blended = {
+    cape: Math.round(bCape),
+    cin: Math.round(bCin),
+    li: +bLi.toFixed(1),
+    cti: currentCTI,
+    peakCTI: peakCTI,
+    peakCape: Math.round(pCape),
+    agreement: agreement
+  };
+  state.peakCTI = Math.max(currentCTI, peakCTI);
+  state.lastUpdate = new Date();
+
+  renderDashboard();
+}
+
+// ---- GAUGE SVG ----
+function buildGauge(score, size){
+  var lv = ctiLevel(score);
+  var r=size*0.38, cx=size/2, cy=size/2+10;
+  var sA=-220, eA=40, tot=eA-sA;
+  var scA = sA + (score/100)*tot;
+  function p2c(a,rd){return{x:cx+rd*Math.cos(a*Math.PI/180),y:cy+rd*Math.sin(a*Math.PI/180)};}
+  function arc(a1,a2,rd){var s=p2c(a1,rd),e=p2c(a2,rd);return"M "+s.x+" "+s.y+" A "+rd+" "+rd+" 0 "+(a2-a1>180?1:0)+" 1 "+e.x+" "+e.y;}
+  var ticks=[0,10,25,45,65,85,100],tk="";
+  ticks.forEach(function(t){
+    var a=sA+(t/100)*tot,i=p2c(a,r-12),o=p2c(a,r+12),l=p2c(a,r+22);
+    tk+='<line x1="'+i.x+'" y1="'+i.y+'" x2="'+o.x+'" y2="'+o.y+'" stroke="rgba(255,255,255,.18)" stroke-width="1.5"/>';
+    tk+='<text x="'+l.x+'" y="'+l.y+'" fill="rgba(255,255,255,.3)" font-size="7.5" text-anchor="middle" dominant-baseline="middle" font-family="Segoe UI,sans-serif">'+t+'</text>';
+  });
+  var np=p2c(scA,r-2),h=size*0.72;
+  return '<svg viewBox="0 0 '+size+' '+h+'" style="width:100%;max-width:'+size+'px;height:auto">'+
+    '<defs>'+
+    '<linearGradient id="mmciG" x1="0%" x2="100%"><stop offset="0%" stop-color="#1a472a"/><stop offset="20%" stop-color="#22c55e"/><stop offset="40%" stop-color="#eab308"/><stop offset="60%" stop-color="#f97316"/><stop offset="80%" stop-color="#ef4444"/><stop offset="100%" stop-color="#dc2626"/></linearGradient>'+
+    '<filter id="mmciGl"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'+
+    '</defs>'+
+    '<path d="'+arc(sA,eA,r)+'" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="14" stroke-linecap="round"/>'+
+    '<path d="'+arc(sA,scA,r)+'" fill="none" stroke="url(#mmciG)" stroke-width="14" stroke-linecap="round" filter="url(#mmciGl)"/>'+
+    tk+
+    '<circle cx="'+np.x+'" cy="'+np.y+'" r="5.5" fill="'+lv.color+'" filter="url(#mmciGl)"/>'+
+    '<text x="'+cx+'" y="'+(cy-18)+'" fill="'+lv.color+'" font-size="36" font-weight="800" text-anchor="middle" dominant-baseline="middle" filter="url(#mmciGl)" font-family="Segoe UI,sans-serif">'+score+'</text>'+
+    '<text x="'+cx+'" y="'+(cy+8)+'" fill="'+lv.color+'" font-size="11" font-weight="700" text-anchor="middle" letter-spacing="3" font-family="Segoe UI,sans-serif">'+lv.label+'</text>'+
+    '<text x="'+cx+'" y="'+(cy+24)+'" fill="rgba(255,255,255,.4)" font-size="7.5" text-anchor="middle" font-family="Segoe UI,sans-serif">'+lv.desc+'</text>'+
+    '</svg>';
+}
+
+// ---- MODEL CONVERGENCE RADAR (radar chart SVG) ----
+function buildConvergenceRadar(){
+  var models = MMCI.models;
+  var axes = [
+    {key:"cape",label:"CAPE",max:5000},
+    {key:"cin",label:"CIN",max:300,invert:true},
+    {key:"li",label:"LIFTED IDX",max:10,invert:true}
+  ];
+  var cx=160,cy=130,R=95,n=axes.length;
+  function polar(i,r){var a=(Math.PI*2/n)*i-Math.PI/2;return{x:cx+r*Math.cos(a),y:cy+r*Math.sin(a)};}
+
+  var svg='<svg viewBox="0 0 320 270" class="mmci-radar-svg" xmlns="http://www.w3.org/2000/svg">';
+  svg+='<defs>';
+  models.forEach(function(m,i){
+    svg+='<filter id="mmciRG'+i+'"><feGaussianBlur stdDeviation="3" result="b"/><feFlood flood-color="'+m.color+'" flood-opacity=".5"/><feComposite in2="b" operator="in"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
+  });
+  svg+='</defs>';
+
+  // Grid rings
+  [0.25,0.5,0.75,1.0].forEach(function(pct){
+    var pts=[];
+    for(var i=0;i<n;i++){var p=polar(i,R*pct);pts.push(p.x+","+p.y);}
+    svg+='<polygon points="'+pts.join(" ")+'" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="1"/>';
+  });
+  // Axis lines + labels
+  for(var i=0;i<n;i++){
+    var p=polar(i,R),lp=polar(i,R+18);
+    svg+='<line x1="'+cx+'" y1="'+cy+'" x2="'+p.x+'" y2="'+p.y+'" stroke="rgba(255,255,255,.08)" stroke-width="1"/>';
+    svg+='<text x="'+lp.x+'" y="'+lp.y+'" text-anchor="middle" fill="rgba(255,255,255,.35)" font-size="7.5" font-weight="700" letter-spacing="1" font-family="Segoe UI,sans-serif">'+axes[i].label+'</text>';
+  }
+
+  // Plot each model
+  models.forEach(function(m,mi){
+    var d = state.modelData[m.id];
+    if(!d||!d.ok) return;
+    var pts=[];
+    axes.forEach(function(ax,ai){
+      var raw;
+      if(ax.key==="cape") raw=d.currentCape;
+      else if(ax.key==="cin") raw=Math.abs(d.currentCin||0);
+      else raw=d.currentLi!=null?-d.currentLi:0; // negate so more negative LI = higher
+      if(ax.invert && ax.key==="cin") raw=Math.abs(d.currentCin||0); // already abs
+      if(ax.invert && ax.key==="li") raw=d.currentLi!=null?Math.max(0,-d.currentLi):0;
+      var pct=Math.max(0.05, Math.min(1, raw/ax.max));
+      var p=polar(ai,R*pct);
+      pts.push({x:p.x,y:p.y,pct:pct});
+    });
+    // Shape fill
+    svg+='<polygon points="'+pts.map(function(p){return p.x+","+p.y;}).join(" ")+'" fill="'+m.color+'" fill-opacity=".08" stroke="'+m.color+'" stroke-width="1.5" stroke-opacity=".5"/>';
+    // Dots
+    pts.forEach(function(p,pi){
+      var sz = 3+p.pct*3;
+      svg+='<circle cx="'+p.x+'" cy="'+p.y+'" r="'+sz+'" fill="'+m.color+'" fill-opacity="'+(0.5+p.pct*0.4)+'" filter="url(#mmciRG'+mi+')"/>';
+      svg+='<circle cx="'+p.x+'" cy="'+p.y+'" r="1.5" fill="white" fill-opacity=".7"/>';
+    });
+  });
+
+  // Center score
+  var b=state.blended, bLv=ctiLevel(b.cti);
+  svg+='<circle cx="'+cx+'" cy="'+cy+'" r="20" fill="rgba(0,0,0,.6)" stroke="'+bLv.color+'" stroke-width="2" stroke-opacity=".5"/>';
+  svg+='<text x="'+cx+'" y="'+(cy+1)+'" text-anchor="middle" dominant-baseline="middle" fill="'+bLv.color+'" font-size="14" font-weight="800" font-family="Segoe UI,sans-serif">'+b.cti+'</text>';
+  svg+='<text x="'+cx+'" y="'+(cy+12)+'" text-anchor="middle" fill="rgba(255,255,255,.25)" font-size="5.5" font-weight="700" letter-spacing="1.5" font-family="Segoe UI,sans-serif">VCTI</text>';
+  svg+='</svg>';
+
+  // Legend
+  var legend='<div class="mmci-radar-legend">';
+  models.forEach(function(m){
+    var d=state.modelData[m.id];
+    legend+='<div class="mmci-radar-leg"><div class="mmci-radar-dot" style="background:'+m.color+(d&&d.ok?'':';opacity:.2')+'"></div>'+m.name+'</div>';
+  });
+  legend+='</div>';
+  return svg+legend;
+}
+
+// ---- RENDER DASHBOARD ----
+function renderDashboard(){
+  var cont = document.getElementById("mmciContent");
+  var wrap = document.getElementById("mmci");
+  var pulse = document.getElementById("mmciPulse");
+  var b = state.blended;
+  var bLv = ctiLevel(b.cti);
+  var pkLv = ctiLevel(state.peakCTI);
+
+  // Pulse bar for elevated threat
+  if(state.peakCTI >= 45){
+    wrap.classList.add("mmci-active");
+    pulse.style.background = "linear-gradient(90deg,transparent,"+pkLv.color+",transparent)";
+  } else {
+    wrap.classList.remove("mmci-active");
+  }
+
+  var gaugeSize = Math.min(230, Math.max(180, wrap.clientWidth * 0.5));
+
+  // Agreement display
+  var agPct = Math.round(b.agreement*100);
+  var agCol = agPct>=80?"#22c55e":(agPct>=50?"#eab308":"#ef4444");
+  var agLbl = agPct>=80?"HIGH":(agPct>=50?"MODERATE":"LOW");
+
+  // Model cards
+  var cardsH = "";
+  MMCI.models.forEach(function(m, idx){
+    var d = state.modelData[m.id];
+    var isAct = idx === state.activeModel;
+    if(!d||!d.ok){
+      cardsH += '<div class="mmci-mc'+(isAct?' act':'')+'" data-idx="'+idx+'"><div class="mmci-mc-stripe" style="background:'+m.color+'"></div><div class="mmci-mc-name" style="color:'+m.color+'">'+m.name+'</div><div style="color:rgba(255,255,255,.25);font-size:10px;padding:20px 0">Offline</div></div>';
+      return;
+    }
+    var capePct = Math.min(100, Math.round(d.currentCape/5000*100));
+    var capeLv = capeThreat(d.currentCape);
+    cardsH += '<div class="mmci-mc'+(isAct?' act':'')+'" data-idx="'+idx+'">'+
+      '<div class="mmci-mc-stripe" style="background:'+m.color+'"></div>'+
+      '<div class="mmci-mc-name" style="color:'+m.color+'">'+m.name+'</div>'+
+      '<div class="mmci-mc-cape">'+Math.round(d.currentCape)+'<span class="mmci-mc-cape-unit">J/kg</span></div>'+
+      '<div class="mmci-mc-cape-lbl">Surface CAPE</div>'+
+      '<div class="mmci-mc-params">'+
+        '<div class="mmci-mc-p"><div class="mmci-mc-p-lbl">CIN</div><div class="mmci-mc-p-val">'+Math.round(d.currentCin||0)+'</div></div>'+
+        '<div class="mmci-mc-p"><div class="mmci-mc-p-lbl">Lifted Idx</div><div class="mmci-mc-p-val">'+(d.currentLi!=null?d.currentLi.toFixed(1):"--")+'</div></div>'+
+      '</div>'+
+      '<div class="mmci-mc-bar"><div class="mmci-mc-bar-f" style="width:'+capePct+'%;background:'+capeLv.color+'"></div></div>'+
+      '<div class="mmci-mc-meta"><span>'+capeLv.label+'</span><span>Peak 24h: '+Math.round(d.peakCape24)+' J/kg</span></div>'+
+      '<div class="mmci-mc-weight">BLEND WEIGHT: '+Math.round(m.weight*100)+'%</div>'+
+    '</div>';
+  });
+
+  // Active model detail
+  var am = MMCI.models[state.activeModel];
+  var ad = state.modelData[am.id];
+  var detH = "";
+  if(ad && ad.ok){
+    var mCTI = computeCTI(ad.currentCape, ad.currentCin, ad.currentLi, 0.5);
+    var mLv = ctiLevel(mCTI);
+    var peakLv = capeThreat(ad.peakCape24);
+    detH = '<div class="mmci-detail">'+
+      '<div class="mmci-det-hdr">'+
+        '<div><div class="mmci-det-model" style="color:'+am.color+'">'+am.full+'</div><div class="mmci-det-res">'+am.res+'</div></div>'+
+        '<div style="text-align:right"><div class="mmci-det-score" style="color:'+mLv.color+'">'+mCTI+'</div><div class="mmci-det-lv" style="color:'+mLv.color+'">'+mLv.label+'</div></div>'+
+      '</div>'+
+      '<div class="mmci-det-grid">'+
+        '<div class="mmci-det-cell"><div class="mmci-det-cell-lbl">CAPE NOW</div><div class="mmci-det-cell-val">'+Math.round(ad.currentCape)+'</div><div class="mmci-det-cell-unit">J/kg</div></div>'+
+        '<div class="mmci-det-cell"><div class="mmci-det-cell-lbl">CIN NOW</div><div class="mmci-det-cell-val">'+Math.round(ad.currentCin||0)+'</div><div class="mmci-det-cell-unit">J/kg</div></div>'+
+        '<div class="mmci-det-cell"><div class="mmci-det-cell-lbl">LIFTED INDEX</div><div class="mmci-det-cell-val">'+(ad.currentLi!=null?ad.currentLi.toFixed(1):"--")+'</div><div class="mmci-det-cell-unit">&deg;C</div></div>'+
+        '<div class="mmci-det-cell"><div class="mmci-det-cell-lbl">PEAK CAPE 24H</div><div class="mmci-det-cell-val" style="color:'+peakLv.color+'">'+Math.round(ad.peakCape24)+'</div><div class="mmci-det-cell-unit">J/kg</div></div>'+
+      '</div>'+
+      '<div class="mmci-det-nar" style="border-left-color:'+am.color+'44">'+
+        '<b>'+am.name+' Analysis:</b> Current CAPE of <b>'+Math.round(ad.currentCape)+' J/kg</b> indicates <b>'+capeThreat(ad.currentCape).desc.toLowerCase()+'</b>. '+
+        (ad.currentCin<-100?'Strong capping inversion (CIN '+Math.round(ad.currentCin)+' J/kg) is suppressing convective initiation. ':'CIN of '+Math.round(ad.currentCin||0)+' J/kg suggests '+(Math.abs(ad.currentCin||0)<50?'minimal capping — storms can fire freely. ':'moderate inhibition present. '))+
+        'Lifted Index of <b>'+(ad.currentLi!=null?ad.currentLi.toFixed(1):"--")+'</b> '+(ad.currentLi!=null?(ad.currentLi<=-4?'strongly supports deep moist convection.':ad.currentLi<=-1?'indicates conditional instability.':'shows a generally stable atmosphere.'):'is unavailable.')+
+        ' Peak CAPE reaches <b>'+Math.round(ad.peakCape24)+' J/kg</b> within 24 hours'+(ad.peakTime24?' near <b>'+new Date(ad.peakTime24).toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit",hour12:true})+' ET</b>':'')+'.'+
+      '</div>'+
+    '</div>';
+  }
+
+  // Assemble
+  cont.innerHTML =
+    '<div class="mmci-hdr">'+
+      '<div class="mmci-hdr-l">'+
+        '<div class="mmci-tag">VALVANO CONVECTIVE THREAT INDEX</div>'+
+        '<h2><span class="mmci-accent">Valvano</span> Convective Threat Index</h2>'+
+        '<div class="mmci-sub">'+MMCI.name+' — HRRR + GFS + ECMWF IFS blended instability analysis</div>'+
+      '</div>'+
+      '<div class="mmci-hdr-r">'+
+        '<div class="mmci-ulbl">LAST UPDATE</div>'+
+        '<div class="mmci-utime">'+(state.lastUpdate?state.lastUpdate.toLocaleTimeString():"--")+'</div>'+
+        '<button class="mmci-rbtn" id="mmciRefresh">Refresh Models</button>'+
+      '</div>'+
+    '</div>'+
+
+    '<div class="mmci-top">'+
+      '<div class="mmci-gauge-w">'+
+        '<div class="mmci-gauge-lbl">VALVANO CONVECTIVE THREAT INDEX</div>'+
+        buildGauge(b.cti, gaugeSize)+
+      '</div>'+
+      '<div class="mmci-stats">'+
+        '<div class="mmci-sbox"><div class="mmci-slbl">BLENDED CAPE</div><div class="mmci-sval" style="color:'+capeThreat(b.cape).color+'">'+b.cape+' <span style="font-size:10px;color:rgba(255,255,255,.3)">J/kg</span></div></div>'+
+        '<div class="mmci-sbox"><div class="mmci-slbl">BLENDED CIN</div><div class="mmci-sval">'+b.cin+' <span style="font-size:10px;color:rgba(255,255,255,.3)">J/kg</span></div></div>'+
+        '<div class="mmci-sbox"><div class="mmci-slbl">BLENDED LIFTED IDX</div><div class="mmci-sval">'+(b.li>0?"+":"")+b.li+'<span style="font-size:10px;color:rgba(255,255,255,.3)"> &deg;C</span></div></div>'+
+        '<div class="mmci-sbox"><div class="mmci-slbl">MODEL AGREEMENT</div><div class="mmci-sval" style="color:'+agCol+'">'+agPct+'% <span style="font-size:10px;color:rgba(255,255,255,.3)">'+agLbl+'</span></div></div>'+
+        '<div class="mmci-sbox"><div class="mmci-slbl">PEAK VCTI (24H)</div><div class="mmci-sval" style="color:'+pkLv.color+'">'+state.peakCTI+' <span style="font-size:10px;color:rgba(255,255,255,.3)">'+pkLv.label+'</span></div></div>'+
+      '</div>'+
+    '</div>'+
+
+    '<div class="mmci-models-lbl">INDIVIDUAL MODEL OUTPUT — Click to explore</div>'+
+    '<div class="mmci-model-cards">'+cardsH+'</div>'+
+
+    '<div class="mmci-radar-wrap">'+
+      '<div class="mmci-radar-title">MODEL CONVERGENCE RADAR</div>'+
+      '<div class="mmci-radar-sub">3-MODEL INSTABILITY PARAMETER OVERLAY</div>'+
+      buildConvergenceRadar()+
+    '</div>'+
+
+    '<div class="mmci-tl-wrap"><div class="mmci-tl-title">CAPE TIMELINE — ALL MODELS (NEXT 48H)</div><canvas id="mmciTL"></canvas></div>'+
+
+    '<div class="mmci-ch-row">'+
+      '<div class="mmci-ch-box"><div class="mmci-ct">CIN TIMELINE — CAPPING STRENGTH</div><canvas id="mmciCIN"></canvas></div>'+
+      '<div class="mmci-ch-box"><div class="mmci-ct">LIFTED INDEX TIMELINE — STABILITY</div><canvas id="mmciLI"></canvas></div>'+
+    '</div>'+
+
+    detH+
+
+    '<div class="mmci-foot">'+
+      '<span>VCTI v1.0 — Valvano Convective Threat Index — Wolfpack Weather</span>'+
+      '<span>HRRR 3km · GFS 0.25° · ECMWF IFS 9km — via Open-Meteo</span>'+
+      '<span>Auto-refresh 10 min</span>'+
+    '</div>';
+
+  // Bind events
+  document.getElementById("mmciRefresh").addEventListener("click", function(){fetchAllModels();});
+  document.querySelectorAll(".mmci-mc").forEach(function(c){
+    c.addEventListener("click", function(){
+      state.activeModel = parseInt(this.getAttribute("data-idx"));
+      renderDashboard();
+    });
+  });
+
+  // Build charts
+  buildCharts();
+}
+
+// ---- CHARTS ----
+function destroyCharts(){
+  ["tl","cin","li"].forEach(function(k){
+    if(state.charts[k]){state.charts[k].destroy();state.charts[k]=null;}
+  });
+}
+
+function buildCharts(){
+  destroyCharts();
+  if(typeof Chart==="undefined") return;
+
+  var mob = window.innerWidth < 600;
+  Chart.defaults.color = "rgba(255,255,255,.35)";
+  Chart.defaults.borderColor = "rgba(255,255,255,.05)";
+  Chart.defaults.font.family = "'Segoe UI',sans-serif";
+  Chart.defaults.font.size = mob?9:10;
+
+  var now = new Date();
+  var limit48 = now.getTime() + 48*3600000;
+
+  // Build aligned time labels from HRRR (finest resolution)
+  var hrrrD = state.modelData["hrrr"];
+  if(!hrrrD||!hrrrD.ok) return;
+
+  var labels = [], labelDates = [];
+  for(var i=0;i<hrrrD.times.length;i++){
+    var t = new Date(hrrrD.times[i]);
+    if(t < now) continue;
+    if(t.getTime() > limit48) break;
+    labels.push(t.toLocaleTimeString("en-US",{hour:"numeric",hour12:true,month:"short",day:"numeric"}));
+    labelDates.push(t.getTime());
+  }
+
+  // For each model, interpolate to the HRRR timeline
+  function alignModel(modelId, param){
+    var d = state.modelData[modelId];
+    if(!d||!d.ok) return labels.map(function(){return null;});
+    var mTimes = d.times.map(function(t){return new Date(t).getTime();});
+    var arr = param==="cape"?d.cape:(param==="cin"?d.cin:d.li);
+    return labelDates.map(function(target){
+      // Find nearest model time
+      var bestIdx=0, bestDiff=Infinity;
+      for(var j=0;j<mTimes.length;j++){
+        var diff=Math.abs(mTimes[j]-target);
+        if(diff<bestDiff){bestDiff=diff;bestIdx=j;}
+      }
+      // Only use if within 3 hours
+      if(bestDiff>3*3600000) return null;
+      return arr[bestIdx]!=null?arr[bestIdx]:null;
+    });
+  }
+
+  // CAPE Timeline
+  var tlEl = document.getElementById("mmciTL");
+  if(tlEl){
+    var datasets = MMCI.models.map(function(m){
+      return {
+        label: m.name,
+        data: alignModel(m.id,"cape"),
+        borderColor: m.color,
+        backgroundColor: m.color+"20",
+        fill: m.id==="hrrr",
+        tension: 0.35,
+        borderWidth: m.id==="hrrr"?2.5:1.5,
+        pointRadius: mob?1:2,
+        borderDash: m.id==="hrrr"?[]:[4,3]
+      };
+    });
+    state.charts.tl = new Chart(tlEl, {
+      type:"line",
+      data:{labels:labels,datasets:datasets},
+      options:{responsive:true,maintainAspectRatio:false,
+        interaction:{mode:"index",intersect:false},
+        scales:{y:{min:0,grid:{color:"rgba(255,255,255,.04)"},title:{display:!mob,text:"CAPE (J/kg)",font:{size:9}}},x:{grid:{display:false},ticks:{maxTicksLimit:mob?6:12,maxRotation:45}}},
+        plugins:{legend:{labels:{boxWidth:10,padding:mob?6:12}},tooltip:{callbacks:{label:function(ctx){return ctx.dataset.label+": "+Math.round(ctx.parsed.y)+" J/kg";}}}}}
+    });
+  }
+
+  // CIN Timeline
+  var cinEl = document.getElementById("mmciCIN");
+  if(cinEl){
+    state.charts.cin = new Chart(cinEl, {
+      type:"line",
+      data:{labels:labels,datasets:MMCI.models.map(function(m){
+        return {label:m.name,data:alignModel(m.id,"cin"),borderColor:m.color,backgroundColor:m.color+"15",fill:false,tension:.35,borderWidth:1.5,pointRadius:mob?1:2};
+      })},
+      options:{responsive:true,maintainAspectRatio:false,
+        interaction:{mode:"index",intersect:false},
+        scales:{y:{grid:{color:"rgba(255,255,255,.04)"},title:{display:!mob,text:"CIN (J/kg)",font:{size:9}}},x:{grid:{display:false},ticks:{maxTicksLimit:mob?5:8,maxRotation:45}}},
+        plugins:{legend:{labels:{boxWidth:8,padding:mob?5:10}},tooltip:{callbacks:{label:function(ctx){return ctx.dataset.label+": "+Math.round(ctx.parsed.y)+" J/kg";}}}}}
+    });
+  }
+
+  // LI Timeline
+  var liEl = document.getElementById("mmciLI");
+  if(liEl){
+    state.charts.li = new Chart(liEl, {
+      type:"line",
+      data:{labels:labels,datasets:MMCI.models.map(function(m){
+        return {label:m.name,data:alignModel(m.id,"li"),borderColor:m.color,fill:false,tension:.35,borderWidth:1.5,pointRadius:mob?1:2};
+      })},
+      options:{responsive:true,maintainAspectRatio:false,
+        interaction:{mode:"index",intersect:false},
+        scales:{y:{reverse:true,grid:{color:"rgba(255,255,255,.04)"},title:{display:!mob,text:"Lifted Index (°C)",font:{size:9}}},x:{grid:{display:false},ticks:{maxTicksLimit:mob?5:8,maxRotation:45}}},
+        plugins:{legend:{labels:{boxWidth:8,padding:mob?5:10}},
+          annotation:liEl?undefined:undefined, // LI=0 line handled by grid
+          tooltip:{callbacks:{label:function(ctx){return ctx.dataset.label+": "+(ctx.parsed.y!=null?ctx.parsed.y.toFixed(1):"--")+"°C";}}}}}
+    });
+  }
+}
+
+// ---- INIT ----
+fetchAllModels();
+setInterval(fetchAllModels, MMCI.refresh);
+
+// Handle resize for chart responsiveness
+var mmciResizeTimer;
+window.addEventListener("resize", function(){
+  clearTimeout(mmciResizeTimer);
+  mmciResizeTimer = setTimeout(function(){
+    if(state.blended) renderDashboard();
+  }, 300);
+});
+
+})();
+</script>
+
+  </div>
   <div style="margin-top:18px">
     <div class="sec">12-Hour Forecast</div>
-    <div id="hr-summary" style="font-size:12px;color:rgba(255,255,255,.6);line-height:1.8;padding:12px 16px;background:var(--p1);border:1px solid var(--bd);border-left:3px solid var(--red);border-radius:3px;margin-top:0"></div>
-    <div class="card hourly-wrap" style="margin-top:8px"><div class="hr-row" id="hr-row"><div class="ld">Loading...</div></div></div>
+    <div class="card hourly-wrap"><div class="hr-row" id="hr-row"><div class="ld">Loading...</div></div></div>
   </div>
   <div style="margin-top:18px">
     <div class="sec">7-Day Extended Forecast <div class="tip-btn" onclick="openTip('tipForecast')">?</div></div>
@@ -237,6 +954,7 @@ footer{padding:16px 12px;margin-top:20px}footer p{font-size:9px}
 </div>
 
 <!-- ALMANAC TAB -->
+
 <div class="tab-pane" id="tab-almanac">
 <div class="alm-wrap">
   <div class="sec">Raleigh Wx Almanac <em>- RDU Airport - Historical Climate Data</em> <div class="tip-btn" onclick="openTip('tipAlmanac')">?</div></div>
@@ -247,6 +965,7 @@ footer{padding:16px 12px;margin-top:20px}footer p{font-size:9px}
 </div>
 
 <!-- PWS TAB -->
+
 <div class="tab-pane" id="tab-pws">
 <div class="alm-wrap">
   <div class="sec">Wake County PWS Network <em>- Personal Weather Stations - Weather Underground</em></div>
@@ -257,7 +976,7 @@ footer{padding:16px 12px;margin-top:20px}footer p{font-size:9px}
 <footer>
   <p><strong>Wolfpack Weather</strong> - Station <strong>KNCRALEI761</strong> - Red Wolf Farm - S. Wake County, NC</p>
   <p>Weather: Open-Meteo - Alerts: NWS - Satellite: NOAA GOES-East - Radar: NWS KRAX</p>
-  <p>Tuffy's Storm Prediction System v2.1 - Wolfpack Weather Network - NC State Athletics</p>
+  <p>Valvano Convective Threat Index v1.0 - Wolfpack Weather Network - NC State Athletics</p>
 </footer>
 
 <script>
@@ -383,43 +1102,14 @@ function fetchConditions(){
 function buildHourly(h){
   var row=$("hr-row");row.innerHTML="";
   var n=new Date();var cnt=0;
-  // Collect upcoming 12 hours of data for summary
-  var upcoming=[];
-  for(var i=0;i<h.time.length&&upcoming.length<12;i++){
+  for(var i=0;i<h.time.length&&cnt<14;i++){
     var t=new Date(h.time[i]);
-    if(t<n)continue;
-    upcoming.push({t:t,temp:Math.round(h.temperature_2m[i]),code:h.weather_code[i],pop:(h.precipitation_probability||[])[i]||0});
-  }
-  // Build hourly tiles
-  upcoming.forEach(function(u){
+    if(t<n)continue; // skip all past hours — no special case for index 0
     var b=document.createElement("div");b.className="hr";
-    var lbl=u.t.toLocaleTimeString("en-US",{hour:"numeric",hour12:true});
-    b.innerHTML='<div class="hr-t">'+lbl+'</div><div class="hr-i">'+wmoIcon(u.code)+'</div><div class="hr-v">'+u.temp+'</div>'+(u.pop>15?'<div class="hr-p">'+u.pop+'%</div>':'');
+    var lbl=t.toLocaleTimeString("en-US",{hour:"numeric",hour12:true});
+    var pp=(h.precipitation_probability||[])[i]||0;
+    b.innerHTML='<div class="hr-t">'+lbl+'</div><div class="hr-i">'+wmoIcon(h.weather_code[i])+'</div><div class="hr-v">'+Math.round(h.temperature_2m[i])+'</div>'+(pp>15?'<div class="hr-p">'+pp+'%</div>':'');
     row.appendChild(b);cnt++;
-  });
-  // Generate 1-2 line plain-language summary
-  var sumEl=$("hr-summary");
-  if(sumEl&&upcoming.length>=6){
-    var first6=upcoming.slice(0,6),second6=upcoming.slice(6,12);
-    function segDesc(seg){
-      if(!seg.length)return"";
-      var maxPop=Math.max.apply(null,seg.map(function(u){return u.pop;}));
-      var codes=seg.map(function(u){return u.code;});
-      var hasStorm=codes.some(function(c){return c>=95;});
-      var hasRain=codes.some(function(c){return(c>=51&&c<=82)||c===95||c===96||c===99;});
-      var hasCloudy=codes.some(function(c){return c===3;});
-      var hasPartly=codes.some(function(c){return c===1||c===2;});
-      var hasClear=codes.every(function(c){return c<=1;});
-      var tempMin=Math.min.apply(null,seg.map(function(u){return u.temp;}));
-      var tempMax=Math.max.apply(null,seg.map(function(u){return u.temp;}));
-      var wx=hasClear?"clear skies":hasStorm?"thunderstorm potential":hasRain?"rain likely":hasCloudy?"cloudy skies":hasPartly?"partly cloudy skies":"mostly clear skies";
-      var popStr=maxPop>=60?" ("+maxPop+"% precip chance)":maxPop>=30?" ("+maxPop+"% chance of rain)":"";
-      return wx+popStr+", "+tempMin+"\u2013"+tempMax+"\u00b0F";
-    }
-    var s1=segDesc(first6),s2=segDesc(second6);
-    var summary='<span style="color:var(--red);font-size:9px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase">Next 6 hrs</span> &nbsp;<span style="color:rgba(255,255,255,.85);font-weight:500">'+s1+'</span>';
-    if(s2)summary+='&emsp;<span style="color:rgba(255,255,255,.2)">|</span>&emsp;<span style="color:var(--red);font-size:9px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase">Hours 6–12</span> &nbsp;<span style="color:rgba(255,255,255,.85);font-weight:500">'+s2+'</span>';
-    sumEl.innerHTML=summary;
   }
 }
 
@@ -467,252 +1157,6 @@ function fetchExtended(){
   })
   .catch(function(){grid.innerHTML='<div style="color:var(--mu);padding:16px">Forecast unavailable</div>';});
 }
-
-// ============================================================
-// TUFFY'S STORM PREDICTION SYSTEM
-// ============================================================
-var TSPS_CFG={lat:35.7113,lon:-78.6141,name:"Red Wolf Farm - S. Wake County, NC",refresh:300000};
-var TSPS_HKW={tornado:30,tornadoes:30,funnel:25,"tornado watch":22,"tornado warning":30,"damaging wind":20,"destructive wind":25,derecho:28,"large hail":20,"giant hail":25,"golf ball":20,"severe thunderstorm":18,supercell:22,hurricane:30,"tropical storm":22,flooding:12,"flash flood":18,thunder:3,thunderstorm:4,storm:2,lightning:3,hail:10,"heavy rain":4,downpour:4,gusty:2,windy:2};
-// Qualifier phrases that dampen keyword scores when present nearby in forecast text
-var TSPS_QUALIFIERS=["marginal","isolated","slight chance","possible","cannot rule out","low probability","not expected","diminish","unlikely","brief","chance of","may become","could become","cannot completely rule out","low-end","at most","limited"];
-var TSPS_ASEV={
-  "Tornado Warning":10,"Tornado Emergency":10,
-  "Severe Thunderstorm Warning":8,"Destructive Severe Thunderstorm Warning":9,
-  "Flash Flood Emergency":9,"Flash Flood Warning":6,
-  "Tornado Watch":5,"Severe Thunderstorm Watch":4,
-  "Flood Warning":3,"Flood Watch":2,
-  "Winter Storm Warning":4,"Ice Storm Warning":5,
-  "Special Weather Statement":2,
-  "Flood Advisory":1,"Coastal Flood Advisory":1,
-  "Excessive Heat Warning":3,"Excessive Heat Watch":2,
-  "_Extreme":6,"_Severe":4,"_Moderate":2,"_Minor":1,"_Unknown":1
-};
-var TSPS_ACOL={"Tornado Warning":"#ff0000","Severe Thunderstorm Warning":"#ffa500","Tornado Watch":"#ffff00","Flash Flood Warning":"#8b0000","Flood Warning":"#00ff00","Special Weather Statement":"#ffe4b5"};
-var tspsState={forecasts:[],alerts:[],activeIdx:0,lastUpdate:null,charts:{},peakScore:0};
-
-function tsps_sevLevel(s){if(s<10)return{label:"NONE",color:"#1a6b3a",desc:"No severe weather expected"};if(s<25)return{label:"LOW",color:"#22c55e",desc:"Minimal threat"};if(s<50)return{label:"GUARDED",color:"#eab308",desc:"Strong storms possible"};if(s<75)return{label:"ELEVATED",color:"#f97316",desc:"Severe storms likely"};if(s<90)return{label:"HIGH",color:"#ef4444",desc:"Damaging weather expected"};return{label:"EXTREME",color:"#dc2626",desc:"Life-threatening weather"};}
-
-function tsps_computeIndex(p,alerts){
-  var bd={wind:0,gusts:0,precip:0,instability:0,textual:0,alerts:0};
-  var ws=parseInt(p.windSpeed)||0,wg=parseInt(p.windGust)||0;
-  var pop=(p.probabilityOfPrecipitation&&p.probabilityOfPrecipitation.value)||0;
-  var temp=p.temperature||70;
-  var dpRaw=p.dewpoint&&p.dewpoint.value;
-  var dp=dpRaw!=null?(dpRaw*9/5+32):null;
-  var txt=((p.detailedForecast||"")+" "+(p.shortForecast||"")).toLowerCase();
-  if(ws>=60)bd.wind=20;else if(ws>=45)bd.wind=16;else if(ws>=30)bd.wind=12;else if(ws>=20)bd.wind=7;else if(ws>=15)bd.wind=4;else if(ws>=10)bd.wind=2;
-  var eg=Math.max(wg,ws*1.3);
-  if(eg>=70)bd.gusts=18;else if(eg>=58)bd.gusts=15;else if(eg>=45)bd.gusts=12;else if(eg>=35)bd.gusts=8;else if(eg>=25)bd.gusts=4;else if(eg>=15)bd.gusts=1;
-  if(pop>=90)bd.precip=14;else if(pop>=70)bd.precip=11;else if(pop>=50)bd.precip=8;else if(pop>=30)bd.precip=5;else if(pop>=15)bd.precip=2;
-  if(dp!==null){var sp=temp-dp;if(sp<=3&&temp>=75)bd.instability=16;else if(sp<=5&&temp>=70)bd.instability=13;else if(sp<=8&&temp>=65)bd.instability=9;else if(sp<=12&&temp>=60)bd.instability=6;else if(sp<=15)bd.instability=3;}
-  else if(pop>=50&&temp>=70)bd.instability=8;
-  var maxTxt=0,hits=0;
-  for(var kw in TSPS_HKW){
-    var kwIdx=txt.indexOf(kw);
-    if(kwIdx>=0){
-      var win=txt.substring(Math.max(0,kwIdx-70),kwIdx+kw.length+20);
-      var isQualified=TSPS_QUALIFIERS.some(function(q){return win.indexOf(q)>=0;});
-      var kwScore=TSPS_HKW[kw]*(isQualified?0.35:1.0);
-      maxTxt=Math.max(maxTxt,kwScore);
-      hits++;
-    }
-  }
-  var coBonus=maxTxt>=15?Math.min(hits*1.5,6):Math.min(hits*0.75,3);
-  bd.textual=Math.min(14,Math.round(maxTxt+coBonus));
-  if(alerts&&alerts.length>0){
-    var mx=0;
-    alerts.forEach(function(a){
-      var evt=(a.properties&&a.properties.event)||"";
-      var sev=(a.properties&&a.properties.severity)||"Unknown";
-      var sc=(TSPS_ASEV[evt]!=null)?TSPS_ASEV[evt]:(TSPS_ASEV["_"+sev]||1);
-      mx=Math.max(mx,sc);
-    });
-    var multiBonus=Math.min(alerts.length-1,2)*0.5;
-    bd.alerts=Math.min(10,mx+multiBonus);
-  }
-  var score=Math.min(100,Math.round(bd.wind+bd.gusts+bd.precip+bd.instability+bd.textual+bd.alerts));
-  var likelihood=Math.min(99,Math.round((pop*0.35)+(score*0.45)+(bd.textual>=12?12:bd.textual>=7?6:0)+(alerts&&alerts.length>0?5:0)));
-  return{score:score,likelihood:likelihood,breakdown:bd};
-}
-
-function tsps_hexToRgb(hex){hex=hex.replace("#","");return parseInt(hex.substr(0,2),16)+","+parseInt(hex.substr(2,2),16)+","+parseInt(hex.substr(4,2),16);}
-function tsps_gaugeSize(){var w=$("tsps").clientWidth||300;return Math.min(230,Math.max(180,w*0.55));}
-
-function tsps_buildGauge(score,size){
-  var lv=tsps_sevLevel(score);
-  var r=size*0.38,cx=size/2,cy=size/2+10,sA=-220,eA=40,tot=eA-sA,scA=sA+(score/100)*tot;
-  function p2c(a,rd){return{x:cx+rd*Math.cos(a*Math.PI/180),y:cy+rd*Math.sin(a*Math.PI/180)};}
-  function arc(a1,a2,rd){var s=p2c(a1,rd),e=p2c(a2,rd);return"M "+s.x+" "+s.y+" A "+rd+" "+rd+" 0 "+(a2-a1>180?1:0)+" 1 "+e.x+" "+e.y;}
-  var ticks=[0,10,25,50,75,90,100],tk="";
-  ticks.forEach(function(t){var a=sA+(t/100)*tot,i=p2c(a,r-12),o=p2c(a,r+12),l=p2c(a,r+22);tk+='<line x1="'+i.x+'" y1="'+i.y+'" x2="'+o.x+'" y2="'+o.y+'" stroke="rgba(255,255,255,.2)" stroke-width="1.5"/><text x="'+l.x+'" y="'+l.y+'" fill="rgba(255,255,255,.35)" font-size="8" text-anchor="middle" dominant-baseline="middle">'+t+'</text>';});
-  var np=p2c(scA,r-2),h=size*0.72;
-  return '<svg viewBox="0 0 '+size+' '+h+'" style="width:100%;max-width:'+size+'px;height:auto"><defs><linearGradient id="tsG" x1="0%" x2="100%"><stop offset="0%" stop-color="#1a472a"/><stop offset="25%" stop-color="#22c55e"/><stop offset="45%" stop-color="#eab308"/><stop offset="65%" stop-color="#f97316"/><stop offset="80%" stop-color="#ef4444"/><stop offset="100%" stop-color="#dc2626"/></linearGradient><filter id="tsGl"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><path d="'+arc(sA,eA,r)+'" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="14" stroke-linecap="round"/><path d="'+arc(sA,scA,r)+'" fill="none" stroke="url(#tsG)" stroke-width="14" stroke-linecap="round" filter="url(#tsGl)"/>'+tk+'<circle cx="'+np.x+'" cy="'+np.y+'" r="5.5" fill="'+lv.color+'" filter="url(#tsGl)"/><text x="'+cx+'" y="'+(cy-16)+'" fill="'+lv.color+'" font-size="38" font-weight="800" text-anchor="middle" dominant-baseline="middle" filter="url(#tsGl)">'+score+'</text><text x="'+cx+'" y="'+(cy+10)+'" fill="'+lv.color+'" font-size="12" font-weight="700" text-anchor="middle" letter-spacing="3">'+lv.label+'</text><text x="'+cx+'" y="'+(cy+27)+'" fill="rgba(255,255,255,.45)" font-size="8" text-anchor="middle">'+lv.desc+'</text></svg>';
-}
-
-function tsps_buildFingerprint(breakdown,score){
-  var items=[{k:"wind",label:"WIND",max:20,color:"#00ccff"},{k:"gusts",label:"GUSTS",max:18,color:"#3b82f6"},{k:"precip",label:"PRECIP",max:14,color:"#6366f1"},{k:"instability",label:"INSTABILITY",max:16,color:"#eab308"},{k:"textual",label:"FORECAST",max:14,color:"#f97316"},{k:"alerts",label:"ALERTS",max:10,color:"#ef4444"}];
-  var cx=160,cy=155,R=110,n=items.length,lv=tsps_sevLevel(score);
-  function polar(i,r){var a=(Math.PI*2/n)*i-Math.PI/2;return{x:cx+r*Math.cos(a),y:cy+r*Math.sin(a)};}
-  // viewBox extended left by 20px so FORECAST label isn't clipped
-  var svg='<svg viewBox="-20 0 360 310" class="tf-svg" xmlns="http://www.w3.org/2000/svg"><defs>';
-  items.forEach(function(item,i){svg+='<filter id="tfGlow'+i+'"><feGaussianBlur stdDeviation="4" result="b"/><feFlood flood-color="'+item.color+'" flood-opacity=".5"/><feComposite in2="b" operator="in"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>';});
-  svg+='<filter id="tfCenterGlow"><feGaussianBlur stdDeviation="8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>';
-  [0.25,0.5,0.75,1.0].forEach(function(pct){var pts=[];for(var i=0;i<n;i++){var p=polar(i,R*pct);pts.push(p.x+","+p.y);}svg+='<polygon points="'+pts.join(" ")+'" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="1"/>';});
-  for(var i=0;i<n;i++){var p=polar(i,R);svg+='<line x1="'+cx+'" y1="'+cy+'" x2="'+p.x+'" y2="'+p.y+'" stroke="rgba(255,255,255,.08)" stroke-width="1"/>';}
-  var shapePoints=[],activeSegments=[];
-  for(var i=0;i<n;i++){var val=breakdown[items[i].k]||0;var pct=Math.max(0.05,val/items[i].max);var p=polar(i,R*pct);shapePoints.push(p.x+","+p.y);activeSegments.push({idx:i,val:val,pct:pct,x:p.x,y:p.y,color:items[i].color});}
-  svg+='<polygon points="'+shapePoints.join(" ")+'" fill="'+lv.color+'" fill-opacity=".12" stroke="'+lv.color+'" stroke-width="1.5" stroke-opacity=".4"/>';
-  for(var i=0;i<n;i++){var seg=activeSegments[i],next=activeSegments[(i+1)%n];if(seg.pct>0.1){svg+='<line x1="'+cx+'" y1="'+cy+'" x2="'+seg.x+'" y2="'+seg.y+'" stroke="'+seg.color+'" stroke-width="2" stroke-opacity=".5" filter="url(#tfGlow'+i+')"/>';svg+='<line x1="'+seg.x+'" y1="'+seg.y+'" x2="'+next.x+'" y2="'+next.y+'" stroke="'+seg.color+'" stroke-width="1.5" stroke-opacity=".35"/>';}}
-  for(var i=0;i<n;i++){var seg=activeSegments[i],ppct=seg.val/items[i].max,ps=3+ppct*4,po=0.4+ppct*0.6;if(ppct>0.3)svg+='<circle cx="'+seg.x+'" cy="'+seg.y+'" r="'+(ps+4)+'" fill="'+seg.color+'" fill-opacity=".1"/>';svg+='<circle cx="'+seg.x+'" cy="'+seg.y+'" r="'+ps+'" fill="'+seg.color+'" fill-opacity="'+po+'" filter="url(#tfGlow'+i+')"/>';svg+='<circle cx="'+seg.x+'" cy="'+seg.y+'" r="1.5" fill="white" fill-opacity=".8"/>';}
-  for(var i=0;i<n;i++){var lp=polar(i,R+22),val=breakdown[items[i].k]||0,pctVal=Math.round(val/items[i].max*100),anchor="middle";if(lp.x<cx-20)anchor="end";if(lp.x>cx+20)anchor="start";svg+='<text x="'+lp.x+'" y="'+(lp.y-5)+'" text-anchor="'+anchor+'" fill="'+items[i].color+'" font-size="8" font-weight="800" letter-spacing="1" font-family="Segoe UI,sans-serif">'+items[i].label+'</text>';svg+='<text x="'+lp.x+'" y="'+(lp.y+7)+'" text-anchor="'+anchor+'" fill="rgba(255,255,255,.6)" font-size="9" font-weight="600" font-family="Segoe UI,sans-serif">'+val+'/'+items[i].max+' ('+pctVal+'%)</text>';}
-  svg+='<circle cx="'+cx+'" cy="'+cy+'" r="24" fill="'+lv.color+'" fill-opacity=".15" filter="url(#tfCenterGlow)"/><circle cx="'+cx+'" cy="'+cy+'" r="20" fill="rgba(0,0,0,.6)" stroke="'+lv.color+'" stroke-width="2" stroke-opacity=".5"/><text x="'+cx+'" y="'+(cy+1)+'" text-anchor="middle" dominant-baseline="middle" fill="'+lv.color+'" font-size="16" font-weight="800" font-family="Segoe UI,sans-serif">'+score+'</text><text x="'+cx+'" y="'+(cy+14)+'" text-anchor="middle" fill="rgba(255,255,255,.3)" font-size="6" font-weight="700" letter-spacing="1.5" font-family="Segoe UI,sans-serif">INDEX</text></svg>';
-  var legend='<div class="tf-legend">';items.forEach(function(item){var val=breakdown[item.k]||0;legend+='<div class="tf-leg-item"><div class="tf-leg-dot" style="background:'+item.color+(val>0?'':';opacity:.25')+'"></div>'+item.label+'</div>';});legend+='</div>';
-  return svg+legend;
-}
-
-function tsps_destroyCharts(){["tl","bar"].forEach(function(k){if(tspsState.charts[k]){tspsState.charts[k].destroy();tspsState.charts[k]=null;}});}
-
-function tsps_renderMain(){
-  var pk=tspsState.peakScore,pkL=tsps_sevLevel(pk),f=tspsState.forecasts,al=tspsState.alerts;
-  var pw=f.length?f.reduce(function(a,b){return a.score>b.score?a:b;}).label:"--";
-  var ml=f.length?Math.max.apply(null,f.map(function(x){return x.likelihood;})):0;
-  var gs=tsps_gaugeSize();
-  var root=$("tsps"),pulse=$("tspsPulseBar"),cont=$("tspsContent");
-  if(pk>=50){root.classList.add("tsps-threat");pulse.style.background="linear-gradient(90deg,transparent,"+pkL.color+",transparent)";}else{root.classList.remove("tsps-threat");}
-  // Build alert name summary for stats box (up to 2 names, then "+ N more")
-  var alStatVal,alStatSub="";
-  if(al.length===0){
-    alStatVal='<span style="color:#22c55e">ALL CLEAR</span>';
-  } else {
-    alStatVal='<span style="color:#ef4444">'+al.length+' ACTIVE</span>';
-    var names=al.slice(0,2).map(function(a){return(a.properties&&a.properties.event)||"Alert";});
-    alStatSub=names.join('<br>');
-    if(al.length>2)alStatSub+='<br>+' +(al.length-2)+' more';
-  }
-  // Alert banner — shows event name, headline, and description excerpt
-  var aH="";
-  if(al.length>0){
-    var alItems="";
-    al.slice(0,6).forEach(function(a){
-      var props=a.properties||{};
-      var e=props.event||"Alert";
-      var c=TSPS_ACOL[e]||"#7b68ee";
-      var expires=props.expires?new Date(props.expires).toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"}):"";
-      var sender=props.senderName||"NWS";
-      // Skip the boilerplate headline; use description and strip NWS header lines
-      // NWS descriptions start with lines like "SPECIAL WEATHER STATEMENT\nNATIONAL WEATHER SERVICE...\n..."
-      // then the actual content follows after the first blank line or after the header block
-      var desc=(props.description||"").trim();
-      var bodyText="";
-      if(desc){
-        // Split into lines, drop lines that are pure caps/metadata headers at the top
-        var lines=desc.split(/\n/);
-        var contentLines=[],pastHeader=false;
-        for(var li=0;li<lines.length;li++){
-          var ln=lines[li].trim();
-          // Blank line after the header block signals content start
-          if(!pastHeader&&ln===""){pastHeader=true;continue;}
-          // Lines that are ALL CAPS with no punctuation are NWS header/label lines — skip
-          if(!pastHeader&&ln===ln.toUpperCase()&&ln.length>0&&!/[.!?,]/.test(ln))continue;
-          // "Issued by", "Until", timestamp lines — skip
-          if(!pastHeader&&/^(issued|until|national weather|at \d|npwzone|expires)/i.test(ln))continue;
-          pastHeader=true;
-          if(ln)contentLines.push(ln);
-        }
-        bodyText=contentLines.join(" ").replace(/\s+/g," ").trim();
-        // If nothing survived stripping, fall back to raw desc minus first line
-        if(!bodyText)bodyText=lines.slice(1).join(" ").replace(/\s+/g," ").trim();
-        if(bodyText.length>400)bodyText=bodyText.substring(0,400).replace(/\s+\S*$/,"")+"...";
-      }
-      alItems+=
-        '<div class="tsps-al-item" style="flex-direction:column;align-items:flex-start;padding:10px 0;gap:5px">'+
-          '<div style="display:flex;align-items:center;gap:8px;width:100%">'+
-            '<div class="tsps-al-dot" style="background:'+c+';box-shadow:0 0 6px '+c+';flex-shrink:0"></div>'+
-            '<span class="tsps-al-ev" style="font-size:12px;font-weight:800;color:#fff">'+e+'</span>'+
-            '<span class="tsps-al-src" style="margin-left:auto">'+(expires?"Expires "+expires+" &middot; ":"")+sender+'</span>'+
-          '</div>'+
-          (bodyText?'<div style="font-size:11px;color:rgba(255,255,255,.65);line-height:1.6;padding-left:15px;border-left:2px solid '+c+'40">'+bodyText+'</div>':'')+
-        '</div>';
-    });
-    aH='<div class="tsps-alerts"><div class="tsps-al-hdr"><span>!!!</span><span>ACTIVE ALERTS &mdash; '+al.length+'</span></div>'+alItems+'</div>';
-  }
-  var cH="";f.forEach(function(fc,i){var lv=tsps_sevLevel(fc.score),isA=i===tspsState.activeIdx;cH+='<div class="tsps-fc'+(isA?" act":"")+'" data-idx="'+i+'" style="background:'+(isA?"rgba("+tsps_hexToRgb(lv.color)+",.12)":"rgba(255,255,255,.025)")+';border-color:'+(isA?lv.color+"77":"rgba(255,255,255,.05)")+'"><div class="fc-lbl">'+fc.label+'</div><div><span class="fc-score" style="color:'+lv.color+'">'+fc.score+'</span><span class="fc-unit">/100</span></div><div class="fc-threat" style="color:'+lv.color+'88">'+lv.label+'</div><div class="fc-lk"><span class="fc-lk-l">Likelihood</span><span class="fc-lk-v" style="color:'+lv.color+'">'+fc.likelihood+'%</span></div><div class="fc-bar"><div class="fc-bar-f" style="width:'+fc.likelihood+'%;background:'+lv.color+'"></div></div><div class="fc-meta">'+(fc.temp!=null?fc.temp+"F":"")+(fc.wind?" - "+fc.wind:"")+'</div></div>';});
-  var af=f[tspsState.activeIdx],afL=af?tsps_sevLevel(af.score):{color:"#888",label:"--"};
-  var dH="";if(af){dH='<div class="tsps-det"><div class="tsps-det-hdr"><div><div class="tsps-det-per">ANALYSIS - '+af.label+'</div><div class="tsps-det-fc">'+(af.shortForecast||"--")+'</div></div><div style="text-align:right"><div class="tsps-det-sc" style="color:'+afL.color+'">'+af.score+'</div><div class="tsps-det-lv" style="color:'+afL.color+'">'+afL.label+'</div></div></div><div class="tsps-det-mg"><div class="tsps-dm"><div class="dm-l">TEMP</div><div class="dm-v">'+(af.temp!=null?af.temp+"F":"--")+'</div></div><div class="tsps-dm"><div class="dm-l">WIND</div><div class="dm-v">'+(af.wind||"--")+'</div></div><div class="tsps-dm"><div class="dm-l">PRECIP</div><div class="dm-v">'+(af.pop||0)+'%</div></div><div class="tsps-dm"><div class="dm-l">LIKELIHOOD</div><div class="dm-v">'+af.likelihood+'%</div></div></div>'+(af.detailedForecast?'<div class="tsps-det-nar" style="border-left-color:'+afL.color+'44"><b>NWS:</b> '+af.detailedForecast+'</div>':'')+'</div>';}
-  var fpH='';if(af&&af.breakdown){fpH='<div class="tf-wrap"><div class="tf-title">THREAT FINGERPRINT</div><div class="tf-subtitle">6-COMPONENT SEVERITY BREAKDOWN</div>'+tsps_buildFingerprint(af.breakdown,af.score)+'</div>';}
-  cont.innerHTML='<div class="tsps-hdr"><div class="tsps-hdr-l"><div class="tsps-tag">PROPRIETARY MODEL</div><h2><span class="tsps-r">Tuffy\'s</span> Storm Prediction System <div class="tip-btn" onclick="openTip(\'tipTSPS\')" style="font-size:10px;width:18px;height:18px">?</div></h2><div class="tsps-loc">'+TSPS_CFG.name+' - NWS-powered intelligence</div></div><div class="tsps-hdr-r"><div class="tsps-ulbl">LAST UPDATE</div><div class="tsps-utime">'+(tspsState.lastUpdate?tspsState.lastUpdate.toLocaleTimeString():"--")+'</div><button class="tsps-rbtn" id="tspsRB">Refresh</button></div></div>'+aH+'<div class="tsps-top"><div class="tsps-gauge-w"><div class="tsps-gauge-lbl">PEAK SEVERE WEATHER INDEX</div>'+tsps_buildGauge(pk,gs)+'</div><div class="tsps-stats"><div class="tsps-sbox"><div class="tsps-slbl">PEAK WINDOW</div><div class="tsps-sval" style="color:'+pkL.color+'">'+pw+'</div></div><div class="tsps-sbox"><div class="tsps-slbl">ACTIVE ALERTS</div><div class="tsps-sval">'+alStatVal+'</div>'+(alStatSub?'<div style="font-size:9px;color:rgba(255,255,255,.45);margin-top:5px;line-height:1.6">'+alStatSub+'</div>':'')+'</div><div class="tsps-sbox"><div class="tsps-slbl">MAX LIKELIHOOD</div><div class="tsps-sval" style="color:rgba(255,255,255,.85)">'+ml+'%</div></div></div></div><div class="tsps-sec-lbl">FORECAST PERIODS</div><div class="tsps-cards">'+cH+'</div>'+fpH+'<div class="tsps-tl-box"><div class="tsps-ct">SEVERITY TIMELINE</div><canvas id="tsTL"></canvas></div><div class="tsps-ch-row"><div class="tsps-ch-box"><div class="tsps-ct">COMPONENT BREAKDOWN</div><canvas id="tsBA"></canvas></div></div>'+dH+'<div class="tsps-foot"><span>TSPS v2.1 - Qualifier-Aware Index - NWS API</span><span>Auto-refresh 5 min</span></div>';
-  $("tspsRB").addEventListener("click",function(){tsps_refresh();});
-  document.querySelectorAll(".tsps-fc").forEach(function(c){c.addEventListener("click",function(){tspsState.activeIdx=parseInt(this.getAttribute("data-idx"));tsps_renderMain();tsps_buildCharts();});});
-  tsps_buildCharts();
-}
-
-function tsps_buildCharts(){
-  tsps_destroyCharts();
-  var f=tspsState.forecasts;if(!f.length)return;
-  var af=f[tspsState.activeIdx],labels=f.map(function(x){return x.label;}),scores=f.map(function(x){return x.score;}),lks=f.map(function(x){return x.likelihood;});
-  var pkL=tsps_sevLevel(tspsState.peakScore);var mob=window.innerWidth<600;
-  Chart.defaults.color="rgba(255,255,255,.4)";Chart.defaults.borderColor="rgba(255,255,255,.06)";Chart.defaults.font.family="'Segoe UI',sans-serif";Chart.defaults.font.size=mob?9:10;
-  var tlEl=$("tsTL");
-  if(tlEl)tspsState.charts.tl=new Chart(tlEl,{type:"line",data:{labels:labels,datasets:[{label:"Severity",data:scores,borderColor:pkL.color,backgroundColor:pkL.color+"30",fill:true,tension:.4,borderWidth:2,pointRadius:mob?3:4,pointBackgroundColor:scores.map(function(s){return tsps_sevLevel(s).color;})},{label:"Likelihood",data:lks,borderColor:"#60a5fa",borderDash:[5,4],fill:false,tension:.4,borderWidth:1.5,pointRadius:mob?2:3}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{min:0,max:100,grid:{color:"rgba(255,255,255,.04)"}},x:{grid:{display:false}}},plugins:{legend:{labels:{boxWidth:10,padding:mob?8:16}}}}});
-  if(af&&af.breakdown){
-    var bd=af.breakdown;
-    var items=[{k:"wind",l:"Wind",m:20},{k:"gusts",l:"Gusts",m:18},{k:"precip",l:"Precip",m:14},{k:"instability",l:"Instab.",m:16},{k:"textual",l:"Fcst Text",m:14},{k:"alerts",l:"Alerts",m:10}];
-    var baEl=$("tsBA");
-    if(baEl){
-      var pcts=items.map(function(x){return Math.round(bd[x.k]/x.m*100);});
-      function baRationale(k,val,max){
-        if(k==="wind"){if(val===0)return"Sustained winds below 10 mph — no wind contribution.";return"Sustained wind: "+(af.wind||"--")+". Scores "+val+"/"+max+" pts. Scale: 10mph=2, 20=7, 30=12, 45=16, 60+=20.";}
-        if(k==="gusts"){if(val===0)return"Estimated gusts below 15 mph — no contribution.";return"Gust estimate scores "+val+"/"+max+" pts. Scale: 15mph=1, 25=4, 35=8, 45=12, 58=15, 70+=18.";}
-        if(k==="precip"){var pop=(af.pop!=null)?af.pop:0;if(val===0)return"Precip probability below 15% — no contribution.";return"Precip probability: "+pop+"%. Scores "+val+"/"+max+" pts. Scale: 15%=2, 30=5, 50=8, 70=11, 90+=14.";}
-        if(k==="instability"){if(val===0)return"Dewpoint spread and humidity indicate a stable atmosphere.";return"Atmospheric instability: "+val+"/"+max+" pts. Based on temp\u2013dewpoint spread and relative humidity. Tighter spread at higher temps = higher score.";}
-        if(k==="textual"){if(val===0)return"No significant severity keywords in NWS forecast text.";return"NWS forecast text scan: "+val+"/"+max+" pts. Severe keywords weighted by type. Qualifying language (\"marginal\", \"isolated\") reduces scores by 65%.";}
-        if(k==="alerts"){var alCount=tspsState.alerts.length;if(val===0)return"No active NWS alerts in effect.";var names=tspsState.alerts.slice(0,2).map(function(a){return(a.properties&&a.properties.event)||"Alert";}).join(", ");return alCount+" alert"+(alCount!==1?"s":"")+": "+names+". Scores "+val+"/"+max+" pts by event type. Tornado Warning=10, SVR T-Storm=8, Watch=4-5, SWS=2.";}
-        return val+"/"+max+" pts";
-      }
-      function wrapText(txt,len){var words=txt.split(" "),lines=[],cur="";words.forEach(function(w){if((cur?cur+" "+w:w).length>len){if(cur)lines.push(cur);cur=w;}else cur=cur?cur+" "+w:w;});if(cur)lines.push(cur);return lines;}
-      tspsState.charts.bar=new Chart(baEl,{
-        type:"bar",
-        data:{labels:items.map(function(x){return x.l;}),datasets:[{data:pcts,backgroundColor:["#00ccff","#3b82f6","#6366f1","#eab308","#f97316","#ef4444"],borderRadius:4,barThickness:mob?12:14}]},
-        options:{
-          responsive:true,maintainAspectRatio:false,indexAxis:"y",
-          scales:{x:{min:0,max:100,grid:{color:"rgba(255,255,255,.04)"}},y:{grid:{display:false}}},
-          plugins:{
-            legend:{display:false},
-            tooltip:{
-              backgroundColor:"rgba(10,10,18,.97)",borderColor:"rgba(255,255,255,.12)",borderWidth:1,
-              titleColor:"rgba(255,255,255,.9)",bodyColor:"rgba(255,255,255,.55)",
-              titleFont:{size:11,weight:"700",family:"'Segoe UI',sans-serif"},
-              bodyFont:{size:10,family:"'Segoe UI',sans-serif"},
-              padding:12,cornerRadius:8,displayColors:true,boxWidth:8,boxHeight:8,
-              callbacks:{
-                title:function(ti){var idx=ti[0].dataIndex;return items[idx].l+" \u2014 "+(bd[items[idx].k]||0)+"/"+items[idx].m+" pts";},
-                label:function(ti){var idx=ti.dataIndex;return wrapText(baRationale(items[idx].k,bd[items[idx].k]||0,items[idx].m),54);}
-              }
-            }
-          }
-        }
-      });
-    }
-  }
-}
-
-function tsps_refresh(){
-  $("tspsContent").innerHTML='<div class="tsps-ld"><div class="tsps-spinner"></div><p>Refreshing predictions...</p></div>';
-  var hdr={"User-Agent":"TSPS/2.0"};
-  Promise.all([fetch("https://api.weather.gov/points/"+TSPS_CFG.lat+","+TSPS_CFG.lon,{headers:hdr}),fetch("https://api.weather.gov/alerts/active?point="+TSPS_CFG.lat+","+TSPS_CFG.lon,{headers:hdr})])
-  .then(function(responses){if(!responses[0].ok)throw new Error("NWS unavailable");return Promise.all([responses[0].json(),responses[1].ok?responses[1].json():{features:[]}]);})
-  .then(function(data){var pD=data[0],aD=data[1];var fUrl=pD.properties&&pD.properties.forecastHourly;if(!fUrl)throw new Error("No forecast URL");tspsState.alerts=aD.features||[];return fetch(fUrl,{headers:{"User-Agent":"TSPS/2.0"}});})
-  .then(function(r){if(!r.ok)throw new Error("Forecast unavailable");return r.json();})
-  .then(function(fcData){
-    var periods=fcData.properties&&fcData.properties.periods;if(!periods||!periods.length)throw new Error("No data");
-    var now=Date.now();var targets=[{h:3,l:"+3 HR"},{h:6,l:"+6 HR"},{h:9,l:"+9 HR"},{h:12,l:"+12 HR"},{h:24,l:"+24 HR"}];
-    tspsState.forecasts=targets.map(function(t){var tgt=now+t.h*3600000;var best=periods[0],bD=Infinity;periods.forEach(function(p){var d=Math.abs(new Date(p.startTime).getTime()-tgt);if(d<bD){bD=d;best=p;}});var result=tsps_computeIndex(best,tspsState.alerts);return{label:t.l,score:result.score,likelihood:result.likelihood,breakdown:result.breakdown,temp:best.temperature,wind:(best.windSpeed||"")+" "+(best.windDirection||""),pop:(best.probabilityOfPrecipitation&&best.probabilityOfPrecipitation.value)||0,shortForecast:best.shortForecast||"",detailedForecast:best.detailedForecast||""};});
-    tspsState.peakScore=Math.max.apply(null,tspsState.forecasts.map(function(x){return x.score;}));
-    tspsState.lastUpdate=new Date();tspsState.activeIdx=0;tsps_renderMain();
-  }).catch(function(e){$("tspsContent").innerHTML='<div class="tsps-ld"><p style="color:#ef4444">'+e.message+'</p><p class="sub" style="margin-top:10px"><button class="tsps-rbtn" onclick="tsps_refresh()">Retry</button></p></div>';});
-}
-tsps_refresh();setInterval(tsps_refresh,TSPS_CFG.refresh);
-var tspsResizeTimer;window.addEventListener("resize",function(){clearTimeout(tspsResizeTimer);tspsResizeTimer=setTimeout(function(){if(tspsState.forecasts.length)tsps_renderMain();},300);});
 
 // ============================================================
 // SUNRISE / SUNSET & DAY LENGTH
@@ -925,7 +1369,7 @@ function accLogActuals(){
 
 function accFetchAndRender(){
   var el=$("acc-dashboard");if(!el)return;
-  el.innerHTML='<div class="acc-wrap"><div class="acc-hdr">Tuffy\'s Accuracy Dashboard <em>- Loading...</em></div><div class="alm-ld"><div class="tsps-spinner"></div></div></div>';
+  el.innerHTML='<div class="acc-wrap"><div class="acc-hdr">Valvano Accuracy Dashboard <em>- Loading...</em></div><div class="alm-ld"><div class="tsps-spinner"></div></div></div>';
   fetch(SHEET_URL+"?tab=Accuracy")
   .then(function(r){return r.text();})
   .then(function(txt){var d=JSON.parse(txt);accRender(el,d.rows||[]);})
@@ -933,47 +1377,18 @@ function accFetchAndRender(){
 }
 
 function accRender(el,rows){
-  if(!rows.length){el.innerHTML='<div class="acc-wrap"><div class="acc-hdr">Tuffy\'s Accuracy Dashboard <em>- Forecast vs Actual</em></div><div style="padding:20px;color:var(--mu);font-size:12px">Accuracy tracking has started. Check back tomorrow for your first comparison.</div></div>';return;}
+  if(!rows.length){el.innerHTML='<div class="acc-wrap"><div class="acc-hdr">Valvano Accuracy Dashboard <em>- Forecast vs Actual</em></div><div style="padding:20px;color:var(--mu);font-size:12px">Accuracy tracking has started. Check back tomorrow for your first comparison.</div></div>';return;}
   var now=new Date(),day1=new Date(now.getTime()-86400000),week1=new Date(now.getTime()-604800000),month1=new Date(now.getTime()-2592000000);
-  function parseRowDate(str){
-    if(!str)return null;str=String(str).trim();
-    if(/^\d{4}-\d{2}-\d{2}$/.test(str))return new Date(str+"T12:00:00");
-    var sl=str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-    if(sl)return new Date(parseInt(sl[3]),parseInt(sl[1])-1,parseInt(sl[2]),12,0,0);
-    var d=new Date(str);return isNaN(d.getTime())?null:d;
-  }
-  function fmtRowDate(str){var d=parseRowDate(str);if(!d)return"--";return d.toLocaleDateString("en-US",{month:"short",day:"numeric"});}
-  function calcAccuracy(rs,cutoff){
-    var hiE=[],loE=[],hiH=0,loH=0,tot=0;
-    rs.forEach(function(r){var d=parseRowDate(r.date);if(!d||d<cutoff)return;var pH=parseFloat(r.pred_high),pL=parseFloat(r.pred_low),aH=parseFloat(r.actual_high),aL=parseFloat(r.actual_low);if(isNaN(pH)||isNaN(aH)||isNaN(pL)||isNaN(aL))return;tot++;var he=Math.abs(pH-aH),le=Math.abs(pL-aL);hiE.push(he);loE.push(le);if(he<=3)hiH++;if(le<=3)loH++;});
-    if(tot===0)return null;
-    return{total:tot,hitPct:Math.round(((hiH+loH)/(tot*2))*100),avgHiErr:hiE.reduce(function(a,b){return a+b;},0)/hiE.length,avgLoErr:loE.reduce(function(a,b){return a+b;},0)/loE.length};
-  }
-  var accYesterday=calcAccuracy(rows,day1),accWeek=calcAccuracy(rows,week1),accMonth=calcAccuracy(rows,month1),accAll=calcAccuracy(rows,new Date(0));
-  function scoreClass(p){return p>=75?"good":p>=50?"ok":"poor";}
-  function renderScoreCard(label,acc){
-    if(!acc)return'<div class="acc-score-card"><div class="acc-score-lbl">'+label+'</div><div class="acc-score-val">--</div><div class="acc-score-sub">No data yet</div></div>';
-    return'<div class="acc-score-card"><div class="acc-score-lbl">'+label+'</div><div class="acc-score-val '+scoreClass(acc.hitPct)+'">'+acc.hitPct+'%</div><div class="acc-score-sub">'+acc.total+' days tracked</div><div class="acc-score-sub">Avg Hi err: '+acc.avgHiErr.toFixed(1)+'F &middot; Lo: '+acc.avgLoErr.toFixed(1)+'F</div></div>';
-  }
-  var html='<div class="acc-wrap"><div class="acc-hdr">Tuffy\'s Accuracy Dashboard <em>- Forecast vs Actual Temperature</em></div>';
-  html+='<div class="acc-score-row">'+renderScoreCard("Yesterday",accYesterday)+renderScoreCard("Last 7 Days",accWeek)+renderScoreCard("Last 30 Days",accMonth)+renderScoreCard("All Time",accAll)+'</div>';
-  html+='<div style="font-size:9px;color:var(--mu2);text-align:center;margin-bottom:14px">HIT = within 3F &nbsp;|&nbsp; CLOSE = within 5F &nbsp;|&nbsp; MISS = off by 6F+</div>';
-  html+='<div class="acc-log"><div class="acc-log-hdr"><div>Date</div><div>Pred Hi</div><div>Act Hi</div><div>Pred Lo</div><div>Act Lo</div><div>Result</div></div>';
-  var shown=0,sortedRows=rows.slice().reverse();
-  sortedRows.forEach(function(r){
-    if(shown>=30)return;
-    var pH=parseFloat(r.pred_high),pL=parseFloat(r.pred_low),aH=parseFloat(r.actual_high),aL=parseFloat(r.actual_low);
-    var hasActual=!isNaN(aH)&&!isNaN(aL),hasPred=!isNaN(pH)&&!isNaN(pL);
-    if(!hasPred)return;
-    var badge='<span class="acc-badge pending">PENDING</span>';
-    if(hasActual){var he=Math.abs(pH-aH),le=Math.abs(pL-aL),avg=(he+le)/2;badge=avg<=3?'<span class="acc-badge hit">HIT</span>':avg<=5?'<span class="acc-badge close">CLOSE</span>':'<span class="acc-badge miss">MISS</span>';}
-    var hiC="",loC="";
-    if(hasActual){hiC=Math.abs(pH-aH)<=3?"color:var(--green)":Math.abs(pH-aH)<=5?"color:var(--yellow)":"color:#ef4444";loC=Math.abs(pL-aL)<=3?"color:var(--green)":Math.abs(pL-aL)<=5?"color:var(--yellow)":"color:#ef4444";}
-    html+='<div class="acc-log-row"><div class="acc-date">'+fmtRowDate(r.date)+'</div><div>'+Math.round(pH)+'F</div><div style="'+hiC+'">'+(hasActual?Math.round(aH)+'F':'--')+'</div><div>'+Math.round(pL)+'F</div><div style="'+loC+'">'+(hasActual?Math.round(aL)+'F':'--')+'</div><div>'+badge+'</div></div>';
-    shown++;
-  });
+  function calcAccuracy(rows,cutoff){var hiErrors=[],loErrors=[],hiHits=0,loHits=0,total=0;rows.forEach(function(r){var d=new Date(r.date);if(d<cutoff)return;var pH=parseFloat(r.pred_high),pL=parseFloat(r.pred_low),aH=parseFloat(r.actual_high),aL=parseFloat(r.actual_low);if(isNaN(pH)||isNaN(aH)||isNaN(pL)||isNaN(aL))return;total++;var hiErr=Math.abs(pH-aH),loErr=Math.abs(pL-aL);hiErrors.push(hiErr);loErrors.push(loErr);if(hiErr<=3)hiHits++;if(loErr<=3)loHits++;});if(total===0)return null;var avgHiErr=hiErrors.reduce(function(a,b){return a+b;},0)/hiErrors.length,avgLoErr=loErrors.reduce(function(a,b){return a+b;},0)/loErrors.length;return{total:total,hitPct:Math.round(((hiHits+loHits)/(total*2))*100),avgHiErr:avgHiErr,avgLoErr:avgLoErr};}
+  var accAll=calcAccuracy(rows,new Date(0)),accMonth=calcAccuracy(rows,month1),accWeek=calcAccuracy(rows,week1),accYesterday=calcAccuracy(rows,day1);
+  function scoreClass(pct){if(pct===null)return"";if(pct>=75)return"good";if(pct>=50)return"ok";return"poor";}
+  function renderScoreCard(label,acc){if(!acc)return'<div class="acc-score-card"><div class="acc-score-lbl">'+label+'</div><div class="acc-score-val">--</div><div class="acc-score-sub">No data yet</div></div>';return'<div class="acc-score-card"><div class="acc-score-lbl">'+label+'</div><div class="acc-score-val '+scoreClass(acc.hitPct)+'">'+acc.hitPct+'%</div><div class="acc-score-sub">'+acc.total+' days tracked</div><div class="acc-score-sub">Avg error: Hi '+acc.avgHiErr.toFixed(1)+'F / Lo '+acc.avgLoErr.toFixed(1)+'F</div></div>';}
+  var html='<div class="acc-wrap"><div class="acc-hdr">Valvano Accuracy Dashboard <em>- Forecast vs Actual Temperature</em></div><div class="acc-score-row">'+renderScoreCard("Yesterday",accYesterday)+renderScoreCard("Last 7 Days",accWeek)+renderScoreCard("Last 30 Days",accMonth)+renderScoreCard("All Time",accAll)+'</div><div style="font-size:9px;color:var(--mu2);text-align:center;margin-bottom:14px">HIT = prediction within 3F of actual | CLOSE = within 5F | MISS = off by 6F+</div>';
+  var sortedRows=rows.slice().reverse();
+  html+='<div class="acc-log"><div class="acc-log-hdr"><div>Date</div><div>Pred High</div><div>Actual High</div><div>Pred Low</div><div>Actual Low</div><div>Result</div></div>';
+  var shown=0;sortedRows.forEach(function(r){if(shown>=30)return;var pH=parseFloat(r.pred_high),pL=parseFloat(r.pred_low),aH=parseFloat(r.actual_high),aL=parseFloat(r.actual_low),hasActual=!isNaN(aH)&&!isNaN(aL),hasPred=!isNaN(pH)&&!isNaN(pL);if(!hasPred)return;var dp=new Date(r.date+"T12:00:00"),dateStr=dp.toLocaleDateString("en-US",{month:"short",day:"numeric"});var badge='<span class="acc-badge pending">PENDING</span>';if(hasActual){var hiErr=Math.abs(pH-aH),loErr=Math.abs(pL-aL),avgErr=(hiErr+loErr)/2;if(avgErr<=3)badge='<span class="acc-badge hit">HIT</span>';else if(avgErr<=5)badge='<span class="acc-badge close">CLOSE</span>';else badge='<span class="acc-badge miss">MISS</span>';}var hiColor="",loColor="";if(hasActual){hiColor=Math.abs(pH-aH)<=3?"color:var(--green)":(Math.abs(pH-aH)<=5?"color:var(--yellow)":"color:#ef4444");loColor=Math.abs(pL-aL)<=3?"color:var(--green)":(Math.abs(pL-aL)<=5?"color:var(--yellow)":"color:#ef4444");}html+='<div class="acc-log-row"><div class="acc-date">'+dateStr+'</div><div>'+Math.round(pH)+'F</div><div style="'+hiColor+'">'+(hasActual?Math.round(aH)+'F':'--')+'</div><div>'+Math.round(pL)+'F</div><div style="'+loColor+'">'+(hasActual?Math.round(aL)+'F':'--')+'</div><div>'+badge+'</div></div>';shown++;});
   if(shown===0)html+='<div style="padding:16px;color:var(--mu);font-size:11px">No predictions logged yet.</div>';
-  html+='</div><div style="font-size:8px;color:var(--mu2);text-align:center;margin-top:10px;line-height:1.7">Predictions logged daily at page load &middot; Actuals from KNCRALEI761 / Open-Meteo ERA5</div></div>';
+  html+='</div><div style="font-size:8px;color:var(--mu2);text-align:center;margin-top:10px;line-height:1.7">Predictions logged daily at page load · Actuals from Open-Meteo ERA5</div></div>';
   el.innerHTML=html;
 }
 setTimeout(function(){accLogPrediction();accLogActuals();},10000);
@@ -1100,7 +1515,7 @@ function mcBuildHistory(rows){
 }
 
 // Log on load then every top-of-hour
-// Microclimate logging: top-of-hour only, no on-load fire
+setTimeout(mcLogTemps,15000);
 function scheduleMcLog(){
   var now=new Date();
   var msUntilNextHour=(60-now.getMinutes())*60000-now.getSeconds()*1000-now.getMilliseconds();
@@ -1149,5 +1564,6 @@ function refreshAll(){fetchConditions();}
 refreshAll();fetchExtended();
 setInterval(refreshAll,300000);setInterval(fetchExtended,1800000);
 </script>
+
 </body>
 </html>
