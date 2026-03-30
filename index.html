@@ -293,6 +293,13 @@ main{max-width:1100px;margin:0 auto;padding:18px;overflow-x:hidden}
 .acc-score-val.poor{color:#ef4444}
 .acc-score-sub{font-size:10px;color:var(--mu);margin-top:5px;line-height:1.5}
 .acc-score-err{font-size:9px;color:var(--mu2);margin-top:3px}
+/* Yesterday special card */
+.acc-yesterday-card{border-top-color:var(--gold)!important}
+.acc-yday-delta{font-size:38px;font-weight:700;line-height:1;margin:4px 0 2px;letter-spacing:-1px}
+.acc-yday-dir{font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px}
+.acc-yday-avg{font-size:9px;color:var(--mu);margin-bottom:5px;line-height:1.6}
+.acc-yday-breakdown{font-size:11px;font-weight:600;display:flex;justify-content:center;gap:8px;align-items:center}
+.acc-yday-sep{color:var(--mu2);font-size:9px}
 .acc-key{font-size:9px;color:var(--mu2);text-align:center;margin-bottom:14px;padding:8px 12px;background:var(--p2);border:1px solid var(--bd);border-radius:3px}
 .acc-key strong{color:var(--mu)}
 .acc-log{background:var(--p2);border:1px solid var(--bd);border-radius:4px;overflow:hidden}
@@ -1352,8 +1359,9 @@ function accRender(el,rawRows){
   // "Yesterday" = exact date match on yesterdayStr.
   // "Last 7 / 30 days" = date string falls within window (date comparison, not timestamp).
   function calcAccuracyExact(rows,dateStr){
-    // Single-day exact match
+    // Single-day exact match — returns full delta breakdown for Yesterday card
     var hiErrors=[],loErrors=[],hiHits=0,loHits=0,total=0;
+    var predAvgSum=0,actAvgSum=0,hiDiffSum=0,loDiffSum=0;
     rows.forEach(function(r){
       if((r.date||"").substring(0,10)!==dateStr)return;
       var pH=parseFloat(r.pred_high),pL=parseFloat(r.pred_low);
@@ -1364,11 +1372,27 @@ function accRender(el,rawRows){
       hiErrors.push(hiErr);loErrors.push(loErr);
       if(hiErr<=3)hiHits++;
       if(loErr<=3)loHits++;
+      // Avg temp = (hi + lo) / 2
+      predAvgSum+=(pH+pL)/2;
+      actAvgSum+=(aH+aL)/2;
+      hiDiffSum+=(aH-pH); // positive = ran warmer
+      loDiffSum+=(aL-pL);
     });
     if(total===0)return null;
     var avgHiErr=hiErrors.reduce(function(a,b){return a+b;},0)/hiErrors.length;
     var avgLoErr=loErrors.reduce(function(a,b){return a+b;},0)/loErrors.length;
-    return{total:total,hitPct:Math.round(((hiHits+loHits)/(total*2))*100),avgHiErr:avgHiErr,avgLoErr:avgLoErr};
+    var predAvg=predAvgSum/total;
+    var actAvg=actAvgSum/total;
+    var avgDiff=actAvg-predAvg; // positive = reality was warmer than forecast
+    var hiDiff=hiDiffSum/total;
+    var loDiff=loDiffSum/total;
+    return{
+      total:total,
+      hitPct:Math.round(((hiHits+loHits)/(total*2))*100),
+      avgHiErr:avgHiErr,avgLoErr:avgLoErr,
+      predAvg:predAvg,actAvg:actAvg,
+      avgDiff:avgDiff,hiDiff:hiDiff,loDiff:loDiff
+    };
   }
   function calcAccuracy(rows,cutoffDate){
     // Multi-day window: include rows where date >= cutoffDate string
@@ -1397,6 +1421,8 @@ function accRender(el,rawRows){
   var accYesterday=calcAccuracyExact(rows,yesterdayStr); // exact date match
 
   function scoreClass(pct){return pct>=75?"good":pct>=50?"ok":"poor";}
+
+  // Standard card for 7-day / 30-day / All Time — shows % accuracy
   function renderScoreCard(label,acc){
     if(!acc)return'<div class="acc-score-card"><div class="acc-score-lbl">'+label+'</div><div class="acc-score-val">--</div><div class="acc-score-sub">No data yet</div></div>';
     return'<div class="acc-score-card">'+
@@ -1407,11 +1433,50 @@ function accRender(el,rawRows){
     '</div>';
   }
 
+  // Yesterday card — shows average temperature delta (the "how far off" format)
+  function renderYesterdayCard(acc){
+    if(!acc){
+      return'<div class="acc-score-card">'+
+        '<div class="acc-score-lbl">Yesterday</div>'+
+        '<div class="acc-score-val">--</div>'+
+        '<div class="acc-score-sub">No data yet</div>'+
+      '</div>';
+    }
+    // avgDiff: how much warmer/cooler reality was vs forecast
+    var diff=acc.avgDiff;
+    var absDiff=Math.abs(diff);
+    var diffSign=diff>0?"+":"";
+    // Color: green ≤1.5°, yellow ≤3°, orange ≤5°, red >5°
+    var diffCol=absDiff<=1.5?"var(--green)":absDiff<=3?"var(--yellow)":absDiff<=5?"#ff8844":"#ef4444";
+    // Direction label
+    var dirLabel=absDiff<0.5?"On Target":diff>0?"Too Cool":"Too Warm";
+    // Hi and Lo signed deltas
+    var hiSign=acc.hiDiff>0?"+":"";
+    var loSign=acc.loDiff>0?"+":"";
+    var hiDiffCol=Math.abs(acc.hiDiff)<=3?"var(--green)":Math.abs(acc.hiDiff)<=5?"var(--yellow)":"#ef4444";
+    var loDiffCol=Math.abs(acc.loDiff)<=3?"var(--green)":Math.abs(acc.loDiff)<=5?"var(--yellow)":"#ef4444";
+
+    return'<div class="acc-score-card acc-yesterday-card">'+
+      '<div class="acc-score-lbl">Yesterday</div>'+
+      // Big number: avg temp delta
+      '<div class="acc-yday-delta" style="color:'+diffCol+'">'+diffSign+diff.toFixed(1)+'°</div>'+
+      '<div class="acc-yday-dir" style="color:'+diffCol+'">'+dirLabel+'</div>'+
+      '<div class="acc-yday-avg">'+
+        'Pred avg '+acc.predAvg.toFixed(1)+'° → Act avg '+acc.actAvg.toFixed(1)+'°'+
+      '</div>'+
+      '<div class="acc-yday-breakdown">'+
+        '<span style="color:'+hiDiffCol+'">Hi '+hiSign+acc.hiDiff.toFixed(1)+'°</span>'+
+        '<span class="acc-yday-sep">·</span>'+
+        '<span style="color:'+loDiffCol+'">Lo '+loSign+acc.loDiff.toFixed(1)+'°</span>'+
+      '</div>'+
+    '</div>';
+  }
+
   var html=
     '<div class="acc-wrap">'+
       '<div class="acc-hdr">Tuffy\'s Accuracy Dashboard <em>- Forecast vs Actual Temperature</em></div>'+
       '<div class="acc-score-row">'+
-        renderScoreCard("Yesterday",accYesterday)+
+        renderYesterdayCard(accYesterday)+
         renderScoreCard("Last 7 Days",accWeek)+
         renderScoreCard("Last 30 Days",accMonth)+
         renderScoreCard("All Time",accAll)+
