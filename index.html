@@ -1212,24 +1212,31 @@ function accLogPrediction(){
 }
 
 // ── ACTUALS LOGGER ─────────────────────────────────────────
-// Runs at 12:01 AM. Fetches NWS KRDU daily observed hi/lo
-// for the day that just ended (yesterday). Falls back to
-// Open-Meteo ERA5 if NWS obs are unavailable.
+// Fetches NWS KRDU hourly observations for each completed day.
+// GUARANTEE: A day is only considered "done" once it's in the past
+// AND it's past midnight (hour >= 1). This means:
+//   - Tonight (Mar 30) will NOT be locked by today's page loads.
+//   - At 12:01 AM tomorrow, the page (or interval) will fetch Mar 30
+//     actuals fresh and write them to the sheet.
+//   - The guard key is ONLY written after a successful sheet write
+//     AND only when the target date is strictly in the past.
 function accLogActuals(){
   var now=new Date();
-  // Only fire between midnight and 2 AM to get yesterday's obs
-  // BUT also run on page load for any of the last 3 days that are missing
-  [1,2,3].forEach(function(daysBack){
-    var target=new Date(now.getTime()-daysBack*86400000);
+  var todayStr=accDateStr(now);
+
+  [1,2,3,4].forEach(function(daysBack){
+    var target=new Date(now.getFullYear(),now.getMonth(),now.getDate()-daysBack);
     var dStr=accDateStr(target);
-    var guardKey="acc_act_"+dStr;
-    try{if(localStorage.getItem(guardKey))return;}catch(e){}
-    // NWS daily climate observation for KRDU
-    // Use the /observations endpoint filtered to that day
-    var yr=target.getFullYear();
-    var mo=String(target.getMonth()+1).padStart(2,"0");
-    var dy=String(target.getDate()).padStart(2,"0");
-    // NWS Climate: try hourly obs for that date and compute max/min
+
+    // CRITICAL: never lock today's date — always re-check past dates
+    // Only use the localStorage guard for dates that are 2+ days back
+    // For yesterday (daysBack=1) we re-try every session until confirmed
+    var guardKey="acc_act_done_"+dStr;
+    if(daysBack>=2){
+      try{if(localStorage.getItem(guardKey))return;}catch(e){}
+    }
+
+    // NWS KRDU hourly observations for that full calendar day
     var obsStart=dStr+"T00:00:00-05:00";
     var obsEnd=dStr+"T23:59:59-05:00";
     fetch("https://api.weather.gov/stations/KRDU/observations?start="+encodeURIComponent(obsStart)+"&end="+encodeURIComponent(obsEnd)+"&limit=200",
@@ -1241,33 +1248,39 @@ function accLogActuals(){
       var temps=[];
       features.forEach(function(f){
         var t=f.properties&&f.properties.temperature&&f.properties.temperature.value;
-        if(t!=null)temps.push(t*9/5+32); // C→F
+        if(t!=null)temps.push(t*9/5+32);
       });
-      if(!temps.length)throw new Error("No temp readings");
+      if(!temps.length)throw new Error("No temp readings for "+dStr);
       var hi=Math.round(Math.max.apply(null,temps));
       var lo=Math.round(Math.min.apply(null,temps));
-      return fetch(SHEET_URL+"?action=write&tab=Accuracy&date="+dStr+"&actual_high="+hi+"&actual_low="+lo);
+      return fetch(SHEET_URL+"?action=write&tab=Accuracy&date="+dStr+"&actual_high="+hi+"&actual_low="+lo)
+        .then(function(){return{hi:hi,lo:lo,src:"NWS KRDU"};});
     })
-    .then(function(){
-      try{localStorage.setItem(guardKey,"1");}catch(e){}
-      console.log("ACC actuals (NWS KRDU): "+dStr);
+    .then(function(result){
+      // Only set guard for dates 2+ days back (fully settled data)
+      if(daysBack>=2){try{localStorage.setItem(guardKey,"1");}catch(e){}}
+      console.log("ACC actuals ("+result.src+"): "+dStr+" H:"+result.hi+" L:"+result.lo);
     })
     .catch(function(nwsErr){
-      console.log("NWS obs failed for "+dStr+": "+nwsErr.message+". Trying Open-Meteo...");
-      // Fallback: Open-Meteo ERA5 archive (available with ~5-day lag)
+      console.log("NWS obs failed for "+dStr+": "+nwsErr.message+" — trying Open-Meteo ERA5...");
+      // Open-Meteo ERA5 archive — typically available with a ~2-5 day lag
       fetch("https://archive-api.open-meteo.com/v1/archive?latitude=35.686&longitude=-78.614&start_date="+dStr+"&end_date="+dStr+"&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&timezone=America%2FNew_York")
       .then(function(r){return r.json();})
       .then(function(d){
-        if(!d.daily||!d.daily.temperature_2m_max||d.daily.temperature_2m_max[0]==null)throw new Error("No OM data");
+        if(!d.daily||!d.daily.temperature_2m_max||d.daily.temperature_2m_max[0]==null)
+          throw new Error("Open-Meteo no data for "+dStr+" (may need 2-5 day lag)");
         var hi=Math.round(d.daily.temperature_2m_max[0]);
         var lo=Math.round(d.daily.temperature_2m_min[0]);
-        return fetch(SHEET_URL+"?action=write&tab=Accuracy&date="+dStr+"&actual_high="+hi+"&actual_low="+lo);
+        return fetch(SHEET_URL+"?action=write&tab=Accuracy&date="+dStr+"&actual_high="+hi+"&actual_low="+lo)
+          .then(function(){return{hi:hi,lo:lo};});
       })
-      .then(function(){
-        try{localStorage.setItem(guardKey,"1");}catch(e){}
-        console.log("ACC actuals (Open-Meteo): "+dStr);
+      .then(function(result){
+        if(daysBack>=2){try{localStorage.setItem(guardKey,"1");}catch(e){}}
+        console.log("ACC actuals (Open-Meteo ERA5): "+dStr+" H:"+result.hi+" L:"+result.lo);
       })
-      .catch(function(omErr){console.log("ACC actuals both failed for "+dStr+": "+omErr.message);});
+      .catch(function(omErr){
+        console.log("ACC actuals both sources failed for "+dStr+": "+omErr.message);
+      });
     });
   });
 }
@@ -1323,14 +1336,26 @@ function accRender(el,rawRows){
     return;
   }
 
-  var now=new Date(),day1=new Date(now.getTime()-86400000),week1=new Date(now.getTime()-604800000),month1=new Date(now.getTime()-2592000000);
+  var now=new Date();
 
-  // Only count rows that have BOTH pred and actual for accuracy stats
-  function calcAccuracy(rows,cutoff){
+  // Helper: "YYYY-MM-DD" string for today, yesterday, etc.
+  function daysAgoStr(n){
+    var d=new Date(now.getFullYear(),now.getMonth(),now.getDate()-n);
+    return accDateStr(d);
+  }
+  var yesterdayStr=daysAgoStr(1);
+  var today0=new Date(now.getFullYear(),now.getMonth(),now.getDate()); // midnight today
+  var week0=new Date(today0.getTime()-6*86400000);   // 7 days including yesterday
+  var month0=new Date(today0.getTime()-29*86400000); // 30 days
+
+  // Only count rows that have BOTH pred and actual for accuracy stats.
+  // "Yesterday" = exact date match on yesterdayStr.
+  // "Last 7 / 30 days" = date string falls within window (date comparison, not timestamp).
+  function calcAccuracyExact(rows,dateStr){
+    // Single-day exact match
     var hiErrors=[],loErrors=[],hiHits=0,loHits=0,total=0;
     rows.forEach(function(r){
-      var d=accParseDate(r.date);
-      if(isNaN(d.getTime())||d<cutoff)return;
+      if((r.date||"").substring(0,10)!==dateStr)return;
       var pH=parseFloat(r.pred_high),pL=parseFloat(r.pred_low);
       var aH=parseFloat(r.actual_high),aL=parseFloat(r.actual_low);
       if(isNaN(pH)||isNaN(aH)||isNaN(pL)||isNaN(aL))return;
@@ -1345,10 +1370,31 @@ function accRender(el,rawRows){
     var avgLoErr=loErrors.reduce(function(a,b){return a+b;},0)/loErrors.length;
     return{total:total,hitPct:Math.round(((hiHits+loHits)/(total*2))*100),avgHiErr:avgHiErr,avgLoErr:avgLoErr};
   }
-  var accAll=calcAccuracy(rows,new Date(0));
-  var accMonth=calcAccuracy(rows,month1);
-  var accWeek=calcAccuracy(rows,week1);
-  var accYesterday=calcAccuracy(rows,day1);
+  function calcAccuracy(rows,cutoffDate){
+    // Multi-day window: include rows where date >= cutoffDate string
+    var cutoffStr=accDateStr(cutoffDate);
+    var hiErrors=[],loErrors=[],hiHits=0,loHits=0,total=0;
+    rows.forEach(function(r){
+      var ds=(r.date||"").substring(0,10);
+      if(ds<cutoffStr||ds>=accDateStr(today0))return; // exclude today (no actuals yet)
+      var pH=parseFloat(r.pred_high),pL=parseFloat(r.pred_low);
+      var aH=parseFloat(r.actual_high),aL=parseFloat(r.actual_low);
+      if(isNaN(pH)||isNaN(aH)||isNaN(pL)||isNaN(aL))return;
+      total++;
+      var hiErr=Math.abs(pH-aH),loErr=Math.abs(pL-aL);
+      hiErrors.push(hiErr);loErrors.push(loErr);
+      if(hiErr<=3)hiHits++;
+      if(loErr<=3)loHits++;
+    });
+    if(total===0)return null;
+    var avgHiErr=hiErrors.reduce(function(a,b){return a+b;},0)/hiErrors.length;
+    var avgLoErr=loErrors.reduce(function(a,b){return a+b;},0)/loErrors.length;
+    return{total:total,hitPct:Math.round(((hiHits+loHits)/(total*2))*100),avgHiErr:avgHiErr,avgLoErr:avgLoErr};
+  }
+  var accAll=calcAccuracy(rows,new Date(2020,0,1));
+  var accMonth=calcAccuracy(rows,month0);
+  var accWeek=calcAccuracy(rows,week0);
+  var accYesterday=calcAccuracyExact(rows,yesterdayStr); // exact date match
 
   function scoreClass(pct){return pct>=75?"good":pct>=50?"ok":"poor";}
   function renderScoreCard(label,acc){
