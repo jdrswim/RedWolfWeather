@@ -296,11 +296,12 @@ main{max-width:1100px;margin:0 auto;padding:18px;overflow-x:hidden}
 .acc-key{font-size:9px;color:var(--mu2);text-align:center;margin-bottom:14px;padding:8px 12px;background:var(--p2);border:1px solid var(--bd);border-radius:3px}
 .acc-key strong{color:var(--mu)}
 .acc-log{background:var(--p2);border:1px solid var(--bd);border-radius:4px;overflow:hidden}
-.acc-log-hdr{display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr 1fr .9fr;gap:4px;padding:10px 16px;background:var(--p1);border-bottom:1px solid var(--bd);font-size:9px;font-weight:800;letter-spacing:1px;color:var(--red);text-transform:uppercase}
-.acc-log-row{display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr 1fr .9fr;gap:4px;padding:9px 16px;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px;color:var(--white);align-items:center}
+.acc-log-hdr{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 1fr 1.4fr 1fr;gap:4px;padding:10px 16px;background:var(--p1);border-bottom:1px solid var(--bd);font-size:9px;font-weight:800;letter-spacing:1px;color:var(--red);text-transform:uppercase}
+.acc-log-row{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 1fr 1.4fr 1fr;gap:4px;padding:9px 16px;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px;color:var(--white);align-items:center}
 .acc-log-row:last-child{border-bottom:none}
 .acc-log-row:hover{background:rgba(255,255,255,.02)}
 .acc-date{font-size:11px;color:var(--mu);font-weight:600}
+.acc-delta{font-size:11px;font-weight:700;line-height:1.4}
 .acc-badge{font-size:9px;font-weight:800;padding:3px 8px;border-radius:3px;letter-spacing:1px;text-transform:uppercase;display:inline-block}
 .acc-badge.hit{background:rgba(0,212,74,.15);color:var(--green)}
 .acc-badge.close{background:rgba(255,204,0,.15);color:var(--yellow)}
@@ -445,7 +446,8 @@ footer strong{color:var(--red)}
   .pws-temp{font-size:32px}
   .pws-name{font-size:13px}
   .acc-score-row{grid-template-columns:1fr}
-  .acc-log-hdr,.acc-log-row{grid-template-columns:1.2fr 1fr 1fr 1fr 1fr .9fr;font-size:9px;padding:7px 10px}
+  .acc-log-hdr,.acc-log-row{grid-template-columns:1.4fr 1fr 1fr 1fr 1fr 1.4fr 1fr;font-size:8px;padding:6px 8px}
+  .acc-delta{font-size:10px}
   .mc-mo-grid{grid-template-columns:repeat(2,1fr)}
   footer{padding:16px 12px;margin-top:20px}
   footer p{font-size:9px}
@@ -1118,90 +1120,154 @@ function fetchAlmanac(){
 }
 
 // ============================================================
-// FIX #4: ACCURACY DASHBOARD — fixed date parsing & actuals logging
-// The "Invalid Date" bug was caused by new Date(r.date) when date comes
-// back as "YYYY-MM-DD" — we force "T12:00:00" appended for local parse.
-// The throttle on accLogActuals was too aggressive; removed date guard.
+// ============================================================
+// ACCURACY DASHBOARD
+// DESIGN:
+//   • One row per day — sheet may have duplicates; we deduplicate
+//     client-side by date, merging pred + actual into a single record.
+//   • Predictions: logged at 8 PM local time for the NEXT day.
+//     NWS /forecast gives tomorrow's daytime high + tomorrow night's low.
+//   • Actuals: logged at 12:01 AM for the day that just ended.
+//     Source: NWS KRDU station observations (official climate record).
+//     Fallback: Open-Meteo ERA5 archive.
 // ============================================================
 var SHEET_URL="https://script.google.com/macros/s/AKfycbzgcFyiIsyyYlXnUPVekTGin4N-_GIJ6qlsq9kPZg1oMbuaGnwF-mZ-xp8-4rTGPZLP/exec";
 
+// Safe date parser — handles "YYYY-MM-DD" from the sheet without timezone shift
+function accParseDate(str){
+  if(!str)return new Date(NaN);
+  if(str.indexOf("T")>=0)return new Date(str);
+  return new Date(str+"T12:00:00");
+}
+
+// Return "YYYY-MM-DD" for a Date object in local time
+function accDateStr(d){return d.toLocaleDateString("en-CA");}
+
+// ── PREDICTION LOGGER ──────────────────────────────────────
+// Runs once per day at 8 PM. Fetches NWS forecast for
+// tomorrow's high and overnight low, writes to sheet.
+// targetDate = tomorrow (the day being predicted for).
 function accLogPrediction(){
-  var today=new Date().toLocaleDateString("en-CA");
-  var lastPred=null;try{lastPred=localStorage.getItem("acc_last_pred");}catch(e){}
-  if(lastPred===today)return;
+  var now=new Date();
+  var hour=now.getHours();
+  // Only fire between 20:00 and 23:59
+  if(hour<20)return;
+  // The day we are predicting for is TOMORROW
+  var tomorrow=new Date(now.getTime()+86400000);
+  var targetDate=accDateStr(tomorrow);
+  var guardKey="acc_pred_"+targetDate;
+  try{if(localStorage.getItem(guardKey))return;}catch(e){}
+
   fetch("https://api.weather.gov/points/35.686,-78.614",{headers:{"User-Agent":"WolfpackWeather/2.0"}})
-  .then(function(r){if(!r.ok)throw new Error("NWS points failed");return r.json();})
+  .then(function(r){if(!r.ok)throw new Error("NWS points "+r.status);return r.json();})
   .then(function(d){
     var furl=d.properties&&d.properties.forecast;
     if(!furl)throw new Error("No forecast URL");
     return fetch(furl,{headers:{"User-Agent":"WolfpackWeather/2.0"}});
   })
-  .then(function(r){if(!r.ok)throw new Error("NWS forecast failed");return r.json();})
+  .then(function(r){if(!r.ok)throw new Error("NWS forecast "+r.status);return r.json();})
   .then(function(d){
     var periods=d.properties&&d.properties.periods;
     if(!periods||!periods.length)throw new Error("No periods");
+    // Find the first DAYTIME period for tomorrow (hi) and the
+    // following NIGHT period (overnight lo into tomorrow night)
     var hi=null,lo=null;
-    for(var i=0;i<Math.min(periods.length,4);i++){
+    var tomorrowStr=targetDate; // "YYYY-MM-DD"
+    for(var i=0;i<periods.length;i++){
       var p=periods[i];
-      if(p.isDaytime&&hi===null)hi=p.temperature;
-      if(!p.isDaytime&&lo===null)lo=p.temperature;
+      var pDate=p.startTime?p.startTime.substring(0,10):"";
+      if(pDate===tomorrowStr&&p.isDaytime&&hi===null){
+        hi=p.temperature;
+      }
+      if(pDate===tomorrowStr&&!p.isDaytime&&lo===null){
+        lo=p.temperature;
+      }
       if(hi!==null&&lo!==null)break;
     }
+    // Fallback: if we can't match by date (e.g. at night NWS shows
+    // "Tonight" then "Tomorrow"), scan by name
     if(hi===null||lo===null){
-      // Fallback: just use first two periods
-      hi=periods[0]?periods[0].temperature:null;
-      lo=periods[1]?periods[1].temperature:null;
+      for(var j=0;j<Math.min(periods.length,6);j++){
+        var pp=periods[j];
+        var nm=(pp.name||"").toLowerCase();
+        if(pp.isDaytime&&hi===null&&(nm.indexOf("tomorrow")>=0||nm.indexOf("monday")>=0||nm.indexOf("tuesday")>=0||nm.indexOf("wednesday")>=0||nm.indexOf("thursday")>=0||nm.indexOf("friday")>=0||nm.indexOf("saturday")>=0||nm.indexOf("sunday")>=0)){
+          hi=pp.temperature;
+        }
+        if(!pp.isDaytime&&lo===null&&hi!==null){
+          lo=pp.temperature;
+        }
+        if(hi!==null&&lo!==null)break;
+      }
     }
-    if(hi===null||lo===null)throw new Error("Could not find hi/lo");
-    return fetch(SHEET_URL+"?action=write&tab=Accuracy&date="+today+"&pred_high="+hi+"&pred_low="+lo);
+    // Last resort: take first daytime + next night
+    if(hi===null){for(var k=0;k<periods.length;k++){if(periods[k].isDaytime){hi=periods[k].temperature;if(k+1<periods.length)lo=periods[k+1].temperature;break;}}}
+    if(hi===null||lo===null)throw new Error("Cannot determine hi/lo for "+targetDate);
+    return fetch(SHEET_URL+"?action=write&tab=Accuracy&date="+targetDate+"&pred_high="+hi+"&pred_low="+lo);
   })
   .then(function(){
-    try{localStorage.setItem("acc_last_pred",today);}catch(e){}
-    console.log("ACC pred logged: "+today);
+    try{localStorage.setItem(guardKey,"1");}catch(e){}
+    console.log("ACC pred logged for "+targetDate);
   })
   .catch(function(e){console.log("ACC pred error: "+e.message);});
 }
 
+// ── ACTUALS LOGGER ─────────────────────────────────────────
+// Runs at 12:01 AM. Fetches NWS KRDU daily observed hi/lo
+// for the day that just ended (yesterday). Falls back to
+// Open-Meteo ERA5 if NWS obs are unavailable.
 function accLogActuals(){
-  // Check yesterday AND the day before to catch missed actuals
   var now=new Date();
-  [1,2].forEach(function(daysBack){
+  // Only fire between midnight and 2 AM to get yesterday's obs
+  // BUT also run on page load for any of the last 3 days that are missing
+  [1,2,3].forEach(function(daysBack){
     var target=new Date(now.getTime()-daysBack*86400000);
-    var yStr=target.toLocaleDateString("en-CA");
-    var lastAct=null;try{lastAct=localStorage.getItem("acc_act_"+yStr);}catch(e){}
-    if(lastAct)return; // already logged this specific date
-    // Try WU station history first
-    var wuDate=yStr.replace(/-/g,"");
-    fetch("https://api.weather.com/v2/pws/history/daily?stationId=KNCRALEI761&format=json&units=e&date="+wuDate+"&apiKey="+WU_COMMUNITY_KEY)
-    .then(function(r){if(!r.ok)throw new Error("WU "+r.status);return r.json();})
+    var dStr=accDateStr(target);
+    var guardKey="acc_act_"+dStr;
+    try{if(localStorage.getItem(guardKey))return;}catch(e){}
+    // NWS daily climate observation for KRDU
+    // Use the /observations endpoint filtered to that day
+    var yr=target.getFullYear();
+    var mo=String(target.getMonth()+1).padStart(2,"0");
+    var dy=String(target.getDate()).padStart(2,"0");
+    // NWS Climate: try hourly obs for that date and compute max/min
+    var obsStart=dStr+"T00:00:00-05:00";
+    var obsEnd=dStr+"T23:59:59-05:00";
+    fetch("https://api.weather.gov/stations/KRDU/observations?start="+encodeURIComponent(obsStart)+"&end="+encodeURIComponent(obsEnd)+"&limit=200",
+      {headers:{"User-Agent":"WolfpackWeather/2.0","Accept":"application/geo+json"}})
+    .then(function(r){if(!r.ok)throw new Error("NWS obs "+r.status);return r.json();})
     .then(function(d){
-      var obs=d.observations&&d.observations[0];
-      if(!obs)throw new Error("No obs");
-      var imp=obs.imperial||{};
-      var hi=imp.tempHigh!=null?Math.round(imp.tempHigh):null;
-      var lo=imp.tempLow!=null?Math.round(imp.tempLow):null;
-      if(hi===null||lo===null)throw new Error("No hi/lo");
-      return fetch(SHEET_URL+"?action=write&tab=Accuracy&date="+yStr+"&actual_high="+hi+"&actual_low="+lo);
+      var features=d.features||[];
+      if(!features.length)throw new Error("No NWS obs for "+dStr);
+      var temps=[];
+      features.forEach(function(f){
+        var t=f.properties&&f.properties.temperature&&f.properties.temperature.value;
+        if(t!=null)temps.push(t*9/5+32); // C→F
+      });
+      if(!temps.length)throw new Error("No temp readings");
+      var hi=Math.round(Math.max.apply(null,temps));
+      var lo=Math.round(Math.min.apply(null,temps));
+      return fetch(SHEET_URL+"?action=write&tab=Accuracy&date="+dStr+"&actual_high="+hi+"&actual_low="+lo);
     })
     .then(function(){
-      try{localStorage.setItem("acc_act_"+yStr,"1");}catch(e){}
-      console.log("ACC actuals (WU): "+yStr);
+      try{localStorage.setItem(guardKey,"1");}catch(e){}
+      console.log("ACC actuals (NWS KRDU): "+dStr);
     })
-    .catch(function(){
-      // Fallback: Open-Meteo archive
-      fetch("https://archive-api.open-meteo.com/v1/archive?latitude=35.686&longitude=-78.614&start_date="+yStr+"&end_date="+yStr+"&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&timezone=America%2FNew_York")
+    .catch(function(nwsErr){
+      console.log("NWS obs failed for "+dStr+": "+nwsErr.message+". Trying Open-Meteo...");
+      // Fallback: Open-Meteo ERA5 archive (available with ~5-day lag)
+      fetch("https://archive-api.open-meteo.com/v1/archive?latitude=35.686&longitude=-78.614&start_date="+dStr+"&end_date="+dStr+"&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&timezone=America%2FNew_York")
       .then(function(r){return r.json();})
       .then(function(d){
-        if(!d.daily)return;
+        if(!d.daily||!d.daily.temperature_2m_max||d.daily.temperature_2m_max[0]==null)throw new Error("No OM data");
         var hi=Math.round(d.daily.temperature_2m_max[0]);
         var lo=Math.round(d.daily.temperature_2m_min[0]);
-        return fetch(SHEET_URL+"?action=write&tab=Accuracy&date="+yStr+"&actual_high="+hi+"&actual_low="+lo);
+        return fetch(SHEET_URL+"?action=write&tab=Accuracy&date="+dStr+"&actual_high="+hi+"&actual_low="+lo);
       })
       .then(function(){
-        try{localStorage.setItem("acc_act_"+yStr,"1");}catch(e){}
-        console.log("ACC actuals (OM fallback): "+yStr);
+        try{localStorage.setItem(guardKey,"1");}catch(e){}
+        console.log("ACC actuals (Open-Meteo): "+dStr);
       })
-      .catch(function(){});
+      .catch(function(omErr){console.log("ACC actuals both failed for "+dStr+": "+omErr.message);});
     });
   });
 }
@@ -1215,40 +1281,64 @@ function accFetchAndRender(){
   .catch(function(){accRender(el,[]);});
 }
 
-// FIX #4: safe date parsing function — handles "YYYY-MM-DD" from sheet
-function accParseDate(str){
-  if(!str)return new Date(NaN);
-  // If it has T already, parse directly
-  if(str.indexOf("T")>=0)return new Date(str);
-  // YYYY-MM-DD — append noon local time to avoid timezone midnight issues
-  return new Date(str+"T12:00:00");
+// ── RENDER ─────────────────────────────────────────────────
+// Key fix: DEDUPLICATE rows by date before rendering.
+// The sheet may have multiple rows for the same date if the page
+// was loaded many times. We merge them: keep the best pred (first
+// logged) and best actual (most recent, to catch late-arriving obs).
+function accDedupeRows(rows){
+  var byDate={};
+  rows.forEach(function(r){
+    var ds=r.date||"";
+    if(!ds)return;
+    if(!byDate[ds]){
+      byDate[ds]={date:ds,pred_high:r.pred_high,pred_low:r.pred_low,actual_high:r.actual_high,actual_low:r.actual_low};
+    } else {
+      var e=byDate[ds];
+      // Keep first valid prediction
+      if((e.pred_high==null||e.pred_high==="")&&r.pred_high)e.pred_high=r.pred_high;
+      if((e.pred_low==null||e.pred_low==="")&&r.pred_low)e.pred_low=r.pred_low;
+      // Override actual with most recent non-empty value
+      if(r.actual_high!=null&&r.actual_high!=="")e.actual_high=r.actual_high;
+      if(r.actual_low!=null&&r.actual_low!=="")e.actual_low=r.actual_low;
+    }
+  });
+  return Object.values(byDate);
 }
 
-function accRender(el,rows){
+function accRender(el,rawRows){
+  // Deduplicate first
+  var rows=accDedupeRows(rawRows);
+
   if(!rows.length){
     el.innerHTML=
       '<div class="acc-wrap">'+
         '<div class="acc-hdr">Tuffy\'s Accuracy Dashboard <em>- Forecast vs Actual Temperature</em></div>'+
-        '<div style="background:var(--p2);border:1px solid var(--bd);border-radius:4px;padding:24px;text-align:center">'+
-          '<div style="font-size:32px;margin-bottom:12px">📊</div>'+
+        '<div style="background:var(--p2);border:1px solid var(--bd);border-radius:4px;padding:28px;text-align:center">'+
+          '<div style="font-size:36px;margin-bottom:14px">📊</div>'+
           '<div style="font-size:14px;color:var(--white);font-weight:700;margin-bottom:8px">Tracking Has Started</div>'+
-          '<div style="font-size:12px;color:var(--mu);line-height:1.7">Predictions are logged daily. Check back tomorrow for your first comparison.<br>Actuals are pulled from KNCRALEI761 station history.</div>'+
+          '<div style="font-size:12px;color:var(--mu);line-height:1.8">Predictions log automatically at 8 PM each evening via NWS Raleigh.<br>Actuals log at midnight from NWS KRDU station observations.<br>Check back tomorrow for your first comparison.</div>'+
         '</div>'+
       '</div>';
     return;
   }
+
   var now=new Date(),day1=new Date(now.getTime()-86400000),week1=new Date(now.getTime()-604800000),month1=new Date(now.getTime()-2592000000);
+
+  // Only count rows that have BOTH pred and actual for accuracy stats
   function calcAccuracy(rows,cutoff){
     var hiErrors=[],loErrors=[],hiHits=0,loHits=0,total=0;
     rows.forEach(function(r){
       var d=accParseDate(r.date);
       if(isNaN(d.getTime())||d<cutoff)return;
-      var pH=parseFloat(r.pred_high),pL=parseFloat(r.pred_low),aH=parseFloat(r.actual_high),aL=parseFloat(r.actual_low);
+      var pH=parseFloat(r.pred_high),pL=parseFloat(r.pred_low);
+      var aH=parseFloat(r.actual_high),aL=parseFloat(r.actual_low);
       if(isNaN(pH)||isNaN(aH)||isNaN(pL)||isNaN(aL))return;
       total++;
       var hiErr=Math.abs(pH-aH),loErr=Math.abs(pL-aL);
       hiErrors.push(hiErr);loErrors.push(loErr);
-      if(hiErr<=3)hiHits++;if(loErr<=3)loHits++;
+      if(hiErr<=3)hiHits++;
+      if(loErr<=3)loHits++;
     });
     if(total===0)return null;
     var avgHiErr=hiErrors.reduce(function(a,b){return a+b;},0)/hiErrors.length;
@@ -1259,11 +1349,18 @@ function accRender(el,rows){
   var accMonth=calcAccuracy(rows,month1);
   var accWeek=calcAccuracy(rows,week1);
   var accYesterday=calcAccuracy(rows,day1);
-  function scoreClass(pct){if(pct===null)return"";if(pct>=75)return"good";if(pct>=50)return"ok";return"poor";}
+
+  function scoreClass(pct){return pct>=75?"good":pct>=50?"ok":"poor";}
   function renderScoreCard(label,acc){
     if(!acc)return'<div class="acc-score-card"><div class="acc-score-lbl">'+label+'</div><div class="acc-score-val">--</div><div class="acc-score-sub">No data yet</div></div>';
-    return'<div class="acc-score-card"><div class="acc-score-lbl">'+label+'</div><div class="acc-score-val '+scoreClass(acc.hitPct)+'">'+acc.hitPct+'%</div><div class="acc-score-sub">'+acc.total+' day'+(acc.total!==1?"s":"")+'</div><div class="acc-score-err">Hi ±'+acc.avgHiErr.toFixed(1)+'F / Lo ±'+acc.avgLoErr.toFixed(1)+'F</div></div>';
+    return'<div class="acc-score-card">'+
+      '<div class="acc-score-lbl">'+label+'</div>'+
+      '<div class="acc-score-val '+scoreClass(acc.hitPct)+'">'+acc.hitPct+'%</div>'+
+      '<div class="acc-score-sub">'+acc.total+' day'+(acc.total!==1?"s":"")+'</div>'+
+      '<div class="acc-score-err">Hi ±'+acc.avgHiErr.toFixed(1)+'° / Lo ±'+acc.avgLoErr.toFixed(1)+'°</div>'+
+    '</div>';
   }
+
   var html=
     '<div class="acc-wrap">'+
       '<div class="acc-hdr">Tuffy\'s Accuracy Dashboard <em>- Forecast vs Actual Temperature</em></div>'+
@@ -1273,40 +1370,103 @@ function accRender(el,rows){
         renderScoreCard("Last 30 Days",accMonth)+
         renderScoreCard("All Time",accAll)+
       '</div>'+
-      '<div class="acc-key"><strong>HIT</strong> = within 3°F &nbsp;|&nbsp; <strong>CLOSE</strong> = within 5°F &nbsp;|&nbsp; <strong>MISS</strong> = off by 6°F+</div>'+
+      '<div class="acc-key">'+
+        '<strong>HIT</strong> = Hi &amp; Lo both within 3° &nbsp;|&nbsp; '+
+        '<strong>CLOSE</strong> = avg error ≤5° &nbsp;|&nbsp; '+
+        '<strong>MISS</strong> = avg error 6°+ &nbsp;|&nbsp; '+
+        'Predicted at 8 PM · Actuals from NWS KRDU'+
+      '</div>'+
       '<div class="acc-log">'+
-        '<div class="acc-log-hdr"><div>Date</div><div>Pred Hi</div><div>Act Hi</div><div>Pred Lo</div><div>Act Lo</div><div>Result</div></div>';
+        '<div class="acc-log-hdr">'+
+          '<div>Date</div>'+
+          '<div>Pred Hi</div>'+
+          '<div>Act Hi</div>'+
+          '<div>Pred Lo</div>'+
+          '<div>Act Lo</div>'+
+          '<div>Delta</div>'+
+          '<div>Result</div>'+
+        '</div>';
+
+  // Sort descending by date, one row per day (already deduped)
   var sortedRows=rows.slice().sort(function(a,b){return accParseDate(b.date)-accParseDate(a.date);});
   var shown=0;
   sortedRows.forEach(function(r){
-    if(shown>=30)return;
+    if(shown>=60)return;
     var pH=parseFloat(r.pred_high),pL=parseFloat(r.pred_low);
     var aH=parseFloat(r.actual_high),aL=parseFloat(r.actual_low);
-    var hasActual=!isNaN(aH)&&!isNaN(aL),hasPred=!isNaN(pH)&&!isNaN(pL);
+    var hasPred=!isNaN(pH)&&!isNaN(pL);
+    var hasActual=!isNaN(aH)&&!isNaN(aL);
     if(!hasPred)return;
-    // FIX: use accParseDate so dates render properly
+
     var dp=accParseDate(r.date);
-    var dateStr=!isNaN(dp.getTime())?dp.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}):"Invalid Date";
+    var dateStr=!isNaN(dp.getTime())
+      ?dp.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric",year:"numeric"})
+      :r.date;
+
+    // Delta: show signed error for Hi and Lo
+    var deltaHtml='<div class="acc-delta" style="color:var(--mu)">--</div>';
     var badge='<span class="acc-badge pending">PENDING</span>';
+    var hiColor="",loColor="";
+
     if(hasActual){
-      var hiErr=Math.abs(pH-aH),loErr=Math.abs(pL-aL),avgErr=(hiErr+loErr)/2;
+      var hiDiff=aH-pH; // positive = ran warmer than predicted
+      var loDiff=aL-pL;
+      var hiErr=Math.abs(hiDiff),loErr=Math.abs(loDiff),avgErr=(hiErr+loErr)/2;
+
+      // Color each actual cell
+      hiColor=hiErr<=3?"color:var(--green)":hiErr<=5?"color:var(--yellow)":"color:#ef4444";
+      loColor=loErr<=3?"color:var(--green)":loErr<=5?"color:var(--yellow)":"color:#ef4444";
+
+      // Delta: show "Hi +2° / Lo -1°" format
+      var hiSign=hiDiff>0?"+":"",loSign=loDiff>0?"+":"";
+      var hiDeltaCol=hiErr<=3?"var(--green)":hiErr<=5?"var(--yellow)":"#ef4444";
+      var loDeltaCol=loErr<=3?"var(--green)":loErr<=5?"var(--yellow)":"#ef4444";
+      deltaHtml=
+        '<div class="acc-delta">'+
+          '<span style="color:'+hiDeltaCol+'">Hi '+hiSign+Math.round(hiDiff)+'°</span>'+
+          '<br>'+
+          '<span style="color:'+loDeltaCol+'">Lo '+loSign+Math.round(loDiff)+'°</span>'+
+        '</div>';
+
       if(avgErr<=3)badge='<span class="acc-badge hit">HIT</span>';
       else if(avgErr<=5)badge='<span class="acc-badge close">CLOSE</span>';
       else badge='<span class="acc-badge miss">MISS</span>';
     }
-    var hiColor="",loColor="";
-    if(hasActual){
-      hiColor=Math.abs(pH-aH)<=3?"color:var(--green)":(Math.abs(pH-aH)<=5?"color:var(--yellow)":"color:#ef4444");
-      loColor=Math.abs(pL-aL)<=3?"color:var(--green)":(Math.abs(pL-aL)<=5?"color:var(--yellow)":"color:#ef4444");
-    }
-    html+='<div class="acc-log-row"><div class="acc-date">'+dateStr+'</div><div>'+Math.round(pH)+'°</div><div style="'+hiColor+'">'+(hasActual?Math.round(aH)+'°':'--')+'</div><div>'+Math.round(pL)+'°</div><div style="'+loColor+'">'+(hasActual?Math.round(aL)+'°':'--')+'</div><div>'+badge+'</div></div>';
+
+    html+=
+      '<div class="acc-log-row">'+
+        '<div class="acc-date">'+dateStr+'</div>'+
+        '<div>'+Math.round(pH)+'°</div>'+
+        '<div style="'+hiColor+'">'+(hasActual?Math.round(aH)+'°':'--')+'</div>'+
+        '<div>'+Math.round(pL)+'°</div>'+
+        '<div style="'+loColor+'">'+(hasActual?Math.round(aL)+'°':'--')+'</div>'+
+        deltaHtml+
+        '<div>'+badge+'</div>'+
+      '</div>';
     shown++;
   });
-  if(shown===0)html+='<div style="padding:16px;color:var(--mu);font-size:11px;text-align:center">No predictions logged yet.</div>';
-  html+='</div><div class="acc-note">Predictions logged at page load via NWS API · Actuals from KNCRALEI761 station history</div></div>';
+
+  if(shown===0)html+='<div style="padding:20px;color:var(--mu);font-size:12px;text-align:center">No predictions logged yet.</div>';
+  html+=
+    '</div>'+
+    '<div class="acc-note">'+
+      'Predictions: NWS Raleigh forecast logged at 8 PM for next day · '+
+      'Actuals: NWS KRDU station hourly obs (fallback: Open-Meteo ERA5) · '+
+      'One row per day · '+rows.length+' day'+(rows.length!==1?"s":"")+' tracked'+
+    '</div>'+
+  '</div>';
   el.innerHTML=html;
 }
-setTimeout(function(){accLogPrediction();accLogActuals();},10000);
+
+// Schedule the two loggers:
+// • accLogPrediction: runs every 30 min — only acts during 8-11 PM window
+// • accLogActuals: runs on page load for last 3 days + every 2 hours
+setTimeout(function(){
+  accLogPrediction();
+  accLogActuals();
+},8000);
+setInterval(accLogPrediction,1800000);   // every 30 min
+setInterval(accLogActuals,7200000);      // every 2 hours
 
 // ============================================================
 // FIX #3: PWS NETWORK — complete visual card rendering
