@@ -1148,10 +1148,9 @@ function fetchAlmanac(){
       '<div class="alm-summary">'+
         '<div class="alm-big"><div class="alm-big-lbl">YTD Rainfall</div><div class="alm-big-val">'+ytdP.toFixed(2)+'"</div><div class="alm-big-sub">Normal: '+nP.toFixed(2)+'"</div>'+dLbl(pDiff,'"',0.25)+'</div>'+
         '<div class="alm-big"><div class="alm-big-lbl">YTD Avg Temp</div><div class="alm-big-val">'+ytdAT.toFixed(1)+'F</div><div class="alm-big-sub">Normal: '+nAT.toFixed(1)+'F</div>'+dLbl(tDiff,"F",0.5)+'</div>'+
-        '<div class="alm-big"><div class="alm-big-lbl">Days Tracked</div><div class="alm-big-val">'+ytdD+'</div><div class="alm-big-sub">'+yr+' Year-to-Date</div></div>'+
       '</div>'+
       '<div class="alm-card" style="margin-top:18px"><h3><span>🌡</span> Temperature Departure from Normal</h3>'+
-        '<div class="alm-summary">'+
+        '<div class="alm-summary" style="grid-template-columns:repeat(2,1fr)">'+
           depCard(depYdayLbl,depYdayLbl==="Yesterday"?"vs "+MO_NAMES[curMo]+" normal":depYdayLbl,depYdayAvg,depYdayNorm,depYday)+
           depCard("Last 7 Days",c7+" days avg",dep7Avg,dep7Norm,dep7)+
           depCard("Last Month",MO_NAMES[prevMo],depLMAvg,depLMNorm,depLM)+
