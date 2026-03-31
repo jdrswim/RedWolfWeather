@@ -1267,6 +1267,7 @@ function accLogActuals(){
       // Only set guard for dates 2+ days back (fully settled data)
       if(daysBack>=2){try{localStorage.setItem(guardKey,"1");}catch(e){}}
       console.log("ACC actuals ("+result.src+"): "+dStr+" H:"+result.hi+" L:"+result.lo);
+      if(daysBack===1)accFetchAndRender();
     })
     .catch(function(nwsErr){
       console.log("NWS obs failed for "+dStr+": "+nwsErr.message+" — trying Open-Meteo ERA5...");
@@ -1284,6 +1285,7 @@ function accLogActuals(){
       .then(function(result){
         if(daysBack>=2){try{localStorage.setItem(guardKey,"1");}catch(e){}}
         console.log("ACC actuals (Open-Meteo ERA5): "+dStr+" H:"+result.hi+" L:"+result.lo);
+        if(daysBack===1)accFetchAndRender();
       })
       .catch(function(omErr){
         console.log("ACC actuals both sources failed for "+dStr+": "+omErr.message);
