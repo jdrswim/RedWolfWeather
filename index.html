@@ -1026,7 +1026,13 @@ function fetchSunData(){
     var arcLen=+(Math.PI*Math.sqrt((rx*rx+ry*ry)/2)).toFixed(0);
     var arcD="M "+(cx-rx)+","+cy+" A "+rx+","+ry+" 0 0 0 "+(cx+rx)+","+cy;
     var sunP=arcPt(sunPct);
-    var svg='<svg viewBox="0 0 320 142" style="width:100%;max-width:360px;height:auto;display:block;margin:0 auto">'+
+    // Solar noon = midpoint between rise and set
+    var solarNoon=new Date((today.rise.getTime()+today.set.getTime())/2);
+    // Solar elevation angle at solar noon: 90 - lat + declination
+    var dayOfYear=Math.round((today.rise-new Date(today.rise.getFullYear(),0,0))/86400000);
+    var decl=23.45*Math.sin(Math.PI/180*(360/365*(284+dayOfYear)));
+    var sunElev=Math.round((90-35.78+decl)*10)/10;
+    var svg='<svg viewBox="0 0 320 142" style="width:100%;height:auto;display:block">'+
       '<defs><linearGradient id="sAG" x1="0%" x2="100%"><stop offset="0%" stop-color="#ff8844"/><stop offset="50%" stop-color="#FFD700"/><stop offset="100%" stop-color="#ff9944"/></linearGradient>'+
       '<filter id="sGl"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'+
       '<filter id="sSun"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>'+
@@ -1038,9 +1044,21 @@ function fetchSunData(){
       (!isBefore&&!isPast?'<circle cx="'+sunP.x+'" cy="'+sunP.y+'" r="16" fill="rgba(255,215,0,.12)" filter="url(#sSun)"/><circle cx="'+sunP.x+'" cy="'+sunP.y+'" r="8" fill="#FFD700" filter="url(#sGl)"/><circle cx="'+sunP.x+'" cy="'+sunP.y+'" r="3" fill="#fff" fill-opacity=".7"/>':'')+
       '<text x="'+(cx-rx)+'" y="'+(cy+17)+'" text-anchor="middle" fill="rgba(255,255,255,.4)" font-size="9" font-family="Segoe UI,sans-serif">'+fmtT(today.rise)+'</text>'+
       '<text x="'+(cx+rx)+'" y="'+(cy+17)+'" text-anchor="middle" fill="rgba(255,255,255,.4)" font-size="9" font-family="Segoe UI,sans-serif">'+fmtT(today.set)+'</text>'+
-      '<text x="'+cx+'" y="'+(cy-52)+'" text-anchor="middle" fill="#FFD700" font-size="22" font-weight="700" font-family="Segoe UI,sans-serif">'+fmtL(todayLen)+'</text>'+
-      '<text x="'+cx+'" y="'+(cy-34)+'" text-anchor="middle" fill="rgba(255,255,255,.28)" font-size="8" letter-spacing="1.5" font-family="Segoe UI,sans-serif">DAYLIGHT TODAY</text>'+
+      '<text x="'+(cx-48)+'" y="'+(cy-52)+'" text-anchor="middle" fill="#FFD700" font-size="22" font-weight="700" font-family="Segoe UI,sans-serif">'+fmtL(todayLen)+'</text>'+
+      '<text x="'+(cx-48)+'" y="'+(cy-34)+'" text-anchor="middle" fill="rgba(255,255,255,.28)" font-size="8" letter-spacing="1.5" font-family="Segoe UI,sans-serif">DAYLIGHT TODAY</text>'+
       '</svg>';
+    var noonPanel=
+      '<div style="display:flex;flex-direction:column;justify-content:center;gap:10px;padding:10px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:6px;min-width:110px;text-align:center">'+
+        '<div>'+
+          '<div style="font-size:8px;letter-spacing:1.5px;color:rgba(255,255,255,.38);margin-bottom:3px">SOLAR NOON</div>'+
+          '<div style="font-size:17px;font-weight:700;color:#FFD700;line-height:1">'+fmtT(solarNoon)+'</div>'+
+        '</div>'+
+        '<div style="border-top:1px solid rgba(255,255,255,.07);padding-top:9px">'+
+          '<div style="font-size:8px;letter-spacing:1.5px;color:rgba(255,255,255,.38);margin-bottom:3px">SUN ANGLE</div>'+
+          '<div style="font-size:17px;font-weight:700;color:#ff8844;line-height:1">'+sunElev+'°</div>'+
+          '<div style="font-size:9px;color:rgba(255,255,255,.3);margin-top:2px">above horizon</div>'+
+        '</div>'+
+      '</div>';
     function diffCard(label,wasLabel,diff){
       if(diff===null)return'<div class="sun-diff-card"><div class="sun-diff-lbl">'+label+'</div><div class="sun-diff-val" style="color:var(--mu)">--</div></div>';
       var pos=diff>0.02,neg=diff<-0.02;
@@ -1049,7 +1067,11 @@ function fetchSunData(){
     }
     el.innerHTML=
       '<div class="sun-sec">🌅 Sunrise &amp; Sunset <em>Raleigh, NC · Day Length Analysis</em></div>'+
-      '<div class="sun-card">'+svg+
+      '<div class="sun-card">'+
+      '<div style="display:flex;align-items:center;gap:12px;margin-bottom:4px">'+
+        '<div style="flex:1;min-width:0">'+svg+'</div>'+
+        noonPanel+
+      '</div>'+
         '<div class="sun-stats">'+
           '<div class="sun-stat" style="border-top:2px solid #ff8844">'+
             '<div class="sun-stat-lbl" style="color:#ff8844">SUNRISE</div>'+
