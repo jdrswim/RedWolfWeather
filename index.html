@@ -287,7 +287,7 @@ main{max-width:1100px;margin:0 auto;padding:18px;overflow-x:hidden}
 .acc-wrap{margin-top:20px}
 .acc-hdr{font-size:13px;font-weight:900;letter-spacing:2px;color:var(--red);text-transform:uppercase;border-left:3px solid var(--red);padding-left:10px;margin-bottom:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .acc-hdr em{color:var(--mu);font-style:normal;font-weight:500;font-size:11px;letter-spacing:1px}
-.acc-score-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.acc-score-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px}
 .acc-score-card{background:var(--p2);border:1px solid var(--bd);border-top:3px solid var(--red);border-radius:4px;padding:16px;text-align:center}
 .acc-score-lbl{font-size:9px;font-weight:800;letter-spacing:1.5px;color:var(--red);text-transform:uppercase;margin-bottom:8px}
 .acc-score-val{font-size:32px;font-weight:200;color:var(--white);line-height:1}
@@ -397,7 +397,7 @@ footer strong{color:var(--red)}
   .media-row{grid-template-columns:1fr 1fr}
   .ext-grid{grid-template-columns:repeat(4,1fr)}
   .alm-grid{grid-template-columns:1fr}
-  .acc-score-row{grid-template-columns:repeat(2,1fr)}
+  .acc-score-row{grid-template-columns:repeat(3,1fr)}
 }
 @media(max-width:760px){
   .ext-grid{grid-template-columns:repeat(3,1fr)}
@@ -457,7 +457,7 @@ footer strong{color:var(--red)}
   .pws-grid{grid-template-columns:repeat(2,1fr)}
   .pws-temp{font-size:32px}
   .pws-name{font-size:13px}
-  .acc-score-row{grid-template-columns:1fr}
+  .acc-score-row{grid-template-columns:repeat(3,1fr)}
   .acc-log-hdr,.acc-log-row{grid-template-columns:1.4fr 1fr 1fr 1fr 1fr 1.4fr 1fr;font-size:8px;padding:6px 8px}
   .acc-delta{font-size:10px}
   .mc-mo-grid{grid-template-columns:repeat(2,1fr)}
@@ -481,7 +481,7 @@ footer strong{color:var(--red)}
 <!-- TOOLTIPS -->
 <div class="tip-overlay" id="tipTSPS"><div class="tip-panel"><button class="tip-close" onclick="closeTip('tipTSPS')">&times;</button><div class="tip-title">About Tuffy's Storm Prediction System</div><div class="tip-body"><div class="tip-label">What Is This?</div>A <strong>proprietary severe weather intelligence engine</strong> generating a <strong>Severe Weather Index (0-100)</strong> and occurrence likelihood for +3, +6, +9, +12, and +24 hour windows.<div class="tip-divider"></div><div class="tip-label">Data Sources</div>All data from the <strong>National Weather Service (NWS) API</strong>: hourly forecast and active alerts.<div class="tip-divider"></div><div class="tip-label">6-Component Algorithm</div><strong>Wind</strong> (0-20), <strong>Gusts</strong> (0-18), <strong>Precip</strong> (0-14), <strong>Instability</strong> (0-16), <strong>Forecast Text</strong> (0-22), <strong>Alerts</strong> (0-10).<div class="tip-divider"></div><div class="tip-label">Threat Levels</div><div class="tip-color-row"><div class="tip-swatch" style="background:#1a6b3a"></div><strong>0-9 NONE</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#22c55e"></div><strong>10-24 LOW</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#eab308"></div><strong>25-49 GUARDED</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#f97316"></div><strong>50-74 ELEVATED</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#ef4444"></div><strong>75-89 HIGH</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#dc2626"></div><strong>90-100 EXTREME</strong></div></div></div></div>
 <div class="tip-overlay" id="tipForecast"><div class="tip-panel"><button class="tip-close" onclick="closeTip('tipForecast')">&times;</button><div class="tip-title">Reading the 7-Day Forecast</div><div class="tip-body"><div class="tip-label">Temperature Range Bar</div>Each bar spans <strong style="color:#77aaff">Low</strong> to <strong style="color:#ffaa55">High</strong>, positioned relative to the full week.<div class="tip-divider"></div><div class="tip-color-row"><div class="tip-swatch" style="background:#ff6600"></div><strong>Orange</strong> 80F+</div><div class="tip-color-row"><div class="tip-swatch" style="background:#ffcc00"></div><strong>Yellow</strong> 60-79F</div><div class="tip-color-row"><div class="tip-swatch" style="background:#4488ff"></div><strong>Blue</strong> Below 60F</div></div></div></div>
-<div class="tip-overlay" id="tipAccuracy"><div class="tip-panel"><button class="tip-close" onclick="closeTip('tipAccuracy')">&times;</button><div class="tip-title">Valvano's Forecast Accountability Dashboard</div><div class="tip-body"><div class="tip-color-row"><div class="tip-swatch" style="background:#00d44a"></div><strong>HIT</strong> — Hi &amp; Lo both within 3° of actual</div><div class="tip-color-row"><div class="tip-swatch" style="background:#FFD700"></div><strong>CLOSE</strong> — Average error ≤ 5°</div><div class="tip-color-row"><div class="tip-swatch" style="background:#ef4444"></div><strong>MISS</strong> — Average error 6°+</div><div class="tip-divider"></div><div class="tip-label">Methodology</div>Forecasts are recorded at <strong>8 PM</strong> each evening for the following day (NWS forecast). Actuals are the observed <strong>high &amp; low from NWS KRDU</strong> station data.</div></div></div>
+<div class="tip-overlay" id="tipAccuracy"><div class="tip-panel"><button class="tip-close" onclick="closeTip('tipAccuracy')">&times;</button><div class="tip-title">Valvano's Forecast Accountability Dashboard</div><div class="tip-body"><div class="tip-color-row"><div class="tip-swatch" style="background:#00d44a"></div><strong>HIT</strong> — Hi &amp; Lo both within 3° of actual</div><div class="tip-color-row"><div class="tip-swatch" style="background:#FFD700"></div><strong>CLOSE</strong> — Average error ≤ 5°</div><div class="tip-color-row"><div class="tip-swatch" style="background:#ef4444"></div><strong>MISS</strong> — Average error 6°+</div><div class="tip-divider"></div><div class="tip-label">Lead-Time Cards</div>Each card shows NWS accuracy for forecasts made <strong>N days before</strong> the target date. 1-Day Out = next-day forecast; 5-Day Out = five days ahead. Accuracy naturally decreases with lead time.<div class="tip-divider"></div><div class="tip-label">Methodology</div>At <strong>8 PM</strong> each evening, forecasts are recorded for all 5 upcoming days from NWS Raleigh. Actuals are the observed <strong>high &amp; low from NWS KRDU</strong> station data.</div></div></div>
 <div class="tip-overlay" id="tipAlmanac"><div class="tip-panel"><button class="tip-close" onclick="closeTip('tipAlmanac')">&times;</button><div class="tip-title">Raleigh Wx Almanac</div><div class="tip-body"><strong>Year-to-date climate stats</strong> vs 30-year normals (1991-2020). Data from <strong>Open-Meteo Archive</strong> (ERA5). Reference: RDU Airport.<div class="tip-divider"></div><div class="tip-color-row"><div class="tip-swatch" style="background:#ff8844"></div><strong>Orange</strong> Above normal</div><div class="tip-color-row"><div class="tip-swatch" style="background:#77aaff"></div><strong>Blue</strong> Below normal</div><div class="tip-color-row"><div class="tip-swatch" style="background:#00d44a"></div><strong>Green</strong> Near normal</div></div></div></div>
 
 <span id="oatemp" style="display:none"></span>
@@ -1379,10 +1379,9 @@ function accLogPrediction(){
   var hour=now.getHours();
   // Only fire between 20:00 and 23:59
   if(hour<20)return;
-  // The day we are predicting for is TOMORROW
-  var tomorrow=new Date(now.getTime()+86400000);
-  var targetDate=accDateStr(tomorrow);
-  var guardKey="acc_pred_"+targetDate;
+  // Session guard — one guard per calendar day covers all 5 writes
+  var sessionDate=accDateStr(now);
+  var guardKey="acc_pred_session_"+sessionDate;
   try{if(localStorage.getItem(guardKey))return;}catch(e){}
 
   fetch("https://api.weather.gov/points/35.686,-78.614",{headers:{"User-Agent":"WolfpackWeather/2.0"}})
@@ -1396,44 +1395,32 @@ function accLogPrediction(){
   .then(function(d){
     var periods=d.properties&&d.properties.periods;
     if(!periods||!periods.length)throw new Error("No periods");
-    // Find the first DAYTIME period for tomorrow (hi) and the
-    // following NIGHT period (overnight lo into tomorrow night)
-    var hi=null,lo=null;
-    var tomorrowStr=targetDate; // "YYYY-MM-DD"
-    for(var i=0;i<periods.length;i++){
-      var p=periods[i];
-      var pDate=p.startTime?p.startTime.substring(0,10):"";
-      if(pDate===tomorrowStr&&p.isDaytime&&hi===null){
-        hi=p.temperature;
-      }
-      if(pDate===tomorrowStr&&!p.isDaytime&&lo===null){
-        lo=p.temperature;
-      }
-      if(hi!==null&&lo!==null)break;
+    // Group periods by date → {hi, lo} for each future date
+    var byDate={};
+    periods.forEach(function(p){
+      var ds=p.startTime?p.startTime.substring(0,10):"";
+      if(!ds)return;
+      if(!byDate[ds])byDate[ds]={hi:null,lo:null};
+      if(p.isDaytime&&byDate[ds].hi===null)byDate[ds].hi=p.temperature;
+      if(!p.isDaytime&&byDate[ds].lo===null)byDate[ds].lo=p.temperature;
+    });
+    // Write D1–D5: each target date gets its own column name
+    var writes=[];
+    for(var lead=1;lead<=5;lead++){
+      var targetDt=new Date(now.getFullYear(),now.getMonth(),now.getDate()+lead);
+      var targetStr=accDateStr(targetDt);
+      var day=byDate[targetStr];
+      if(!day||day.hi===null||day.lo===null)continue;
+      var hiKey=lead===1?"pred_high":"pred_hi_d"+lead;
+      var loKey=lead===1?"pred_low":"pred_lo_d"+lead;
+      writes.push(fetch(SHEET_URL+"?action=write&tab=Accuracy&date="+targetStr+"&"+hiKey+"="+day.hi+"&"+loKey+"="+day.lo));
+      console.log("ACC pred D"+lead+" → "+targetStr+" Hi:"+day.hi+" Lo:"+day.lo);
     }
-    // Fallback: if we can't match by date (e.g. at night NWS shows
-    // "Tonight" then "Tomorrow"), scan by name
-    if(hi===null||lo===null){
-      for(var j=0;j<Math.min(periods.length,6);j++){
-        var pp=periods[j];
-        var nm=(pp.name||"").toLowerCase();
-        if(pp.isDaytime&&hi===null&&(nm.indexOf("tomorrow")>=0||nm.indexOf("monday")>=0||nm.indexOf("tuesday")>=0||nm.indexOf("wednesday")>=0||nm.indexOf("thursday")>=0||nm.indexOf("friday")>=0||nm.indexOf("saturday")>=0||nm.indexOf("sunday")>=0)){
-          hi=pp.temperature;
-        }
-        if(!pp.isDaytime&&lo===null&&hi!==null){
-          lo=pp.temperature;
-        }
-        if(hi!==null&&lo!==null)break;
-      }
-    }
-    // Last resort: take first daytime + next night
-    if(hi===null){for(var k=0;k<periods.length;k++){if(periods[k].isDaytime){hi=periods[k].temperature;if(k+1<periods.length)lo=periods[k+1].temperature;break;}}}
-    if(hi===null||lo===null)throw new Error("Cannot determine hi/lo for "+targetDate);
-    return fetch(SHEET_URL+"?action=write&tab=Accuracy&date="+targetDate+"&pred_high="+hi+"&pred_low="+lo);
+    return Promise.all(writes);
   })
   .then(function(){
     try{localStorage.setItem(guardKey,"1");}catch(e){}
-    console.log("ACC pred logged for "+targetDate);
+    console.log("ACC pred session logged for "+sessionDate);
   })
   .catch(function(e){console.log("ACC pred error: "+e.message);});
 }
@@ -1559,16 +1546,18 @@ function accFetchAndRender(){
 // logged) and best actual (most recent, to catch late-arriving obs).
 function accDedupeRows(rows){
   var byDate={};
+  var predKeys=["pred_high","pred_low","pred_hi_d2","pred_lo_d2","pred_hi_d3","pred_lo_d3","pred_hi_d4","pred_lo_d4","pred_hi_d5","pred_lo_d5"];
   rows.forEach(function(r){
     var ds=r.date||"";
     if(!ds)return;
     if(!byDate[ds]){
-      byDate[ds]={date:ds,pred_high:r.pred_high,pred_low:r.pred_low,actual_high:r.actual_high,actual_low:r.actual_low};
+      var obj={date:ds,actual_high:r.actual_high,actual_low:r.actual_low};
+      predKeys.forEach(function(k){obj[k]=r[k];});
+      byDate[ds]=obj;
     } else {
       var e=byDate[ds];
-      // Keep first valid prediction
-      if((e.pred_high==null||e.pred_high==="")&&r.pred_high)e.pred_high=r.pred_high;
-      if((e.pred_low==null||e.pred_low==="")&&r.pred_low)e.pred_low=r.pred_low;
+      // Keep first valid prediction for each lead column
+      predKeys.forEach(function(k){if((e[k]==null||e[k]==="")&&r[k])e[k]=r[k];});
       // Override actual with most recent non-empty value
       if(r.actual_high!=null&&r.actual_high!=="")e.actual_high=r.actual_high;
       if(r.actual_low!=null&&r.actual_low!=="")e.actual_low=r.actual_low;
@@ -1601,58 +1590,20 @@ function accRender(el,rawRows){
     var d=new Date(now.getFullYear(),now.getMonth(),now.getDate()-n);
     return accDateStr(d);
   }
-  var yesterdayStr=daysAgoStr(1);
   var today0=new Date(now.getFullYear(),now.getMonth(),now.getDate()); // midnight today
-  var week0=new Date(today0.getTime()-7*86400000);   // 7 days including yesterday
-  var month0=new Date(today0.getTime()-30*86400000); // 30 days
 
-  // Only count rows that have BOTH pred and actual for accuracy stats.
-  // "Yesterday" = exact date match on yesterdayStr.
-  // "Last 7 / 30 days" = date string falls within window (date comparison, not timestamp).
-  function calcAccuracyExact(rows,dateStr){
-    // Single-day exact match — returns full delta breakdown for Yesterday card
+  // Aggregate accuracy for a given forecast lead day (1–5).
+  // lead=1 uses pred_high/pred_low; lead=2–5 use pred_hi_dN/pred_lo_dN.
+  // All leads compare against actual_high/actual_low on the same target date.
+  function calcAccuracyForLead(rows,lead){
+    var hiKey=lead===1?"pred_high":"pred_hi_d"+lead;
+    var loKey=lead===1?"pred_low":"pred_lo_d"+lead;
     var hiErrors=[],loErrors=[],hiHits=0,loHits=0,total=0;
-    var predAvgSum=0,actAvgSum=0,hiDiffSum=0,loDiffSum=0;
-    rows.forEach(function(r){
-      if((r.date||"").substring(0,10)!==dateStr)return;
-      var pH=parseFloat(r.pred_high),pL=parseFloat(r.pred_low);
-      var aH=parseFloat(r.actual_high),aL=parseFloat(r.actual_low);
-      if(isNaN(pH)||isNaN(aH)||isNaN(pL)||isNaN(aL))return;
-      total++;
-      var hiErr=Math.abs(pH-aH),loErr=Math.abs(pL-aL);
-      hiErrors.push(hiErr);loErrors.push(loErr);
-      if(hiErr<=3)hiHits++;
-      if(loErr<=3)loHits++;
-      // Avg temp = (hi + lo) / 2
-      predAvgSum+=(pH+pL)/2;
-      actAvgSum+=(aH+aL)/2;
-      hiDiffSum+=(aH-pH); // positive = ran warmer
-      loDiffSum+=(aL-pL);
-    });
-    if(total===0)return null;
-    var avgHiErr=hiErrors.reduce(function(a,b){return a+b;},0)/hiErrors.length;
-    var avgLoErr=loErrors.reduce(function(a,b){return a+b;},0)/loErrors.length;
-    var predAvg=predAvgSum/total;
-    var actAvg=actAvgSum/total;
-    var avgDiff=actAvg-predAvg; // positive = reality was warmer than forecast
-    var hiDiff=hiDiffSum/total;
-    var loDiff=loDiffSum/total;
-    return{
-      total:total,
-      hitPct:Math.round(((hiHits+loHits)/(total*2))*100),
-      avgHiErr:avgHiErr,avgLoErr:avgLoErr,
-      predAvg:predAvg,actAvg:actAvg,
-      avgDiff:avgDiff,hiDiff:hiDiff,loDiff:loDiff
-    };
-  }
-  function calcAccuracy(rows,cutoffDate){
-    // Multi-day window: include rows where date >= cutoffDate string
-    var cutoffStr=accDateStr(cutoffDate);
-    var hiErrors=[],loErrors=[],hiHits=0,loHits=0,total=0;
+    var todayStr=accDateStr(today0);
     rows.forEach(function(r){
       var ds=(r.date||"").substring(0,10);
-      if(ds<cutoffStr||ds>=accDateStr(today0))return; // exclude today (no actuals yet)
-      var pH=parseFloat(r.pred_high),pL=parseFloat(r.pred_low);
+      if(ds>=todayStr)return; // skip today — no actuals yet
+      var pH=parseFloat(r[hiKey]),pL=parseFloat(r[loKey]);
       var aH=parseFloat(r.actual_high),aL=parseFloat(r.actual_low);
       if(isNaN(pH)||isNaN(aH)||isNaN(pL)||isNaN(aL))return;
       total++;
@@ -1666,16 +1617,13 @@ function accRender(el,rawRows){
     var avgLoErr=loErrors.reduce(function(a,b){return a+b;},0)/loErrors.length;
     return{total:total,hitPct:Math.round(((hiHits+loHits)/(total*2))*100),avgHiErr:avgHiErr,avgLoErr:avgLoErr};
   }
-  var accAll=calcAccuracy(rows,new Date(2020,0,1));
-  var accMonth=calcAccuracy(rows,month0);
-  var accWeek=calcAccuracy(rows,week0);
-  var accYesterday=calcAccuracyExact(rows,yesterdayStr); // exact date match
 
   function scoreClass(pct){return pct>=75?"good":pct>=50?"ok":"poor";}
 
-  // Standard card for 7-day / 30-day / All Time — shows % accuracy
-  function renderScoreCard(label,acc){
-    if(!acc)return'<div class="acc-score-card"><div class="acc-score-lbl">'+label+'</div><div class="acc-score-val">--</div><div class="acc-score-sub">No data yet</div></div>';
+  function renderLeadCard(lead,acc){
+    var label=lead+"-Day Out";
+    var sub=lead===1?"Next day":lead===2?"2 days ahead":lead===3?"3 days ahead":lead===4?"4 days ahead":"5 days ahead";
+    if(!acc)return'<div class="acc-score-card"><div class="acc-score-lbl">'+label+'</div><div class="acc-score-val" style="font-size:14px;margin-top:8px;color:var(--mu)">Building data…</div><div class="acc-score-sub">Need '+lead+' days of 8 PM logs</div></div>';
     return'<div class="acc-score-card">'+
       '<div class="acc-score-lbl">'+label+'</div>'+
       '<div class="acc-score-val '+scoreClass(acc.hitPct)+'">'+acc.hitPct+'%</div>'+
@@ -1684,53 +1632,15 @@ function accRender(el,rawRows){
     '</div>';
   }
 
-  // Yesterday card — shows average temperature delta (the "how far off" format)
-  function renderYesterdayCard(acc){
-    if(!acc){
-      return'<div class="acc-score-card">'+
-        '<div class="acc-score-lbl">Yesterday</div>'+
-        '<div class="acc-score-val">--</div>'+
-        '<div class="acc-score-sub">No data yet</div>'+
-      '</div>';
-    }
-    // avgDiff: how much warmer/cooler reality was vs forecast
-    var diff=acc.avgDiff;
-    var absDiff=Math.abs(diff);
-    var diffSign=diff>0?"+":"";
-    // Color: green ≤1.5°, yellow ≤3°, orange ≤5°, red >5°
-    var diffCol=absDiff<=1.5?"var(--green)":absDiff<=3?"var(--yellow)":absDiff<=5?"#ff8844":"#ef4444";
-    // Direction label
-    var dirLabel=absDiff<0.5?"On Target":diff>0?"Too Cool":"Too Warm";
-    // Hi and Lo signed deltas
-    var hiSign=acc.hiDiff>0?"+":"";
-    var loSign=acc.loDiff>0?"+":"";
-    var hiDiffCol=Math.abs(acc.hiDiff)<=3?"var(--green)":Math.abs(acc.hiDiff)<=5?"var(--yellow)":"#ef4444";
-    var loDiffCol=Math.abs(acc.loDiff)<=3?"var(--green)":Math.abs(acc.loDiff)<=5?"var(--yellow)":"#ef4444";
-
-    return'<div class="acc-score-card acc-yesterday-card">'+
-      '<div class="acc-score-lbl">Yesterday</div>'+
-      // Big number: avg temp delta
-      '<div class="acc-yday-delta" style="color:'+diffCol+'">'+diffSign+diff.toFixed(1)+'°</div>'+
-      '<div class="acc-yday-dir" style="color:'+diffCol+'">'+dirLabel+'</div>'+
-      '<div class="acc-yday-avg">'+
-        'Pred avg '+acc.predAvg.toFixed(1)+'° → Act avg '+acc.actAvg.toFixed(1)+'°'+
-      '</div>'+
-      '<div class="acc-yday-breakdown">'+
-        '<span style="color:'+hiDiffCol+'">Hi '+hiSign+acc.hiDiff.toFixed(1)+'°</span>'+
-        '<span class="acc-yday-sep">·</span>'+
-        '<span style="color:'+loDiffCol+'">Lo '+loSign+acc.loDiff.toFixed(1)+'°</span>'+
-      '</div>'+
-    '</div>';
-  }
-
   var html=
     '<div class="acc-wrap">'+
       '<div class="acc-hdr">Valvano\'s Forecast Accountability Dashboard <em>- Forecast vs Actual Temperature</em> <div class="tip-btn" onclick="openTip(\'tipAccuracy\')" style="display:inline-flex;vertical-align:middle;margin-left:6px">?</div></div>'+
       '<div class="acc-score-row">'+
-        renderYesterdayCard(accYesterday)+
-        renderScoreCard("Last 7 Days",accWeek)+
-        renderScoreCard("Last 30 Days",accMonth)+
-        renderScoreCard("All Time",accAll)+
+        renderLeadCard(1,calcAccuracyForLead(rows,1))+
+        renderLeadCard(2,calcAccuracyForLead(rows,2))+
+        renderLeadCard(3,calcAccuracyForLead(rows,3))+
+        renderLeadCard(4,calcAccuracyForLead(rows,4))+
+        renderLeadCard(5,calcAccuracyForLead(rows,5))+
       '</div>'+
       '<div class="acc-log">'+
         '<div class="acc-log-hdr">'+
@@ -1806,7 +1716,7 @@ function accRender(el,rawRows){
   html+=
     '</div>'+
     '<div class="acc-note">'+
-      'Predictions: NWS Raleigh forecast logged at 8 PM for next day · '+
+      'Predictions: NWS Raleigh forecast logged at 8 PM for days 1–5 out · '+
       'Actuals: NWS KRDU station hourly obs (fallback: Open-Meteo) · '+
       'One row per day · '+rows.length+' day'+(rows.length!==1?"s":"")+' tracked'+
     '</div>'+
