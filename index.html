@@ -1244,8 +1244,8 @@ function accLogActuals(){
     }
 
     // NWS KRDU hourly observations for that full calendar day
-    var obsStart=dStr+"T00:00:00-05:00";
-    var obsEnd=dStr+"T23:59:59-05:00";
+    var obsStart=new Date(target.getFullYear(),target.getMonth(),target.getDate(),0,0,0).toISOString();
+    var obsEnd=new Date(target.getFullYear(),target.getMonth(),target.getDate(),23,59,59).toISOString();
     fetch("https://api.weather.gov/stations/KRDU/observations?start="+encodeURIComponent(obsStart)+"&end="+encodeURIComponent(obsEnd)+"&limit=200",
       {headers:{"User-Agent":"WolfpackWeather/2.0","Accept":"application/geo+json"}})
     .then(function(r){if(!r.ok)throw new Error("NWS obs "+r.status);return r.json();})
@@ -1352,8 +1352,8 @@ function accRender(el,rawRows){
   }
   var yesterdayStr=daysAgoStr(1);
   var today0=new Date(now.getFullYear(),now.getMonth(),now.getDate()); // midnight today
-  var week0=new Date(today0.getTime()-6*86400000);   // 7 days including yesterday
-  var month0=new Date(today0.getTime()-29*86400000); // 30 days
+  var week0=new Date(today0.getTime()-7*86400000);   // 7 days including yesterday
+  var month0=new Date(today0.getTime()-30*86400000); // 30 days
 
   // Only count rows that have BOTH pred and actual for accuracy stats.
   // "Yesterday" = exact date match on yesterdayStr.
@@ -1539,7 +1539,7 @@ function accRender(el,rawRows){
           '<span style="color:'+loDeltaCol+'">Lo '+loSign+Math.round(loDiff)+'°</span>'+
         '</div>';
 
-      if(avgErr<=3)badge='<span class="acc-badge hit">HIT</span>';
+      if(hiErr<=3&&loErr<=3)badge='<span class="acc-badge hit">HIT</span>';
       else if(avgErr<=5)badge='<span class="acc-badge close">CLOSE</span>';
       else badge='<span class="acc-badge miss">MISS</span>';
     }
