@@ -1107,16 +1107,18 @@ function fetchAlmanac(){
     // ── Departure from normal calculations ──
     // Latest available day (ERA5 may lag a few days)
     var depYday=null,depYdayAvg=null,depYdayNorm=null,depYdayLbl="Latest Day";
+    var todayStr2=new Date().toLocaleDateString("en-CA");
+    var ydDate=new Date();ydDate.setDate(ydDate.getDate()-1);var ydStr=ydDate.toLocaleDateString("en-CA");
     if(dl.time.length>0){
       var li=dl.time.length-1;
-      while(li>=0&&dl.temperature_2m_mean[li]==null)li--;
+      // Skip today (incomplete) and nulls — only use fully completed days
+      while(li>=0&&(dl.temperature_2m_mean[li]==null||dl.time[li]===todayStr2))li--;
       if(li>=0){
         depYdayAvg=dl.temperature_2m_mean[li];
         var lm=new Date(dl.time[li]+"T12:00:00").getMonth();
         depYdayNorm=RDU_NTEMP[lm];
         depYday=depYdayAvg-depYdayNorm;
-        var yd=new Date();yd.setDate(yd.getDate()-1);
-        depYdayLbl=dl.time[li]===yd.toLocaleDateString("en-CA")?"Yesterday":new Date(dl.time[li]+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"});
+        depYdayLbl=dl.time[li]===ydStr?"Yesterday":new Date(dl.time[li]+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"});
       }
     }
     // Last 7 available days
@@ -1148,7 +1150,7 @@ function fetchAlmanac(){
       pMo+='<div class="alm-mo'+(iC?" current":"")+(iF?" future":"")+'"><div class="alm-mo-name">'+MO_NAMES[m3]+'</div><div class="alm-mo-val">'+(tP!==null?tP.toFixed(2)+'"':"--")+'</div><div class="alm-mo-nrm">Nrm: '+RDU_NPREC[m3].toFixed(2)+'"</div>'+(pd!==null?'<div class="alm-mo-diff '+(Math.abs(pd)<0.25?"zero":pd>0?"pos":"neg")+'">'+(Math.abs(pd)<0.25?"Normal":(pd>0?"+":"")+pd.toFixed(2)+'"')+'</div>':'')+(tP!==null?'<div class="alm-mo-bar"><div class="alm-mo-bar-fill" style="width:'+pB+'%;background:'+pC+'"></div></div>':'')+'</div>';
     }
     el.innerHTML=
-      '<div class="alm-summary">'+
+      '<div class="alm-summary" style="grid-template-columns:repeat(2,1fr);max-width:720px;margin:0 auto 16px">'+
         '<div class="alm-big"><div class="alm-big-lbl">YTD Rainfall</div><div class="alm-big-val">'+ytdP.toFixed(2)+'"</div><div class="alm-big-sub">Normal: '+nP.toFixed(2)+'"</div>'+dLbl(pDiff,'"',0.25)+'</div>'+
         '<div class="alm-big"><div class="alm-big-lbl">YTD Avg Temp</div><div class="alm-big-val">'+ytdAT.toFixed(1)+'F</div><div class="alm-big-sub">Normal: '+nAT.toFixed(1)+'F</div>'+dLbl(tDiff,"F",0.5)+'</div>'+
       '</div>'+
