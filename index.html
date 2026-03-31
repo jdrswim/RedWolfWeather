@@ -42,10 +42,10 @@ header{background:var(--off);border-bottom:3px solid var(--red);padding:10px 22p
 .cdate{font-size:9px;color:var(--mu);letter-spacing:2px;text-transform:uppercase;margin-top:2px}
 
 /* TABS */
-.tab-bar{display:flex;background:var(--off);border-bottom:1px solid var(--bd);padding:0 22px;overflow-x:auto}
-.tab-btn{background:none;border:none;border-bottom:3px solid transparent;color:var(--mu);font-family:var(--font);font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;padding:10px 20px;cursor:pointer;white-space:nowrap;transition:all .2s}
-.tab-btn:hover{color:var(--white)}
-.tab-btn.active{color:var(--red);border-bottom-color:var(--red)}
+.tab-bar{display:flex;background:#0c0c0c;border-bottom:2px solid var(--bd);padding:8px 14px;gap:6px;overflow-x:auto}
+.tab-btn{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:5px;color:rgba(255,255,255,.42);font-family:var(--font);font-size:11px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;padding:9px 14px;cursor:pointer;white-space:nowrap;transition:all .18s;flex:1;min-width:0}
+.tab-btn:hover{background:rgba(255,255,255,.1);color:rgba(255,255,255,.75);border-color:rgba(255,255,255,.22)}
+.tab-btn.active{background:var(--red2);border-color:var(--red);color:#fff;box-shadow:0 0 10px rgba(204,0,0,.25)}
 .tab-pane{display:none}
 .tab-pane.active{display:block}
 
@@ -418,7 +418,8 @@ footer strong{color:var(--red)}
   .logo-text p{font-size:7px}
   .clock{font-size:20px}
   .cdate{font-size:8px}
-  .tab-btn{font-size:10px;padding:8px 14px;letter-spacing:1px}
+  .tab-bar{padding:6px 8px;gap:4px}
+  .tab-btn{font-size:9px;padding:8px 6px;letter-spacing:.8px}
   main{padding:10px 8px}
   .sec{font-size:11px;padding-left:8px;margin-bottom:10px}
   .card{padding:14px 12px}
@@ -487,7 +488,7 @@ footer strong{color:var(--red)}
 <header>
   <div class="logo">
     <svg viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="3" fill="#CC0000"/><polygon points="7,39 14,18 22,30 24,13 26,30 34,18 41,39 35,39 29,23 24,35 19,23 13,39" fill="white"/></svg>
-    <div class="logo-text"><h1>Wolfpack Weather</h1><p>Storm Intelligence Network - NC State</p></div>
+    <div class="logo-text"><h1>Wolfpack Weather</h1><p>Convection, Almanac &amp; Wake County Microclimate Data Center</p></div>
   </div>
   <div class="hdr-r">
     <div class="clock" id="clock">--:--:--</div>
@@ -496,9 +497,9 @@ footer strong{color:var(--red)}
 </header>
 
 <div class="tab-bar">
-  <button class="tab-btn active" id="tabBtnLive" onclick="switchTab('live',this)">Live Weather</button>
-  <button class="tab-btn" id="tabBtnAlmanac" onclick="switchTab('almanac',this)">Raleigh Almanac</button>
-  <button class="tab-btn" id="tabBtnPws" onclick="switchTab('pws',this)">Raleigh Microclimate Data</button>
+  <button class="tab-btn active" id="tabBtnLive" onclick="switchTab('live',this)">⚡ Live Weather</button>
+  <button class="tab-btn" id="tabBtnAlmanac" onclick="switchTab('almanac',this)">📊 Wx Almanac</button>
+  <button class="tab-btn" id="tabBtnPws" onclick="switchTab('pws',this)">🌡 Microclimate</button>
 </div>
 
 <!-- ============================================================ LIVE TAB -->
