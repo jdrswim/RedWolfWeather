@@ -1100,6 +1100,40 @@ function fetchAlmanac(){
     for(var m2=0;m2<12;m2++){if(m2<curMo){nP+=RDU_NPREC[m2];nTT+=RDU_NTEMP[m2]*dim[m2];nD+=dim[m2];}else if(m2===curMo){var frac=curDay/dim[m2];nP+=RDU_NPREC[m2]*frac;nTT+=RDU_NTEMP[m2]*curDay;nD+=curDay;}}
     var nAT=nD?nTT/nD:0,pDiff=ytdP-nP,tDiff=ytdAT-nAT;
     function dLbl(d,u,th){if(Math.abs(d)<th)return'<span class="alm-cmp normal">NORMAL</span>';return'<span class="alm-cmp '+(d>0?"above":"below")+'">'+(d>0?"+":"")+d.toFixed(1)+u+" "+(d>0?"ABOVE":"BELOW")+'</span>';}
+
+    // ── Departure from normal calculations ──
+    // Latest available day (ERA5 may lag a few days)
+    var depYday=null,depYdayAvg=null,depYdayNorm=null,depYdayLbl="Latest Day";
+    if(dl.time.length>0){
+      var li=dl.time.length-1;
+      while(li>=0&&dl.temperature_2m_mean[li]==null)li--;
+      if(li>=0){
+        depYdayAvg=dl.temperature_2m_mean[li];
+        var lm=new Date(dl.time[li]+"T12:00:00").getMonth();
+        depYdayNorm=RDU_NTEMP[lm];
+        depYday=depYdayAvg-depYdayNorm;
+        var yd=new Date();yd.setDate(yd.getDate()-1);
+        depYdayLbl=dl.time[li]===yd.toLocaleDateString("en-CA")?"Yesterday":new Date(dl.time[li]+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"});
+      }
+    }
+    // Last 7 available days
+    var dep7=null,dep7Avg=null,dep7Norm=null,s7=0,n7=0,c7=0;
+    for(var k7=Math.max(0,dl.time.length-7);k7<dl.time.length;k7++){
+      if(dl.temperature_2m_mean[k7]!=null){s7+=dl.temperature_2m_mean[k7];var k7m=new Date(dl.time[k7]+"T12:00:00").getMonth();n7+=RDU_NTEMP[k7m];c7++;}
+    }
+    if(c7){dep7Avg=s7/c7;dep7Norm=n7/c7;dep7=dep7Avg-dep7Norm;}
+    // Last calendar month
+    var prevMo=curMo===0?11:curMo-1;
+    var depLM=null,depLMAvg=null,depLMNorm=RDU_NTEMP[prevMo];
+    if(moCnt[prevMo]){depLMAvg=moTemp[prevMo]/moCnt[prevMo];depLM=depLMAvg-depLMNorm;}
+    // This calendar month
+    var depTM=null,depTMAvg=null,depTMNorm=RDU_NTEMP[curMo];
+    if(moCnt[curMo]){depTMAvg=moTemp[curMo]/moCnt[curMo];depTM=depTMAvg-depTMNorm;}
+
+    function depCard(title,sub,avg,norm,dep){
+      if(dep===null)return'<div class="alm-big"><div class="alm-big-lbl">'+title+'</div><div class="alm-big-val">--</div><div class="alm-big-sub">No data yet</div></div>';
+      return'<div class="alm-big"><div class="alm-big-lbl">'+title+'</div><div class="alm-big-val">'+avg.toFixed(1)+'°F</div><div class="alm-big-sub">Normal: '+norm.toFixed(1)+'°F · '+sub+'</div>'+dLbl(dep,"°F",0.5)+'</div>';
+    }
     var tMo="",pMo="";
     for(var m3=0;m3<12;m3++){
       var iC=m3===curMo,iF=m3>curMo;
@@ -1115,6 +1149,14 @@ function fetchAlmanac(){
         '<div class="alm-big"><div class="alm-big-lbl">YTD Rainfall</div><div class="alm-big-val">'+ytdP.toFixed(2)+'"</div><div class="alm-big-sub">Normal: '+nP.toFixed(2)+'"</div>'+dLbl(pDiff,'"',0.25)+'</div>'+
         '<div class="alm-big"><div class="alm-big-lbl">YTD Avg Temp</div><div class="alm-big-val">'+ytdAT.toFixed(1)+'F</div><div class="alm-big-sub">Normal: '+nAT.toFixed(1)+'F</div>'+dLbl(tDiff,"F",0.5)+'</div>'+
         '<div class="alm-big"><div class="alm-big-lbl">Days Tracked</div><div class="alm-big-val">'+ytdD+'</div><div class="alm-big-sub">'+yr+' Year-to-Date</div></div>'+
+      '</div>'+
+      '<div class="alm-card" style="margin-top:18px"><h3><span>🌡</span> Temperature Departure from Normal</h3>'+
+        '<div class="alm-summary">'+
+          depCard(depYdayLbl,depYdayLbl==="Yesterday"?"vs "+MO_NAMES[curMo]+" normal":depYdayLbl,depYdayAvg,depYdayNorm,depYday)+
+          depCard("Last 7 Days",c7+" days avg",dep7Avg,dep7Norm,dep7)+
+          depCard("Last Month",MO_NAMES[prevMo],depLMAvg,depLMNorm,depLM)+
+          depCard("This Month",MO_NAMES[curMo]+" so far",depTMAvg,depTMNorm,depTM)+
+        '</div>'+
       '</div>'+
       '<div class="alm-grid">'+
         '<div class="alm-card"><h3><span>🌡</span> Monthly Avg Temperature</h3><div class="alm-mo-grid">'+tMo+'</div></div>'+
