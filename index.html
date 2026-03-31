@@ -261,6 +261,9 @@ main{max-width:1100px;margin:0 auto;padding:18px;overflow-x:hidden}
 /* SUN */
 .sun-sec{font-size:13px;font-weight:900;letter-spacing:2px;color:var(--gold);text-transform:uppercase;border-left:3px solid var(--gold);padding-left:10px;margin:18px 0 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .sun-sec em{color:var(--mu);font-style:normal;font-weight:500;font-size:11px;letter-spacing:1px}
+.sun-tab{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.5);font-size:10px;font-weight:700;letter-spacing:1px;padding:4px 10px;border-radius:20px;cursor:pointer;text-transform:uppercase;transition:all .2s}
+.sun-tab:hover{background:rgba(255,255,255,.12);color:rgba(255,255,255,.8)}
+.sun-tab-on{background:rgba(255,200,0,.15);border-color:var(--gold);color:var(--gold)}
 .sun-card{background:linear-gradient(135deg,#1a1500,var(--p1));border:1px solid var(--bd);border-top:3px solid var(--gold);border-radius:3px;padding:20px;overflow:hidden}
 .sun-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
 .sun-stat{background:var(--p2);border:1px solid var(--bd);border-radius:4px;padding:14px;text-align:center}
@@ -997,8 +1000,53 @@ tsps_refresh();setInterval(tsps_refresh,TSPS_CFG.refresh);
 var tspsResizeTimer;window.addEventListener("resize",function(){clearTimeout(tspsResizeTimer);tspsResizeTimer=setTimeout(function(){if(tspsState.forecasts.length)tsps_renderMain();},300);});
 
 // ============================================================
+// MOON CALCULATIONS (pure JS — no external library)
+// ============================================================
+function moonCalc(date){
+  var JD=date.getTime()/86400000+2440587.5,d=JD-2451545.0;
+  var L=((218.316+13.176396*d)%360+360)%360;
+  var M=((134.963+13.064993*d)%360+360)%360;
+  var Ls=((280.460+0.985647*d)%360+360)%360;
+  var lon=L+6.289*Math.sin(M*Math.PI/180);
+  var elong=((lon-Ls)%360+360)%360;
+  var phase=elong/360; // 0=new, 0.5=full
+  var illum=(1-Math.cos(elong*Math.PI/180))/2;
+  return{phase:phase,illum:illum};
+}
+function moonPhaseName(p){
+  if(p<0.0625||p>=0.9375)return{name:"New Moon",emoji:"🌑"};
+  if(p<0.1875)return{name:"Waxing Crescent",emoji:"🌒"};
+  if(p<0.3125)return{name:"First Quarter",emoji:"🌓"};
+  if(p<0.4375)return{name:"Waxing Gibbous",emoji:"🌔"};
+  if(p<0.5625)return{name:"Full Moon",emoji:"🌕"};
+  if(p<0.6875)return{name:"Waning Gibbous",emoji:"🌖"};
+  if(p<0.8125)return{name:"Last Quarter",emoji:"🌗"};
+  return{name:"Waning Crescent",emoji:"🌘"};
+}
+// Find the next date when phase crosses targetPhase (0=new,0.25=first q,0.5=full,0.75=last q)
+function nextMoonPhaseDate(fromDate,targetPhase){
+  var synodic=29.530588853;
+  var cur=moonCalc(fromDate).phase;
+  var diff=(targetPhase-cur+1)%1;
+  if(diff<0.015)diff+=1; // already at/past this phase
+  return new Date(fromDate.getTime()+diff*synodic*86400000);
+}
+// Moon age in days (days since last new moon)
+function moonAge(date){
+  var synodic=29.530588853;
+  return moonCalc(date).phase*synodic;
+}
+
+// ============================================================
 // SUNRISE / SUNSET & DAY LENGTH
 // ============================================================
+function sunSetMode(mode){
+  var s=$("sun-solar-view"),l=$("sun-lunar-view");
+  var bs=$("btn-solar"),bl=$("btn-lunar");
+  if(!s||!l)return;
+  if(mode==="solar"){s.style.display="";l.style.display="none";bs.classList.add("sun-tab-on");bl.classList.remove("sun-tab-on");}
+  else{s.style.display="none";l.style.display="";bs.classList.remove("sun-tab-on");bl.classList.add("sun-tab-on");}
+}
 function fetchSunData(){
   var el=$("sun-dashboard");if(!el)return;
   el.innerHTML='<div class="alm-ld"><div class="tsps-spinner"></div>Loading sun data...</div>';
@@ -1044,8 +1092,8 @@ function fetchSunData(){
       (!isBefore&&!isPast?'<circle cx="'+sunP.x+'" cy="'+sunP.y+'" r="16" fill="rgba(255,215,0,.12)" filter="url(#sSun)"/><circle cx="'+sunP.x+'" cy="'+sunP.y+'" r="8" fill="#FFD700" filter="url(#sGl)"/><circle cx="'+sunP.x+'" cy="'+sunP.y+'" r="3" fill="#fff" fill-opacity=".7"/>':'')+
       '<text x="'+(cx-rx)+'" y="'+(cy+17)+'" text-anchor="middle" fill="rgba(255,255,255,.4)" font-size="9" font-family="Segoe UI,sans-serif">'+fmtT(today.rise)+'</text>'+
       '<text x="'+(cx+rx)+'" y="'+(cy+17)+'" text-anchor="middle" fill="rgba(255,255,255,.4)" font-size="9" font-family="Segoe UI,sans-serif">'+fmtT(today.set)+'</text>'+
-      '<text x="'+(cx-48)+'" y="'+(cy-52)+'" text-anchor="middle" fill="#FFD700" font-size="22" font-weight="700" font-family="Segoe UI,sans-serif">'+fmtL(todayLen)+'</text>'+
-      '<text x="'+(cx-48)+'" y="'+(cy-34)+'" text-anchor="middle" fill="rgba(255,255,255,.28)" font-size="8" letter-spacing="1.5" font-family="Segoe UI,sans-serif">DAYLIGHT TODAY</text>'+
+      '<text x="'+(cx-48)+'" y="'+(cy-50)+'" text-anchor="middle" fill="#FFD700" font-size="13" font-weight="700" font-family="Segoe UI,sans-serif">'+fmtL(todayLen)+'</text>'+
+      '<text x="'+(cx-48)+'" y="'+(cy-37)+'" text-anchor="middle" fill="rgba(255,255,255,.28)" font-size="7" letter-spacing="1.5" font-family="Segoe UI,sans-serif">DAYLIGHT TODAY</text>'+
       '</svg>';
     var noonPanel=
       '<div style="display:flex;flex-direction:column;justify-content:center;gap:10px;padding:10px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:6px;min-width:110px;text-align:center">'+
@@ -1065,37 +1113,124 @@ function fetchSunData(){
       var col=pos?"#ff8844":neg?"#77aaff":"#00d44a",tag=pos?"gaining":neg?"losing":"stable",tagL=pos?"GAINING":neg?"LOSING":"STABLE";
       return'<div class="sun-diff-card"><div class="sun-diff-lbl">'+label+'</div><div class="sun-diff-val" style="color:'+col+'">'+fmtD(diff)+'</div><div class="sun-diff-was">was '+wasLabel+'</div><div class="sun-diff-tag '+tag+'">'+tagL+'</div></div>';
     }
-    el.innerHTML=
-      '<div class="sun-sec">🌅 Sunrise &amp; Sunset <em>Raleigh, NC · Day Length Analysis</em></div>'+
-      '<div class="sun-card">'+
-      '<div style="display:flex;align-items:center;gap:12px;margin-bottom:4px">'+
-        '<div style="flex:1;min-width:0">'+svg+'</div>'+
-        noonPanel+
+    // ── Lunar view ──
+    var moon=moonCalc(now);
+    var mpn=moonPhaseName(moon.phase);
+    var mAge=moonAge(now).toFixed(1);
+    var mIllum=Math.round(moon.illum*100);
+    // Next 4 phases sorted chronologically
+    var phases=[
+      {t:0,   label:"New Moon",      emoji:"🌑", col:"#aaa"},
+      {t:0.25,label:"First Quarter", emoji:"🌓", col:"#FFD700"},
+      {t:0.5, label:"Full Moon",     emoji:"🌕", col:"#fff"},
+      {t:0.75,label:"Last Quarter",  emoji:"🌗", col:"#FFD700"}
+    ];
+    phases.forEach(function(p){p.date=nextMoonPhaseDate(now,p.t);});
+    phases.sort(function(a,b){return a.date-b.date;});
+    function fmtPhaseDate(d){return d.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});}
+    // Moon phase SVG: two overlapping circles to show illuminated limb
+    var phaseSvg=(function(){
+      var p=moon.phase;
+      // Determine if waxing (0-0.5) or waning (0.5-1)
+      var waxing=p<0.5;
+      // terminator position: -1 (right edge) to +1 (left edge)
+      var k=waxing?(1-4*p):((4*p-3)>1?1:4*p-3);
+      // k goes from 1 (new) to -1 (full) for waxing; -1 (full) to 1 (new) for waning
+      var bright=waxing?"right":"left";
+      // cx of the terminator ellipse (offset from center)
+      var tx=Math.cos(p*2*Math.PI); // simple cos approximation
+      var r=36;
+      var tRx=Math.abs(tx)*r; // ellipse x-radius (0 at quarter, r at full/new)
+      var fillBright="rgba(220,220,180,.92)";
+      var fillDark="rgba(40,40,40,.85)";
+      // Draw: dark circle, then bright sliver or bright circle
+      var out='<svg viewBox="0 0 80 80" width="80" height="80" style="display:block;margin:0 auto">';
+      out+='<circle cx="40" cy="40" r="'+r+'" fill="'+fillDark+'"/>';
+      if(p<0.02||p>0.98){
+        // New moon — all dark
+      } else if(p>0.48&&p<0.52){
+        // Full moon — all bright
+        out+='<circle cx="40" cy="40" r="'+r+'" fill="'+fillBright+'"/>';
+      } else if(waxing){
+        // Waxing: bright right half + terminator ellipse on left edge of bright half
+        out+='<clipPath id="mc-r"><rect x="40" y="4" width="36" height="72"/></clipPath>';
+        out+='<circle cx="40" cy="40" r="'+r+'" fill="'+fillBright+'" clip-path="url(#mc-r)"/>';
+        // terminator ellipse covers/reveals left part of bright side
+        var ex=Math.round(Math.cos(p*Math.PI*2)*r*10)/10;
+        out+='<ellipse cx="40" cy="40" rx="'+Math.abs(ex)+'" ry="'+r+'" fill="'+(ex<0?fillBright:fillDark)+'"/>';
+      } else {
+        // Waning: bright left half + terminator ellipse
+        out+='<clipPath id="mc-l"><rect x="4" y="4" width="36" height="72"/></clipPath>';
+        out+='<circle cx="40" cy="40" r="'+r+'" fill="'+fillBright+'" clip-path="url(#mc-l)"/>';
+        var ex2=Math.round(Math.cos(p*Math.PI*2)*r*10)/10;
+        out+='<ellipse cx="40" cy="40" rx="'+Math.abs(ex2)+'" ry="'+r+'" fill="'+(ex2>0?fillBright:fillDark)+'"/>';
+      }
+      out+='</svg>';
+      return out;
+    })();
+    var lunarView=
+      '<div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:16px">'+
+        '<div style="text-align:center;min-width:90px">'+phaseSvg+
+          '<div style="font-size:18px;margin-top:4px">'+mpn.emoji+'</div>'+
+        '</div>'+
+        '<div style="flex:1;min-width:140px">'+
+          '<div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:6px">'+mpn.name+'</div>'+
+          '<div style="display:flex;gap:16px;flex-wrap:wrap">'+
+            '<div><div style="font-size:8px;letter-spacing:1.5px;color:rgba(255,255,255,.38)">ILLUMINATION</div><div style="font-size:20px;font-weight:700;color:#c8d8ff">'+mIllum+'%</div></div>'+
+            '<div><div style="font-size:8px;letter-spacing:1.5px;color:rgba(255,255,255,.38)">MOON AGE</div><div style="font-size:20px;font-weight:700;color:#aab8cc">'+mAge+'d</div></div>'+
+          '</div>'+
+        '</div>'+
       '</div>'+
-        '<div class="sun-stats">'+
-          '<div class="sun-stat" style="border-top:2px solid #ff8844">'+
-            '<div class="sun-stat-lbl" style="color:#ff8844">SUNRISE</div>'+
-            '<div class="sun-stat-val">'+fmtT(today.rise)+'</div>'+
-            '<div class="sun-stat-sub">'+fmtUntil(today.rise,"sunrise")+'</div>'+
+      '<div style="font-size:8px;letter-spacing:1.5px;color:rgba(255,255,255,.38);margin-bottom:8px">UPCOMING PHASES</div>'+
+      '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">'+
+        phases.map(function(p){
+          return'<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:4px;padding:10px;text-align:center">'+
+            '<div style="font-size:18px;margin-bottom:4px">'+p.emoji+'</div>'+
+            '<div style="font-size:9px;letter-spacing:1px;color:'+p.col+';font-weight:700">'+p.label.toUpperCase()+'</div>'+
+            '<div style="font-size:12px;color:rgba(255,255,255,.65);margin-top:3px">'+fmtPhaseDate(p.date)+'</div>'+
+          '</div>';
+        }).join("")+
+      '</div>'+
+      '<div class="alm-note" style="margin-top:12px">Lunar calculations: astronomical formula · Raleigh, NC</div>';
+
+    var tabBar='<div style="display:flex;gap:6px;margin-left:auto">'+
+      '<button id="btn-solar" class="sun-tab sun-tab-on" onclick="sunSetMode(\'solar\')">☀ Solar</button>'+
+      '<button id="btn-lunar" class="sun-tab" onclick="sunSetMode(\'lunar\')">☽ Lunar</button>'+
+    '</div>';
+    el.innerHTML=
+      '<div class="sun-sec">🌅 Sunrise &amp; Sunset <em>Raleigh, NC · Day Length Analysis</em>'+tabBar+'</div>'+
+      '<div class="sun-card">'+
+        '<div id="sun-solar-view">'+
+          '<div style="display:flex;align-items:center;gap:12px;margin-bottom:4px">'+
+            '<div style="flex:1;min-width:0">'+svg+'</div>'+
+            noonPanel+
           '</div>'+
-          '<div class="sun-stat" style="border-top:2px solid var(--gold)">'+
-            '<div class="sun-stat-lbl" style="color:var(--gold)">DAY LENGTH</div>'+
-            '<div class="sun-stat-val">'+fmtL(todayLen)+'</div>'+
-            '<div class="sun-stat-sub">Total daylight</div>'+
+          '<div class="sun-stats">'+
+            '<div class="sun-stat" style="border-top:2px solid #ff8844">'+
+              '<div class="sun-stat-lbl" style="color:#ff8844">SUNRISE</div>'+
+              '<div class="sun-stat-val">'+fmtT(today.rise)+'</div>'+
+              '<div class="sun-stat-sub">'+fmtUntil(today.rise,"sunrise")+'</div>'+
+            '</div>'+
+            '<div class="sun-stat" style="border-top:2px solid var(--gold)">'+
+              '<div class="sun-stat-lbl" style="color:var(--gold)">DAY LENGTH</div>'+
+              '<div class="sun-stat-val">'+fmtL(todayLen)+'</div>'+
+              '<div class="sun-stat-sub">Total daylight</div>'+
+            '</div>'+
+            '<div class="sun-stat" style="border-top:2px solid #ff9944">'+
+              '<div class="sun-stat-lbl" style="color:#ff9944">SUNSET</div>'+
+              '<div class="sun-stat-val">'+fmtT(today.set)+'</div>'+
+              '<div class="sun-stat-sub">'+fmtUntil(today.set,"sunset")+'</div>'+
+            '</div>'+
           '</div>'+
-          '<div class="sun-stat" style="border-top:2px solid #ff9944">'+
-            '<div class="sun-stat-lbl" style="color:#ff9944">SUNSET</div>'+
-            '<div class="sun-stat-val">'+fmtT(today.set)+'</div>'+
-            '<div class="sun-stat-sub">'+fmtUntil(today.set,"sunset")+'</div>'+
+          '<div class="sun-diff-hdr">Daylight Change</div>'+
+          '<div class="sun-diff-grid">'+
+            diffCard("vs Yesterday",fmtL(len(t1)),diffs.d)+
+            diffCard("vs 7 Days Ago",fmtL(len(t7)),diffs.w)+
+            diffCard("vs 30 Days Ago",fmtL(len(t30)),diffs.mo)+
           '</div>'+
+          '<div class="alm-note">Data: Open-Meteo · Raleigh, NC (35.78°N, 78.64°W) · All times Eastern</div>'+
         '</div>'+
-        '<div class="sun-diff-hdr">Daylight Change</div>'+
-        '<div class="sun-diff-grid">'+
-          diffCard("vs Yesterday",fmtL(len(t1)),diffs.d)+
-          diffCard("vs 7 Days Ago",fmtL(len(t7)),diffs.w)+
-          diffCard("vs 30 Days Ago",fmtL(len(t30)),diffs.mo)+
-        '</div>'+
-        '<div class="alm-note">Data: Open-Meteo · Raleigh, NC (35.78°N, 78.64°W) · All times Eastern</div>'+
+        '<div id="sun-lunar-view" style="display:none">'+lunarView+'</div>'+
       '</div>';
   })
   .catch(function(){el.innerHTML='<div style="padding:8px;color:var(--mu2);font-size:11px;text-align:center">Sun data temporarily unavailable</div>';});
