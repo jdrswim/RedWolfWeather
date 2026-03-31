@@ -479,6 +479,7 @@ footer strong{color:var(--red)}
 <!-- TOOLTIPS -->
 <div class="tip-overlay" id="tipTSPS"><div class="tip-panel"><button class="tip-close" onclick="closeTip('tipTSPS')">&times;</button><div class="tip-title">About Tuffy's Storm Prediction System</div><div class="tip-body"><div class="tip-label">What Is This?</div>A <strong>proprietary severe weather intelligence engine</strong> generating a <strong>Severe Weather Index (0-100)</strong> and occurrence likelihood for +3, +6, +9, +12, and +24 hour windows.<div class="tip-divider"></div><div class="tip-label">Data Sources</div>All data from the <strong>National Weather Service (NWS) API</strong>: hourly forecast and active alerts.<div class="tip-divider"></div><div class="tip-label">6-Component Algorithm</div><strong>Wind</strong> (0-20), <strong>Gusts</strong> (0-18), <strong>Precip</strong> (0-14), <strong>Instability</strong> (0-16), <strong>Forecast Text</strong> (0-22), <strong>Alerts</strong> (0-10).<div class="tip-divider"></div><div class="tip-label">Threat Levels</div><div class="tip-color-row"><div class="tip-swatch" style="background:#1a6b3a"></div><strong>0-9 NONE</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#22c55e"></div><strong>10-24 LOW</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#eab308"></div><strong>25-49 GUARDED</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#f97316"></div><strong>50-74 ELEVATED</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#ef4444"></div><strong>75-89 HIGH</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#dc2626"></div><strong>90-100 EXTREME</strong></div></div></div></div>
 <div class="tip-overlay" id="tipForecast"><div class="tip-panel"><button class="tip-close" onclick="closeTip('tipForecast')">&times;</button><div class="tip-title">Reading the 7-Day Forecast</div><div class="tip-body"><div class="tip-label">Temperature Range Bar</div>Each bar spans <strong style="color:#77aaff">Low</strong> to <strong style="color:#ffaa55">High</strong>, positioned relative to the full week.<div class="tip-divider"></div><div class="tip-color-row"><div class="tip-swatch" style="background:#ff6600"></div><strong>Orange</strong> 80F+</div><div class="tip-color-row"><div class="tip-swatch" style="background:#ffcc00"></div><strong>Yellow</strong> 60-79F</div><div class="tip-color-row"><div class="tip-swatch" style="background:#4488ff"></div><strong>Blue</strong> Below 60F</div></div></div></div>
+<div class="tip-overlay" id="tipAccuracy"><div class="tip-panel"><button class="tip-close" onclick="closeTip('tipAccuracy')">&times;</button><div class="tip-title">Valvano's Forecast Accountability Dashboard</div><div class="tip-body"><div class="tip-color-row"><div class="tip-swatch" style="background:#00d44a"></div><strong>HIT</strong> — Hi &amp; Lo both within 3° of actual</div><div class="tip-color-row"><div class="tip-swatch" style="background:#FFD700"></div><strong>CLOSE</strong> — Average error ≤ 5°</div><div class="tip-color-row"><div class="tip-swatch" style="background:#ef4444"></div><strong>MISS</strong> — Average error 6°+</div><div class="tip-divider"></div><div class="tip-label">Methodology</div>Forecasts are recorded at <strong>8 PM</strong> each evening for the following day (NWS forecast). Actuals are the observed <strong>high &amp; low from NWS KRDU</strong> station data.</div></div></div>
 <div class="tip-overlay" id="tipAlmanac"><div class="tip-panel"><button class="tip-close" onclick="closeTip('tipAlmanac')">&times;</button><div class="tip-title">Raleigh Wx Almanac</div><div class="tip-body"><strong>Year-to-date climate stats</strong> vs 30-year normals (1991-2020). Data from <strong>Open-Meteo Archive</strong> (ERA5). Reference: RDU Airport.<div class="tip-divider"></div><div class="tip-color-row"><div class="tip-swatch" style="background:#ff8844"></div><strong>Orange</strong> Above normal</div><div class="tip-color-row"><div class="tip-swatch" style="background:#77aaff"></div><strong>Blue</strong> Below normal</div><div class="tip-color-row"><div class="tip-swatch" style="background:#00d44a"></div><strong>Green</strong> Near normal</div></div></div></div>
 
 <span id="oatemp" style="display:none"></span>
@@ -1539,7 +1540,7 @@ function accLogActuals(){
 
 function accFetchAndRender(){
   var el=$("acc-dashboard");if(!el)return;
-  el.innerHTML='<div class="acc-wrap"><div class="acc-hdr">Tuffy\'s Accuracy Dashboard <em>- Loading...</em></div><div class="alm-ld"><div class="tsps-spinner"></div></div></div>';
+  el.innerHTML='<div class="acc-wrap"><div class="acc-hdr">Valvano\'s Forecast Accountability Dashboard <em>- Loading...</em></div><div class="alm-ld"><div class="tsps-spinner"></div></div></div>';
   fetch(SHEET_URL+"?tab=Accuracy")
   .then(function(r){return r.text();})
   .then(function(txt){var d=JSON.parse(txt);accRender(el,d.rows||[]);})
@@ -1578,7 +1579,7 @@ function accRender(el,rawRows){
   if(!rows.length){
     el.innerHTML=
       '<div class="acc-wrap">'+
-        '<div class="acc-hdr">Tuffy\'s Accuracy Dashboard <em>- Forecast vs Actual Temperature</em></div>'+
+        '<div class="acc-hdr">Valvano\'s Forecast Accountability Dashboard <em>- Forecast vs Actual Temperature</em> <div class="tip-btn" onclick="openTip(\'tipAccuracy\')" style="display:inline-flex;vertical-align:middle;margin-left:6px">?</div></div>'+
         '<div style="background:var(--p2);border:1px solid var(--bd);border-radius:4px;padding:28px;text-align:center">'+
           '<div style="font-size:36px;margin-bottom:14px">📊</div>'+
           '<div style="font-size:14px;color:var(--white);font-weight:700;margin-bottom:8px">Tracking Has Started</div>'+
@@ -1719,7 +1720,7 @@ function accRender(el,rawRows){
 
   var html=
     '<div class="acc-wrap">'+
-      '<div class="acc-hdr">Tuffy\'s Accuracy Dashboard <em>- Forecast vs Actual Temperature</em></div>'+
+      '<div class="acc-hdr">Valvano\'s Forecast Accountability Dashboard <em>- Forecast vs Actual Temperature</em> <div class="tip-btn" onclick="openTip(\'tipAccuracy\')" style="display:inline-flex;vertical-align:middle;margin-left:6px">?</div></div>'+
       '<div class="acc-score-row">'+
         renderYesterdayCard(accYesterday)+
         renderScoreCard("Last 7 Days",accWeek)+
