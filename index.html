@@ -1105,6 +1105,18 @@ function fetchAlmanac(){
     function dLbl(d,u,th){if(Math.abs(d)<th)return'<span class="alm-cmp normal">NORMAL</span>';return'<span class="alm-cmp '+(d>0?"above":"below")+'">'+(d>0?"+":"")+d.toFixed(1)+u+" "+(d>0?"ABOVE":"BELOW")+'</span>';}
 
     // ── Departure from normal calculations ──
+    // Interpolate a daily normal from monthly normals.
+    // Monthly normals represent the average for the full month; we treat each
+    // month's normal as centred on the 15th and linearly interpolate between
+    // adjacent monthly midpoints so late-March gets a higher normal than the
+    // March monthly average (matching NWS day-specific climatology more closely).
+    function dailyNorm(dateStr){
+      var d=new Date(dateStr+"T12:00:00"),m=d.getMonth(),day=d.getDate();
+      var dim=new Date(d.getFullYear(),m+1,0).getDate();
+      var frac=(day-15.5)/dim;
+      if(frac>=0){var nm=(m+1)%12;return RDU_NTEMP[m]+(RDU_NTEMP[nm]-RDU_NTEMP[m])*frac;}
+      else{var pm=(m+11)%12;return RDU_NTEMP[m]+(RDU_NTEMP[m]-RDU_NTEMP[pm])*(-frac);}
+    }
     // Latest available day (ERA5 may lag a few days)
     var depYday=null,depYdayAvg=null,depYdayNorm=null,depYdayLbl="Latest Day";
     var todayStr2=new Date().toLocaleDateString("en-CA");
@@ -1115,8 +1127,7 @@ function fetchAlmanac(){
       while(li>=0&&(dl.temperature_2m_mean[li]==null||dl.time[li]===todayStr2))li--;
       if(li>=0){
         depYdayAvg=dl.temperature_2m_mean[li];
-        var lm=new Date(dl.time[li]+"T12:00:00").getMonth();
-        depYdayNorm=RDU_NTEMP[lm];
+        depYdayNorm=dailyNorm(dl.time[li]);
         depYday=depYdayAvg-depYdayNorm;
         depYdayLbl=dl.time[li]===ydStr?"Yesterday":new Date(dl.time[li]+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"});
       }
@@ -1124,7 +1135,7 @@ function fetchAlmanac(){
     // Last 7 available days
     var dep7=null,dep7Avg=null,dep7Norm=null,s7=0,n7=0,c7=0;
     for(var k7=Math.max(0,dl.time.length-7);k7<dl.time.length;k7++){
-      if(dl.temperature_2m_mean[k7]!=null){s7+=dl.temperature_2m_mean[k7];var k7m=new Date(dl.time[k7]+"T12:00:00").getMonth();n7+=RDU_NTEMP[k7m];c7++;}
+      if(dl.temperature_2m_mean[k7]!=null&&dl.time[k7]!==todayStr2){s7+=dl.temperature_2m_mean[k7];n7+=dailyNorm(dl.time[k7]);c7++;}
     }
     if(c7){dep7Avg=s7/c7;dep7Norm=n7/c7;dep7=dep7Avg-dep7Norm;}
     // Last calendar month
@@ -1156,7 +1167,7 @@ function fetchAlmanac(){
       '</div>'+
       '<div class="alm-card" style="margin-top:18px"><h3><span>🌡</span> Temperature Departure from Normal</h3>'+
         '<div class="alm-summary" style="grid-template-columns:repeat(2,1fr)">'+
-          depCard(depYdayLbl,depYdayLbl==="Yesterday"?"vs "+MO_NAMES[curMo]+" normal":depYdayLbl,depYdayAvg,depYdayNorm,depYday)+
+          depCard(depYdayLbl,depYdayLbl==="Yesterday"?"vs daily normal":depYdayLbl,depYdayAvg,depYdayNorm,depYday)+
           depCard("Last 7 Days",c7+" days avg",dep7Avg,dep7Norm,dep7)+
           depCard("Last Month",MO_NAMES[prevMo],depLMAvg,depLMNorm,depLM)+
           depCard("This Month",MO_NAMES[curMo]+" so far",depTMAvg,depTMNorm,depTM)+
