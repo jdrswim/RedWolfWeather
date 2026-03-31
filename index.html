@@ -1244,8 +1244,8 @@ function accLogActuals(){
     }
 
     // NWS KRDU hourly observations for that full calendar day
-    var obsStart=dStr+"T00:00:00-05:00";
-    var obsEnd=dStr+"T23:59:59-05:00";
+    var obsStart=new Date(target.getFullYear(),target.getMonth(),target.getDate(),0,0,0).toISOString();
+    var obsEnd=new Date(target.getFullYear(),target.getMonth(),target.getDate(),23,59,59).toISOString();
     fetch("https://api.weather.gov/stations/KRDU/observations?start="+encodeURIComponent(obsStart)+"&end="+encodeURIComponent(obsEnd)+"&limit=200",
       {headers:{"User-Agent":"WolfpackWeather/2.0","Accept":"application/geo+json"}})
     .then(function(r){if(!r.ok)throw new Error("NWS obs "+r.status);return r.json();})
@@ -1267,23 +1267,27 @@ function accLogActuals(){
       // Only set guard for dates 2+ days back (fully settled data)
       if(daysBack>=2){try{localStorage.setItem(guardKey,"1");}catch(e){}}
       console.log("ACC actuals ("+result.src+"): "+dStr+" H:"+result.hi+" L:"+result.lo);
+      if(daysBack===1)accFetchAndRender();
     })
     .catch(function(nwsErr){
-      console.log("NWS obs failed for "+dStr+": "+nwsErr.message+" — trying Open-Meteo ERA5...");
-      // Open-Meteo ERA5 archive — typically available with a ~2-5 day lag
-      fetch("https://archive-api.open-meteo.com/v1/archive?latitude=35.686&longitude=-78.614&start_date="+dStr+"&end_date="+dStr+"&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&timezone=America%2FNew_York")
+      console.log("NWS obs failed for "+dStr+": "+nwsErr.message+" — trying Open-Meteo...");
+      // Open-Meteo forecast API with past_days — no lag, available immediately
+      fetch("https://api.open-meteo.com/v1/forecast?latitude=35.686&longitude=-78.614&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&timezone=America%2FNew_York&past_days=7&forecast_days=0")
       .then(function(r){return r.json();})
       .then(function(d){
-        if(!d.daily||!d.daily.temperature_2m_max||d.daily.temperature_2m_max[0]==null)
-          throw new Error("Open-Meteo no data for "+dStr+" (may need 2-5 day lag)");
-        var hi=Math.round(d.daily.temperature_2m_max[0]);
-        var lo=Math.round(d.daily.temperature_2m_min[0]);
+        if(!d.daily||!d.daily.time)throw new Error("Open-Meteo no data");
+        var idx=d.daily.time.indexOf(dStr);
+        if(idx===-1||d.daily.temperature_2m_max[idx]==null)
+          throw new Error("Open-Meteo no data for "+dStr);
+        var hi=Math.round(d.daily.temperature_2m_max[idx]);
+        var lo=Math.round(d.daily.temperature_2m_min[idx]);
         return fetch(SHEET_URL+"?action=write&tab=Accuracy&date="+dStr+"&actual_high="+hi+"&actual_low="+lo)
           .then(function(){return{hi:hi,lo:lo};});
       })
       .then(function(result){
         if(daysBack>=2){try{localStorage.setItem(guardKey,"1");}catch(e){}}
-        console.log("ACC actuals (Open-Meteo ERA5): "+dStr+" H:"+result.hi+" L:"+result.lo);
+        console.log("ACC actuals (Open-Meteo): "+dStr+" H:"+result.hi+" L:"+result.lo);
+        if(daysBack===1)accFetchAndRender();
       })
       .catch(function(omErr){
         console.log("ACC actuals both sources failed for "+dStr+": "+omErr.message);
@@ -1352,8 +1356,8 @@ function accRender(el,rawRows){
   }
   var yesterdayStr=daysAgoStr(1);
   var today0=new Date(now.getFullYear(),now.getMonth(),now.getDate()); // midnight today
-  var week0=new Date(today0.getTime()-6*86400000);   // 7 days including yesterday
-  var month0=new Date(today0.getTime()-29*86400000); // 30 days
+  var week0=new Date(today0.getTime()-7*86400000);   // 7 days including yesterday
+  var month0=new Date(today0.getTime()-30*86400000); // 30 days
 
   // Only count rows that have BOTH pred and actual for accuracy stats.
   // "Yesterday" = exact date match on yesterdayStr.
@@ -1539,7 +1543,7 @@ function accRender(el,rawRows){
           '<span style="color:'+loDeltaCol+'">Lo '+loSign+Math.round(loDiff)+'°</span>'+
         '</div>';
 
-      if(avgErr<=3)badge='<span class="acc-badge hit">HIT</span>';
+      if(hiErr<=3&&loErr<=3)badge='<span class="acc-badge hit">HIT</span>';
       else if(avgErr<=5)badge='<span class="acc-badge close">CLOSE</span>';
       else badge='<span class="acc-badge miss">MISS</span>';
     }
@@ -1562,7 +1566,7 @@ function accRender(el,rawRows){
     '</div>'+
     '<div class="acc-note">'+
       'Predictions: NWS Raleigh forecast logged at 8 PM for next day · '+
-      'Actuals: NWS KRDU station hourly obs (fallback: Open-Meteo ERA5) · '+
+      'Actuals: NWS KRDU station hourly obs (fallback: Open-Meteo) · '+
       'One row per day · '+rows.length+' day'+(rows.length!==1?"s":"")+' tracked'+
     '</div>'+
   '</div>';
