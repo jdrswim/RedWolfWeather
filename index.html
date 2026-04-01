@@ -264,6 +264,9 @@ main{max-width:1100px;margin:0 auto;padding:18px;overflow-x:hidden}
 .sun-tab{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.5);font-size:10px;font-weight:700;letter-spacing:1px;padding:4px 10px;border-radius:20px;cursor:pointer;text-transform:uppercase;transition:all .2s}
 .sun-tab:hover{background:rgba(255,255,255,.12);color:rgba(255,255,255,.8)}
 .sun-tab-on{background:rgba(255,200,0,.15);border-color:var(--gold);color:var(--gold)}
+.tide-loc-btn{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.5);font-family:var(--font);font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;padding:6px 10px;border-radius:4px;cursor:pointer;white-space:nowrap;transition:all .18s;flex:1;min-width:0}
+.tide-loc-btn:hover{background:rgba(255,255,255,.1);color:rgba(255,255,255,.75)}
+.tide-loc-btn.tide-loc-on{background:rgba(0,120,220,.2);border-color:rgba(0,150,255,.4);color:#7dd3fc}
 .sun-card{background:linear-gradient(135deg,#1a1500,var(--p1));border:1px solid var(--bd);border-top:3px solid var(--gold);border-radius:3px;padding:20px;overflow:hidden}
 .sun-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
 .sun-stat{background:var(--p2);border:1px solid var(--bd);border-radius:4px;padding:14px;text-align:center}
@@ -1047,11 +1050,96 @@ function moonAge(date){
 // SUNRISE / SUNSET & DAY LENGTH
 // ============================================================
 function sunSetMode(mode){
-  var s=$("sun-solar-view"),l=$("sun-lunar-view");
-  var bs=$("btn-solar"),bl=$("btn-lunar");
+  var s=$("sun-solar-view"),l=$("sun-lunar-view"),t=$("sun-tides-view");
+  var bs=$("btn-solar"),bl=$("btn-lunar"),bt=$("btn-tides");
   if(!s||!l)return;
-  if(mode==="solar"){s.style.display="";l.style.display="none";bs.classList.add("sun-tab-on");bl.classList.remove("sun-tab-on");}
-  else{s.style.display="none";l.style.display="";bs.classList.remove("sun-tab-on");bl.classList.add("sun-tab-on");}
+  s.style.display=mode==="solar"?"":"none";
+  l.style.display=mode==="lunar"?"":"none";
+  if(t)t.style.display=mode==="tides"?"":"none";
+  bs.classList.toggle("sun-tab-on",mode==="solar");
+  bl.classList.toggle("sun-tab-on",mode==="lunar");
+  if(bt)bt.classList.toggle("sun-tab-on",mode==="tides");
+  if(mode==="tides"){var tc=$("tide-content");if(tc&&tc.querySelector(".tsps-spinner"))setTideLoc(_currentTideLoc);}
+}
+
+var TIDE_STATIONS={
+  hiltonhead:{id:"8670870",label:"Coligny Beach · Hilton Head Island, SC"},
+  wrightsville:{id:"8658120",label:"Wrightsville Beach, NC"},
+  emerald:{id:"8656483",label:"Emerald Isle, NC"}
+};
+var _currentTideLoc="hiltonhead";
+var _tideCache={};
+
+function setTideLoc(loc){
+  _currentTideLoc=loc;
+  ["hiltonhead","wrightsville","emerald"].forEach(function(k){
+    var b=$("tl-"+k);if(b)b.classList.toggle("tide-loc-on",k===loc);
+  });
+  var st=TIDE_STATIONS[loc];
+  fetchTides(st.id,st.label);
+}
+
+function fetchTides(stationId,locLabel){
+  var el=$("tide-content");if(!el)return;
+  if(_tideCache[stationId]){renderTides(el,_tideCache[stationId],locLabel,stationId);return;}
+  el.innerHTML='<div class="alm-ld"><div class="tsps-spinner"></div></div>';
+  var now=new Date();
+  function fmt(d){return d.getFullYear()+(d.getMonth()<9?"0":"")+(d.getMonth()+1)+(d.getDate()<10?"0":"")+d.getDate();}
+  var today=fmt(now);
+  var tomorrow=fmt(new Date(now.getFullYear(),now.getMonth(),now.getDate()+1));
+  fetch("https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date="+today+"&end_date="+tomorrow+"&station="+stationId+"&product=predictions&datum=MLLW&time_zone=lst_ldt&interval=hilo&units=english&application=RedWolfWeather&format=json")
+  .then(function(r){return r.json();})
+  .then(function(d){
+    if(d.error)throw new Error(d.error.message);
+    _tideCache[stationId]=d.predictions;
+    renderTides(el,d.predictions,locLabel,stationId);
+  })
+  .catch(function(e){el.innerHTML='<div style="color:var(--mu);padding:20px;text-align:center;font-size:12px">Could not load tide data: '+e.message+'</div>';});
+}
+
+function renderTides(el,preds,locLabel,stationId){
+  var now=new Date();
+  var todayStr=now.getFullYear()+"-"+(now.getMonth()<9?"0":"")+(now.getMonth()+1)+"-"+(now.getDate()<10?"0":"")+now.getDate();
+  var tomorrowD=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1);
+  var tomorrowStr=tomorrowD.getFullYear()+"-"+(tomorrowD.getMonth()<9?"0":"")+(tomorrowD.getMonth()+1)+"-"+(tomorrowD.getDate()<10?"0":"")+tomorrowD.getDate();
+  var days={};
+  preds.forEach(function(p){
+    var ds=p.t.substring(0,10);
+    if(!days[ds])days[ds]=[];
+    days[ds].push(p);
+  });
+  var dayNames=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  var monNames=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  function fmtDay(ds){var d=new Date(ds+"T12:00:00");return dayNames[d.getDay()]+", "+monNames[d.getMonth()]+" "+d.getDate();}
+  function fmtTime(ts){
+    var parts=ts.split(" ")[1].split(":");
+    var h=parseInt(parts[0]),m=parts[1],ampm=h>=12?"PM":"AM";
+    h=h%12||12;return h+":"+m+" "+ampm;
+  }
+  var html="";
+  [todayStr,tomorrowStr].forEach(function(ds){
+    var entries=days[ds];if(!entries||!entries.length)return;
+    var label=ds===todayStr?"Today":"Tomorrow";
+    html+='<div style="margin-bottom:14px">'+
+      '<div style="font-size:9px;letter-spacing:1.5px;font-weight:700;color:rgba(255,255,255,.35);text-transform:uppercase;margin-bottom:8px">'+label+' &mdash; '+fmtDay(ds)+'</div>'+
+      '<div style="display:flex;flex-direction:column;gap:5px">';
+    entries.forEach(function(p){
+      var isHigh=p.type==="H";
+      var tTime=new Date(p.t.replace(" ","T"));
+      var isNext=tTime>now&&!html.includes("NEXT");
+      var ht=parseFloat(p.v).toFixed(1);
+      html+='<div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-left:3px solid '+(isHigh?"rgba(0,150,255,.5)":"rgba(255,255,255,.15)")+';border-radius:4px;padding:8px 12px">'+
+        '<span style="font-size:14px">'+(isHigh?"🔼":"🔽")+'</span>'+
+        '<span style="font-size:11px;font-weight:700;letter-spacing:1px;color:'+(isHigh?"#7dd3fc":"rgba(255,255,255,.45)")+';min-width:38px">'+(isHigh?"HIGH":"LOW")+'</span>'+
+        '<span style="font-size:13px;color:#fff;font-weight:600;flex:1">'+fmtTime(p.t)+'</span>'+
+        '<span style="font-size:13px;color:'+(isHigh?"#7dd3fc":"rgba(255,255,255,.55)")+';font-weight:700">'+ht+' ft</span>'+
+        (isNext?'<span style="font-size:9px;background:rgba(0,150,255,.2);border:1px solid rgba(0,150,255,.4);color:#7dd3fc;border-radius:3px;padding:2px 6px;letter-spacing:.8px;font-weight:700">NEXT</span>':'')+
+      '</div>';
+    });
+    html+='</div></div>';
+  });
+  html+='<div class="alm-note" style="margin-top:6px">Data: NOAA Tides &amp; Currents · Station '+stationId+' · Heights in ft above MLLW · '+locLabel+'</div>';
+  el.innerHTML=html;
 }
 function fetchSunData(){
   var el=$("sun-dashboard");if(!el)return;
@@ -1202,9 +1290,19 @@ function fetchSunData(){
     var tabBar='<div style="display:flex;gap:6px;margin-left:auto">'+
       '<button id="btn-solar" class="sun-tab sun-tab-on" onclick="sunSetMode(\'solar\')">☀ Solar</button>'+
       '<button id="btn-lunar" class="sun-tab" onclick="sunSetMode(\'lunar\')">☽ Lunar</button>'+
+      '<button id="btn-tides" class="sun-tab" onclick="sunSetMode(\'tides\')">🌊 Tides</button>'+
     '</div>';
+    var tidesView=
+      '<div id="sun-tides-view" style="display:none">'+
+        '<div style="display:flex;gap:6px;margin-bottom:14px">'+
+          '<button class="tide-loc-btn tide-loc-on" id="tl-hiltonhead"   onclick="setTideLoc(\'hiltonhead\')">Hilton Head Island</button>'+
+          '<button class="tide-loc-btn"             id="tl-wrightsville" onclick="setTideLoc(\'wrightsville\')">Wrightsville Beach</button>'+
+          '<button class="tide-loc-btn"             id="tl-emerald"      onclick="setTideLoc(\'emerald\')">Emerald Isle</button>'+
+        '</div>'+
+        '<div id="tide-content"><div class="alm-ld"><div class="tsps-spinner"></div></div></div>'+
+      '</div>';
     el.innerHTML=
-      '<div class="sun-sec">🌅 Sunrise &amp; Sunset <em>Raleigh, NC · Day Length Analysis</em>'+tabBar+'</div>'+
+      '<div class="sun-sec">🌊 Sun, Moon &amp; Tides <em>Raleigh, NC · Day Length Analysis</em>'+tabBar+'</div>'+
       '<div class="sun-card">'+
         '<div id="sun-solar-view">'+
           '<div style="display:flex;align-items:center;gap:12px;margin-bottom:4px">'+
@@ -1237,6 +1335,7 @@ function fetchSunData(){
           '<div class="alm-note">Data: Open-Meteo · Raleigh, NC (35.78°N, 78.64°W) · All times Eastern</div>'+
         '</div>'+
         '<div id="sun-lunar-view" style="display:none">'+lunarView+'</div>'+
+        tidesView+
       '</div>';
   })
   .catch(function(){el.innerHTML='<div style="padding:8px;color:var(--mu2);font-size:11px;text-align:center">Sun data temporarily unavailable</div>';});
