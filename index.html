@@ -1373,51 +1373,71 @@ var MO_NAMES=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov",
 function fetchAlmanac(){
   var el=$("alm-content");
   var now=new Date(),yr=now.getFullYear(),curMo=now.getMonth(),curDay=now.getDate();
+  function p2(n){return n<10?"0"+n:""+n;}
 
-  // Fetch WU PWS daily history for each month Jan→current in parallel
-  var fetches=[];
+  // Group A: monthly aggregates (history/monthly, YYYYMM) — one call per month Jan→current
+  var mFetches=[];
   for(var mi=0;mi<=curMo;mi++){
-    fetches.push((function(mo){
-      var dp=yr+(mo+1<10?"0":"")+(mo+1); // YYYYMM
-      return fetch("https://api.weather.com/v2/pws/history/daily?stationId=KNCRALEI761&format=json&units=e&date="+dp+"&apiKey="+WU_COMMUNITY_KEY)
-      .then(function(r){if(!r.ok)throw new Error("WU "+r.status);return r.json();})
+    mFetches.push((function(mo){
+      var dp=yr+p2(mo+1);
+      return fetch("https://api.weather.com/v2/pws/history/monthly?stationId=KNCRALEI761&format=json&units=e&date="+dp+"&apiKey="+WU_COMMUNITY_KEY)
+      .then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json();})
       .then(function(d){return{mo:mo,obs:d.observations||[]};})
-      .catch(function(){return{mo:mo,obs:[]};});
+      .catch(function(e){console.error("WU monthly m="+(mo+1)+": "+e.message);return{mo:mo,obs:[]};});
     })(mi));
   }
 
-  Promise.all(fetches).then(function(results){
-    var moTemp={},moPrec={},moCnt={};
-    var dailyArr=[]; // [{date,temp}] for departure cards
-    var ytdTS=0,ytdD=0,ytdP=0;
+  // Group B: last 8 individual days (history/daily, YYYYMMDD) for departure cards
+  var dFetches=[];
+  for(var di=1;di<=8;di++){
+    dFetches.push((function(ago){
+      var dd=new Date(yr,now.getMonth(),now.getDate()-ago);
+      var dp=dd.getFullYear()+p2(dd.getMonth()+1)+p2(dd.getDate());
+      var ds=dd.getFullYear()+"-"+p2(dd.getMonth()+1)+"-"+p2(dd.getDate());
+      return fetch("https://api.weather.com/v2/pws/history/daily?stationId=KNCRALEI761&format=json&units=e&date="+dp+"&apiKey="+WU_COMMUNITY_KEY)
+      .then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json();})
+      .then(function(j){
+        var obs=j.observations||[];
+        if(!obs.length||!obs[0].imperial)return{date:ds,temp:null};
+        var imp=obs[0].imperial;
+        var t=imp.tempAvg!=null&&imp.tempAvg>-90?imp.tempAvg:
+              (imp.tempHigh!=null&&imp.tempLow!=null?(imp.tempHigh+imp.tempLow)/2:null);
+        return{date:ds,temp:t};
+      })
+      .catch(function(e){console.error("WU daily "+dp+": "+e.message);return{date:ds,temp:null};});
+    })(di));
+  }
 
-    results.forEach(function(res){
+  Promise.all([Promise.all(mFetches),Promise.all(dFetches)]).then(function(all){
+    var mRes=all[0],dRes=all[1];
+    var moTemp={},moPrec={};
+    var ytdTS=0,ytdD=0,ytdP=0;
+    var dim=[31,28+(yr%4===0?1:0),31,30,31,30,31,31,30,31,30,31];
+
+    // Monthly aggregates → moTemp[m] = monthly avg, moPrec[m] = monthly total
+    mRes.forEach(function(res){
       var m=res.mo;
       res.obs.forEach(function(obs){
         if(!obs.imperial)return;
         var imp=obs.imperial;
-        var dateStr=(obs.obsTimeLocal||"").substring(0,10);
-        // Use tempAvg if valid; fall back to (Hi+Lo)/2
-        var t=(imp.tempAvg!=null&&imp.tempAvg>-90&&!isNaN(imp.tempAvg))?imp.tempAvg:
-              (imp.tempHigh!=null&&imp.tempLow!=null?((imp.tempHigh+imp.tempLow)/2):null);
-        var p=imp.precipTotal;
-        if(t!=null){
-          if(!moTemp[m]){moTemp[m]=0;moCnt[m]=0;}
-          moTemp[m]+=t;moCnt[m]++;
-          ytdTS+=t;ytdD++;
-          if(dateStr)dailyArr.push({date:dateStr,temp:t});
-        }
-        if(p!=null&&!isNaN(p)&&p>=0){
-          if(!moPrec[m])moPrec[m]=0;
-          moPrec[m]+=p;ytdP+=p;
-        }
+        var t=imp.tempAvg!=null&&imp.tempAvg>-90&&!isNaN(imp.tempAvg)?imp.tempAvg:null;
+        var p=imp.precipTotal!=null&&!isNaN(imp.precipTotal)&&imp.precipTotal>=0?imp.precipTotal:null;
+        if(t!=null)moTemp[m]=t;
+        if(p!=null)moPrec[m]=p;
       });
     });
 
-    dailyArr.sort(function(a,b){return a.date<b.date?-1:1;});
+    // YTD: weight monthly averages by days in month
+    for(var mi2=0;mi2<=curMo;mi2++){
+      if(moTemp[mi2]!=null){var days=mi2<curMo?dim[mi2]:curDay;ytdTS+=moTemp[mi2]*days;ytdD+=days;}
+      if(moPrec[mi2]!=null)ytdP+=moPrec[mi2];
+    }
+
+    // dailyArr from individual-day fetches (for Latest Day / Last 7 Days departure cards)
+    var dailyArr=dRes.filter(function(x){return x.temp!=null;})
+                     .sort(function(a,b){return a.date<b.date?-1:1;});
 
     var ytdAT=ytdD?ytdTS/ytdD:0;
-    var dim=[31,28+(yr%4===0?1:0),31,30,31,30,31,31,30,31,30,31];
     var nP=0,nTT=0,nD=0;
     for(var m2=0;m2<12;m2++){
       if(m2<curMo){nP+=RDU_NPREC[m2];nTT+=RDU_NTEMP[m2]*dim[m2];nD+=dim[m2];}
@@ -1457,10 +1477,10 @@ function fetchAlmanac(){
     var dep7=c7?(s7/c7-n7/c7):null,dep7Avg=c7?s7/c7:null,dep7Norm=c7?n7/c7:null;
     // Last month
     var prevMo=curMo===0?11:curMo-1;
-    var depLMAvg=moCnt[prevMo]?moTemp[prevMo]/moCnt[prevMo]:null;
+    var depLMAvg=moTemp[prevMo]!=null?moTemp[prevMo]:null;
     var depLM=depLMAvg!=null?depLMAvg-RDU_NTEMP[prevMo]:null;
     // This month
-    var depTMAvg=moCnt[curMo]?moTemp[curMo]/moCnt[curMo]:null;
+    var depTMAvg=moTemp[curMo]!=null?moTemp[curMo]:null;
     var depTM=depTMAvg!=null?depTMAvg-RDU_NTEMP[curMo]:null;
 
     function depCard(title,sub,avg,norm,dep){
@@ -1471,7 +1491,7 @@ function fetchAlmanac(){
     var tMo="",pMo="";
     for(var m3=0;m3<12;m3++){
       var iC=m3===curMo,iF=m3>curMo;
-      var aT=moCnt[m3]?moTemp[m3]/moCnt[m3]:null;
+      var aT=moTemp[m3]!=null?moTemp[m3]:null;
       var tP=moPrec[m3]!=null?moPrec[m3]:null;
       var td=aT!==null?aT-RDU_NTEMP[m3]:null,pd=tP!==null?tP-RDU_NPREC[m3]:null;
       tMo+='<div class="alm-mo'+(iC?" current":"")+(iF?" future":"")+'"><div class="alm-mo-name">'+MO_NAMES[m3]+'</div><div class="alm-mo-val">'+(aT!==null?aT.toFixed(1):"--")+'</div><div class="alm-mo-nrm">Nrm: '+RDU_NTEMP[m3].toFixed(1)+'</div>'+(td!==null?'<div class="alm-mo-diff '+(Math.abs(td)<0.5?"zero":td>0?"pos":"neg")+'">'+(Math.abs(td)<0.5?"Normal":(td>0?"+":"")+td.toFixed(1))+'</div>':'')+'</div>';
