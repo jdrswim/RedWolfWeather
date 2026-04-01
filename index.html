@@ -2340,75 +2340,118 @@ function rktVisCalc(padLat,padLon,launchTimeStr){
   });
 }
 function escH(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+var RKT_CACHE_KEY='rkt_v1_cache';
+var RKT_CACHE_TTL=7200000; // 2 hours
+// LL2 dev server (higher rate limits, designed for app development)
+var RKT_URLS=['https://lldev.thespacedevs.com/2.2.0/launch/upcoming/?limit=50&format=json',
+              'https://ll2.thespacedevs.com/2.2.0/launch/upcoming/?limit=50&format=json'];
+
+function rktFetchWithTimeout(url,ms){
+  var ctrl=typeof AbortController!=='undefined'?new AbortController():null;
+  var timer=ctrl?setTimeout(function(){ctrl.abort();},ms):null;
+  return fetch(url,ctrl?{signal:ctrl.signal}:{}).then(function(r){
+    if(timer)clearTimeout(timer);
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    return r.json();
+  });
+}
+
+function rktTryUrls(urls,idx){
+  if(idx>=urls.length)return Promise.reject(new Error('all failed'));
+  return rktFetchWithTimeout(urls[idx],12000).catch(function(){return rktTryUrls(urls,idx+1);});
+}
+
 function fetchRockets(){
   _rktLoaded=true;
   var el=document.getElementById('rkt-content');
-  fetch('https://ll2.thespacedevs.com/2.2.0/launch/upcoming/?limit=40&format=json')
-    .then(function(r){return r.json();})
+  el.innerHTML='<div class="alm-ld"><div class="tsps-spinner"></div>Loading launches...</div>';
+
+  // Check localStorage cache first
+  try{
+    var cached=localStorage.getItem(RKT_CACHE_KEY);
+    if(cached){
+      var obj=JSON.parse(cached);
+      if(obj&&obj.ts&&(Date.now()-obj.ts)<RKT_CACHE_TTL&&obj.data){
+        rktRender(el,obj.data);
+        return;
+      }
+    }
+  }catch(e){}
+
+  rktTryUrls(RKT_URLS,0)
     .then(function(data){
-      var list=(data.results||[]).filter(function(l){
-        if(!l.pad||!l.pad.latitude||!l.pad.longitude)return false;
-        var lat=parseFloat(l.pad.latitude),lon=parseFloat(l.pad.longitude);
-        // East coast US launch sites: lon -84 to -71, lat 25-42
-        return l.pad.location&&l.pad.location.country_code==='USA'&&lon>=-84&&lon<=-71&&lat>=25&&lat<=42;
-      });
-      if(!list.length){el.innerHTML='<div class="rkt-empty">No upcoming east coast launches found right now.</div>';return;}
-      var html='';
-      list.forEach(function(l){
-        var provider=(l.launch_service_provider&&l.launch_service_provider.name)||'Unknown';
-        var rktName=(l.rocket&&l.rocket.configuration&&(l.rocket.configuration.full_name||l.rocket.configuration.name))||'Unknown';
-        var mission=(l.mission&&l.mission.name)||l.name||'Unknown Mission';
-        var padName=(l.pad&&l.pad.name)||'Unknown';
-        var locName=(l.pad&&l.pad.location&&l.pad.location.name)||'Unknown';
-        var orbit=(l.mission&&l.mission.orbit&&l.mission.orbit.abbrev)||'';
-        var statusName=(l.status&&l.status.name)||'TBD';
-        var statusAbbrev=(l.status&&l.status.abbrev)||'TBD';
-        var netStr=l.net||l.window_start||'';
-        var statusClass=statusAbbrev==='Go'?'go':statusAbbrev==='Hold'?'hold':'tbd';
-        var launchTimeStr='NET TBD';
-        var visHtml='';
-        if(netStr){
-          var net=new Date(netStr);
-          if(!isNaN(net.getTime())){
-            launchTimeStr=net.toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit',timeZone:'America/New_York',timeZoneName:'short'});
-            var padLat=parseFloat(l.pad.latitude),padLon=parseFloat(l.pad.longitude);
-            var vis=rktVisCalc(padLat,padLon,netStr);
-            visHtml='<div class="rkt-vis"><div class="rkt-vis-title">Estimated Visibility</div><div class="rkt-vis-grid">'+
-              vis.map(function(v){
-                return '<div class="rkt-vis-city">'+
-                  '<div class="rkt-vis-city-name">'+v.name+'</div>'+
-                  '<div class="rkt-vis-offset">T+'+v.offMin+'m</div>'+
-                  '<div class="rkt-vis-city-time">'+v.tStr+' ET</div>'+
-                  '<div class="rkt-vis-city-dir">Look '+v.dir+' · '+v.dist+' mi</div>'+
-                '</div>';
-              }).join('')+
-            '</div></div>';
-          }
-        }
-        html+='<div class="rkt-launch">'+
-          '<div class="rkt-launch-top">'+
-            '<div>'+
-              '<div class="rkt-launch-name">'+escH(mission)+'</div>'+
-              '<div class="rkt-launch-provider">'+escH(provider)+' &middot; '+escH(rktName)+'</div>'+
-            '</div>'+
-            '<span class="rkt-status '+statusClass+'">'+escH(statusName)+'</span>'+
-          '</div>'+
-          '<div class="rkt-meta">'+
-            '<div class="rkt-meta-item"><div class="rkt-meta-lbl">Launch Time</div><div class="rkt-meta-val">'+launchTimeStr+'</div></div>'+
-            '<div class="rkt-meta-item"><div class="rkt-meta-lbl">Pad</div><div class="rkt-meta-val">'+escH(padName)+'</div></div>'+
-            '<div class="rkt-meta-item"><div class="rkt-meta-lbl">Location</div><div class="rkt-meta-val">'+escH(locName)+'</div></div>'+
-            (orbit?'<div class="rkt-meta-item"><div class="rkt-meta-lbl">Orbit</div><div class="rkt-meta-val">'+escH(orbit)+'</div></div>':'')+
-          '</div>'+
-          visHtml+
-        '</div>';
-      });
-      html+='<div class="rkt-note">Visibility estimates assume dark or twilight conditions — daytime launches are rarely visible with the naked eye.<br>T+ offsets are approximations based on distance from each city to the launch pad. Look in the listed compass direction.<br>Data: Launch Library 2 &middot; thespacedevs.com</div>';
-      el.innerHTML=html;
+      try{localStorage.setItem(RKT_CACHE_KEY,JSON.stringify({ts:Date.now(),data:data}));}catch(e){}
+      rktRender(el,data);
     })
     .catch(function(){
       _rktLoaded=false;
-      el.innerHTML='<div class="rkt-empty">Could not load launch data. <button onclick="fetchRockets()" style="background:var(--red2);border:1px solid var(--red);color:#fff;font-size:10px;padding:4px 12px;cursor:pointer;font-family:inherit;border-radius:2px;margin-left:8px">Retry</button></div>';
+      el.innerHTML='<div class="rkt-empty" style="line-height:2">'+
+        'Launch data temporarily unavailable.<br>'+
+        '<button onclick="fetchRockets()" style="background:var(--red2);border:1px solid var(--red);color:#fff;font-size:10px;font-weight:700;padding:5px 14px;cursor:pointer;font-family:inherit;border-radius:2px;margin-top:6px">Retry</button>'+
+        '<br><a href="https://www.thespacedevs.com/llapi" target="_blank" rel="noopener" style="font-size:10px;color:var(--cyan);margin-top:8px;display:inline-block">View launches manually</a>'+
+      '</div>';
     });
+}
+
+function rktRender(el,data){
+  var list=(data.results||[]).filter(function(l){
+    if(!l.pad||!l.pad.latitude||!l.pad.longitude)return false;
+    var lat=parseFloat(l.pad.latitude),lon=parseFloat(l.pad.longitude);
+    // East coast US: lon -84 to -71, lat 25-42 (covers KSC/CCAFS/Wallops)
+    return l.pad.location&&l.pad.location.country_code==='USA'&&lon>=-84&&lon<=-71&&lat>=25&&lat<=42;
+  });
+  if(!list.length){el.innerHTML='<div class="rkt-empty">No upcoming east coast launches in the next window.<br><span style="font-size:10px;color:var(--mu)">Check back soon — data refreshes every 2 hours.</span></div>';return;}
+  var html='';
+  list.forEach(function(l){
+    var provider=(l.launch_service_provider&&l.launch_service_provider.name)||'Unknown';
+    var rktName=(l.rocket&&l.rocket.configuration&&(l.rocket.configuration.full_name||l.rocket.configuration.name))||'Unknown';
+    var mission=(l.mission&&l.mission.name)||l.name||'Unknown Mission';
+    var padName=(l.pad&&l.pad.name)||'Unknown';
+    var locName=(l.pad&&l.pad.location&&l.pad.location.name)||'Unknown';
+    var orbit=(l.mission&&l.mission.orbit&&l.mission.orbit.abbrev)||'';
+    var statusName=(l.status&&l.status.name)||'TBD';
+    var statusAbbrev=(l.status&&l.status.abbrev)||'TBD';
+    var netStr=l.net||l.window_start||'';
+    var statusClass=statusAbbrev==='Go'?'go':statusAbbrev==='Hold'?'hold':'tbd';
+    var launchTimeStr='NET TBD';
+    var visHtml='';
+    if(netStr){
+      var net=new Date(netStr);
+      if(!isNaN(net.getTime())){
+        launchTimeStr=net.toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit',timeZone:'America/New_York',timeZoneName:'short'});
+        var padLat=parseFloat(l.pad.latitude),padLon=parseFloat(l.pad.longitude);
+        var vis=rktVisCalc(padLat,padLon,netStr);
+        visHtml='<div class="rkt-vis"><div class="rkt-vis-title">Estimated Visibility</div><div class="rkt-vis-grid">'+
+          vis.map(function(v){
+            return '<div class="rkt-vis-city">'+
+              '<div class="rkt-vis-city-name">'+v.name+'</div>'+
+              '<div class="rkt-vis-offset">T+'+v.offMin+'m</div>'+
+              '<div class="rkt-vis-city-time">'+v.tStr+' ET</div>'+
+              '<div class="rkt-vis-city-dir">Look '+v.dir+' &middot; '+v.dist+' mi</div>'+
+            '</div>';
+          }).join('')+
+        '</div></div>';
+      }
+    }
+    html+='<div class="rkt-launch">'+
+      '<div class="rkt-launch-top">'+
+        '<div>'+
+          '<div class="rkt-launch-name">'+escH(mission)+'</div>'+
+          '<div class="rkt-launch-provider">'+escH(provider)+' &middot; '+escH(rktName)+'</div>'+
+        '</div>'+
+        '<span class="rkt-status '+statusClass+'">'+escH(statusName)+'</span>'+
+      '</div>'+
+      '<div class="rkt-meta">'+
+        '<div class="rkt-meta-item"><div class="rkt-meta-lbl">Launch Time</div><div class="rkt-meta-val">'+launchTimeStr+'</div></div>'+
+        '<div class="rkt-meta-item"><div class="rkt-meta-lbl">Pad</div><div class="rkt-meta-val">'+escH(padName)+'</div></div>'+
+        '<div class="rkt-meta-item"><div class="rkt-meta-lbl">Location</div><div class="rkt-meta-val">'+escH(locName)+'</div></div>'+
+        (orbit?'<div class="rkt-meta-item"><div class="rkt-meta-lbl">Orbit</div><div class="rkt-meta-val">'+escH(orbit)+'</div></div>':'')+
+      '</div>'+
+      visHtml+
+    '</div>';
+  });
+  html+='<div class="rkt-note">Visibility estimates assume dark or twilight conditions — daytime launches are rarely visible.<br>T+ offsets are approximate based on distance to the pad. Look in the listed compass direction.<br>Data: Launch Library 2 (thespacedevs.com) &middot; Cached 2 hrs</div>';
+  el.innerHTML=html;
 }
 
 // ============================================================
