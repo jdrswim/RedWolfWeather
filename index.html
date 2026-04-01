@@ -1582,7 +1582,7 @@ function accLogActuals(){
         });
     }
 
-    // Source 1: NWS KRDU hourly observations — official station, matches NOWData record
+    // NWS KRDU hourly observations — official station, matches NOWData record
     var obsS=new Date(target.getFullYear(),target.getMonth(),target.getDate(),0,0,0).toISOString();
     var obsE=new Date(target.getFullYear(),target.getMonth(),target.getDate(),23,59,59).toISOString();
     fetch("https://api.weather.gov/stations/KRDU/observations?start="+encodeURIComponent(obsS)+"&end="+encodeURIComponent(obsE)+"&limit=200",
@@ -1593,33 +1593,11 @@ function accLogActuals(){
         var t=f.properties&&f.properties.temperature&&f.properties.temperature.value;
         if(t!=null)a.push(t*9/5+32);return a;
       },[]);
-      if(!temps.length)throw new Error("NWS no temps for "+dStr);
+      if(!temps.length)throw new Error("NWS KRDU returned no temperature readings for "+dStr);
       return storeAndWrite(Math.round(Math.max.apply(null,temps)),Math.round(Math.min.apply(null,temps)),"NWS KRDU");
     })
-    .catch(function(e1){
-      console.log("NWS KRDU failed for "+dStr+": "+e1.message+" — trying Open-Meteo historical...");
-      // Source 2: Open-Meteo historical-forecast archive
-      return fetch("https://historical-forecast-api.open-meteo.com/v1/forecast?latitude=35.78&longitude=-78.64&start_date="+dStr+"&end_date="+dStr+"&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&timezone=America%2FNew_York")
-      .then(function(r){if(!r.ok)throw new Error("OM-hf HTTP "+r.status);return r.json();})
-      .then(function(d){
-        if(!d.daily||!d.daily.temperature_2m_max||d.daily.temperature_2m_max[0]==null)throw new Error("OM-hf no data for "+dStr);
-        return storeAndWrite(Math.round(d.daily.temperature_2m_max[0]),Math.round(d.daily.temperature_2m_min[0]),"OM-hf");
-      });
-    })
-    .catch(function(e2){
-      console.log("OM-hf failed for "+dStr+": "+e2.message+" — trying Open-Meteo forecast...");
-      // Source 3: Open-Meteo forecast with past_days
-      return fetch("https://api.open-meteo.com/v1/forecast?latitude=35.78&longitude=-78.64&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&timezone=America%2FNew_York&past_days=7&forecast_days=1")
-      .then(function(r){if(!r.ok)throw new Error("OM-fc HTTP "+r.status);return r.json();})
-      .then(function(d){
-        if(!d.daily||!d.daily.time)throw new Error("OM-fc no data");
-        var idx=d.daily.time.indexOf(dStr);
-        if(idx===-1||d.daily.temperature_2m_max[idx]==null)throw new Error("OM-fc no row for "+dStr);
-        return storeAndWrite(Math.round(d.daily.temperature_2m_max[idx]),Math.round(d.daily.temperature_2m_min[idx]),"OM-fc");
-      });
-    })
-    .catch(function(finalErr){
-      console.log("ACC actuals ALL 3 sources failed for "+dStr+": "+finalErr.message);
+    .catch(function(e){
+      console.log("ACC actuals NWS KRDU failed for "+dStr+": "+e.message);
     });
   });
 }
