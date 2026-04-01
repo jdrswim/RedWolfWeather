@@ -479,6 +479,43 @@ footer strong{color:var(--red)}
   .tsps-sbox{flex:1 1 100%}
   .tsps-stats{flex-direction:column}
 }
+
+/* ROCKETS */
+.rkt-wrap{max-width:1100px;margin:24px auto 0;padding:0 18px}
+.rkt-toggle{background:var(--p1);border:1px solid var(--bd);border-left:3px solid var(--red);border-radius:3px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none;transition:background .15s}
+.rkt-toggle:hover{background:var(--p2)}
+.rkt-toggle-left{display:flex;align-items:center;gap:12px}
+.rkt-toggle-title{font-size:13px;font-weight:900;letter-spacing:2px;color:var(--red);text-transform:uppercase}
+.rkt-toggle-sub{font-size:10px;color:var(--mu);font-weight:500;letter-spacing:.5px;margin-top:2px}
+.rkt-chevron{font-size:11px;color:var(--mu);transition:transform .3s;flex-shrink:0}
+.rkt-chevron.open{transform:rotate(180deg)}
+.rkt-body{background:var(--p1);border:1px solid var(--bd);border-top:none;border-radius:0 0 3px 3px;overflow:hidden;max-height:0;transition:max-height .45s ease}
+.rkt-body.open{max-height:6000px}
+.rkt-inner{padding:16px}
+.rkt-launch{background:var(--p2);border:1px solid var(--bd);border-radius:3px;padding:14px;margin-bottom:10px;display:grid;gap:10px}
+.rkt-launch:last-child{margin-bottom:0}
+.rkt-launch-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.rkt-launch-name{font-size:13px;font-weight:800;color:var(--white);letter-spacing:.3px}
+.rkt-launch-provider{font-size:10px;color:var(--mu);font-weight:600;letter-spacing:.8px;text-transform:uppercase;margin-top:3px}
+.rkt-status{font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;padding:3px 8px;border-radius:2px;flex-shrink:0;white-space:nowrap}
+.rkt-status.go{background:rgba(0,212,74,.15);color:#00d44a;border:1px solid rgba(0,212,74,.3)}
+.rkt-status.tbd{background:rgba(255,204,0,.1);color:#ffcc00;border:1px solid rgba(255,204,0,.2)}
+.rkt-status.hold{background:rgba(255,100,0,.15);color:#ff6600;border:1px solid rgba(255,100,0,.3)}
+.rkt-meta{display:flex;gap:14px;flex-wrap:wrap}
+.rkt-meta-item{display:flex;flex-direction:column;gap:2px}
+.rkt-meta-lbl{font-size:9px;color:var(--mu);font-weight:700;letter-spacing:1.5px;text-transform:uppercase}
+.rkt-meta-val{font-size:11px;color:var(--tx);font-weight:600}
+.rkt-vis{background:rgba(0,204,255,.05);border:1px solid rgba(0,204,255,.14);border-radius:3px;padding:10px 12px}
+.rkt-vis-title{font-size:9px;font-weight:800;letter-spacing:2px;color:var(--cyan);text-transform:uppercase;margin-bottom:8px}
+.rkt-vis-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.rkt-vis-city{text-align:center;background:rgba(255,255,255,.02);border-radius:3px;padding:8px 4px}
+.rkt-vis-city-name{font-size:9px;color:var(--mu);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.rkt-vis-offset{font-size:17px;font-weight:200;color:var(--cyan);line-height:1}
+.rkt-vis-city-time{font-size:10px;font-weight:600;color:var(--tx);margin-top:4px}
+.rkt-vis-city-dir{font-size:9px;color:var(--mu);margin-top:2px}
+.rkt-empty{text-align:center;padding:32px 20px;color:var(--mu);font-size:13px}
+.rkt-note{font-size:9px;color:rgba(255,255,255,.2);text-align:center;padding:12px 0 2px;letter-spacing:.3px;line-height:1.7}
+@media(max-width:600px){.rkt-vis-grid{grid-template-columns:repeat(3,1fr)}.rkt-vis-offset{font-size:13px}}
 </style>
 </head>
 <body>
@@ -594,6 +631,25 @@ footer strong{color:var(--red)}
   <div class="sec">Wake County PWS Network <em>- Personal Weather Stations - Weather Underground</em></div>
   <div id="pws-content"><div class="alm-ld"><div class="tsps-spinner"></div>Loading PWS data...</div></div>
 </div>
+</div>
+
+<!-- ============================================================ ROCKETS SECTION -->
+<div class="rkt-wrap">
+  <div class="rkt-toggle" onclick="toggleRockets()">
+    <div class="rkt-toggle-left">
+      <span style="font-size:20px;line-height:1">🚀</span>
+      <div>
+        <div class="rkt-toggle-title">East Coast Rocket Launches</div>
+        <div class="rkt-toggle-sub">Upcoming launches visible from Raleigh · Wilmington · Hilton Head</div>
+      </div>
+    </div>
+    <span class="rkt-chevron" id="rktChevron">▼</span>
+  </div>
+  <div class="rkt-body" id="rktBody">
+    <div class="rkt-inner">
+      <div id="rkt-content"><div class="alm-ld"><div class="tsps-spinner"></div>Loading launches...</div></div>
+    </div>
+  </div>
 </div>
 
 <footer>
@@ -2248,6 +2304,112 @@ function wxSetCondition(code,desc){
 }
 wxResize();wxApplyTheme();wxAnimate();
 window.addEventListener("resize",function(){wxResize();});
+
+// ============================================================
+// ROCKETS
+// ============================================================
+var _rktLoaded=false;
+function toggleRockets(){
+  var body=document.getElementById('rktBody');
+  var chev=document.getElementById('rktChevron');
+  var open=body.classList.contains('open');
+  if(open){body.classList.remove('open');chev.classList.remove('open');}
+  else{body.classList.add('open');chev.classList.add('open');if(!_rktLoaded)fetchRockets();}
+}
+function rktHav(lat1,lon1,lat2,lon2){
+  var R=6371,dL=(lat2-lat1)*Math.PI/180,dO=(lon2-lon1)*Math.PI/180;
+  var a=Math.sin(dL/2)*Math.sin(dL/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dO/2)*Math.sin(dO/2);
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+function rktBear(lat1,lon1,lat2,lon2){
+  var dO=(lon2-lon1)*Math.PI/180;lat1=lat1*Math.PI/180;lat2=lat2*Math.PI/180;
+  var y=Math.sin(dO)*Math.cos(lat2),x=Math.cos(lat1)*Math.sin(lat2)-Math.sin(lat1)*Math.cos(lat2)*Math.cos(dO);
+  return((Math.atan2(y,x)*180/Math.PI)+360)%360;
+}
+function rktDir(d){return['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'][Math.round(d/22.5)%16];}
+var RKT_CITIES=[{name:'Raleigh',lat:35.78,lon:-78.64},{name:'Wilmington',lat:34.23,lon:-77.95},{name:'Hilton Head',lat:32.22,lon:-80.68}];
+function rktVisCalc(padLat,padLon,launchTimeStr){
+  return RKT_CITIES.map(function(c){
+    var dist=rktHav(c.lat,c.lon,padLat,padLon);
+    var bear=rktBear(c.lat,c.lon,padLat,padLon);
+    // ~3 min base; add ~1 min per 200km beyond 200km; max out at 12 min
+    var offMin=Math.min(12,Math.max(3,Math.round(3+Math.max(0,dist-200)/200)));
+    var vt=new Date(new Date(launchTimeStr).getTime()+offMin*60000);
+    var tStr=vt.toLocaleString('en-US',{hour:'2-digit',minute:'2-digit',timeZone:'America/New_York'});
+    return{name:c.name,offMin:offMin,tStr:tStr,dir:rktDir(bear),dist:Math.round(dist/1.609)};
+  });
+}
+function escH(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function fetchRockets(){
+  _rktLoaded=true;
+  var el=document.getElementById('rkt-content');
+  fetch('https://ll2.thespacedevs.com/2.2.0/launch/upcoming/?limit=40&format=json')
+    .then(function(r){return r.json();})
+    .then(function(data){
+      var list=(data.results||[]).filter(function(l){
+        if(!l.pad||!l.pad.latitude||!l.pad.longitude)return false;
+        var lat=parseFloat(l.pad.latitude),lon=parseFloat(l.pad.longitude);
+        // East coast US launch sites: lon -84 to -71, lat 25-42
+        return l.pad.location&&l.pad.location.country_code==='USA'&&lon>=-84&&lon<=-71&&lat>=25&&lat<=42;
+      });
+      if(!list.length){el.innerHTML='<div class="rkt-empty">No upcoming east coast launches found right now.</div>';return;}
+      var html='';
+      list.forEach(function(l){
+        var provider=(l.launch_service_provider&&l.launch_service_provider.name)||'Unknown';
+        var rktName=(l.rocket&&l.rocket.configuration&&(l.rocket.configuration.full_name||l.rocket.configuration.name))||'Unknown';
+        var mission=(l.mission&&l.mission.name)||l.name||'Unknown Mission';
+        var padName=(l.pad&&l.pad.name)||'Unknown';
+        var locName=(l.pad&&l.pad.location&&l.pad.location.name)||'Unknown';
+        var orbit=(l.mission&&l.mission.orbit&&l.mission.orbit.abbrev)||'';
+        var statusName=(l.status&&l.status.name)||'TBD';
+        var statusAbbrev=(l.status&&l.status.abbrev)||'TBD';
+        var netStr=l.net||l.window_start||'';
+        var statusClass=statusAbbrev==='Go'?'go':statusAbbrev==='Hold'?'hold':'tbd';
+        var launchTimeStr='NET TBD';
+        var visHtml='';
+        if(netStr){
+          var net=new Date(netStr);
+          if(!isNaN(net.getTime())){
+            launchTimeStr=net.toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit',timeZone:'America/New_York',timeZoneName:'short'});
+            var padLat=parseFloat(l.pad.latitude),padLon=parseFloat(l.pad.longitude);
+            var vis=rktVisCalc(padLat,padLon,netStr);
+            visHtml='<div class="rkt-vis"><div class="rkt-vis-title">Estimated Visibility</div><div class="rkt-vis-grid">'+
+              vis.map(function(v){
+                return '<div class="rkt-vis-city">'+
+                  '<div class="rkt-vis-city-name">'+v.name+'</div>'+
+                  '<div class="rkt-vis-offset">T+'+v.offMin+'m</div>'+
+                  '<div class="rkt-vis-city-time">'+v.tStr+' ET</div>'+
+                  '<div class="rkt-vis-city-dir">Look '+v.dir+' · '+v.dist+' mi</div>'+
+                '</div>';
+              }).join('')+
+            '</div></div>';
+          }
+        }
+        html+='<div class="rkt-launch">'+
+          '<div class="rkt-launch-top">'+
+            '<div>'+
+              '<div class="rkt-launch-name">'+escH(mission)+'</div>'+
+              '<div class="rkt-launch-provider">'+escH(provider)+' &middot; '+escH(rktName)+'</div>'+
+            '</div>'+
+            '<span class="rkt-status '+statusClass+'">'+escH(statusName)+'</span>'+
+          '</div>'+
+          '<div class="rkt-meta">'+
+            '<div class="rkt-meta-item"><div class="rkt-meta-lbl">Launch Time</div><div class="rkt-meta-val">'+launchTimeStr+'</div></div>'+
+            '<div class="rkt-meta-item"><div class="rkt-meta-lbl">Pad</div><div class="rkt-meta-val">'+escH(padName)+'</div></div>'+
+            '<div class="rkt-meta-item"><div class="rkt-meta-lbl">Location</div><div class="rkt-meta-val">'+escH(locName)+'</div></div>'+
+            (orbit?'<div class="rkt-meta-item"><div class="rkt-meta-lbl">Orbit</div><div class="rkt-meta-val">'+escH(orbit)+'</div></div>':'')+
+          '</div>'+
+          visHtml+
+        '</div>';
+      });
+      html+='<div class="rkt-note">Visibility estimates assume dark or twilight conditions — daytime launches are rarely visible with the naked eye.<br>T+ offsets are approximations based on distance from each city to the launch pad. Look in the listed compass direction.<br>Data: Launch Library 2 &middot; thespacedevs.com</div>';
+      el.innerHTML=html;
+    })
+    .catch(function(){
+      _rktLoaded=false;
+      el.innerHTML='<div class="rkt-empty">Could not load launch data. <button onclick="fetchRockets()" style="background:var(--red2);border:1px solid var(--red);color:#fff;font-size:10px;padding:4px 12px;cursor:pointer;font-family:inherit;border-radius:2px;margin-left:8px">Retry</button></div>';
+    });
+}
 
 // ============================================================
 // BOOT
