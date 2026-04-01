@@ -1105,23 +1105,31 @@ function setTideLoc(loc){
 
 function fetchTides(stationId,locLabel){
   var el=$("tide-content");if(!el)return;
-  if(_tideCache[stationId]){renderTides(el,_tideCache[stationId],locLabel,stationId);return;}
+  if(_tideCache[stationId]){var c=_tideCache[stationId];renderTides(el,c.preds,locLabel,stationId,c.wt);return;}
   el.innerHTML='<div class="alm-ld"><div class="tsps-spinner"></div></div>';
   var now=new Date();
   function fmt(d){return d.getFullYear()+(d.getMonth()<9?"0":"")+(d.getMonth()+1)+(d.getDate()<10?"0":"")+d.getDate();}
-  var today=fmt(now);
-  var tomorrow=fmt(new Date(now.getFullYear(),now.getMonth(),now.getDate()+1));
-  fetch("https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date="+today+"&end_date="+tomorrow+"&station="+stationId+"&product=predictions&datum=MLLW&time_zone=lst_ldt&interval=hilo&units=english&application=RedWolfWeather&format=json")
-  .then(function(r){return r.json();})
-  .then(function(d){
-    if(d.error)throw new Error(d.error.message);
-    _tideCache[stationId]=d.predictions;
-    renderTides(el,d.predictions,locLabel,stationId);
+  var today=fmt(now),tomorrow=fmt(new Date(now.getFullYear(),now.getMonth(),now.getDate()+1));
+  var predsFetch=fetch("https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date="+today+"&end_date="+tomorrow+"&station="+stationId+"&product=predictions&datum=MLLW&time_zone=lst_ldt&interval=hilo&units=english&application=RedWolfWeather&format=json")
+    .then(function(r){return r.json();})
+    .then(function(d){if(d.error)throw new Error(d.error.message);return d.predictions;});
+  var wtFetch=fetch("https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=water_temperature&station="+stationId+"&date=latest&time_zone=lst_ldt&units=english&application=RedWolfWeather&format=json")
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d.error||!d.data||!d.data.length)return null;
+      var v=parseFloat(d.data[d.data.length-1].v);
+      return isNaN(v)?null:v;
+    })
+    .catch(function(){return null;});
+  Promise.all([predsFetch,wtFetch])
+  .then(function(all){
+    _tideCache[stationId]={preds:all[0],wt:all[1]};
+    renderTides(el,all[0],locLabel,stationId,all[1]);
   })
   .catch(function(e){el.innerHTML='<div style="color:var(--mu);padding:20px;text-align:center;font-size:12px">Could not load tide data: '+e.message+'</div>';});
 }
 
-function renderTides(el,preds,locLabel,stationId){
+function renderTides(el,preds,locLabel,stationId,waterTemp){
   var now=new Date();
   var todayStr=now.getFullYear()+"-"+(now.getMonth()<9?"0":"")+(now.getMonth()+1)+"-"+(now.getDate()<10?"0":"")+now.getDate();
   var tomorrowD=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1);
@@ -1141,6 +1149,14 @@ function renderTides(el,preds,locLabel,stationId){
     h=h%12||12;return h+":"+m+" "+ampm;
   }
   var html="";
+  if(waterTemp!=null){
+    var wc=waterTemp<60?"#7dd3fc":waterTemp<70?"#4ade80":waterTemp<80?"#facc15":"#f97316";
+    html+='<div style="display:flex;align-items:center;gap:10px;background:rgba(0,150,255,.07);border:1px solid rgba(0,150,255,.2);border-radius:6px;padding:10px 14px;margin-bottom:14px">'+
+      '<span style="font-size:18px">🌊</span>'+
+      '<span style="font-size:10px;font-weight:700;letter-spacing:1.2px;color:rgba(255,255,255,.4);text-transform:uppercase;flex:1">Water Temp</span>'+
+      '<span style="font-size:20px;font-weight:700;color:'+wc+'">'+Math.round(waterTemp)+'°F</span>'+
+    '</div>';
+  }
   [todayStr,tomorrowStr].forEach(function(ds){
     var entries=days[ds];if(!entries||!entries.length)return;
     var label=ds===todayStr?"Today":"Tomorrow";
