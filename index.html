@@ -620,8 +620,8 @@ function switchTab(name,btn){
   $("tab-"+name).classList.add("active");
   btn.classList.add("active");
   if(window.pendo){pendo.pageLoad({url:'/#'+name});}
-  if(name==="almanac"&&!window._almLoaded){fetchAlmanac();fetchSunData();accLogActuals();accFetchAndRender();}
-  else if(name==="almanac"){fetchSunData();accLogActuals();accFetchAndRender();}
+  if(name==="almanac"&&!window._almLoaded){fetchAlmanac();fetchSunData();accFetchAndRender();}
+  else if(name==="almanac"){fetchSunData();accFetchAndRender();}
   if(name==="pws"){fetchPWS();}
 }
 
@@ -1503,6 +1503,9 @@ function accLogPrediction(){
   var guardKey="acc_pred_session_"+sessionDate;
   try{if(localStorage.getItem(guardKey))return;}catch(e){}
 
+  // Also log actuals for past days at 8 PM (same session as predictions)
+  accLogActuals();
+
   fetch("https://api.weather.gov/points/35.686,-78.614",{headers:{"User-Agent":"WolfpackWeather/2.0"}})
   .then(function(r){if(!r.ok)throw new Error("NWS points "+r.status);return r.json();})
   .then(function(d){
@@ -1693,7 +1696,7 @@ function accRender(el,rawRows){
   if(!rows.length){
     el.innerHTML=
       '<div class="acc-wrap">'+
-        '<div class="acc-hdr">Valvano\'s Forecast Accountability Dashboard <em>- Forecast vs Actual Temperature</em> <div class="tip-btn" onclick="openTip(\'tipAccuracy\')" style="display:inline-flex;vertical-align:middle;margin-left:6px">?</div><button class="acc-sync-btn" onclick="accForceSync()" style="margin-left:auto;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:3px;color:rgba(255,255,255,.45);font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;cursor:pointer;font-family:inherit">&#8635; Sync Actuals</button></div>'+
+        '<div class="acc-hdr">Valvano\'s Forecast Accountability Dashboard <em>- Forecast vs Actual Temperature</em> <div class="tip-btn" onclick="openTip(\'tipAccuracy\')" style="display:inline-flex;vertical-align:middle;margin-left:6px">?</div></div>'+
         '<div style="background:var(--p2);border:1px solid var(--bd);border-radius:4px;padding:28px;text-align:center">'+
           '<div style="font-size:36px;margin-bottom:14px">📊</div>'+
           '<div style="font-size:14px;color:var(--white);font-weight:700;margin-bottom:8px">Tracking Has Started</div>'+
@@ -1754,7 +1757,7 @@ function accRender(el,rawRows){
 
   var html=
     '<div class="acc-wrap">'+
-      '<div class="acc-hdr">Valvano\'s Forecast Accountability Dashboard <em>- Forecast vs Actual Temperature</em> <div class="tip-btn" onclick="openTip(\'tipAccuracy\')" style="display:inline-flex;vertical-align:middle;margin-left:6px">?</div><button class="acc-sync-btn" onclick="accForceSync()" style="margin-left:auto;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:3px;color:rgba(255,255,255,.45);font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;cursor:pointer;font-family:inherit">&#8635; Sync Actuals</button></div>'+
+      '<div class="acc-hdr">Valvano\'s Forecast Accountability Dashboard <em>- Forecast vs Actual Temperature</em> <div class="tip-btn" onclick="openTip(\'tipAccuracy\')" style="display:inline-flex;vertical-align:middle;margin-left:6px">?</div></div>'+
       '<div class="acc-score-row">'+
         renderLeadCard(1,calcAccuracyForLead(rows,1))+
         renderLeadCard(2,calcAccuracyForLead(rows,2))+
@@ -1844,27 +1847,10 @@ function accRender(el,rawRows){
   el.innerHTML=html;
 }
 
-// Force-retry actuals for last 4 days (clears guards and re-runs)
-function accForceSync(){
-  var now=new Date();
-  for(var d=1;d<=4;d++){
-    var dt=new Date(now.getFullYear(),now.getMonth(),now.getDate()-d);
-    try{localStorage.removeItem("acc_act_done_"+dt.toLocaleDateString("en-CA"));}catch(e){}
-  }
-  accLogActuals();
-  var btn=document.querySelector(".acc-sync-btn");
-  if(btn){btn.textContent="Syncing…";btn.disabled=true;setTimeout(function(){accFetchAndRender();},6000);}
-}
-
-// Schedule the two loggers:
-// • accLogPrediction: runs every 30 min — only acts during 8-11 PM window
-// • accLogActuals: runs on page load for last 3 days + every 2 hours
-setTimeout(function(){
-  accLogPrediction();
-  accLogActuals();
-},8000);
-setInterval(accLogPrediction,1800000);   // every 30 min
-setInterval(accLogActuals,7200000);      // every 2 hours
+// Schedule prediction logger: runs every 30 min, only acts at 8 PM
+// Actuals are logged automatically inside accLogPrediction at 8 PM
+setTimeout(accLogPrediction,8000);
+setInterval(accLogPrediction,1800000);
 
 // ============================================================
 // FIX #3: PWS NETWORK — complete visual card rendering
