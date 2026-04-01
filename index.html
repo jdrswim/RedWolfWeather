@@ -701,6 +701,21 @@ function applyConditions(t,feels,dew,humid,wspd,wdir,gust,pres,prec,uv,hi,lo,cod
 
 var WU_COMMUNITY_KEY="6532d6454b8aa370768e63d6ba5a832e";
 
+// Return the highest observed temp so far today from hourly data.
+// Falls back to the daily forecast max if no hourly obs exist yet.
+function todayObsHigh(hourly,dailyMax){
+  if(!hourly||!hourly.time)return dailyMax!=null?Math.round(dailyMax):"--";
+  var now=new Date();
+  var pad=function(n){return n<10?"0"+n:""+n;};
+  var ds=now.getFullYear()+"-"+pad(now.getMonth()+1)+"-"+pad(now.getDate());
+  var best=-Infinity;
+  hourly.time.forEach(function(t,i){
+    if(t.substring(0,10)===ds&&new Date(t)<=now&&hourly.temperature_2m[i]!=null)
+      best=Math.max(best,hourly.temperature_2m[i]);
+  });
+  return best>-Infinity?Math.round(best):(dailyMax!=null?Math.round(dailyMax):"--");
+}
+
 function fetchConditions(){
   fetch("https://api.weather.com/v2/pws/observations/current?stationId=KNCRALEI761&format=json&units=e&apiKey="+WU_COMMUNITY_KEY)
   .then(function(r){if(!r.ok)throw new Error("WU");return r.json();})
@@ -722,7 +737,7 @@ function fetchConditions(){
     .then(function(r2){return r2.json();})
     .then(function(d2){
       code=d2.current?d2.current.weather_code:code;
-      var hi=d2.daily?Math.round(d2.daily.temperature_2m_max[0]):"--";
+      var hi=todayObsHigh(d2.hourly,d2.daily?d2.daily.temperature_2m_max[0]:null);
       var lo=d2.daily?Math.round(d2.daily.temperature_2m_min[0]):"--";
       applyConditions(temp,feels,dew,humid,wspd,wdir,gust,pres,prec,uvi,hi,lo,code,d2.hourly||null);
     })
@@ -733,7 +748,7 @@ function fetchConditions(){
     .then(function(r){return r.json();})
     .then(function(d){
       var c=d.current,dl=d.daily;
-      applyConditions(Math.round(c.temperature_2m),Math.round(c.apparent_temperature),Math.round(c.dew_point_2m),Math.round(c.relative_humidity_2m),Math.round(c.wind_speed_10m),Math.round(c.wind_direction_10m),Math.round(c.wind_gusts_10m),(c.surface_pressure*0.02953).toFixed(2),c.precipitation.toFixed(2),Math.round(c.uv_index),Math.round(dl.temperature_2m_max[0]),Math.round(dl.temperature_2m_min[0]),c.weather_code,d.hourly);
+      applyConditions(Math.round(c.temperature_2m),Math.round(c.apparent_temperature),Math.round(c.dew_point_2m),Math.round(c.relative_humidity_2m),Math.round(c.wind_speed_10m),Math.round(c.wind_direction_10m),Math.round(c.wind_gusts_10m),(c.surface_pressure*0.02953).toFixed(2),c.precipitation.toFixed(2),Math.round(c.uv_index),todayObsHigh(d.hourly,dl.temperature_2m_max[0]),Math.round(dl.temperature_2m_min[0]),c.weather_code,d.hourly);
       $("cupd").textContent=$("cupd").textContent+" (Open-Meteo fallback)";
     })
     .catch(function(){$("cupd").textContent="Data unavailable";});
