@@ -1411,16 +1411,28 @@ function fetchAlmanac(){
     var byDay={};
 
     // Parse CSV: station,valid,tmpf,p01i
+    // p01i = precip last 1 hour. SPECIs report the same rolling-hour total multiple times,
+    // so deduplicate by keeping max p01i per hour-slot, then sum hours → daily total.
+    var byHour={}; // "YYYY-MM-DD HH" -> {ds, temps:[], precip}
     csv.split("\n").forEach(function(line){
       line=line.trim();
       if(!line||line.charAt(0)==="#"||line.indexOf("station")===0)return;
       var p=line.split(",");
       if(p.length<4)return;
-      var ds=p[1].substring(0,10); // "YYYY-MM-DD"
+      var ts=p[1]; // "YYYY-MM-DD HH:MM"
+      var hk=ts.substring(0,13); // "YYYY-MM-DD HH"
+      var ds=ts.substring(0,10);
       var tmpf=p[2],prec=p[3];
+      if(!byHour[hk])byHour[hk]={ds:ds,temps:[],precip:0};
+      if(tmpf!=="M"&&tmpf!==""){var t=parseFloat(tmpf);if(!isNaN(t))byHour[hk].temps.push(t);}
+      if(prec!=="M"&&prec!=="T"&&prec!==""){var pv=parseFloat(prec);if(!isNaN(pv)&&pv>0)byHour[hk].precip=Math.max(byHour[hk].precip,pv);}
+    });
+    // Collapse hours → days
+    Object.keys(byHour).forEach(function(hk){
+      var h=byHour[hk],ds=h.ds;
       if(!byDay[ds])byDay[ds]={temps:[],precip:0};
-      if(tmpf!=="M"&&tmpf!==""){var t=parseFloat(tmpf);if(!isNaN(t))byDay[ds].temps.push(t);}
-      if(prec!=="M"&&prec!=="T"&&prec!==""){var pv=parseFloat(prec);if(!isNaN(pv)&&pv>0)byDay[ds].precip+=pv;}
+      byDay[ds].temps=byDay[ds].temps.concat(h.temps);
+      byDay[ds].precip+=h.precip;
     });
 
     // Aggregate daily → monthly
