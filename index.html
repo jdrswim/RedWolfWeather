@@ -612,8 +612,8 @@ function switchTab(name,btn){
   $("tab-"+name).classList.add("active");
   btn.classList.add("active");
   if(window.pendo){pendo.pageLoad({url:'/#'+name});}
-  if(name==="almanac"&&!window._almLoaded){fetchAlmanac();fetchSunData();accFetchAndRender();}
-  else if(name==="almanac"){fetchSunData();accFetchAndRender();}
+  if(name==="almanac"&&!window._almLoaded){fetchAlmanac();fetchSunData();accLogActuals();accFetchAndRender();}
+  else if(name==="almanac"){fetchSunData();accLogActuals();accFetchAndRender();}
   if(name==="pws"){fetchPWS();}
 }
 
@@ -1447,8 +1447,8 @@ function accLogActuals(){
     function storeAndWrite(hi,lo,src){
       try{localStorage.setItem("acc_actual_"+dStr,JSON.stringify({hi:hi,lo:lo}));}catch(e){}
       console.log("ACC actuals ("+src+"): "+dStr+" H:"+hi+" L:"+lo);
-      // Re-render immediately from cache so display updates right away
-      if(daysBack===1)setTimeout(accFetchAndRender,500);
+      // Re-render immediately using cached rows + localStorage (no spinner, no sheet round-trip)
+      if(daysBack===1)setTimeout(accQuickRender,100);
       // Then persist to sheet
       return fetch(SHEET_URL+"?action=write&tab=Accuracy&date="+dStr+"&actual_high="+hi+"&actual_low="+lo)
         .then(function(r){if(!r.ok)throw new Error("Sheet HTTP "+r.status);return r.json();})
@@ -1514,13 +1514,19 @@ function accLogActuals(){
   });
 }
 
+var _accCachedRows=[];
 function accFetchAndRender(){
   var el=$("acc-dashboard");if(!el)return;
   el.innerHTML='<div class="acc-wrap"><div class="acc-hdr">Valvano\'s Forecast Accountability Dashboard <em>- Loading...</em></div><div class="alm-ld"><div class="tsps-spinner"></div></div></div>';
   fetch(SHEET_URL+"?tab=Accuracy")
   .then(function(r){return r.text();})
-  .then(function(txt){var d=JSON.parse(txt);accRender(el,d.rows||[]);})
-  .catch(function(){accRender(el,[]);});
+  .then(function(txt){var d=JSON.parse(txt);_accCachedRows=d.rows||[];accRender(el,_accCachedRows);})
+  .catch(function(){accRender(el,_accCachedRows);});
+}
+// Re-render immediately using cached rows + localStorage (no sheet round-trip, no spinner)
+function accQuickRender(){
+  var el=$("acc-dashboard");if(!el||!_accCachedRows.length)return;
+  accRender(el,_accCachedRows);
 }
 
 // ── RENDER ─────────────────────────────────────────────────
