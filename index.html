@@ -1559,7 +1559,7 @@ function accLogPrediction(){
 function accLogActuals(){
   var now=new Date();
 
-  [1,2,3,4].forEach(function(daysBack){
+  [0,1,2,3,4].forEach(function(daysBack){
     var target=new Date(now.getFullYear(),now.getMonth(),now.getDate()-daysBack);
     var dStr=accDateStr(target);
     var guardKey="acc_act_done_"+dStr;
