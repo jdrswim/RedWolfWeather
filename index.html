@@ -515,6 +515,13 @@ footer strong{color:var(--red)}
 .rkt-vis-city-dir{font-size:9px;color:var(--mu);margin-top:2px}
 .rkt-empty{text-align:center;padding:32px 20px;color:var(--mu);font-size:13px}
 .rkt-note{font-size:9px;color:rgba(255,255,255,.2);text-align:center;padding:12px 0 2px;letter-spacing:.3px;line-height:1.7}
+.rkt-lik{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:10px;padding-bottom:9px;border-bottom:1px solid rgba(0,204,255,.1)}
+.rkt-lik-lbl{font-size:9px;font-weight:800;letter-spacing:2px;color:var(--cyan);text-transform:uppercase}
+.rkt-lik-right{display:flex;align-items:center;gap:7px}
+.rkt-lik-bar{display:flex;gap:3px;align-items:center}
+.rkt-lik-seg{width:18px;height:7px;border-radius:2px;transition:opacity .2s}
+.rkt-lik-name{font-size:11px;font-weight:900;letter-spacing:1px}
+.rkt-lik-sub{font-size:9px;color:var(--mu);margin-top:2px}
 @media(max-width:600px){.rkt-vis-grid{grid-template-columns:repeat(3,1fr)}.rkt-vis-offset{font-size:13px}}
 </style>
 </head>
@@ -2340,6 +2347,63 @@ function rktVisCalc(padLat,padLon,launchTimeStr){
   });
 }
 function escH(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function rktLikelihood(netStr,padLat,padLon,statusAbbrev){
+  // ── Time-of-day score (60%) ──────────────────────────────────
+  // Convert UTC launch time to ET hour
+  var etHour=null,timeLabel='Unknown time';
+  if(netStr){
+    try{
+      var d=new Date(netStr);
+      etHour=parseInt(d.toLocaleString('en-US',{hour:'numeric',hour12:false,timeZone:'America/New_York'}),10);
+      timeLabel=d.toLocaleString('en-US',{hour:'2-digit',minute:'2-digit',timeZone:'America/New_York',timeZoneName:'short'});
+    }catch(e){}
+  }
+  var tScore=0,tDesc='Unknown';
+  if(etHour!==null){
+    if(etHour>=21||etHour<5){tScore=100;tDesc='Dark night';}
+    else if(etHour>=19){tScore=80;tDesc='Dusk/twilight';}
+    else if(etHour>=5&&etHour<7){tScore=70;tDesc='Pre-dawn';}
+    else if(etHour>=7&&etHour<9){tScore=20;tDesc='Early morning';}
+    else if(etHour>=17&&etHour<19){tScore=25;tDesc='Late afternoon';}
+    else{tScore=5;tDesc='Daytime';}
+  }
+  // ── Distance score (30%) ─────────────────────────────────────
+  // Use average miles from the 3 cities
+  var totalDist=0;
+  RKT_CITIES.forEach(function(c){totalDist+=rktHav(c.lat,c.lon,padLat,padLon)/1.609;});
+  var avgDist=totalDist/RKT_CITIES.length;
+  var dScore=avgDist<200?100:avgDist<400?80:avgDist<600?55:avgDist<800?35:15;
+  // ── Status score (10%) ────────────────────────────────────────
+  var sScore=statusAbbrev==='Go'?100:statusAbbrev==='Hold'?20:50;
+  // ── Composite ────────────────────────────────────────────────
+  var score=Math.round(tScore*0.6+dScore*0.3+sScore*0.1);
+  var tier,color,filled;
+  if(score>=75){tier='EXCELLENT';color='#00d44a';filled=5;}
+  else if(score>=55){tier='GOOD';color='#00ccff';filled=4;}
+  else if(score>=35){tier='FAIR';color='#ffcc00';filled=3;}
+  else if(score>=15){tier='LOW';color='#ff6600';filled=2;}
+  else{tier='UNLIKELY';color='#cc4444';filled=1;}
+  var bars='';
+  for(var i=1;i<=5;i++){
+    bars+='<div class="rkt-lik-seg" style="background:'+(i<=filled?color:'rgba(255,255,255,.1)')+'"></div>';
+  }
+  var subParts=[];
+  if(tDesc!=='Unknown')subParts.push(tDesc);
+  subParts.push('~'+Math.round(avgDist)+' mi avg');
+  return{
+    html:'<div class="rkt-lik">'+
+      '<div>'+
+        '<div class="rkt-lik-lbl">Visibility Likelihood</div>'+
+        '<div class="rkt-lik-sub">'+subParts.join(' &middot; ')+'</div>'+
+      '</div>'+
+      '<div class="rkt-lik-right">'+
+        '<div class="rkt-lik-bar">'+bars+'</div>'+
+        '<span class="rkt-lik-name" style="color:'+color+'">'+tier+'</span>'+
+      '</div>'+
+    '</div>'
+  };
+}
 var RKT_CACHE_KEY='rkt_v1_cache';
 var RKT_CACHE_TTL=7200000; // 2 hours
 // LL2 dev server (higher rate limits, designed for app development)
@@ -2421,7 +2485,8 @@ function rktRender(el,data){
         launchTimeStr=net.toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit',timeZone:'America/New_York',timeZoneName:'short'});
         var padLat=parseFloat(l.pad.latitude),padLon=parseFloat(l.pad.longitude);
         var vis=rktVisCalc(padLat,padLon,netStr);
-        visHtml='<div class="rkt-vis"><div class="rkt-vis-title">Estimated Visibility</div><div class="rkt-vis-grid">'+
+        var lik=rktLikelihood(netStr,padLat,padLon,statusAbbrev);
+        visHtml='<div class="rkt-vis">'+lik.html+'<div class="rkt-vis-title">Estimated Look Times</div><div class="rkt-vis-grid">'+
           vis.map(function(v){
             return '<div class="rkt-vis-city">'+
               '<div class="rkt-vis-city-name">'+v.name+'</div>'+
