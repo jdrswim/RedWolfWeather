@@ -745,6 +745,8 @@ function fetchConditions(){
     .then(function(d2){
       code=d2.current?d2.current.weather_code:code;
       var hi=todayObsHigh(d2.hourly,d2.daily?d2.daily.temperature_2m_max[0]:null);
+      // Current WU reading may exceed model hourly data — use whichever is higher
+      if(typeof temp==="number"&&typeof hi==="number")hi=Math.max(hi,temp);
       var lo=d2.daily?Math.round(d2.daily.temperature_2m_min[0]):"--";
       applyConditions(temp,feels,dew,humid,wspd,wdir,gust,pres,prec,uvi,hi,lo,code,d2.hourly||null);
     })
