@@ -1372,78 +1372,114 @@ var MO_NAMES=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov",
 
 function fetchAlmanac(){
   var el=$("alm-content");
-  var yr=new Date().getFullYear(),today=new Date().toISOString().split("T")[0];
-  fetch("https://archive-api.open-meteo.com/v1/archive?latitude=35.78&longitude=-78.64&start_date="+yr+"-01-01&end_date="+today+"&daily=temperature_2m_mean,precipitation_sum&temperature_unit=fahrenheit&precipitation_unit=inch&timezone=America%2FNew_York")
-  .then(function(r){return r.json();})
-  .then(function(d){
-    var dl=d.daily,moTemp={},moPrec={},moCnt={};
-    for(var i=0;i<dl.time.length;i++){var m=new Date(dl.time[i]+"T12:00:00").getMonth();if(!moTemp[m]){moTemp[m]=0;moPrec[m]=0;moCnt[m]=0;}if(dl.temperature_2m_mean[i]!=null){moTemp[m]+=dl.temperature_2m_mean[i];moCnt[m]++;}if(dl.precipitation_sum[i]!=null)moPrec[m]+=dl.precipitation_sum[i];}
-    var ytdP=0,ytdTS=0,ytdD=0;
-    for(var j=0;j<dl.time.length;j++){if(dl.precipitation_sum[j]!=null)ytdP+=dl.precipitation_sum[j];if(dl.temperature_2m_mean[j]!=null){ytdTS+=dl.temperature_2m_mean[j];ytdD++;}}
+  var now=new Date(),yr=now.getFullYear(),curMo=now.getMonth(),curDay=now.getDate();
+
+  // Fetch WU PWS daily history for each month Jan→current in parallel
+  var fetches=[];
+  for(var mi=0;mi<=curMo;mi++){
+    fetches.push((function(mo){
+      var dp=yr+(mo+1<10?"0":"")+(mo+1); // YYYYMM
+      return fetch("https://api.weather.com/v2/pws/history/daily?stationId=KNCRALEI761&format=json&units=e&date="+dp+"&apiKey="+WU_COMMUNITY_KEY)
+      .then(function(r){if(!r.ok)throw new Error("WU "+r.status);return r.json();})
+      .then(function(d){return{mo:mo,obs:d.observations||[]};})
+      .catch(function(){return{mo:mo,obs:[]};});
+    })(mi));
+  }
+
+  Promise.all(fetches).then(function(results){
+    var moTemp={},moPrec={},moCnt={};
+    var dailyArr=[]; // [{date,temp}] for departure cards
+    var ytdTS=0,ytdD=0,ytdP=0;
+
+    results.forEach(function(res){
+      var m=res.mo;
+      res.obs.forEach(function(obs){
+        if(!obs.imperial)return;
+        var imp=obs.imperial;
+        var dateStr=(obs.obsTimeLocal||"").substring(0,10);
+        // Use tempAvg if valid; fall back to (Hi+Lo)/2
+        var t=(imp.tempAvg!=null&&imp.tempAvg>-90&&!isNaN(imp.tempAvg))?imp.tempAvg:
+              (imp.tempHigh!=null&&imp.tempLow!=null?((imp.tempHigh+imp.tempLow)/2):null);
+        var p=imp.precipTotal;
+        if(t!=null){
+          if(!moTemp[m]){moTemp[m]=0;moCnt[m]=0;}
+          moTemp[m]+=t;moCnt[m]++;
+          ytdTS+=t;ytdD++;
+          if(dateStr)dailyArr.push({date:dateStr,temp:t});
+        }
+        if(p!=null&&!isNaN(p)&&p>=0){
+          if(!moPrec[m])moPrec[m]=0;
+          moPrec[m]+=p;ytdP+=p;
+        }
+      });
+    });
+
+    dailyArr.sort(function(a,b){return a.date<b.date?-1:1;});
+
     var ytdAT=ytdD?ytdTS/ytdD:0;
-    var curMo=new Date().getMonth(),curDay=new Date().getDate();
     var dim=[31,28+(yr%4===0?1:0),31,30,31,30,31,31,30,31,30,31];
     var nP=0,nTT=0,nD=0;
-    for(var m2=0;m2<12;m2++){if(m2<curMo){nP+=RDU_NPREC[m2];nTT+=RDU_NTEMP[m2]*dim[m2];nD+=dim[m2];}else if(m2===curMo){var frac=curDay/dim[m2];nP+=RDU_NPREC[m2]*frac;nTT+=RDU_NTEMP[m2]*curDay;nD+=curDay;}}
+    for(var m2=0;m2<12;m2++){
+      if(m2<curMo){nP+=RDU_NPREC[m2];nTT+=RDU_NTEMP[m2]*dim[m2];nD+=dim[m2];}
+      else if(m2===curMo){nP+=RDU_NPREC[m2]*(curDay/dim[m2]);nTT+=RDU_NTEMP[m2]*curDay;nD+=curDay;}
+    }
     var nAT=nD?nTT/nD:0,pDiff=ytdP-nP,tDiff=ytdAT-nAT;
-    function dLbl(d,u,th){if(Math.abs(d)<th)return'<span class="alm-cmp normal">NORMAL</span>';return'<span class="alm-cmp '+(d>0?"above":"below")+'">'+(d>0?"+":"")+d.toFixed(1)+u+" "+(d>0?"ABOVE":"BELOW")+'</span>';}
 
-    // ── Departure from normal calculations ──
-    // Interpolate a daily normal from monthly normals.
-    // Monthly normals represent the average for the full month; we treat each
-    // month's normal as centred on the 15th and linearly interpolate between
-    // adjacent monthly midpoints so late-March gets a higher normal than the
-    // March monthly average (matching NWS day-specific climatology more closely).
+    function dLbl(d,u,th){
+      if(Math.abs(d)<th)return'<span class="alm-cmp normal">NORMAL</span>';
+      return'<span class="alm-cmp '+(d>0?"above":"below")+'">'+(d>0?"+":"")+d.toFixed(1)+u+" "+(d>0?"ABOVE":"BELOW")+'</span>';
+    }
     function dailyNorm(dateStr){
       var d=new Date(dateStr+"T12:00:00"),m=d.getMonth(),day=d.getDate();
-      var dim=new Date(d.getFullYear(),m+1,0).getDate();
-      var frac=(day-15.5)/dim;
+      var dm=new Date(d.getFullYear(),m+1,0).getDate(),frac=(day-15.5)/dm;
       if(frac>=0){var nm=(m+1)%12;return RDU_NTEMP[m]+(RDU_NTEMP[nm]-RDU_NTEMP[m])*frac;}
       else{var pm=(m+11)%12;return RDU_NTEMP[m]+(RDU_NTEMP[m]-RDU_NTEMP[pm])*(-frac);}
     }
-    // Latest available day (ERA5 may lag a few days)
+
+    var todayStr2=now.toLocaleDateString("en-CA");
+    var ydDate=new Date(now);ydDate.setDate(ydDate.getDate()-1);
+    var ydStr=ydDate.toLocaleDateString("en-CA");
+
+    // Yesterday / latest day departure
     var depYday=null,depYdayAvg=null,depYdayNorm=null,depYdayLbl="Latest Day";
-    var todayStr2=new Date().toLocaleDateString("en-CA");
-    var ydDate=new Date();ydDate.setDate(ydDate.getDate()-1);var ydStr=ydDate.toLocaleDateString("en-CA");
-    if(dl.time.length>0){
-      var li=dl.time.length-1;
-      // Skip today (incomplete) and nulls — only use fully completed days
-      while(li>=0&&(dl.temperature_2m_mean[li]==null||dl.time[li]===todayStr2))li--;
-      if(li>=0){
-        depYdayAvg=dl.temperature_2m_mean[li];
-        depYdayNorm=dailyNorm(dl.time[li]);
+    for(var li=dailyArr.length-1;li>=0;li--){
+      if(dailyArr[li].date!==todayStr2){
+        depYdayAvg=dailyArr[li].temp;depYdayNorm=dailyNorm(dailyArr[li].date);
         depYday=depYdayAvg-depYdayNorm;
-        depYdayLbl=dl.time[li]===ydStr?"Yesterday":new Date(dl.time[li]+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"});
+        depYdayLbl=dailyArr[li].date===ydStr?"Yesterday":new Date(dailyArr[li].date+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"});
+        break;
       }
     }
-    // Last 7 available days
-    var dep7=null,dep7Avg=null,dep7Norm=null,s7=0,n7=0,c7=0;
-    for(var k7=Math.max(0,dl.time.length-7);k7<dl.time.length;k7++){
-      if(dl.temperature_2m_mean[k7]!=null&&dl.time[k7]!==todayStr2){s7+=dl.temperature_2m_mean[k7];n7+=dailyNorm(dl.time[k7]);c7++;}
-    }
-    if(c7){dep7Avg=s7/c7;dep7Norm=n7/c7;dep7=dep7Avg-dep7Norm;}
-    // Last calendar month
+    // Last 7 days
+    var s7=0,n7=0,c7=0;
+    var d7=dailyArr.filter(function(d){return d.date!==todayStr2;}).slice(-7);
+    d7.forEach(function(d){s7+=d.temp;n7+=dailyNorm(d.date);c7++;});
+    var dep7=c7?(s7/c7-n7/c7):null,dep7Avg=c7?s7/c7:null,dep7Norm=c7?n7/c7:null;
+    // Last month
     var prevMo=curMo===0?11:curMo-1;
-    var depLM=null,depLMAvg=null,depLMNorm=RDU_NTEMP[prevMo];
-    if(moCnt[prevMo]){depLMAvg=moTemp[prevMo]/moCnt[prevMo];depLM=depLMAvg-depLMNorm;}
-    // This calendar month
-    var depTM=null,depTMAvg=null,depTMNorm=RDU_NTEMP[curMo];
-    if(moCnt[curMo]){depTMAvg=moTemp[curMo]/moCnt[curMo];depTM=depTMAvg-depTMNorm;}
+    var depLMAvg=moCnt[prevMo]?moTemp[prevMo]/moCnt[prevMo]:null;
+    var depLM=depLMAvg!=null?depLMAvg-RDU_NTEMP[prevMo]:null;
+    // This month
+    var depTMAvg=moCnt[curMo]?moTemp[curMo]/moCnt[curMo]:null;
+    var depTM=depTMAvg!=null?depTMAvg-RDU_NTEMP[curMo]:null;
 
     function depCard(title,sub,avg,norm,dep){
       if(dep===null)return'<div class="alm-big"><div class="alm-big-lbl">'+title+'</div><div class="alm-big-val">--</div><div class="alm-big-sub">No data yet</div></div>';
       return'<div class="alm-big"><div class="alm-big-lbl">'+title+'</div><div class="alm-big-val">'+avg.toFixed(1)+'°F</div><div class="alm-big-sub">Normal: '+norm.toFixed(1)+'°F · '+sub+'</div>'+dLbl(dep,"°F",0.5)+'</div>';
     }
+
     var tMo="",pMo="";
     for(var m3=0;m3<12;m3++){
       var iC=m3===curMo,iF=m3>curMo;
-      var aT=moCnt[m3]?moTemp[m3]/moCnt[m3]:null,tP=moPrec[m3]!=null&&moCnt[m3]?moPrec[m3]:null;
+      var aT=moCnt[m3]?moTemp[m3]/moCnt[m3]:null;
+      var tP=moPrec[m3]!=null?moPrec[m3]:null;
       var td=aT!==null?aT-RDU_NTEMP[m3]:null,pd=tP!==null?tP-RDU_NPREC[m3]:null;
       tMo+='<div class="alm-mo'+(iC?" current":"")+(iF?" future":"")+'"><div class="alm-mo-name">'+MO_NAMES[m3]+'</div><div class="alm-mo-val">'+(aT!==null?aT.toFixed(1):"--")+'</div><div class="alm-mo-nrm">Nrm: '+RDU_NTEMP[m3].toFixed(1)+'</div>'+(td!==null?'<div class="alm-mo-diff '+(Math.abs(td)<0.5?"zero":td>0?"pos":"neg")+'">'+(Math.abs(td)<0.5?"Normal":(td>0?"+":"")+td.toFixed(1))+'</div>':'')+'</div>';
       var pB=tP!==null?Math.min(100,Math.round(tP/Math.max(RDU_NPREC[m3],0.01)*100)):0;
       var pC=pd!==null?(pd>0.25?"#ff8844":pd<-0.25?"#4488ff":"#00d44a"):"#333";
       pMo+='<div class="alm-mo'+(iC?" current":"")+(iF?" future":"")+'"><div class="alm-mo-name">'+MO_NAMES[m3]+'</div><div class="alm-mo-val">'+(tP!==null?tP.toFixed(2)+'"':"--")+'</div><div class="alm-mo-nrm">Nrm: '+RDU_NPREC[m3].toFixed(2)+'"</div>'+(pd!==null?'<div class="alm-mo-diff '+(Math.abs(pd)<0.25?"zero":pd>0?"pos":"neg")+'">'+(Math.abs(pd)<0.25?"Normal":(pd>0?"+":"")+pd.toFixed(2)+'"')+'</div>':'')+(tP!==null?'<div class="alm-mo-bar"><div class="alm-mo-bar-fill" style="width:'+pB+'%;background:'+pC+'"></div></div>':'')+'</div>';
     }
+
     el.innerHTML=
       '<div class="alm-summary" style="grid-template-columns:repeat(2,1fr);max-width:720px;margin:0 auto 16px">'+
         '<div class="alm-big"><div class="alm-big-lbl">YTD Rainfall</div><div class="alm-big-val">'+ytdP.toFixed(2)+'"</div><div class="alm-big-sub">Normal: '+nP.toFixed(2)+'"</div>'+dLbl(pDiff,'"',0.25)+'</div>'+
@@ -1453,18 +1489,17 @@ function fetchAlmanac(){
         '<div class="alm-summary" style="grid-template-columns:repeat(2,1fr)">'+
           depCard(depYdayLbl,depYdayLbl==="Yesterday"?"vs daily normal":depYdayLbl,depYdayAvg,depYdayNorm,depYday)+
           depCard("Last 7 Days",c7+" days avg",dep7Avg,dep7Norm,dep7)+
-          depCard("Last Month",MO_NAMES[prevMo],depLMAvg,depLMNorm,depLM)+
-          depCard("This Month",MO_NAMES[curMo]+" so far",depTMAvg,depTMNorm,depTM)+
+          depCard("Last Month",MO_NAMES[prevMo],depLMAvg,RDU_NTEMP[prevMo],depLM)+
+          depCard("This Month",MO_NAMES[curMo]+" so far",depTMAvg,RDU_NTEMP[curMo],depTM)+
         '</div>'+
       '</div>'+
       '<div class="alm-grid">'+
         '<div class="alm-card"><h3><span>🌡</span> Monthly Avg Temperature</h3><div class="alm-mo-grid">'+tMo+'</div></div>'+
         '<div class="alm-card"><h3><span>🌧</span> Monthly Rainfall Totals</h3><div class="alm-mo-grid">'+pMo+'</div></div>'+
       '</div>'+
-      '<div class="alm-note">Data: Open-Meteo Historical Archive (ERA5) - RDU Airport - 30-year normals: 1991-2020 NCEI</div>';
+      '<div class="alm-note">Data: Red Wolf Farm · Station KNCRALEI761 (Weather Underground) · 30-year normals: 1991-2020 NCEI</div>';
     window._almLoaded=true;
-  })
-  .catch(function(e){el.innerHTML='<div class="alm-ld" style="color:#ef4444">'+e.message+'<br><button onclick="fetchAlmanac()" style="margin-top:10px;background:var(--red2);border:1px solid var(--red);color:#fff;padding:6px 16px;border-radius:2px;cursor:pointer">Retry</button></div>';});
+  }).catch(function(e){el.innerHTML='<div class="alm-ld" style="color:#ef4444">'+e.message+'<br><button onclick="fetchAlmanac()" style="margin-top:10px;background:var(--red2);border:1px solid var(--red);color:#fff;padding:6px 16px;border-radius:2px;cursor:pointer">Retry</button></div>';});
 }
 
 // ============================================================
