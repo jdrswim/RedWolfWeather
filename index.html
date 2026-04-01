@@ -1401,7 +1401,7 @@ function fetchAlmanac(){
     "&year1="+yr+"&month1=1&day1=1" +
     "&year2="+yr+"&month2="+(curMo+1)+"&day2="+curDay +
     "&tz=America%2FNew_York&format=onlycomma&latlon=no" +
-    "&missing=M&trace=T&direct=no&report_type=1&report_type=2";
+    "&missing=M&trace=T&direct=yes&report_type=1&report_type=2";
 
   fetch(url)
   .then(function(r){if(!r.ok)throw new Error("ASOS HTTP "+r.status);return r.text();})
@@ -1534,7 +1534,7 @@ function fetchAlmanac(){
       '</div>'+
       '<div class="alm-note">Data: ASOS KRDU via Iowa State Mesonet · 30-year normals: 1991-2020 NCEI</div>';
     window._almLoaded=true;
-  }).catch(function(e){el.innerHTML='<div class="alm-ld" style="color:#ef4444">'+e.message+'<br><button onclick="fetchAlmanac()" style="margin-top:10px;background:var(--red2);border:1px solid var(--red);color:#fff;padding:6px 16px;border-radius:2px;cursor:pointer">Retry</button></div>';});
+  }).catch(function(e){window._almLoaded=false;el.innerHTML='<div class="alm-ld" style="color:#ef4444">'+e.message+'<br><button onclick="fetchAlmanac()" style="margin-top:10px;background:var(--red2);border:1px solid var(--red);color:#fff;padding:6px 16px;border-radius:2px;cursor:pointer">Retry</button></div>';});
 }
 
 // ============================================================
