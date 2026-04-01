@@ -1468,7 +1468,8 @@ function accLogActuals(){
       var hi=Math.round(Math.max.apply(null,temps));
       var lo=Math.round(Math.min.apply(null,temps));
       return fetch(SHEET_URL+"?action=write&tab=Accuracy&date="+dStr+"&actual_high="+hi+"&actual_low="+lo)
-        .then(function(){return{hi:hi,lo:lo,src:"NWS KRDU"};});
+        .then(function(r){if(!r.ok)throw new Error("Sheet HTTP "+r.status);return r.json();})
+        .then(function(j){if(j&&j.error)throw new Error("Sheet error: "+j.error);return{hi:hi,lo:lo,src:"NWS KRDU"};});
     })
     .then(function(result){
       // Only set guard for dates 2+ days back (fully settled data)
@@ -1487,7 +1488,8 @@ function accLogActuals(){
         var hi=Math.round(d.daily.temperature_2m_max[0]);
         var lo=Math.round(d.daily.temperature_2m_min[0]);
         return fetch(SHEET_URL+"?action=write&tab=Accuracy&date="+dStr+"&actual_high="+hi+"&actual_low="+lo)
-          .then(function(){return{hi:hi,lo:lo};});
+          .then(function(r){if(!r.ok)throw new Error("Sheet HTTP "+r.status);return r.json();})
+          .then(function(j){if(j&&j.error)throw new Error("Sheet error: "+j.error);return{hi:hi,lo:lo};});
       })
       .then(function(result){
         if(daysBack>=2){try{localStorage.setItem(guardKey,"1");}catch(e){}}
@@ -1498,7 +1500,7 @@ function accLogActuals(){
         console.log("Open-Meteo hf failed for "+dStr+": "+hfErr.message+" — trying forecast API...");
         // Second fallback: Open-Meteo forecast API with past_days
         fetch("https://api.open-meteo.com/v1/forecast?latitude=35.686&longitude=-78.614&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&timezone=America%2FNew_York&past_days=7&forecast_days=0")
-        .then(function(r){return r.json();})
+        .then(function(r){if(!r.ok)throw new Error("Open-Meteo fc "+r.status);return r.json();})
         .then(function(d){
           if(!d.daily||!d.daily.time)throw new Error("Open-Meteo fc no data");
           var idx=d.daily.time.indexOf(dStr);
@@ -1507,7 +1509,8 @@ function accLogActuals(){
           var hi=Math.round(d.daily.temperature_2m_max[idx]);
           var lo=Math.round(d.daily.temperature_2m_min[idx]);
           return fetch(SHEET_URL+"?action=write&tab=Accuracy&date="+dStr+"&actual_high="+hi+"&actual_low="+lo)
-            .then(function(){return{hi:hi,lo:lo};});
+            .then(function(r){if(!r.ok)throw new Error("Sheet HTTP "+r.status);return r.json();})
+            .then(function(j){if(j&&j.error)throw new Error("Sheet error: "+j.error);return{hi:hi,lo:lo};});
         })
         .then(function(result){
           if(daysBack>=2){try{localStorage.setItem(guardKey,"1");}catch(e){}}
