@@ -42,10 +42,11 @@ header{background:var(--off);border-bottom:3px solid var(--red);padding:10px 22p
 .cdate{font-size:9px;color:var(--mu);letter-spacing:2px;text-transform:uppercase;margin-top:2px}
 
 /* TABS */
-.tab-bar{display:flex;background:#0c0c0c;border-bottom:2px solid var(--bd);padding:8px 14px;gap:6px;overflow-x:auto}
+.tab-bar{display:flex;background:#0c0c0c;border-bottom:2px solid var(--bd);padding:8px 14px;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch}
 .tab-btn{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:5px;color:rgba(255,255,255,.42);font-family:var(--font);font-size:11px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;padding:9px 14px;cursor:pointer;white-space:nowrap;transition:all .18s;flex:1;min-width:0}
 .tab-btn:hover{background:rgba(255,255,255,.1);color:rgba(255,255,255,.75);border-color:rgba(255,255,255,.22)}
 .tab-btn.active{background:var(--red2);border-color:var(--red);color:#fff;box-shadow:0 0 10px rgba(204,0,0,.25)}
+.tab-l{display:inline}.tab-s{display:none}
 .tab-pane{display:none}
 .tab-pane.active{display:block}
 
@@ -423,7 +424,8 @@ footer strong{color:var(--red)}
   .clock{font-size:20px}
   .cdate{font-size:8px}
   .tab-bar{padding:6px 8px;gap:4px}
-  .tab-btn{font-size:9px;padding:8px 6px;letter-spacing:.8px}
+  .tab-btn{font-size:9px;padding:8px 5px;letter-spacing:.5px}
+  .tab-l{display:none}.tab-s{display:inline}
   .hdr-r{align-items:flex-start}
   main{padding:10px 8px}
   .sec{font-size:11px;padding-left:8px;margin-bottom:10px}
@@ -480,18 +482,8 @@ footer strong{color:var(--red)}
   .tsps-stats{flex-direction:column}
 }
 
-/* ROCKETS */
-.rkt-wrap{max-width:1100px;margin:24px auto 0;padding:0 18px}
-.rkt-toggle{background:var(--p1);border:1px solid var(--bd);border-left:3px solid var(--red);border-radius:3px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none;transition:background .15s}
-.rkt-toggle:hover{background:var(--p2)}
-.rkt-toggle-left{display:flex;align-items:center;gap:12px}
-.rkt-toggle-title{font-size:13px;font-weight:900;letter-spacing:2px;color:var(--red);text-transform:uppercase}
-.rkt-toggle-sub{font-size:10px;color:var(--mu);font-weight:500;letter-spacing:.5px;margin-top:2px}
-.rkt-chevron{font-size:11px;color:var(--mu);transition:transform .3s;flex-shrink:0}
-.rkt-chevron.open{transform:rotate(180deg)}
-.rkt-body{background:var(--p1);border:1px solid var(--bd);border-top:none;border-radius:0 0 3px 3px;overflow:hidden;max-height:0;transition:max-height .45s ease}
-.rkt-body.open{max-height:6000px}
-.rkt-inner{padding:16px}
+/* ROCKETS / AEROSPACE TAB */
+.rkt-inner{padding:0}
 .rkt-launch{background:var(--p2);border:1px solid var(--bd);border-radius:3px;padding:14px;margin-bottom:10px;display:grid;gap:10px}
 .rkt-launch:last-child{margin-bottom:0}
 .rkt-launch-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap}
@@ -550,9 +542,10 @@ footer strong{color:var(--red)}
 </header>
 
 <div class="tab-bar">
-  <button class="tab-btn active" id="tabBtnLive" onclick="switchTab('live',this)">⚡ Live Weather</button>
-  <button class="tab-btn" id="tabBtnAlmanac" onclick="switchTab('almanac',this)">📊 Wx Almanac</button>
-  <button class="tab-btn" id="tabBtnPws" onclick="switchTab('pws',this)">🌡 Microclimate</button>
+  <button class="tab-btn active" id="tabBtnLive" onclick="switchTab('live',this)"><span class="tab-l">⚡ Live Weather</span><span class="tab-s">⚡ Live</span></button>
+  <button class="tab-btn" id="tabBtnAlmanac" onclick="switchTab('almanac',this)"><span class="tab-l">📊 Wx Almanac</span><span class="tab-s">📊 Almanac</span></button>
+  <button class="tab-btn" id="tabBtnPws" onclick="switchTab('pws',this)"><span class="tab-l">🌡 Microclimate</span><span class="tab-s">🌡 PWS</span></button>
+  <button class="tab-btn" id="tabBtnAerospace" onclick="switchTab('aerospace',this)"><span class="tab-l">🚀 Aerospace</span><span class="tab-s">🚀 Space</span></button>
 </div>
 
 <!-- ============================================================ LIVE TAB -->
@@ -640,23 +633,14 @@ footer strong{color:var(--red)}
 </div>
 </div>
 
-<!-- ============================================================ ROCKETS SECTION -->
-<div class="rkt-wrap">
-  <div class="rkt-toggle" onclick="toggleRockets()">
-    <div class="rkt-toggle-left">
-      <span style="font-size:20px;line-height:1">🚀</span>
-      <div>
-        <div class="rkt-toggle-title">East Coast Rocket Launches</div>
-        <div class="rkt-toggle-sub">Upcoming launches visible from Raleigh · Wilmington · Hilton Head</div>
-      </div>
-    </div>
-    <span class="rkt-chevron" id="rktChevron">▼</span>
+<!-- ============================================================ AEROSPACE TAB -->
+<div class="tab-pane" id="tab-aerospace">
+<div class="alm-wrap">
+  <div class="sec">East Coast Rocket Launches <em>- Visible from Raleigh · Wilmington · Hilton Head SC</em></div>
+  <div class="rkt-inner">
+    <div id="rkt-content"><div class="alm-ld"><div class="tsps-spinner"></div>Loading launches...</div></div>
   </div>
-  <div class="rkt-body" id="rktBody">
-    <div class="rkt-inner">
-      <div id="rkt-content"><div class="alm-ld"><div class="tsps-spinner"></div>Loading launches...</div></div>
-    </div>
-  </div>
+</div>
 </div>
 
 <footer>
@@ -688,6 +672,7 @@ function switchTab(name,btn){
   if(name==="almanac"&&!window._almLoaded){fetchAlmanac();fetchSunData();accFetchAndRender();}
   else if(name==="almanac"){fetchSunData();accFetchAndRender();}
   if(name==="pws"){fetchPWS();}
+  if(name==="aerospace"&&!window._rktLoaded){fetchRockets();}
 }
 
 // ============================================================
@@ -2316,13 +2301,6 @@ window.addEventListener("resize",function(){wxResize();});
 // ROCKETS
 // ============================================================
 var _rktLoaded=false;
-function toggleRockets(){
-  var body=document.getElementById('rktBody');
-  var chev=document.getElementById('rktChevron');
-  var open=body.classList.contains('open');
-  if(open){body.classList.remove('open');chev.classList.remove('open');}
-  else{body.classList.add('open');chev.classList.add('open');if(!_rktLoaded)fetchRockets();}
-}
 function rktHav(lat1,lon1,lat2,lon2){
   var R=6371,dL=(lat2-lat1)*Math.PI/180,dO=(lon2-lon1)*Math.PI/180;
   var a=Math.sin(dL/2)*Math.sin(dL/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dO/2)*Math.sin(dO/2);
