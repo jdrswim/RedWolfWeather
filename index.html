@@ -1582,56 +1582,44 @@ function accLogActuals(){
         });
     }
 
-    // Source 1: Open-Meteo forecast w/ past_days — simplest, no CORS preflight
-    fetch("https://api.open-meteo.com/v1/forecast?latitude=35.686&longitude=-78.614&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&timezone=America%2FNew_York&past_days=7&forecast_days=1")
-    .then(function(r){if(!r.ok)throw new Error("OM-fc HTTP "+r.status);return r.json();})
+    // Source 1: NWS KRDU hourly observations — official station, matches NOWData record
+    var obsS=new Date(target.getFullYear(),target.getMonth(),target.getDate(),0,0,0).toISOString();
+    var obsE=new Date(target.getFullYear(),target.getMonth(),target.getDate(),23,59,59).toISOString();
+    fetch("https://api.weather.gov/stations/KRDU/observations?start="+encodeURIComponent(obsS)+"&end="+encodeURIComponent(obsE)+"&limit=200",
+      {headers:{"User-Agent":"WolfpackWeather/2.0"}})
+    .then(function(r){if(!r.ok)throw new Error("NWS HTTP "+r.status);return r.json();})
     .then(function(d){
-      if(!d.daily||!d.daily.time)throw new Error("OM-fc no data");
-      var idx=d.daily.time.indexOf(dStr);
-      if(idx===-1||d.daily.temperature_2m_max[idx]==null)throw new Error("OM-fc no row for "+dStr);
-      return storeAndWrite(Math.round(d.daily.temperature_2m_max[idx]),Math.round(d.daily.temperature_2m_min[idx]),"Open-Meteo");
+      var temps=(d.features||[]).reduce(function(a,f){
+        var t=f.properties&&f.properties.temperature&&f.properties.temperature.value;
+        if(t!=null)a.push(t*9/5+32);return a;
+      },[]);
+      if(!temps.length)throw new Error("NWS no temps for "+dStr);
+      return storeAndWrite(Math.round(Math.max.apply(null,temps)),Math.round(Math.min.apply(null,temps)),"NWS KRDU");
     })
     .catch(function(e1){
-      console.log("OM-fc failed for "+dStr+": "+e1.message+" — trying NWS KRDU...");
-      // Source 2: NWS KRDU hourly observations (no Accept header to avoid CORS preflight)
-      var s=new Date(target.getFullYear(),target.getMonth(),target.getDate(),0,0,0).toISOString();
-      var e=new Date(target.getFullYear(),target.getMonth(),target.getDate(),23,59,59).toISOString();
-      return fetch("https://api.weather.gov/stations/KRDU/observations?start="+encodeURIComponent(s)+"&end="+encodeURIComponent(e)+"&limit=200",
-        {headers:{"User-Agent":"WolfpackWeather/2.0"}})
-      .then(function(r){if(!r.ok)throw new Error("NWS "+r.status);return r.json();})
-      .then(function(d){
-        var temps=(d.features||[]).reduce(function(a,f){
-          var t=f.properties&&f.properties.temperature&&f.properties.temperature.value;
-          if(t!=null)a.push(t*9/5+32);return a;
-        },[]);
-        if(!temps.length)throw new Error("NWS no temps for "+dStr);
-        return storeAndWrite(Math.round(Math.max.apply(null,temps)),Math.round(Math.min.apply(null,temps)),"NWS KRDU");
-      });
-    })
-    .catch(function(e2){
-      console.log("NWS failed for "+dStr+": "+e2.message+" — trying OM historical-forecast...");
-      // Source 3: Open-Meteo historical-forecast (zero lag archive)
-      return fetch("https://historical-forecast-api.open-meteo.com/v1/forecast?latitude=35.686&longitude=-78.614&start_date="+dStr+"&end_date="+dStr+"&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&timezone=America%2FNew_York")
+      console.log("NWS KRDU failed for "+dStr+": "+e1.message+" — trying Open-Meteo historical...");
+      // Source 2: Open-Meteo historical-forecast archive
+      return fetch("https://historical-forecast-api.open-meteo.com/v1/forecast?latitude=35.78&longitude=-78.64&start_date="+dStr+"&end_date="+dStr+"&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&timezone=America%2FNew_York")
       .then(function(r){if(!r.ok)throw new Error("OM-hf HTTP "+r.status);return r.json();})
       .then(function(d){
         if(!d.daily||!d.daily.temperature_2m_max||d.daily.temperature_2m_max[0]==null)throw new Error("OM-hf no data for "+dStr);
         return storeAndWrite(Math.round(d.daily.temperature_2m_max[0]),Math.round(d.daily.temperature_2m_min[0]),"OM-hf");
       });
     })
+    .catch(function(e2){
+      console.log("OM-hf failed for "+dStr+": "+e2.message+" — trying Open-Meteo forecast...");
+      // Source 3: Open-Meteo forecast with past_days
+      return fetch("https://api.open-meteo.com/v1/forecast?latitude=35.78&longitude=-78.64&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&timezone=America%2FNew_York&past_days=7&forecast_days=1")
+      .then(function(r){if(!r.ok)throw new Error("OM-fc HTTP "+r.status);return r.json();})
+      .then(function(d){
+        if(!d.daily||!d.daily.time)throw new Error("OM-fc no data");
+        var idx=d.daily.time.indexOf(dStr);
+        if(idx===-1||d.daily.temperature_2m_max[idx]==null)throw new Error("OM-fc no row for "+dStr);
+        return storeAndWrite(Math.round(d.daily.temperature_2m_max[idx]),Math.round(d.daily.temperature_2m_min[idx]),"OM-fc");
+      });
+    })
     .catch(function(finalErr){
       console.log("ACC actuals ALL 3 sources failed for "+dStr+": "+finalErr.message);
-      var el=$("acc-dashboard");
-      if(el){
-        var wrap=el.querySelector(".acc-wrap");
-        if(wrap&&!wrap.querySelector(".acc-actuals-warn")){
-          var warn=document.createElement("div");
-          warn.className="acc-actuals-warn";
-          warn.style.cssText="background:#3a1a1a;border:1px solid #ef4444;border-radius:4px;padding:10px 14px;margin:10px 0;font-size:11px;color:#ef9999;line-height:1.7";
-          warn.innerHTML="&#9888; Could not log actuals for <strong>"+dStr+"</strong>: "+finalErr.message
-            +"<br><button onclick=\"accForceSync()\" style=\"margin-top:6px;background:#5a0000;border:1px solid #ef4444;color:#ef9999;font-size:10px;padding:4px 10px;border-radius:3px;cursor:pointer;font-family:inherit\">Retry Now</button>";
-          wrap.appendChild(warn);
-        }
-      }
     });
   });
 }
