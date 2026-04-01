@@ -1394,63 +1394,59 @@ function fetchAlmanac(){
   function p2(n){return n<10?"0"+n:""+n;}
   var dim=[31,28+(yr%4===0?1:0),31,30,31,30,31,31,30,31,30,31];
 
-  // Fetch NWS KRDU hourly observations for each month Jan→current (one call per month)
-  var fetches=[];
-  for(var mi=0;mi<=curMo;mi++){
-    fetches.push((function(mo){
-      var s=yr+"-"+p2(mo+1)+"-01T00:00:00Z";
-      var e=yr+"-"+p2(mo+1)+"-"+p2(dim[mo])+"T23:59:59Z";
-      return fetch("https://api.weather.gov/stations/KRDU/observations?start="+encodeURIComponent(s)+"&end="+encodeURIComponent(e)+"&limit=1000",
-        {headers:{"User-Agent":"WolfpackWeather/2.0"}})
-      .then(function(r){if(!r.ok)throw new Error("NWS HTTP "+r.status);return r.json();})
-      .then(function(d){return{mo:mo,features:d.features||[]};})
-      .catch(function(e){console.error("NWS obs m="+(mo+1)+": "+e.message);return{mo:mo,features:[]};});
-    })(mi));
-  }
+  // Iowa State Mesonet ASOS archive — free, no key, complete history for KRDU
+  // Single request covers entire YTD; timestamps returned in local Eastern time
+  var url="https://mesonet.agron.iastate.edu/cgi-bin/request/asos.py" +
+    "?station=KRDU&data=tmpf&data=p01i" +
+    "&year1="+yr+"&month1=1&day1=1" +
+    "&year2="+yr+"&month2="+(curMo+1)+"&day2="+curDay +
+    "&tz=America%2FNew_York&format=onlycomma&latlon=no" +
+    "&missing=M&trace=T&direct=no&report_type=1&report_type=2";
 
-  Promise.all(fetches).then(function(results){
-    var moTemp={},moPrec={};
-    var dailyMap={}; // "YYYY-MM-DD" -> {temps:[], precip:0}
-    var ytdTS=0,ytdD=0,ytdP=0;
+  fetch(url)
+  .then(function(r){if(!r.ok)throw new Error("ASOS HTTP "+r.status);return r.text();})
+  .then(function(csv){
+    var moTSum={},moCnt={},moPrec={};
+    var dailyMap={};
+    var byDay={};
 
-    results.forEach(function(res){
-      var byDay={};
-      res.features.forEach(function(f){
-        var props=f.properties;
-        // Group by Eastern local date (UTC-5 approximation covers both EST and EDT boundary)
-        var ts=new Date(props.timestamp);
-        var local=new Date(ts.getTime()-5*3600000);
-        var ds=local.getUTCFullYear()+"-"+p2(local.getUTCMonth()+1)+"-"+p2(local.getUTCDate());
-        if(!byDay[ds])byDay[ds]={temps:[],precip:0};
-        var tC=props.temperature&&props.temperature.value;
-        if(tC!=null)byDay[ds].temps.push(tC*9/5+32);
-        var p1h=props.precipitationLastHour&&props.precipitationLastHour.value;
-        if(p1h!=null&&p1h>0)byDay[ds].precip+=p1h*0.0393701; // mm→inches
-      });
-
-      // Aggregate days → monthly avg temp and total precip
-      var mTemps=[],mPrec=0,hasDays=false;
-      Object.keys(byDay).forEach(function(ds){
-        var day=byDay[ds];
-        if(day.temps.length){
-          var hi=Math.max.apply(null,day.temps),lo=Math.min.apply(null,day.temps);
-          mTemps.push((hi+lo)/2);
-        }
-        mPrec+=day.precip;
-        hasDays=true;
-        dailyMap[ds]={temp:day.temps.length?((Math.max.apply(null,day.temps)+Math.min.apply(null,day.temps))/2):null};
-      });
-      if(mTemps.length)moTemp[res.mo]=mTemps.reduce(function(a,b){return a+b;},0)/mTemps.length;
-      if(hasDays)moPrec[res.mo]=mPrec;
+    // Parse CSV: station,valid,tmpf,p01i
+    csv.split("\n").forEach(function(line){
+      line=line.trim();
+      if(!line||line.charAt(0)==="#"||line.indexOf("station")===0)return;
+      var p=line.split(",");
+      if(p.length<4)return;
+      var ds=p[1].substring(0,10); // "YYYY-MM-DD"
+      var tmpf=p[2],prec=p[3];
+      if(!byDay[ds])byDay[ds]={temps:[],precip:0};
+      if(tmpf!=="M"&&tmpf!==""){var t=parseFloat(tmpf);if(!isNaN(t))byDay[ds].temps.push(t);}
+      if(prec!=="M"&&prec!=="T"&&prec!==""){var pv=parseFloat(prec);if(!isNaN(pv)&&pv>0)byDay[ds].precip+=pv;}
     });
 
-    // YTD: weight monthly averages by days in month
+    // Aggregate daily → monthly
+    Object.keys(byDay).forEach(function(ds){
+      var mo=parseInt(ds.substring(5,7),10)-1;
+      var day=byDay[ds];
+      if(day.temps.length){
+        var hi=Math.max.apply(null,day.temps),lo=Math.min.apply(null,day.temps),avg=(hi+lo)/2;
+        if(!moTSum[mo]){moTSum[mo]=0;moCnt[mo]=0;}
+        moTSum[mo]+=avg;moCnt[mo]++;
+      }
+      if(!moPrec[mo])moPrec[mo]=0;
+      moPrec[mo]+=day.precip;
+      dailyMap[ds]={temp:day.temps.length?((Math.max.apply(null,day.temps)+Math.min.apply(null,day.temps))/2):null};
+    });
+
+    // Build moTemp (monthly average) from sums
+    var moTemp={};
+    Object.keys(moTSum).forEach(function(m){moTemp[m]=moTSum[m]/moCnt[m];});
+
+    var ytdTS=0,ytdD=0,ytdP=0;
     for(var mi2=0;mi2<=curMo;mi2++){
       if(moTemp[mi2]!=null){var days=mi2<curMo?dim[mi2]:curDay;ytdTS+=moTemp[mi2]*days;ytdD+=days;}
       if(moPrec[mi2]!=null)ytdP+=moPrec[mi2];
     }
 
-    // dailyArr for departure cards: last 8 complete days from NWS data
     var todayStr2=now.getFullYear()+"-"+p2(now.getMonth()+1)+"-"+p2(now.getDate());
     var dailyArr=Object.keys(dailyMap)
       .filter(function(ds){return ds<todayStr2&&dailyMap[ds].temp!=null;})
@@ -1536,7 +1532,7 @@ function fetchAlmanac(){
         '<div class="alm-card"><h3><span>🌡</span> Monthly Avg Temperature</h3><div class="alm-mo-grid">'+tMo+'</div></div>'+
         '<div class="alm-card"><h3><span>🌧</span> Monthly Rainfall Totals</h3><div class="alm-mo-grid">'+pMo+'</div></div>'+
       '</div>'+
-      '<div class="alm-note">Data: NWS KRDU (Raleigh-Durham Airport) · 30-year normals: 1991-2020 NCEI</div>';
+      '<div class="alm-note">Data: ASOS KRDU via Iowa State Mesonet · 30-year normals: 1991-2020 NCEI</div>';
     window._almLoaded=true;
   }).catch(function(e){el.innerHTML='<div class="alm-ld" style="color:#ef4444">'+e.message+'<br><button onclick="fetchAlmanac()" style="margin-top:10px;background:var(--red2);border:1px solid var(--red);color:#fff;padding:6px 16px;border-radius:2px;cursor:pointer">Retry</button></div>';});
 }
