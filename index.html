@@ -1442,166 +1442,169 @@ var RDU_NTEMP=[40.4,43.2,50.5,60.1,68.8,76.8,80.6,79.0,72.7,61.5,51.0,42.8];
 var RDU_NPREC=[3.55,3.16,3.82,3.18,3.95,4.06,4.67,4.44,4.39,3.42,3.22,3.27];
 var MO_NAMES=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
-function fetchAlmanac(){
-  var el=$("alm-content");
-  var now=new Date(),yr=now.getFullYear(),curMo=now.getMonth(),curDay=now.getDate();
-  function p2(n){return n<10?"0"+n:""+n;}
-  var dim=[31,28+(yr%4===0?1:0),31,30,31,30,31,31,30,31,30,31];
 
-  // Iowa State Mesonet ASOS archive — free, no key, complete history for KRDU
-  // Single request covers entire YTD; timestamps returned in local Eastern time
-  var url="https://mesonet.agron.iastate.edu/cgi-bin/request/asos.py" +
-    "?station=KRDU&data=tmpf&data=p01i" +
-    "&year1="+yr+"&month1=1&day1=1" +
-    "&year2="+yr+"&month2="+(curMo+1)+"&day2="+curDay +
-    "&tz=America%2FNew_York&format=onlycomma&latlon=no" +
-    "&missing=M&trace=T&direct=yes&report_type=1&report_type=2";
+var ALM_CACHE_KEY='alm_v3_';
+var ALM_CACHE_TTL=82800000; // 23 hours
 
-  fetch(url)
-  .then(function(r){if(!r.ok)throw new Error("ASOS HTTP "+r.status);return r.text();})
-  .then(function(csv){
-    var moTSum={},moCnt={},moPrec={};
-    var dailyMap={};
-    var byDay={};
-
-    // Parse CSV: station,valid,tmpf,p01i
-    // p01i = precip last 1 hour. SPECIs report the same rolling-hour total multiple times,
-    // so deduplicate by keeping max p01i per hour-slot, then sum hours → daily total.
-    var byHour={}; // "YYYY-MM-DD HH" -> {ds, temps:[], precip}
-    csv.split("\n").forEach(function(line){
-      line=line.trim();
-      if(!line||line.charAt(0)==="#"||line.indexOf("station")===0)return;
-      var p=line.split(",");
-      if(p.length<4)return;
-      var ts=p[1]; // "YYYY-MM-DD HH:MM"
-      var hk=ts.substring(0,13); // "YYYY-MM-DD HH"
-      var ds=ts.substring(0,10);
-      var tmpf=p[2],prec=p[3];
-      if(!byHour[hk])byHour[hk]={ds:ds,temps:[],precip:0};
-      if(tmpf!=="M"&&tmpf!==""){var t=parseFloat(tmpf);if(!isNaN(t))byHour[hk].temps.push(t);}
-      if(prec!=="M"&&prec!=="T"&&prec!==""){var pv=parseFloat(prec);if(!isNaN(pv)&&pv>0)byHour[hk].precip=Math.max(byHour[hk].precip,pv);}
-    });
-    // Collapse hours → days
-    Object.keys(byHour).forEach(function(hk){
-      var h=byHour[hk],ds=h.ds;
-      if(!byDay[ds])byDay[ds]={temps:[],precip:0};
-      byDay[ds].temps=byDay[ds].temps.concat(h.temps);
-      byDay[ds].precip+=h.precip;
-    });
-
-    // Aggregate daily → monthly
-    Object.keys(byDay).forEach(function(ds){
-      var mo=parseInt(ds.substring(5,7),10)-1;
-      var day=byDay[ds];
-      if(day.temps.length){
-        var hi=Math.max.apply(null,day.temps),lo=Math.min.apply(null,day.temps),avg=(hi+lo)/2;
-        if(!moTSum[mo]){moTSum[mo]=0;moCnt[mo]=0;}
-        moTSum[mo]+=avg;moCnt[mo]++;
-      }
-      if(!moPrec[mo])moPrec[mo]=0;
-      moPrec[mo]+=day.precip;
-      dailyMap[ds]={temp:day.temps.length?((Math.max.apply(null,day.temps)+Math.min.apply(null,day.temps))/2):null};
-    });
-
-    // Build moTemp (monthly average) from sums
-    var moTemp={};
-    Object.keys(moTSum).forEach(function(m){moTemp[m]=moTSum[m]/moCnt[m];});
-
-    var ytdTS=0,ytdD=0,ytdP=0;
-    for(var mi2=0;mi2<=curMo;mi2++){
-      if(moTemp[mi2]!=null){var days=mi2<curMo?dim[mi2]:curDay;ytdTS+=moTemp[mi2]*days;ytdD+=days;}
-      if(moPrec[mi2]!=null)ytdP+=moPrec[mi2];
-    }
-
-    var todayStr2=now.getFullYear()+"-"+p2(now.getMonth()+1)+"-"+p2(now.getDate());
-    var dailyArr=Object.keys(dailyMap)
-      .filter(function(ds){return ds<todayStr2&&dailyMap[ds].temp!=null;})
-      .sort().slice(-8)
-      .map(function(ds){return{date:ds,temp:dailyMap[ds].temp};});
-
-    var ytdAT=ytdD?ytdTS/ytdD:0;
-    var nP=0,nTT=0,nD=0;
-    for(var m2=0;m2<12;m2++){
-      if(m2<curMo){nP+=RDU_NPREC[m2];nTT+=RDU_NTEMP[m2]*dim[m2];nD+=dim[m2];}
-      else if(m2===curMo){nP+=RDU_NPREC[m2]*(curDay/dim[m2]);nTT+=RDU_NTEMP[m2]*curDay;nD+=curDay;}
-    }
-    var nAT=nD?nTT/nD:0,pDiff=ytdP-nP,tDiff=ytdAT-nAT;
-
-    function dLbl(d,u,th){
-      if(Math.abs(d)<th)return'<span class="alm-cmp normal">NORMAL</span>';
-      return'<span class="alm-cmp '+(d>0?"above":"below")+'">'+(d>0?"+":"")+d.toFixed(1)+u+" "+(d>0?"ABOVE":"BELOW")+'</span>';
-    }
-    function dailyNorm(dateStr){
-      var d=new Date(dateStr+"T12:00:00"),m=d.getMonth(),day=d.getDate();
-      var dm=new Date(d.getFullYear(),m+1,0).getDate(),frac=(day-15.5)/dm;
-      if(frac>=0){var nm=(m+1)%12;return RDU_NTEMP[m]+(RDU_NTEMP[nm]-RDU_NTEMP[m])*frac;}
-      else{var pm=(m+11)%12;return RDU_NTEMP[m]+(RDU_NTEMP[m]-RDU_NTEMP[pm])*(-frac);}
-    }
-
-    var ydDate=new Date(now);ydDate.setDate(ydDate.getDate()-1);
-    var ydStr=ydDate.toLocaleDateString("en-CA");
-
-    // Yesterday / latest day departure
-    var depYday=null,depYdayAvg=null,depYdayNorm=null,depYdayLbl="Latest Day";
-    for(var li=dailyArr.length-1;li>=0;li--){
-      if(dailyArr[li].date!==todayStr2){
-        depYdayAvg=dailyArr[li].temp;depYdayNorm=dailyNorm(dailyArr[li].date);
-        depYday=depYdayAvg-depYdayNorm;
-        depYdayLbl=dailyArr[li].date===ydStr?"Yesterday":new Date(dailyArr[li].date+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"});
-        break;
-      }
-    }
-    // Last 7 days
-    var s7=0,n7=0,c7=0;
-    var d7=dailyArr.filter(function(d){return d.date!==todayStr2;}).slice(-7);
-    d7.forEach(function(d){s7+=d.temp;n7+=dailyNorm(d.date);c7++;});
-    var dep7=c7?(s7/c7-n7/c7):null,dep7Avg=c7?s7/c7:null,dep7Norm=c7?n7/c7:null;
-    // Last month
-    var prevMo=curMo===0?11:curMo-1;
-    var depLMAvg=moTemp[prevMo]!=null?moTemp[prevMo]:null;
-    var depLM=depLMAvg!=null?depLMAvg-RDU_NTEMP[prevMo]:null;
-    // This month
-    var depTMAvg=moTemp[curMo]!=null?moTemp[curMo]:null;
-    var depTM=depTMAvg!=null?depTMAvg-RDU_NTEMP[curMo]:null;
-
-    function depCard(title,sub,avg,norm,dep){
-      if(dep===null)return'<div class="alm-big"><div class="alm-big-lbl">'+title+'</div><div class="alm-big-val">--</div><div class="alm-big-sub">No data yet</div></div>';
-      return'<div class="alm-big"><div class="alm-big-lbl">'+title+'</div><div class="alm-big-val">'+avg.toFixed(1)+'°F</div><div class="alm-big-sub">Normal: '+norm.toFixed(1)+'°F · '+sub+'</div>'+dLbl(dep,"°F",0.5)+'</div>';
-    }
-
-    var tMo="",pMo="";
-    for(var m3=0;m3<12;m3++){
-      var iC=m3===curMo,iF=m3>curMo;
-      var aT=moTemp[m3]!=null?moTemp[m3]:null;
-      var tP=moPrec[m3]!=null?moPrec[m3]:null;
-      var td=aT!==null?aT-RDU_NTEMP[m3]:null,pd=tP!==null?tP-RDU_NPREC[m3]:null;
-      tMo+='<div class="alm-mo'+(iC?" current":"")+(iF?" future":"")+'"><div class="alm-mo-name">'+MO_NAMES[m3]+'</div><div class="alm-mo-val">'+(aT!==null?aT.toFixed(1):"--")+'</div><div class="alm-mo-nrm">Nrm: '+RDU_NTEMP[m3].toFixed(1)+'</div>'+(td!==null?'<div class="alm-mo-diff '+(Math.abs(td)<0.5?"zero":td>0?"pos":"neg")+'">'+(Math.abs(td)<0.5?"Normal":(td>0?"+":"")+td.toFixed(1))+'</div>':'')+'</div>';
-      var pB=tP!==null?Math.min(100,Math.round(tP/Math.max(RDU_NPREC[m3],0.01)*100)):0;
-      var pC=pd!==null?(pd>0.25?"#ff8844":pd<-0.25?"#4488ff":"#00d44a"):"#333";
-      pMo+='<div class="alm-mo'+(iC?" current":"")+(iF?" future":"")+'"><div class="alm-mo-name">'+MO_NAMES[m3]+'</div><div class="alm-mo-val">'+(tP!==null?tP.toFixed(2)+'"':"--")+'</div><div class="alm-mo-nrm">Nrm: '+RDU_NPREC[m3].toFixed(2)+'"</div>'+(pd!==null?'<div class="alm-mo-diff '+(Math.abs(pd)<0.25?"zero":pd>0?"pos":"neg")+'">'+(Math.abs(pd)<0.25?"Normal":(pd>0?"+":"")+pd.toFixed(2)+'"')+'</div>':'')+(tP!==null?'<div class="alm-mo-bar"><div class="alm-mo-bar-fill" style="width:'+pB+'%;background:'+pC+'"></div></div>':'')+'</div>';
-    }
-
-    el.innerHTML=
-      '<div class="alm-summary" style="grid-template-columns:repeat(2,1fr);max-width:720px;margin:0 auto 16px">'+
-        '<div class="alm-big"><div class="alm-big-lbl">YTD Rainfall</div><div class="alm-big-val">'+ytdP.toFixed(2)+'"</div><div class="alm-big-sub">Normal: '+nP.toFixed(2)+'"</div>'+dLbl(pDiff,'"',0.25)+'</div>'+
-        '<div class="alm-big"><div class="alm-big-lbl">YTD Avg Temp</div><div class="alm-big-val">'+ytdAT.toFixed(1)+'F</div><div class="alm-big-sub">Normal: '+nAT.toFixed(1)+'F</div>'+dLbl(tDiff,"F",0.5)+'</div>'+
-      '</div>'+
-      '<div class="alm-card" style="margin-top:18px"><h3><span>🌡</span> Temperature Departure from Normal</h3>'+
-        '<div class="alm-summary" style="grid-template-columns:repeat(2,1fr)">'+
-          depCard(depYdayLbl,depYdayLbl==="Yesterday"?"vs daily normal":depYdayLbl,depYdayAvg,depYdayNorm,depYday)+
-          depCard("Last 7 Days",c7+" days avg",dep7Avg,dep7Norm,dep7)+
-          depCard("Last Month",MO_NAMES[prevMo],depLMAvg,RDU_NTEMP[prevMo],depLM)+
-          depCard("This Month",MO_NAMES[curMo]+" so far",depTMAvg,RDU_NTEMP[curMo],depTM)+
-        '</div>'+
-      '</div>'+
-      '<div class="alm-grid">'+
-        '<div class="alm-card"><h3><span>🌡</span> Monthly Avg Temperature</h3><div class="alm-mo-grid">'+tMo+'</div></div>'+
-        '<div class="alm-card"><h3><span>🌧</span> Monthly Rainfall Totals</h3><div class="alm-mo-grid">'+pMo+'</div></div>'+
-      '</div>'+
-      '<div class="alm-note">Data: ASOS KRDU via Iowa State Mesonet · 30-year normals: 1991-2020 NCEI</div>';
-    window._almLoaded=true;
-  }).catch(function(e){window._almLoaded=false;el.innerHTML='<div class="alm-ld" style="color:#ef4444">'+e.message+'<br><button onclick="fetchAlmanac()" style="margin-top:10px;background:var(--red2);border:1px solid var(--red);color:#fff;padding:6px 16px;border-radius:2px;cursor:pointer">Retry</button></div>';});
+function almFetchTO(url,ms){
+  var ctrl=typeof AbortController!=='undefined'?new AbortController():null;
+  var t=ctrl?setTimeout(function(){ctrl.abort();},ms):null;
+  return fetch(url,ctrl?{signal:ctrl.signal}:{}).then(function(r){if(t)clearTimeout(t);if(!r.ok)throw new Error('HTTP '+r.status);return r;});
 }
+
+function almParseAsos(csv){
+  var byHour={};
+  csv.split('\n').forEach(function(line){
+    line=line.trim();
+    if(!line||line[0]==='#'||line.indexOf('station')===0)return;
+    var p=line.split(',');if(p.length<4)return;
+    var ts=p[1],hk=ts.substring(0,13),ds=ts.substring(0,10);
+    var tmpf=p[2],prec=p[3];
+    if(!byHour[hk])byHour[hk]={ds:ds,temps:[],precip:0};
+    if(tmpf!=='M'&&tmpf!==''){var t=parseFloat(tmpf);if(!isNaN(t))byHour[hk].temps.push(t);}
+    if(prec!=='M'&&prec!=='T'&&prec!==''){var pv=parseFloat(prec);if(!isNaN(pv)&&pv>0)byHour[hk].precip=Math.max(byHour[hk].precip,pv);}
+  });
+  var byDay={};
+  Object.keys(byHour).forEach(function(hk){
+    var h=byHour[hk],ds=h.ds;
+    if(!byDay[ds])byDay[ds]={temps:[],precip:0};
+    byDay[ds].temps=byDay[ds].temps.concat(h.temps);
+    byDay[ds].precip+=h.precip;
+  });
+  var result={};
+  Object.keys(byDay).forEach(function(ds){
+    var d=byDay[ds];
+    result[ds]={hi:d.temps.length?Math.max.apply(null,d.temps):null,lo:d.temps.length?Math.min.apply(null,d.temps):null,precip:d.precip};
+  });
+  return result;
+}
+
+function almParseOM(data){
+  var result={};
+  if(!data||!data.daily||!data.daily.time)return result;
+  var times=data.daily.time,maxT=data.daily.temperature_2m_max||[],minT=data.daily.temperature_2m_min||[],prec=data.daily.precipitation_sum||[];
+  for(var i=0;i<times.length;i++)result[times[i]]={hi:maxT[i]!=null?maxT[i]:null,lo:minT[i]!=null?minT[i]:null,precip:prec[i]||0};
+  return result;
+}
+
+function almRender(byDay,el,now,yr,curMo,curDay,src){
+  function p2(n){return n<10?'0'+n:''+n;}
+  var dim=[31,28+(yr%4===0?1:0),31,30,31,30,31,31,30,31,30,31];
+  var moTSum={},moCnt={},moPrec={},dailyMap={};
+  Object.keys(byDay).forEach(function(ds){
+    var d=byDay[ds],mo=parseInt(ds.substring(5,7),10)-1;
+    if(d.hi!==null&&d.lo!==null){var avg=(d.hi+d.lo)/2;if(!moTSum[mo]){moTSum[mo]=0;moCnt[mo]=0;}moTSum[mo]+=avg;moCnt[mo]++;dailyMap[ds]={temp:avg};}
+    else{dailyMap[ds]={temp:null};}
+    if(!moPrec[mo])moPrec[mo]=0;
+    moPrec[mo]+=(d.precip||0);
+  });
+  var moTemp={};Object.keys(moTSum).forEach(function(m){moTemp[m]=moTSum[m]/moCnt[m];});
+  var ytdTS=0,ytdD=0,ytdP=0;
+  for(var mi2=0;mi2<=curMo;mi2++){
+    if(moTemp[mi2]!=null){var days=mi2<curMo?dim[mi2]:curDay;ytdTS+=moTemp[mi2]*days;ytdD+=days;}
+    if(moPrec[mi2]!=null)ytdP+=moPrec[mi2];
+  }
+  var todayStr2=yr+'-'+p2(curMo+1)+'-'+p2(curDay);
+  var dailyArr=Object.keys(dailyMap).filter(function(ds){return ds<todayStr2&&dailyMap[ds].temp!=null;}).sort().slice(-8).map(function(ds){return{date:ds,temp:dailyMap[ds].temp};});
+  var ytdAT=ytdD?ytdTS/ytdD:0;
+  var nP=0,nTT=0,nD=0;
+  for(var m2=0;m2<12;m2++){
+    if(m2<curMo){nP+=RDU_NPREC[m2];nTT+=RDU_NTEMP[m2]*dim[m2];nD+=dim[m2];}
+    else if(m2===curMo){nP+=RDU_NPREC[m2]*(curDay/dim[m2]);nTT+=RDU_NTEMP[m2]*curDay;nD+=curDay;}
+  }
+  var nAT=nD?nTT/nD:0,pDiff=ytdP-nP,tDiff=ytdAT-nAT;
+  function dLbl(d,u,th){if(Math.abs(d)<th)return'<span class="alm-cmp normal">NORMAL</span>';return'<span class="alm-cmp '+(d>0?"above":"below")+'">'+(d>0?"+":"")+d.toFixed(1)+u+" "+(d>0?"ABOVE":"BELOW")+'</span>';}
+  function dailyNorm(dateStr){var d=new Date(dateStr+"T12:00:00"),m=d.getMonth(),day=d.getDate();var dm=new Date(d.getFullYear(),m+1,0).getDate(),frac=(day-15.5)/dm;if(frac>=0){var nm=(m+1)%12;return RDU_NTEMP[m]+(RDU_NTEMP[nm]-RDU_NTEMP[m])*frac;}else{var pm=(m+11)%12;return RDU_NTEMP[m]+(RDU_NTEMP[m]-RDU_NTEMP[pm])*(-frac);}}
+  var ydDate=new Date(now);ydDate.setDate(ydDate.getDate()-1);
+  var ydStr=ydDate.toLocaleDateString('en-CA');
+  var depYday=null,depYdayAvg=null,depYdayNorm=null,depYdayLbl='Latest Day';
+  for(var li=dailyArr.length-1;li>=0;li--){if(dailyArr[li].date!==todayStr2){depYdayAvg=dailyArr[li].temp;depYdayNorm=dailyNorm(dailyArr[li].date);depYday=depYdayAvg-depYdayNorm;depYdayLbl=dailyArr[li].date===ydStr?'Yesterday':new Date(dailyArr[li].date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'});break;}}
+  var s7=0,n7=0,c7=0;var d7=dailyArr.filter(function(d){return d.date!==todayStr2;}).slice(-7);d7.forEach(function(d){s7+=d.temp;n7+=dailyNorm(d.date);c7++;});
+  var dep7=c7?(s7/c7-n7/c7):null,dep7Avg=c7?s7/c7:null,dep7Norm=c7?n7/c7:null;
+  var prevMo=curMo===0?11:curMo-1;
+  var depLMAvg=moTemp[prevMo]!=null?moTemp[prevMo]:null,depLM=depLMAvg!=null?depLMAvg-RDU_NTEMP[prevMo]:null;
+  var depTMAvg=moTemp[curMo]!=null?moTemp[curMo]:null,depTM=depTMAvg!=null?depTMAvg-RDU_NTEMP[curMo]:null;
+  function depCard(title,sub,avg,norm,dep){if(dep===null)return'<div class="alm-big"><div class="alm-big-lbl">'+title+'</div><div class="alm-big-val">--</div><div class="alm-big-sub">No data yet</div></div>';return'<div class="alm-big"><div class="alm-big-lbl">'+title+'</div><div class="alm-big-val">'+avg.toFixed(1)+'°F</div><div class="alm-big-sub">Normal: '+norm.toFixed(1)+'°F · '+sub+'</div>'+dLbl(dep,'°F',0.5)+'</div>';}
+  var tMo='',pMo='';
+  for(var m3=0;m3<12;m3++){
+    var iC=m3===curMo,iF=m3>curMo;
+    var aT=moTemp[m3]!=null?moTemp[m3]:null,tP=moPrec[m3]!=null?moPrec[m3]:null;
+    var td=aT!==null?aT-RDU_NTEMP[m3]:null,pd=tP!==null?tP-RDU_NPREC[m3]:null;
+    tMo+='<div class="alm-mo'+(iC?' current':'')+(iF?' future':'')+'"><div class="alm-mo-name">'+MO_NAMES[m3]+'</div><div class="alm-mo-val">'+(aT!==null?aT.toFixed(1):'--')+'</div><div class="alm-mo-nrm">Nrm: '+RDU_NTEMP[m3].toFixed(1)+'</div>'+(td!==null?'<div class="alm-mo-diff '+(Math.abs(td)<0.5?'zero':td>0?'pos':'neg')+'">'+(Math.abs(td)<0.5?'Normal':(td>0?'+':'')+td.toFixed(1))+'</div>':'')+'</div>';
+    var pB=tP!==null?Math.min(100,Math.round(tP/Math.max(RDU_NPREC[m3],0.01)*100)):0;
+    var pC=pd!==null?(pd>0.25?'#ff8844':pd<-0.25?'#4488ff':'#00d44a'):'#333';
+    pMo+='<div class="alm-mo'+(iC?' current':'')+(iF?' future':'')+'"><div class="alm-mo-name">'+MO_NAMES[m3]+'</div><div class="alm-mo-val">'+(tP!==null?tP.toFixed(2)+'"':'--')+'</div><div class="alm-mo-nrm">Nrm: '+RDU_NPREC[m3].toFixed(2)+'"</div>'+(pd!==null?'<div class="alm-mo-diff '+(Math.abs(pd)<0.25?'zero':pd>0?'pos':'neg')+'">'+(Math.abs(pd)<0.25?'Normal':(pd>0?'+':'')+pd.toFixed(2)+'"')+'</div>':'')+(tP!==null?'<div class="alm-mo-bar"><div class="alm-mo-bar-fill" style="width:'+pB+'%;background:'+pC+'"></div></div>':'')+'</div>';
+  }
+  var srcNote=src==='om'?' · via Open-Meteo Archive':src==='stale'?' · <span style="color:#ffcc00">cached data</span>':'';
+  el.innerHTML=
+    '<div class="alm-summary" style="grid-template-columns:repeat(2,1fr);max-width:720px;margin:0 auto 16px">'+
+      '<div class="alm-big"><div class="alm-big-lbl">YTD Rainfall</div><div class="alm-big-val">'+ytdP.toFixed(2)+'"</div><div class="alm-big-sub">Normal: '+nP.toFixed(2)+'"</div>'+dLbl(pDiff,'"',0.25)+'</div>'+
+      '<div class="alm-big"><div class="alm-big-lbl">YTD Avg Temp</div><div class="alm-big-val">'+ytdAT.toFixed(1)+'F</div><div class="alm-big-sub">Normal: '+nAT.toFixed(1)+'F</div>'+dLbl(tDiff,'F',0.5)+'</div>'+
+    '</div>'+
+    '<div class="alm-card" style="margin-top:18px"><h3><span>🌡</span> Temperature Departure from Normal</h3>'+
+      '<div class="alm-summary" style="grid-template-columns:repeat(2,1fr)">'+
+        depCard(depYdayLbl,depYdayLbl==='Yesterday'?'vs daily normal':depYdayLbl,depYdayAvg,depYdayNorm,depYday)+
+        depCard('Last 7 Days',c7+' days avg',dep7Avg,dep7Norm,dep7)+
+        depCard('Last Month',MO_NAMES[prevMo],depLMAvg,RDU_NTEMP[prevMo],depLM)+
+        depCard('This Month',MO_NAMES[curMo]+' so far',depTMAvg,RDU_NTEMP[curMo],depTM)+
+      '</div>'+
+    '</div>'+
+    '<div class="alm-grid">'+
+      '<div class="alm-card"><h3><span>🌡</span> Monthly Avg Temperature</h3><div class="alm-mo-grid">'+tMo+'</div></div>'+
+      '<div class="alm-card"><h3><span>🌧</span> Monthly Rainfall Totals</h3><div class="alm-mo-grid">'+pMo+'</div></div>'+
+    '</div>'+
+    '<div class="alm-note">Data: ASOS KRDU via Iowa State Mesonet'+srcNote+' · 30-yr normals: 1991–2020 NCEI</div>';
+  window._almLoaded=true;
+}
+
+function fetchAlmanac(){
+  var el=$('alm-content');
+  var now=new Date(),yr=now.getFullYear(),curMo=now.getMonth(),curDay=now.getDate();
+  function p2(n){return n<10?'0'+n:''+n;}
+  var cacheKey=ALM_CACHE_KEY+yr;
+
+  // Serve from cache immediately if fresh
+  try{
+    var cached=localStorage.getItem(cacheKey);
+    if(cached){var obj=JSON.parse(cached);if(obj&&obj.ts&&(Date.now()-obj.ts)<ALM_CACHE_TTL&&obj.byDay){almRender(obj.byDay,el,now,yr,curMo,curDay,'asos');return;}}
+  }catch(e){}
+
+  el.innerHTML='<div class="alm-ld"><div class="tsps-spinner"></div>Loading climate data...</div>';
+
+  function saveRender(byDay,src){
+    try{localStorage.setItem(cacheKey,JSON.stringify({ts:Date.now(),byDay:byDay}));}catch(e){}
+    almRender(byDay,el,now,yr,curMo,curDay,src);
+  }
+
+  function tryOM(){
+    var endDate=yr+'-'+p2(curMo+1)+'-'+p2(curDay);
+    almFetchTO('https://archive-api.open-meteo.com/v1/archive?latitude=35.88&longitude=-78.79&start_date='+yr+'-01-01&end_date='+endDate+'&daily=temperature_2m_max,temperature_2m_min,precipitation_sum&temperature_unit=fahrenheit&precipitation_unit=inch&timezone=America%2FNew_York',15000)
+      .then(function(r){return r.json();})
+      .then(function(data){
+        var byDay=almParseOM(data);
+        if(Object.keys(byDay).length<5)throw new Error('empty');
+        saveRender(byDay,'om');
+      })
+      .catch(function(){
+        // Last resort: render stale cache with warning
+        try{var s=localStorage.getItem(cacheKey);if(s){var o=JSON.parse(s);if(o&&o.byDay){almRender(o.byDay,el,now,yr,curMo,curDay,'stale');return;}}}catch(e){}
+        window._almLoaded=false;
+        el.innerHTML='<div class="alm-ld" style="color:#ef4444">Load failed<br><button onclick="fetchAlmanac()" style="margin-top:10px;background:var(--red2);border:1px solid var(--red);color:#fff;padding:6px 16px;border-radius:2px;cursor:pointer;font-family:inherit">Retry</button></div>';
+      });
+  }
+
+  // Primary: Iowa State ASOS (most accurate, complete hourly data)
+  var asosUrl='https://mesonet.agron.iastate.edu/cgi-bin/request/asos.py?station=KRDU&data=tmpf&data=p01i&year1='+yr+'&month1=1&day1=1&year2='+yr+'&month2='+(curMo+1)+'&day2='+curDay+'&tz=America%2FNew_York&format=onlycomma&latlon=no&missing=M&trace=T&direct=yes&report_type=1&report_type=2';
+  almFetchTO(asosUrl,12000)
+    .then(function(r){return r.text();})
+    .then(function(csv){
+      var byDay=almParseAsos(csv);
+      if(Object.keys(byDay).length<5)throw new Error('insufficient ASOS data');
+      saveRender(byDay,'asos');
+    })
+    .catch(function(){tryOM();});
+}
+
 
 // ============================================================
 // ============================================================
