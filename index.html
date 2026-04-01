@@ -1374,57 +1374,56 @@ function fetchAlmanac(){
   var el=$("alm-content");
   var now=new Date(),yr=now.getFullYear(),curMo=now.getMonth(),curDay=now.getDate();
   function p2(n){return n<10?"0"+n:""+n;}
+  var dim=[31,28+(yr%4===0?1:0),31,30,31,30,31,31,30,31,30,31];
 
-  // Group A: monthly aggregates (history/monthly, YYYYMM) — one call per month Jan→current
-  var mFetches=[];
+  // Fetch NWS KRDU hourly observations for each month Jan→current (one call per month)
+  var fetches=[];
   for(var mi=0;mi<=curMo;mi++){
-    mFetches.push((function(mo){
-      var dp=yr+p2(mo+1);
-      return fetch("https://api.weather.com/v2/pws/history/monthly?stationId=KNCRALEI761&format=json&units=e&date="+dp+"&apiKey="+WU_COMMUNITY_KEY)
-      .then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json();})
-      .then(function(d){return{mo:mo,obs:d.observations||[]};})
-      .catch(function(e){console.error("WU monthly m="+(mo+1)+": "+e.message);return{mo:mo,obs:[]};});
+    fetches.push((function(mo){
+      var s=yr+"-"+p2(mo+1)+"-01T00:00:00Z";
+      var e=yr+"-"+p2(mo+1)+"-"+p2(dim[mo])+"T23:59:59Z";
+      return fetch("https://api.weather.gov/stations/KRDU/observations?start="+encodeURIComponent(s)+"&end="+encodeURIComponent(e)+"&limit=1000",
+        {headers:{"User-Agent":"WolfpackWeather/2.0"}})
+      .then(function(r){if(!r.ok)throw new Error("NWS HTTP "+r.status);return r.json();})
+      .then(function(d){return{mo:mo,features:d.features||[]};})
+      .catch(function(e){console.error("NWS obs m="+(mo+1)+": "+e.message);return{mo:mo,features:[]};});
     })(mi));
   }
 
-  // Group B: last 8 individual days (history/daily, YYYYMMDD) for departure cards
-  var dFetches=[];
-  for(var di=1;di<=8;di++){
-    dFetches.push((function(ago){
-      var dd=new Date(yr,now.getMonth(),now.getDate()-ago);
-      var dp=dd.getFullYear()+p2(dd.getMonth()+1)+p2(dd.getDate());
-      var ds=dd.getFullYear()+"-"+p2(dd.getMonth()+1)+"-"+p2(dd.getDate());
-      return fetch("https://api.weather.com/v2/pws/history/daily?stationId=KNCRALEI761&format=json&units=e&date="+dp+"&apiKey="+WU_COMMUNITY_KEY)
-      .then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json();})
-      .then(function(j){
-        var obs=j.observations||[];
-        if(!obs.length||!obs[0].imperial)return{date:ds,temp:null};
-        var imp=obs[0].imperial;
-        var t=imp.tempAvg!=null&&imp.tempAvg>-90?imp.tempAvg:
-              (imp.tempHigh!=null&&imp.tempLow!=null?(imp.tempHigh+imp.tempLow)/2:null);
-        return{date:ds,temp:t};
-      })
-      .catch(function(e){console.error("WU daily "+dp+": "+e.message);return{date:ds,temp:null};});
-    })(di));
-  }
-
-  Promise.all([Promise.all(mFetches),Promise.all(dFetches)]).then(function(all){
-    var mRes=all[0],dRes=all[1];
+  Promise.all(fetches).then(function(results){
     var moTemp={},moPrec={};
+    var dailyMap={}; // "YYYY-MM-DD" -> {temps:[], precip:0}
     var ytdTS=0,ytdD=0,ytdP=0;
-    var dim=[31,28+(yr%4===0?1:0),31,30,31,30,31,31,30,31,30,31];
 
-    // Monthly aggregates → moTemp[m] = monthly avg, moPrec[m] = monthly total
-    mRes.forEach(function(res){
-      var m=res.mo;
-      res.obs.forEach(function(obs){
-        if(!obs.imperial)return;
-        var imp=obs.imperial;
-        var t=imp.tempAvg!=null&&imp.tempAvg>-90&&!isNaN(imp.tempAvg)?imp.tempAvg:null;
-        var p=imp.precipTotal!=null&&!isNaN(imp.precipTotal)&&imp.precipTotal>=0?imp.precipTotal:null;
-        if(t!=null)moTemp[m]=t;
-        if(p!=null)moPrec[m]=p;
+    results.forEach(function(res){
+      var byDay={};
+      res.features.forEach(function(f){
+        var props=f.properties;
+        // Group by Eastern local date (UTC-5 approximation covers both EST and EDT boundary)
+        var ts=new Date(props.timestamp);
+        var local=new Date(ts.getTime()-5*3600000);
+        var ds=local.getUTCFullYear()+"-"+p2(local.getUTCMonth()+1)+"-"+p2(local.getUTCDate());
+        if(!byDay[ds])byDay[ds]={temps:[],precip:0};
+        var tC=props.temperature&&props.temperature.value;
+        if(tC!=null)byDay[ds].temps.push(tC*9/5+32);
+        var p1h=props.precipitationLastHour&&props.precipitationLastHour.value;
+        if(p1h!=null&&p1h>0)byDay[ds].precip+=p1h*0.0393701; // mm→inches
       });
+
+      // Aggregate days → monthly avg temp and total precip
+      var mTemps=[],mPrec=0,hasDays=false;
+      Object.keys(byDay).forEach(function(ds){
+        var day=byDay[ds];
+        if(day.temps.length){
+          var hi=Math.max.apply(null,day.temps),lo=Math.min.apply(null,day.temps);
+          mTemps.push((hi+lo)/2);
+        }
+        mPrec+=day.precip;
+        hasDays=true;
+        dailyMap[ds]={temp:day.temps.length?((Math.max.apply(null,day.temps)+Math.min.apply(null,day.temps))/2):null};
+      });
+      if(mTemps.length)moTemp[res.mo]=mTemps.reduce(function(a,b){return a+b;},0)/mTemps.length;
+      if(hasDays)moPrec[res.mo]=mPrec;
     });
 
     // YTD: weight monthly averages by days in month
@@ -1433,9 +1432,12 @@ function fetchAlmanac(){
       if(moPrec[mi2]!=null)ytdP+=moPrec[mi2];
     }
 
-    // dailyArr from individual-day fetches (for Latest Day / Last 7 Days departure cards)
-    var dailyArr=dRes.filter(function(x){return x.temp!=null;})
-                     .sort(function(a,b){return a.date<b.date?-1:1;});
+    // dailyArr for departure cards: last 8 complete days from NWS data
+    var todayStr2=now.getFullYear()+"-"+p2(now.getMonth()+1)+"-"+p2(now.getDate());
+    var dailyArr=Object.keys(dailyMap)
+      .filter(function(ds){return ds<todayStr2&&dailyMap[ds].temp!=null;})
+      .sort().slice(-8)
+      .map(function(ds){return{date:ds,temp:dailyMap[ds].temp};});
 
     var ytdAT=ytdD?ytdTS/ytdD:0;
     var nP=0,nTT=0,nD=0;
@@ -1456,7 +1458,6 @@ function fetchAlmanac(){
       else{var pm=(m+11)%12;return RDU_NTEMP[m]+(RDU_NTEMP[m]-RDU_NTEMP[pm])*(-frac);}
     }
 
-    var todayStr2=now.toLocaleDateString("en-CA");
     var ydDate=new Date(now);ydDate.setDate(ydDate.getDate()-1);
     var ydStr=ydDate.toLocaleDateString("en-CA");
 
@@ -1517,7 +1518,7 @@ function fetchAlmanac(){
         '<div class="alm-card"><h3><span>🌡</span> Monthly Avg Temperature</h3><div class="alm-mo-grid">'+tMo+'</div></div>'+
         '<div class="alm-card"><h3><span>🌧</span> Monthly Rainfall Totals</h3><div class="alm-mo-grid">'+pMo+'</div></div>'+
       '</div>'+
-      '<div class="alm-note">Data: Red Wolf Farm · Station KNCRALEI761 (Weather Underground) · 30-year normals: 1991-2020 NCEI</div>';
+      '<div class="alm-note">Data: NWS KRDU (Raleigh-Durham Airport) · 30-year normals: 1991-2020 NCEI</div>';
     window._almLoaded=true;
   }).catch(function(e){el.innerHTML='<div class="alm-ld" style="color:#ef4444">'+e.message+'<br><button onclick="fetchAlmanac()" style="margin-top:10px;background:var(--red2);border:1px solid var(--red);color:#fff;padding:6px 16px;border-radius:2px;cursor:pointer">Retry</button></div>';});
 }
