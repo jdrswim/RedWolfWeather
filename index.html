@@ -1087,16 +1087,19 @@ function sunSetMode(mode){
 }
 
 var TIDE_STATIONS={
-  hiltonhead:{id:"8670870",label:"Coligny Beach · Hilton Head Island, SC"},
+  hiltonhead: {id:"8670870",label:"Coligny Beach · Hilton Head Island, SC"},
   wrightsville:{id:"8658120",label:"Wrightsville Beach, NC"},
-  emerald:{id:"8656483",label:"Emerald Isle, NC"}
+  emerald:     {id:"8656483",label:"Emerald Isle, NC"},
+  oakisland:   {id:"8658163",label:"Oak Island Beach, NC"},
+  hatteras:    {id:"8654467",label:"Cape Hatteras · Hatteras Inlet, NC"},
+  corolla:     {id:"8651370",label:"Corolla Beach · Duck, NC"}
 };
 var _currentTideLoc="hiltonhead";
 var _tideCache={};
 
 function setTideLoc(loc){
   _currentTideLoc=loc;
-  ["hiltonhead","wrightsville","emerald"].forEach(function(k){
+  ["hiltonhead","wrightsville","emerald","oakisland","hatteras","corolla"].forEach(function(k){
     var b=$("tl-"+k);if(b)b.classList.toggle("tide-loc-on",k===loc);
   });
   var st=TIDE_STATIONS[loc];
@@ -1334,10 +1337,13 @@ function fetchSunData(){
     '</div>';
     var tidesView=
       '<div id="sun-tides-view" style="display:none">'+
-        '<div style="display:flex;gap:6px;margin-bottom:14px">'+
+        '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:14px">'+
           '<button class="tide-loc-btn tide-loc-on" id="tl-hiltonhead"   onclick="setTideLoc(\'hiltonhead\')"><span class="hhi-full">Hilton Head Island</span><span class="hhi-short">HHI</span></button>'+
           '<button class="tide-loc-btn"             id="tl-wrightsville" onclick="setTideLoc(\'wrightsville\')"><span class="hhi-full">Wrightsville Beach</span><span class="hhi-short">Wrightsville</span></button>'+
           '<button class="tide-loc-btn"             id="tl-emerald"      onclick="setTideLoc(\'emerald\')">Emerald Isle</button>'+
+          '<button class="tide-loc-btn"             id="tl-oakisland"    onclick="setTideLoc(\'oakisland\')"><span class="hhi-full">Oak Island Beach</span><span class="hhi-short">OIB</span></button>'+
+          '<button class="tide-loc-btn"             id="tl-hatteras"     onclick="setTideLoc(\'hatteras\')"><span class="hhi-full">Cape Hatteras</span><span class="hhi-short">Hatteras</span></button>'+
+          '<button class="tide-loc-btn"             id="tl-corolla"      onclick="setTideLoc(\'corolla\')">Corolla Beach</button>'+
         '</div>'+
         '<div id="tide-content"><div class="alm-ld"><div class="tsps-spinner"></div></div></div>'+
       '</div>';
