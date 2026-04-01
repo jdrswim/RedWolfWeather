@@ -267,6 +267,7 @@ main{max-width:1100px;margin:0 auto;padding:18px;overflow-x:hidden}
 .tide-loc-btn{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.5);font-family:var(--font);font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;padding:6px 10px;border-radius:4px;cursor:pointer;white-space:nowrap;transition:all .18s;flex:1;min-width:0}
 .tide-loc-btn:hover{background:rgba(255,255,255,.1);color:rgba(255,255,255,.75)}
 .tide-loc-btn.tide-loc-on{background:rgba(0,120,220,.2);border-color:rgba(0,150,255,.4);color:#7dd3fc}
+.hhi-short{display:none}
 .sun-card{background:linear-gradient(135deg,#1a1500,var(--p1));border:1px solid var(--bd);border-top:3px solid var(--gold);border-radius:3px;padding:20px;overflow:hidden}
 .sun-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
 .sun-stat{background:var(--p2);border:1px solid var(--bd);border-radius:4px;padding:14px;text-align:center}
@@ -468,6 +469,7 @@ footer strong{color:var(--red)}
   footer p{font-size:9px}
   .tip-panel{padding:18px;margin:10px}
 }
+@media(max-width:500px){.hhi-full{display:none}.hhi-short{display:inline}}
 @media(max-width:380px){
   .logo svg{width:30px;height:30px}
   .logo-text h1{font-size:14px}
@@ -1315,7 +1317,7 @@ function fetchSunData(){
     var tidesView=
       '<div id="sun-tides-view" style="display:none">'+
         '<div style="display:flex;gap:6px;margin-bottom:14px">'+
-          '<button class="tide-loc-btn tide-loc-on" id="tl-hiltonhead"   onclick="setTideLoc(\'hiltonhead\')">Hilton Head Island</button>'+
+          '<button class="tide-loc-btn tide-loc-on" id="tl-hiltonhead"   onclick="setTideLoc(\'hiltonhead\')"><span class="hhi-full">Hilton Head Island</span><span class="hhi-short">HHI</span></button>'+
           '<button class="tide-loc-btn"             id="tl-wrightsville" onclick="setTideLoc(\'wrightsville\')">Wrightsville Beach</button>'+
           '<button class="tide-loc-btn"             id="tl-emerald"      onclick="setTideLoc(\'emerald\')">Emerald Isle</button>'+
         '</div>'+
