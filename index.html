@@ -515,6 +515,29 @@ footer strong{color:var(--red)}
 .rkt-lik-name{font-size:11px;font-weight:900;letter-spacing:1px}
 .rkt-lik-sub{font-size:9px;color:var(--mu);margin-top:2px}
 @media(max-width:600px){.rkt-vis-grid{grid-template-columns:repeat(3,1fr)}.rkt-vis-offset{font-size:13px}}
+/* AEROSPACE SUB-TABS */
+.aero-tab-bar{display:flex;gap:0;margin-bottom:18px;border-bottom:1px solid var(--bd)}
+.aero-tab-btn{background:none;border:none;border-bottom:2px solid transparent;color:var(--mu);font-family:inherit;font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;padding:8px 16px 9px;cursor:pointer;transition:color .15s,border-color .15s;margin-bottom:-1px}
+.aero-tab-btn.active{color:var(--cyan);border-bottom-color:var(--cyan)}
+.aero-tab-btn:hover:not(.active){color:var(--tx)}
+.aero-pane{display:none}.aero-pane.active{display:block}
+/* ISS PASSES */
+.iss-pass{background:var(--p2);border:1px solid var(--bd);border-left:3px solid rgba(255,255,255,.15);border-radius:3px;padding:14px;margin-bottom:10px}
+.iss-pass.iss-visible{border-left-color:#00d44a}
+.iss-pass.iss-twilight{border-left-color:#ffcc00}
+.iss-pass.iss-day{border-left-color:rgba(255,255,255,.12);opacity:.5}
+.iss-pass-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.iss-pass-time{font-size:14px;font-weight:800;color:var(--white)}
+.iss-pass-date{font-size:10px;color:var(--mu);font-weight:600;margin-top:2px}
+.iss-vis-badge{font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;padding:3px 8px;border-radius:2px;flex-shrink:0}
+.iss-vis-badge.iss-visible{background:rgba(0,212,74,.15);color:#00d44a;border:1px solid rgba(0,212,74,.3)}
+.iss-vis-badge.iss-twilight{background:rgba(255,204,0,.1);color:#ffcc00;border:1px solid rgba(255,204,0,.2)}
+.iss-vis-badge.iss-day{background:rgba(255,255,255,.05);color:var(--mu);border:1px solid rgba(255,255,255,.1)}
+.iss-pass-meta{display:flex;gap:14px;flex-wrap:wrap}
+.iss-pass-path{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06);font-size:11px;font-weight:600;color:var(--tx)}
+.iss-path-lbl{font-size:9px;color:var(--mu);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-right:2px}
+.iss-path-arrow{color:var(--mu);font-size:10px}
+@media(max-width:600px){.aero-tab-btn{font-size:10px;padding:7px 10px 8px}.iss-pass-meta{gap:10px}}
 </style>
 </head>
 <body>
@@ -636,9 +659,17 @@ footer strong{color:var(--red)}
 <!-- ============================================================ AEROSPACE TAB -->
 <div class="tab-pane" id="tab-aerospace">
 <div class="alm-wrap">
-  <div class="sec">East Coast Rocket Launches</div>
-  <div class="rkt-inner">
-    <div id="rkt-content"><div class="alm-ld"><div class="tsps-spinner"></div>Loading launches...</div></div>
+  <div class="aero-tab-bar">
+    <button class="aero-tab-btn active" id="aeroBtnLaunches" onclick="switchAeroTab('launches',this)">East Coast Rocket Launches</button>
+    <button class="aero-tab-btn" id="aeroBtnIss" onclick="switchAeroTab('iss',this)">ISS Passings</button>
+  </div>
+  <div class="aero-pane active" id="aero-launches">
+    <div class="rkt-inner">
+      <div id="rkt-content"><div class="alm-ld"><div class="tsps-spinner"></div>Loading launches...</div></div>
+    </div>
+  </div>
+  <div class="aero-pane" id="aero-iss">
+    <div id="iss-content"><div class="alm-ld"><div class="tsps-spinner"></div>Loading ISS passes...</div></div>
   </div>
 </div>
 </div>
@@ -673,6 +704,14 @@ function switchTab(name,btn){
   else if(name==="almanac"){fetchSunData();accFetchAndRender();}
   if(name==="pws"){fetchPWS();}
   if(name==="aerospace"&&!window._rktLoaded){fetchRockets();}
+}
+
+function switchAeroTab(name,btn){
+  document.querySelectorAll('.aero-pane').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.aero-tab-btn').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('aero-'+name).classList.add('active');
+  btn.classList.add('active');
+  if(name==='iss'&&!window._issLoaded){fetchISSPasses();}
 }
 
 // ============================================================
@@ -2557,6 +2596,150 @@ function rktRender(el,data){
     '</div>';
   });
   html+='<div class="rkt-note">Visibility estimates assume dark or twilight conditions — daytime launches are rarely visible.<br>T+ offsets are approximate based on distance to the pad. Look in the listed compass direction.<br>Data: Launch Library 2 (thespacedevs.com) &middot; Cached 2 hrs</div>';
+  el.innerHTML=html;
+}
+
+// ============================================================
+// ISS PASS PREDICTIONS
+// Uses satellite.js (CDN) + CelesTrak TLE for SGP4 propagation.
+// Observer: Red Wolf Farm, 35.624178°N 78.666837°W
+// ============================================================
+var ISS_CACHE_KEY='iss_v1_cache';
+var ISS_LAT=35.624178,ISS_LON=-78.666837,ISS_ALT_KM=0.07;
+var _issLoaded=false;
+
+function fetchISSPasses(){
+  _issLoaded=true;
+  var el=document.getElementById('iss-content');
+  el.innerHTML='<div class="alm-ld"><div class="tsps-spinner"></div>Loading ISS passes...</div>';
+  // Check 2-hour cache
+  try{
+    var c=localStorage.getItem(ISS_CACHE_KEY);
+    if(c){var obj=JSON.parse(c);if(Date.now()-obj.ts<7200000){issRender(el,obj.passes);return;}}
+  }catch(e){}
+  // Load satellite.js from CDN then compute
+  if(window.satellite){issFetchTLE(el);}
+  else{
+    var s=document.createElement('script');
+    s.src='https://cdn.jsdelivr.net/npm/satellite.js@4.1.3/dist/satellite.min.js';
+    s.onload=function(){issFetchTLE(el);};
+    s.onerror=function(){
+      _issLoaded=false;
+      el.innerHTML='<div class="rkt-empty">Could not load satellite tracking library.<br><button onclick="fetchISSPasses()" style="background:var(--red2);border:1px solid var(--red);color:#fff;font-size:10px;font-weight:700;padding:5px 14px;cursor:pointer;font-family:inherit;border-radius:2px;margin-top:6px">Retry</button></div>';
+    };
+    document.head.appendChild(s);
+  }
+}
+
+function issFetchTLE(el){
+  var ctrl=new AbortController();
+  setTimeout(function(){ctrl.abort();},10000);
+  fetch('https://celestrak.org/satcat/elements.php?CATNR=25544&FORMAT=JSON',{signal:ctrl.signal})
+    .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
+    .then(function(data){
+      if(!data||!data.length||!data[0].TLE_LINE1)throw new Error('No TLE');
+      var satrec=satellite.twoline2satrec(data[0].TLE_LINE1,data[0].TLE_LINE2);
+      var passes=issComputePasses(satrec,ISS_LAT,ISS_LON,ISS_ALT_KM,7);
+      try{localStorage.setItem(ISS_CACHE_KEY,JSON.stringify({ts:Date.now(),passes:passes}));}catch(e){}
+      issRender(el,passes);
+    })
+    .catch(function(){
+      _issLoaded=false;
+      el.innerHTML='<div class="rkt-empty" style="line-height:2">Could not load ISS pass data.<br>'+
+        '<button onclick="fetchISSPasses()" style="background:var(--red2);border:1px solid var(--red);color:#fff;font-size:10px;font-weight:700;padding:5px 14px;cursor:pointer;font-family:inherit;border-radius:2px;margin-top:6px">Retry</button></div>';
+    });
+}
+
+function issComputePasses(satrec,lat,lon,altKm,days){
+  var passes=[],inPass=false,pass=null;
+  var now=Date.now(),endMs=now+days*86400000;
+  var observer={latitude:satellite.degreesToRadians(lat),longitude:satellite.degreesToRadians(lon),height:altKm};
+  for(var tMs=now;tMs<endMs;tMs+=15000){
+    var d=new Date(tMs);
+    var pv=satellite.propagate(satrec,d);
+    if(!pv||!pv.position||pv.position===true)continue;
+    var gmst=satellite.gstime(d);
+    var ecf=satellite.eciToEcf(pv.position,gmst);
+    var look=satellite.ecfToLookAngles(observer,ecf);
+    var el=satellite.radiansToDegrees(look.elevation);
+    var az=((satellite.radiansToDegrees(look.azimuth)%360)+360)%360;
+    if(el>=10){
+      if(!inPass){inPass=true;pass={startMs:tMs,startAz:az,maxEl:el,maxElAz:az,maxElMs:tMs,endMs:tMs,endAz:az};}
+      else{if(el>pass.maxEl){pass.maxEl=el;pass.maxElAz=az;pass.maxElMs=tMs;}pass.endMs=tMs;pass.endAz=az;}
+    }else if(inPass){passes.push(pass);inPass=false;pass=null;}
+  }
+  if(inPass)passes.push(pass);
+  return passes;
+}
+
+// Compact solar elevation calculator (±1° accuracy)
+function issSolarEl(ms,lat,lon){
+  var jd=ms/86400000+2440587.5,n=jd-2451545.0;
+  var L=((280.460+0.9856474*n)%360+360)%360;
+  var g=((357.528+0.9856003*n)%360+360)%360,gr=g*Math.PI/180;
+  var lam=L+1.915*Math.sin(gr)+0.02*Math.sin(2*gr),lamR=lam*Math.PI/180;
+  var eps=(23.439-0.0000004*n)*Math.PI/180;
+  var dec=Math.asin(Math.sin(eps)*Math.sin(lamR));
+  var RA=Math.atan2(Math.cos(eps)*Math.sin(lamR),Math.cos(lamR))*180/Math.PI;
+  var GMST=((280.46061837+360.98564736629*(jd-2451545.0))%360+360)%360;
+  var HA=((GMST+lon-RA)%360+360)%360;if(HA>180)HA-=360;
+  var HAr=HA*Math.PI/180,latR=lat*Math.PI/180;
+  return Math.asin(Math.sin(latR)*Math.sin(dec)+Math.cos(latR)*Math.cos(dec)*Math.cos(HAr))*180/Math.PI;
+}
+
+function issAzDir(az){
+  var d=['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+  return d[Math.round(az/22.5)%16];
+}
+
+function issRender(el,passes){
+  var future=(passes||[]).filter(function(p){return p.endMs>Date.now();});
+  if(!future.length){
+    el.innerHTML='<div class="rkt-empty">No ISS passes ≥10° elevation predicted in the next 7 days.<br><span style="font-size:10px;color:var(--mu)">Check back soon — passes repeat on a ~90-minute cycle.</span></div>';
+    return;
+  }
+  var html='<div style="font-size:10px;color:var(--mu);margin-bottom:14px;line-height:1.8">'+
+    '🛰 Red Wolf Farm · 35.624°N 78.667°W · Next 7 days · Min 10° elevation<br>'+
+    '<span style="color:#00d44a">▌</span> Dark sky — ISS likely sunlit &nbsp;'+
+    '<span style="color:#ffcc00">▌</span> Twilight window &nbsp;'+
+    '<span style="color:rgba(255,255,255,.2)">▌</span> Daytime (not visible)'+
+    '</div>';
+  future.forEach(function(p){
+    var solEl=issSolarEl(p.maxElMs,ISS_LAT,ISS_LON);
+    var cls,badge;
+    if(solEl>-6){cls='iss-day';badge='Day Pass';}
+    else if(solEl>-18){cls='iss-twilight';badge='Twilight';}
+    else{cls='iss-visible';badge=solEl<-30?'Night (may be dark)':'Likely Visible';}
+    var durSec=Math.round((p.endMs-p.startMs)/1000);
+    var durStr=Math.floor(durSec/60)+'m '+(durSec%60)+'s';
+    var maxC=p.maxEl>=60?'#00d44a':p.maxEl>=30?'#ffcc00':'var(--tx)';
+    var maxRat=p.maxEl>=60?'HIGH':p.maxEl>=30?'GOOD':'FAIR';
+    var sd=new Date(p.startMs);
+    var tStr=sd.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',second:'2-digit',hour12:true});
+    var dStr=sd.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+    html+='<div class="iss-pass '+cls+'">'+
+      '<div class="iss-pass-top">'+
+        '<div><div class="iss-pass-time">'+tStr+'</div><div class="iss-pass-date">'+dStr+'</div></div>'+
+        '<span class="iss-vis-badge '+cls+'">'+badge+'</span>'+
+      '</div>'+
+      '<div class="iss-pass-meta">'+
+        '<div class="rkt-meta-item"><span class="rkt-meta-lbl">Max Elevation</span>'+
+          '<span class="rkt-meta-val" style="color:'+maxC+'">'+Math.round(p.maxEl)+'° <span style="font-size:9px;font-weight:800;letter-spacing:1px;color:'+maxC+'">'+maxRat+'</span></span></div>'+
+        '<div class="rkt-meta-item"><span class="rkt-meta-lbl">Duration</span><span class="rkt-meta-val">'+durStr+'</span></div>'+
+        '<div class="rkt-meta-item"><span class="rkt-meta-lbl">Approach</span><span class="rkt-meta-val">'+issAzDir(p.startAz)+' '+Math.round(p.startAz)+'°</span></div>'+
+        '<div class="rkt-meta-item"><span class="rkt-meta-lbl">Departure</span><span class="rkt-meta-val">'+issAzDir(p.endAz)+' '+Math.round(p.endAz)+'°</span></div>'+
+      '</div>'+
+      '<div class="iss-pass-path">'+
+        '<span class="iss-path-lbl">Path</span>'+
+        '<span>'+issAzDir(p.startAz)+' '+Math.round(p.startAz)+'°</span>'+
+        '<span class="iss-path-arrow">→</span>'+
+        '<span style="color:'+maxC+'">'+issAzDir(p.maxElAz)+' '+Math.round(p.maxElAz)+'° peak</span>'+
+        '<span class="iss-path-arrow">→</span>'+
+        '<span>'+issAzDir(p.endAz)+' '+Math.round(p.endAz)+'°</span>'+
+      '</div>'+
+    '</div>';
+  });
+  html+='<div class="rkt-note">ISS orbital data: CelesTrak · Propagation: satellite.js SGP4 · Predictions ±2 min · Cached 2 hrs<br>Visibility requires dark observer location + ISS in sunlight — best in ±90 min of sunrise/sunset</div>';
   el.innerHTML=html;
 }
 
