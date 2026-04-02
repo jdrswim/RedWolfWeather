@@ -540,31 +540,6 @@ footer strong{color:var(--red)}
 .iss-path-lbl{font-size:9px;color:var(--mu);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-right:2px}
 .iss-path-arrow{color:var(--mu);font-size:10px}
 @media(max-width:600px){.aero-tab-btn{font-size:10px;padding:8px 12px;letter-spacing:1px}.iss-pass-meta{gap:10px}}
-/* LIVE FLIGHTS */
-.flt-card{background:var(--p2);border:1px solid var(--bd);border-left:3px solid var(--cyan);border-radius:3px;padding:14px;margin-bottom:10px}
-.flt-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
-.flt-callsign{font-size:15px;font-weight:800;letter-spacing:1.5px;color:var(--red);text-transform:uppercase}
-.flt-reg{font-size:9px;color:var(--mu);letter-spacing:.5px;margin-top:3px}
-.flt-airline{font-size:10px;color:var(--mu);letter-spacing:.5px;margin-top:2px}
-.flt-type{font-size:12px;font-weight:700;color:var(--cyan);text-align:right}
-.flt-type-full{font-size:9px;color:var(--mu);text-align:right;margin-top:2px;max-width:130px;line-height:1.3}
-.flt-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
-.flt-m{background:var(--p3);border-radius:3px;padding:8px 10px;text-align:center}
-.flt-mv{font-size:15px;font-weight:700;color:var(--tx)}
-.flt-ml{font-size:9px;color:var(--mu);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-top:2px}
-.flt-footer{display:flex;justify-content:space-between;align-items:center}
-.flt-eta-time{color:var(--green);font-weight:700;font-size:12px}
-.flt-eta-lbl{font-size:9px;color:var(--mu);margin-top:1px}
-.flt-link{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--cyan);text-decoration:none;border:1px solid rgba(0,204,255,.3);padding:4px 10px;border-radius:2px}
-.flt-link:hover{background:rgba(0,204,255,.1)}
-.flt-airport-sect{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--mu);margin:16px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--bd)}
-.flt-airport-sect:first-child{margin-top:0}
-.flt-none{font-size:11px;color:var(--mu2);padding:10px 0;font-style:italic}
-.flt-toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
-.flt-ts{font-size:9px;color:var(--mu2);letter-spacing:.5px}
-.flt-refresh{background:transparent;border:1px solid rgba(255,255,255,.15);color:var(--mu);font-family:inherit;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:5px 12px;cursor:pointer;border-radius:2px}
-.flt-refresh:hover{border-color:var(--cyan);color:var(--cyan)}
-.flt-note{font-size:9px;color:var(--mu2);font-style:italic;margin-top:12px;line-height:1.6}
 </style>
 </head>
 <body>
@@ -660,7 +635,7 @@ footer strong{color:var(--red)}
   </div>
 
   <div class="media-row">
-    <div class="media-card"><div class="sec" style="margin-bottom:10px">GOES-East Satellite</div><div class="media-frame" style="height:280px"><img id="goes-img" alt="GOES-East" src="https://cdn.star.nesdis.noaa.gov/GOES16/ABI/SECTOR/eus/GEOCOLOR/latest.jpg" style="width:100%;height:100%;object-fit:cover;transform:scale(2.2);transform-origin:50% 45%"/></div><div class="mfooter"><div class="ldot"></div>NOAA GOES-East - Carolinas Region - GeoColor</div></div>
+    <div class="media-card"><div class="sec" style="margin-bottom:10px">GOES-East Satellite</div><div class="media-frame" style="height:280px"><img id="goes-img" alt="GOES-East" src="https://cdn.star.nesdis.noaa.gov/GOES16/ABI/SECTOR/eus/GEOCOLOR/latest.jpg" style="width:100%;height:100%;object-fit:cover;transform:scale(2.2);transform-origin:46% 45%"/></div><div class="mfooter"><div class="ldot"></div>NOAA GOES-East - Carolinas Region - GeoColor</div></div>
     <div class="media-card"><div class="sec" style="margin-bottom:10px">NWS KRAX Radar</div><div class="media-frame" style="height:280px"><iframe src="https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=in&metricTemp=%C2%B0F&metricWind=mph&zoom=8&overlay=radar&product=radar&level=surface&lat=35.78&lon=-78.64&pressure=false&message=false" title="Radar" loading="lazy"></iframe></div><div class="mfooter"><div class="ldot"></div>Radar - Centered on Raleigh-Durham</div></div>
     <div class="media-card"><div class="sec" style="margin-bottom:10px">Sugar Mountain Base Cam</div><div class="media-frame" style="position:relative" id="sugar-wrap"><img id="sugar-cam" src="" alt="Sugar Mtn" style="width:100%;height:100%;object-fit:cover;display:none" onerror="showCamFb('sugar-wrap','sugar-cam','https://skisugar.com/cams/')"/><div class="cam-overlay"><span>SUGAR MTN - 4,000 ft</span></div></div><div class="mfooter"><div class="ldot"></div>Sugar Mountain Resort - Banner Elk, NC</div></div>
     <div class="media-card"><div class="sec" style="margin-bottom:10px">Cape Hatteras Live Cam</div><div class="media-frame" style="position:relative" id="hat-wrap"><img id="hat-cam" src="" alt="Hatteras" style="width:100%;height:100%;object-fit:cover;display:none" onerror="showCamFb('hat-wrap','hat-cam','https://www.surfchex.com/cams/hatteras-web-cam/')"/><div class="cam-overlay"><span>CAPE HATTERAS - OBX</span></div></div><div class="mfooter"><div class="ldot"></div>Surfchex - Hatteras, NC</div></div>
@@ -692,7 +667,6 @@ footer strong{color:var(--red)}
   <div class="aero-tab-bar">
     <button class="aero-tab-btn active" id="aeroBtnLaunches" onclick="switchAeroTab('launches',this)">East Coast Rocket Launches</button>
     <button class="aero-tab-btn" id="aeroBtnIss" onclick="switchAeroTab('iss',this)">ISS Passings</button>
-    <button class="aero-tab-btn" id="aeroBtnFlights" onclick="switchAeroTab('flights',this)">Live Flights</button>
   </div>
   <div class="aero-pane active" id="aero-launches">
     <div class="rkt-inner">
@@ -702,9 +676,7 @@ footer strong{color:var(--red)}
   <div class="aero-pane" id="aero-iss">
     <div id="iss-content"><div class="alm-ld"><div class="tsps-spinner"></div>Loading ISS passes...</div></div>
   </div>
-  <div class="aero-pane" id="aero-flights">
-    <div id="flights-content"><div class="alm-ld"><div class="tsps-spinner"></div>Loading live flights...</div></div>
-  </div>
+
 </div>
 </div>
 
@@ -746,7 +718,7 @@ function switchAeroTab(name,btn){
   document.getElementById('aero-'+name).classList.add('active');
   btn.classList.add('active');
   if(name==='iss'&&!window._issLoaded){fetchISSPasses();}
-  if(name==='flights'&&!window._flightsLoaded){fetchLiveFlights();}
+
 }
 
 // ============================================================
@@ -3075,174 +3047,7 @@ function issRender(el,passes,clouds,loc){
   el.innerHTML=html;
 }
 
-// ============================================================
-// LIVE FLIGHTS
-// ============================================================
-var FLIGHTS_CACHE_KEY='flights_v1_cache';
-var FLIGHTS_CACHE_TTL=90000;
-var _flightsLoaded=false;
-var KRDU_APT={lat:35.8776,lon:-78.7875,icao:'KRDU',name:'Raleigh-Durham International'};
-var KCLT_APT={lat:35.2144,lon:-80.9473,icao:'KCLT',name:'Charlotte Douglas International'};
 
-var ACTYPE_NAMES={
-  'B738':'Boeing 737-800','B737':'Boeing 737-700','B739':'Boeing 737-900','B38M':'Boeing 737 MAX 8','B39M':'Boeing 737 MAX 9',
-  'B77W':'Boeing 777-300ER','B772':'Boeing 777-200','B788':'Boeing 787-8','B789':'Boeing 787-9','B78X':'Boeing 787-10',
-  'B744':'Boeing 747-400','B752':'Boeing 757-200','B753':'Boeing 757-300','B763':'Boeing 767-300','B764':'Boeing 767-400',
-  'A319':'Airbus A319','A320':'Airbus A320','A321':'Airbus A321','A20N':'Airbus A320neo','A21N':'Airbus A321neo',
-  'A332':'Airbus A330-200','A333':'Airbus A330-300','A339':'Airbus A330-900neo',
-  'A359':'Airbus A350-900','A35K':'Airbus A350-1000',
-  'E170':'Embraer E170','E175':'Embraer E175','E190':'Embraer E190','E195':'Embraer E195',
-  'CRJ2':'Bombardier CRJ-200','CRJ7':'Bombardier CRJ-700','CRJ9':'Bombardier CRJ-900',
-  'DH8D':'Dash 8 Q400','AT76':'ATR 72-600','AT75':'ATR 72-500',
-  'C172':'Cessna 172','C208':'Cessna Caravan','PC12':'Pilatus PC-12',
-  'GLF6':'Gulfstream G600','GLF5':'Gulfstream G550','C56X':'Cessna Citation X','LJ75':'Learjet 75',
-  'BE20':'Beechcraft King Air 200','C680':'Cessna Citation Sovereign'
-};
-
-var AIRLINE_PFX={
-  'AAL':'American Airlines','DAL':'Delta Air Lines','UAL':'United Airlines',
-  'SWA':'Southwest Airlines','SKW':'SkyWest Airlines','ASA':'Alaska Airlines',
-  'JBU':'JetBlue Airways','FFT':'Frontier Airlines','NKS':'Spirit Airlines',
-  'RPA':'Republic Airways','ASH':'Mesa Airlines','PDT':'Piedmont Airlines',
-  'QXE':'Horizon Air','FDX':'FedEx Express','UPS':'UPS Airlines',
-  'EJA':'NetJets','FLX':'Sun Country','GTI':'Atlas Air',
-  'AWI':'Air Wisconsin','ENY':'Envoy Air'
-};
-
-function fltAirline(cs){
-  if(!cs)return'';
-  var pfx=(cs.replace(/[0-9]/g,'')).substring(0,3).toUpperCase();
-  return AIRLINE_PFX[pfx]||'';
-}
-
-function fltDistNm(lat1,lon1,lat2,lon2){
-  var R=3440.065,dL=(lat2-lat1)*Math.PI/180,dO=(lon2-lon1)*Math.PI/180;
-  var a=Math.sin(dL/2)*Math.sin(dL/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dO/2)*Math.sin(dO/2);
-  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
-}
-
-function fltRefresh(){
-  try{localStorage.removeItem(FLIGHTS_CACHE_KEY);}catch(e){}
-  _flightsLoaded=false;
-  fetchLiveFlights();
-}
-
-function fetchLiveFlights(){
-  _flightsLoaded=true;
-  var el=document.getElementById('flights-content');
-  el.innerHTML='<div class="alm-ld"><div class="tsps-spinner"></div>Loading live flights...</div>';
-
-  try{
-    var cached=JSON.parse(localStorage.getItem(FLIGHTS_CACHE_KEY)||'null');
-    if(cached&&(Date.now()-cached.ts)<FLIGHTS_CACHE_TTL){
-      renderFlights(el,cached.krdu,cached.kclt,cached.ts);return;
-    }
-  }catch(e){}
-
-  var ctrl=new AbortController();
-  var timer=setTimeout(function(){ctrl.abort();},12000);
-
-  function fetchApt(apt){
-    return fetch('https://api.adsb.fi/v1/lat/'+apt.lat+'/lon/'+apt.lon+'/dist/50',{signal:ctrl.signal})
-      .then(function(r){return r.json();})
-      .then(function(d){
-        var ac=d.ac||[];
-        return ac.filter(function(a){
-          if(a.alt_baro==='ground'||!a.lat||!a.lon)return false;
-          var dist=fltDistNm(a.lat,a.lon,apt.lat,apt.lon);
-          var alt=typeof a.alt_baro==='number'?a.alt_baro:99999;
-          var vr=typeof a.baro_rate==='number'?a.baro_rate:0;
-          return dist<=40&&(vr<-200||alt<8000);
-        }).map(function(a){
-          var dist=fltDistNm(a.lat,a.lon,apt.lat,apt.lon);
-          var gs=typeof a.gs==='number'&&a.gs>50?a.gs:250;
-          var etaMin=Math.round((dist/gs)*60);
-          return{
-            hex:a.hex||'',
-            callsign:(a.flight||'').trim(),
-            type:(a.t||'').toUpperCase(),
-            reg:(a.r||'').toUpperCase(),
-            alt:typeof a.alt_baro==='number'?Math.round(a.alt_baro):null,
-            gs:typeof a.gs==='number'?Math.round(a.gs):null,
-            vr:typeof a.baro_rate==='number'?Math.round(a.baro_rate):null,
-            dist:Math.round(dist),
-            etaMin:etaMin
-          };
-        }).sort(function(a,b){return a.dist-b.dist;});
-      });
-  }
-
-  Promise.all([fetchApt(KRDU_APT),fetchApt(KCLT_APT)])
-    .then(function(res){
-      clearTimeout(timer);
-      var ts=Date.now();
-      try{localStorage.setItem(FLIGHTS_CACHE_KEY,JSON.stringify({ts:ts,krdu:res[0],kclt:res[1]}));}catch(e){}
-      renderFlights(el,res[0],res[1],ts);
-    })
-    .catch(function(){
-      clearTimeout(timer);
-      _flightsLoaded=false;
-      el.innerHTML='<div class="rkt-empty">Live flight data temporarily unavailable.<br>'+
-        '<button onclick="fltRefresh()" style="background:var(--red2);border:1px solid var(--red);color:#fff;font-size:10px;font-weight:700;padding:5px 14px;cursor:pointer;font-family:inherit;border-radius:2px;margin-top:6px">Retry</button></div>';
-    });
-}
-
-function fltCard(f){
-  var typeFull=f.type&&ACTYPE_NAMES[f.type]?ACTYPE_NAMES[f.type]:'';
-  var airline=fltAirline(f.callsign);
-  var altStr=f.alt!==null?f.alt.toLocaleString()+' ft':'--';
-  var gsStr=f.gs!==null?f.gs+' kts':'--';
-  var vrStr=f.vr!==null?(f.vr<0?'↓ '+Math.abs(f.vr)+' fpm':f.vr>0?'↑ '+f.vr+' fpm':'level'):'--';
-  var vrColor=f.vr!==null&&f.vr<-100?'color:var(--green)':f.vr!==null&&f.vr>100?'color:var(--orange)':'color:var(--mu)';
-  var etaStr=f.etaMin!==null?(f.etaMin<=1?'< 1 min':f.etaMin+' min'):'--';
-  var faLink=f.callsign?'https://www.flightaware.com/live/flight/'+encodeURIComponent(f.callsign):'#';
-  return '<div class="flt-card">'+
-    '<div class="flt-hdr">'+
-      '<div>'+
-        '<div class="flt-callsign">'+(f.callsign||'Unknown')+'</div>'+
-        (airline?'<div class="flt-airline">'+airline+'</div>':'')+
-        (f.reg?'<div class="flt-reg">'+f.reg+'</div>':'')+
-      '</div>'+
-      '<div style="text-align:right">'+
-        '<div class="flt-type">'+(f.type||'--')+'</div>'+
-        (typeFull?'<div class="flt-type-full">'+typeFull+'</div>':'')+
-        '<div style="font-size:9px;color:var(--mu2);margin-top:4px">'+f.dist+' nm out</div>'+
-      '</div>'+
-    '</div>'+
-    '<div class="flt-meta">'+
-      '<div class="flt-m"><div class="flt-mv">'+altStr+'</div><div class="flt-ml">Altitude</div></div>'+
-      '<div class="flt-m"><div class="flt-mv">'+gsStr+'</div><div class="flt-ml">Speed</div></div>'+
-      '<div class="flt-m"><div class="flt-mv" style="'+vrColor+'">'+vrStr+'</div><div class="flt-ml">Vert Rate</div></div>'+
-    '</div>'+
-    '<div class="flt-footer">'+
-      '<div><div class="flt-eta-time">~'+etaStr+' to touchdown</div></div>'+
-      (f.callsign?'<a class="flt-link" href="'+faLink+'" target="_blank" rel="noopener">Full Route ↗</a>':'<span></span>')+
-    '</div>'+
-  '</div>';
-}
-
-function renderFlights(el,krdu,kclt,ts){
-  var minAgo=Math.round((Date.now()-ts)/60000);
-  var tsStr=minAgo<1?'just now':minAgo+' min ago';
-  var html='<div class="flt-toolbar">'+
-    '<span class="flt-ts">Updated '+tsStr+'</span>'+
-    '<button class="flt-refresh" onclick="fltRefresh()">↺ Refresh</button>'+
-  '</div>';
-  html+='<div class="flt-airport-sect">▼ KRDU — Raleigh-Durham Arrivals</div>';
-  if(!krdu||!krdu.length){
-    html+='<div class="flt-none">No inbound aircraft detected within 40 nm.</div>';
-  }else{
-    krdu.forEach(function(f){html+=fltCard(f);});
-  }
-  html+='<div class="flt-airport-sect">▼ KCLT — Charlotte Douglas Arrivals</div>';
-  if(!kclt||!kclt.length){
-    html+='<div class="flt-none">No inbound aircraft detected within 40 nm.</div>';
-  }else{
-    kclt.forEach(function(f){html+=fltCard(f);});
-  }
-  html+='<div class="flt-note">Origin airport &amp; full flight history: tap Full Route ↗ to view on FlightAware.<br>Real-time ADS-B positions via adsb.fi · Data refreshes every 90 sec · Showing descending aircraft within 40 nm.</div>';
-  el.innerHTML=html;
-}
 
 // ============================================================
 // BOOT
