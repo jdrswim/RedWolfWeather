@@ -607,8 +607,8 @@ footer strong{color:var(--red)}
         <div class="sbox"><div class="slbl">UV Index</div><div class="sval" id="uv">--</div><div class="sunit" id="uvl">--</div></div>
       </div>
       <div class="hlrow">
-        <div class="hlbox"><div class="hllbl">Today High</div><div class="hlval"><span id="hi">--</span>F</div></div>
-        <div class="hlbox"><div class="hllbl">Today Low</div><div class="hlval"><span id="lo">--</span>F</div></div>
+        <div class="hlbox"><div class="hllbl" id="hiLbl">Today High</div><div class="hlval"><span id="hi">--</span>F</div><div style="font-size:9px;color:rgba(255,119,119,.5);margin-top:3px;letter-spacing:.5px" id="hiSub">observed</div></div>
+        <div class="hlbox"><div class="hllbl" id="loLbl">Tonight Low</div><div class="hlval"><span id="lo">--</span>F</div><div style="font-size:9px;color:rgba(119,170,255,.5);margin-top:3px;letter-spacing:.5px" id="loSub">forecast</div></div>
       </div>
     </div>
   </div>
@@ -792,8 +792,22 @@ function applyConditions(t,feels,dew,humid,wspd,wdir,gust,pres,prec,uv,hi,lo,cod
   $("hi").textContent=hi;$("lo").textContent=lo;
   $("cdesc").textContent=wmoDesc(code);
   var _cLoc=wxGetCustLoc();
-  var _cStn=(_cLoc&&_cLoc.isCustom)?(_cLoc.name||'Your Location'):'KNCRALEI761';
+  var _isCust=_cLoc&&_cLoc.isCustom;
+  var _cStn=_isCust?(_cLoc.name||'Your Location'):'KNCRALEI761';
   $("cupd").textContent=_cStn+" - Updated "+new Date().toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit",second:"2-digit"})+" ET";
+  // Update hi/lo labels to clarify observed vs forecast
+  var hiLbl=$("hiLbl"),loLbl=$("loLbl"),hiSub=$("hiSub"),loSub=$("loSub");
+  if(_isCust){
+    if(hiLbl)hiLbl.textContent="Forecast High";
+    if(loLbl)loLbl.textContent="Forecast Low";
+    if(hiSub)hiSub.textContent="full day";
+    if(loSub)loSub.textContent="full day";
+  }else{
+    if(hiLbl)hiLbl.textContent="Today High";
+    if(loLbl)loLbl.textContent="Tonight Low";
+    if(hiSub)hiSub.textContent="observed so far";
+    if(loSub)loSub.textContent="forecast";
+  }
   if(typeof wxSetCondition==="function")wxSetCondition(code,wmoDesc(code));
   if(hourly)buildHourly(hourly);
 }
@@ -908,7 +922,10 @@ function fetchConditions(){
     fetch(om).then(function(r){return r.json();})
       .then(function(d){
         var c=d.current,dl=d.daily;
-        applyConditions(Math.round(c.temperature_2m),Math.round(c.apparent_temperature),Math.round(c.dew_point_2m),Math.round(c.relative_humidity_2m),Math.round(c.wind_speed_10m),Math.round(c.wind_direction_10m),Math.round(c.wind_gusts_10m),(c.surface_pressure*0.02953).toFixed(2),c.precipitation.toFixed(2),Math.round(c.uv_index),todayObsHigh(d.hourly,dl.temperature_2m_max[0]),Math.round(dl.temperature_2m_min[0]),c.weather_code,d.hourly);
+        // Use full-day forecast high/low for custom locations (not partial observed)
+        var fHi=dl&&dl.temperature_2m_max?Math.round(dl.temperature_2m_max[0]):"--";
+        var fLo=dl&&dl.temperature_2m_min?Math.round(dl.temperature_2m_min[0]):"--";
+        applyConditions(Math.round(c.temperature_2m),Math.round(c.apparent_temperature),Math.round(c.dew_point_2m),Math.round(c.relative_humidity_2m),Math.round(c.wind_speed_10m),Math.round(c.wind_direction_10m),Math.round(c.wind_gusts_10m),(c.surface_pressure*0.02953).toFixed(2),c.precipitation.toFixed(2),Math.round(c.uv_index),fHi,fLo,c.weather_code,d.hourly);
       })
       .catch(function(){$('cupd').textContent='Weather data unavailable';});
     return;
