@@ -2617,11 +2617,11 @@ function rktRender(el,data){
 
 // ============================================================
 // ISS PASS PREDICTIONS
-// Uses satellite.js (CDN) + CelesTrak TLE for SGP4 propagation.
-// Observer: Red Wolf Farm, 35.624178°N 78.666837°W
+// Visible passes only (solar elevation < -6°).
+// Scored on elevation, duration, darkness, and sky conditions.
 // ============================================================
-var ISS_CACHE_KEY='iss_v2_cache';
-var ISS_DEFAULT_LAT=35.624178,ISS_DEFAULT_LON=-78.666837,ISS_DEFAULT_NAME='Red Wolf Farm';
+var ISS_CACHE_KEY='iss_v3_cache';
+var ISS_DEFAULT_LAT=35.624178,ISS_DEFAULT_LON=-78.666837,ISS_DEFAULT_NAME='Red Wolf Farm — S. Wake County, NC';
 var ISS_ALT_KM=0.07;
 var _issLoaded=false;
 
@@ -2644,11 +2644,28 @@ function issUseMyLocation(){
     function(pos){
       var lat=Math.round(pos.coords.latitude*10000)/10000;
       var lon=Math.round(pos.coords.longitude*10000)/10000;
-      var loc={lat:lat,lon:lon,name:'Your Location ('+lat+'°, '+lon+'°)',isCustom:true};
-      try{localStorage.setItem('iss_user_loc',JSON.stringify(loc));}catch(e){}
-      try{localStorage.removeItem(ISS_CACHE_KEY);}catch(e){}  // clear cache for new location
-      _issLoaded=false;
-      fetchISSPasses();
+      // Reverse geocode to nearest city using Open-Meteo geocoding (no key needed)
+      fetch('https://nominatim.openstreetmap.org/reverse?lat='+lat+'&lon='+lon+'&format=json',
+        {headers:{'Accept-Language':'en','User-Agent':'WolfpackWeather/2.0'}})
+        .then(function(r){return r.json();})
+        .then(function(g){
+          var a=g.address||{};
+          var city=a.city||a.town||a.village||a.hamlet||a.county||'';
+          var state=a.state||'';
+          var place=city&&state?city+', '+state:city||state||'';
+          var name='Your Location ('+lat+'°, '+lon+'°)'+(place?' — '+place:'');
+          var loc={lat:lat,lon:lon,name:name,isCustom:true};
+          try{localStorage.setItem('iss_user_loc',JSON.stringify(loc));}catch(e){}
+          try{localStorage.removeItem(ISS_CACHE_KEY);}catch(e){}
+          _issLoaded=false;fetchISSPasses();
+        })
+        .catch(function(){
+          // Fall back to coords-only name if geocoding fails
+          var loc={lat:lat,lon:lon,name:'Your Location ('+lat+'°, '+lon+'°)',isCustom:true};
+          try{localStorage.setItem('iss_user_loc',JSON.stringify(loc));}catch(e){}
+          try{localStorage.removeItem(ISS_CACHE_KEY);}catch(e){}
+          _issLoaded=false;fetchISSPasses();
+        });
     },
     function(err){
       _issLoaded=false;
@@ -2674,7 +2691,7 @@ function fetchISSPasses(){
   // Check 2-hour cache (keyed to location)
   try{
     var c=localStorage.getItem(ISS_CACHE_KEY);
-    if(c){var obj=JSON.parse(c);if(Date.now()-obj.ts<7200000&&obj.lat===loc.lat&&obj.lon===loc.lon){issRender(el,obj.passes,loc);return;}}
+    if(c){var obj=JSON.parse(c);if(Date.now()-obj.ts<7200000&&obj.lat===loc.lat&&obj.lon===loc.lon){issRender(el,obj.passes,obj.clouds||{},loc);return;}}
   }catch(e){}
   // Load satellite.js from CDN then compute
   if(window.satellite){issFetchTLE(el,loc);}
@@ -2691,26 +2708,84 @@ function fetchISSPasses(){
 }
 
 function issFetchTLE(el,loc){
-  function tryFetch(url,parseFunc){
-    var ctrl=new AbortController();
-    setTimeout(function(){ctrl.abort();},10000);
-    return fetch(url,{signal:ctrl.signal})
-      .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
-      .then(function(data){var p=parseFunc(data);if(!p.tle1||!p.tle2)throw new Error('No TLE');return p;});
+  function tryTLE(url,parseFunc){
+    var ctrl=new AbortController();setTimeout(function(){ctrl.abort();},10000);
+    return fetch(url,{signal:ctrl.signal}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
+      .then(function(d){var p=parseFunc(d);if(!p.tle1||!p.tle2)throw new Error('No TLE');return p;});
   }
-  tryFetch('https://api.wheretheiss.at/v1/satellites/25544/tles',function(d){return{tle1:d.tle1,tle2:d.tle2};})
-  .catch(function(){
-    return tryFetch('https://tle.ivanstanojevic.me/api/tle/25544',function(d){return{tle1:d.line1,tle2:d.line2};});
-  }).then(function(tle){
+  var tleProm=tryTLE('https://api.wheretheiss.at/v1/satellites/25544/tles',function(d){return{tle1:d.tle1,tle2:d.tle2};})
+    .catch(function(){return tryTLE('https://tle.ivanstanojevic.me/api/tle/25544',function(d){return{tle1:d.line1,tle2:d.line2};});});
+  var cloudProm=issCloudFetch(loc.lat,loc.lon);
+  Promise.all([tleProm,cloudProm]).then(function(res){
+    var tle=res[0],clouds=res[1];
     var satrec=satellite.twoline2satrec(tle.tle1,tle.tle2);
     var passes=issComputePasses(satrec,loc.lat,loc.lon,ISS_ALT_KM,7);
-    try{localStorage.setItem(ISS_CACHE_KEY,JSON.stringify({ts:Date.now(),passes:passes,lat:loc.lat,lon:loc.lon}));}catch(e){}
-    issRender(el,passes,loc);
+    try{localStorage.setItem(ISS_CACHE_KEY,JSON.stringify({ts:Date.now(),passes:passes,clouds:clouds,lat:loc.lat,lon:loc.lon}));}catch(e){}
+    issRender(el,passes,clouds,loc);
   }).catch(function(){
     _issLoaded=false;
     el.innerHTML='<div class="rkt-empty" style="line-height:2">Could not load ISS pass data.<br>'+
       '<button onclick="fetchISSPasses()" style="background:var(--red2);border:1px solid var(--red);color:#fff;font-size:10px;font-weight:700;padding:5px 14px;cursor:pointer;font-family:inherit;border-radius:2px;margin-top:6px">Retry</button></div>';
   });
+}
+
+function issCloudFetch(lat,lon){
+  var ctrl=new AbortController();setTimeout(function(){ctrl.abort();},10000);
+  return fetch('https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+'&hourly=cloudcover&timezone=UTC&forecast_days=7',{signal:ctrl.signal})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      var map={};
+      if(d.hourly&&d.hourly.time){d.hourly.time.forEach(function(t,i){map[t]=d.hourly.cloudcover[i]||0;});}
+      return map;
+    }).catch(function(){return{};});
+}
+
+function issGetCloud(clouds,ms){
+  if(!clouds)return null;
+  var h=new Date(ms);h.setUTCMinutes(0,0,0);
+  var key=h.toISOString().substring(0,16);
+  return clouds.hasOwnProperty(key)?clouds[key]:null;
+}
+
+function issScorePass(p,lat,lon,clouds){
+  var solEl=issSolarEl(p.maxElMs,lat,lon);
+  if(solEl>-6)return null; // daytime — not visible
+  var el=p.maxEl;
+  var elPts=el>=80?40:el>=60?35:el>=45?28:el>=30?20:el>=20?12:5;
+  var elStars=el>=60?5:el>=45?4:el>=30?3:el>=20?2:1;
+  var elLbl=el>=60?'Overhead':el>=45?'Very High':el>=30?'High':el>=20?'Medium':'Low';
+  var durMin=(p.endMs-p.startMs)/60000;
+  var durPts=durMin>=7?20:durMin>=5?16:durMin>=4?12:durMin>=3?8:durMin>=2?4:2;
+  var durStars=durMin>=6?5:durMin>=4.5?4:durMin>=3?3:durMin>=2?2:1;
+  var darkPts=solEl<=-18?25:solEl<=-12?20:15;
+  var darkStars=solEl<=-18?5:solEl<=-12?4:3;
+  var darkLbl=solEl<=-18?'Astronomical':solEl<=-12?'Nautical':'Civil';
+  var cloudPct=issGetCloud(clouds,p.maxElMs);
+  var skyPts,skyStars,skyLbl;
+  if(cloudPct===null){skyPts=8;skyStars=3;skyLbl='Unknown';}
+  else if(cloudPct<=10){skyPts=15;skyStars=5;skyLbl='Clear';}
+  else if(cloudPct<=25){skyPts=12;skyStars=4;skyLbl='Mostly Clear';}
+  else if(cloudPct<=50){skyPts=8;skyStars=3;skyLbl='Partly Cloudy';}
+  else if(cloudPct<=75){skyPts=4;skyStars=2;skyLbl='Mostly Cloudy';}
+  else{skyPts=1;skyStars=1;skyLbl='Overcast';}
+  var total=elPts+durPts+darkPts+skyPts;
+  var grade,gradeColor,gradeLbl;
+  if(total>=85){grade='A+';gradeColor='#00d44a';gradeLbl='EXCEPTIONAL';}
+  else if(total>=72){grade='A';gradeColor='#00d44a';gradeLbl='EXCELLENT';}
+  else if(total>=60){grade='B';gradeColor='#7fff00';gradeLbl='GREAT';}
+  else if(total>=48){grade='C';gradeColor='#ffcc00';gradeLbl='GOOD';}
+  else if(total>=35){grade='D';gradeColor='#ff8800';gradeLbl='FAIR';}
+  else{grade='F';gradeColor='#ef4444';gradeLbl='POOR';}
+  return{total:total,grade:grade,gradeColor:gradeColor,gradeLbl:gradeLbl,
+    elPts:elPts,elStars:elStars,elLbl:elLbl,
+    durPts:durPts,durStars:durStars,
+    darkPts:darkPts,darkStars:darkStars,darkLbl:darkLbl,
+    skyPts:skyPts,skyStars:skyStars,skyLbl:skyLbl,cloudPct:cloudPct,solEl:solEl};
+}
+
+function issDots(filled,color){
+  var s='';for(var i=1;i<=5;i++)s+='<span style="color:'+(i<=filled?color:'rgba(255,255,255,.15)')+'">●</span>';
+  return s;
 }
 
 function issComputePasses(satrec,lat,lon,altKm,days){
@@ -2755,62 +2830,78 @@ function issAzDir(az){
   return d[Math.round(az/22.5)%16];
 }
 
-function issRender(el,passes,loc){
+function issRender(el,passes,clouds,loc){
   if(!loc)loc=issGetLocation();
-  var future=(passes||[]).filter(function(p){return p.endMs>Date.now();});
+  if(!clouds)clouds={};
 
-  // Location bar — always shown at top
+  var locBtns=!loc.isCustom
+    ?'<button onclick="issUseMyLocation()" style="background:rgba(0,204,255,.12);border:1px solid rgba(0,204,255,.3);color:var(--cyan);font-family:inherit;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:6px 14px;border-radius:2px;cursor:pointer">📡 Use My Location</button>'
+    :'<button onclick="issResetLocation()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--mu);font-family:inherit;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:6px 12px;border-radius:2px;cursor:pointer">Reset</button>'+
+     '<button onclick="issUseMyLocation()" style="background:rgba(0,204,255,.12);border:1px solid rgba(0,204,255,.3);color:var(--cyan);font-family:inherit;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:6px 14px;border-radius:2px;cursor:pointer">📡 Update</button>';
+
   var locBar='<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:3px;padding:10px 14px;margin-bottom:14px">'+
-    '<div>'+
-      '<div style="font-size:9px;font-weight:800;letter-spacing:1.5px;color:var(--mu);text-transform:uppercase;margin-bottom:2px">📍 Location</div>'+
-      '<div style="font-size:12px;font-weight:700;color:var(--white)">'+loc.name+'</div>'+
-    '</div>'+
-    '<div style="display:flex;gap:8px;align-items:center">'+
-      (!loc.isCustom
-        ? '<button onclick="issUseMyLocation()" style="background:rgba(0,204,255,.12);border:1px solid rgba(0,204,255,.3);color:var(--cyan);font-family:inherit;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:6px 14px;border-radius:2px;cursor:pointer">📡 Use My Location</button>'
-        : '<button onclick="issResetLocation()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--mu);font-family:inherit;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:6px 14px;border-radius:2px;cursor:pointer">Reset to Default</button>'+
-          '<button onclick="issUseMyLocation()" style="background:rgba(0,204,255,.12);border:1px solid rgba(0,204,255,.3);color:var(--cyan);font-family:inherit;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:6px 14px;border-radius:2px;cursor:pointer">📡 Update Location</button>'
-      )+
-    '</div>'+
-  '</div>';
+    '<div><div style="font-size:9px;font-weight:800;letter-spacing:1.5px;color:var(--mu);text-transform:uppercase;margin-bottom:2px">📍 Location</div>'+
+    '<div style="font-size:12px;font-weight:700;color:var(--white)">'+loc.name+'</div></div>'+
+    '<div style="display:flex;gap:8px;align-items:center">'+locBtns+'</div></div>';
 
-  if(!future.length){
-    el.innerHTML=locBar+'<div class="rkt-empty">No ISS passes ≥10° elevation predicted in the next 7 days.<br><span style="font-size:10px;color:var(--mu)">Check back soon — passes repeat on a ~90-minute cycle.</span></div>';
+  // Filter to future visible-only passes (solar elevation < -6°) and score them
+  var now=Date.now();
+  var scored=[];
+  (passes||[]).forEach(function(p){
+    if(p.endMs<=now)return;
+    var sc=issScorePass(p,loc.lat,loc.lon,clouds);
+    if(sc)scored.push({p:p,sc:sc});
+  });
+
+  if(!scored.length){
+    el.innerHTML=locBar+'<div class="rkt-empty">No visible ISS passes in the next 7 days.<br>'+
+      '<span style="font-size:10px;color:var(--mu)">Visible passes require darkness — check back as the ISS orbit shifts over the coming days.</span></div>';
     return;
   }
-  var html=locBar+
-    '<div style="font-size:10px;color:var(--mu);margin-bottom:14px;line-height:1.8">'+
-    '🛰 Next 7 days · Min 10° elevation &nbsp;·&nbsp; '+
-    '<span style="color:#00d44a">▌</span> Dark sky — ISS likely sunlit &nbsp;'+
-    '<span style="color:#ffcc00">▌</span> Twilight window &nbsp;'+
-    '<span style="color:rgba(255,255,255,.2)">▌</span> Daytime (not visible)'+
-    '</div>';
-  future.forEach(function(p){
-    var solEl=issSolarEl(p.maxElMs,loc.lat,loc.lon);
-    var cls,badge;
-    if(solEl>-6){cls='iss-day';badge='Day Pass';}
-    else if(solEl>-18){cls='iss-twilight';badge='Twilight';}
-    else{cls='iss-visible';badge=solEl<-30?'Night (may be dark)':'Likely Visible';}
-    var durSec=Math.round((p.endMs-p.startMs)/1000);
-    var durStr=Math.floor(durSec/60)+'m '+(durSec%60)+'s';
-    var maxC=p.maxEl>=60?'#00d44a':p.maxEl>=30?'#ffcc00':'var(--tx)';
-    var maxRat=p.maxEl>=60?'HIGH':p.maxEl>=30?'GOOD':'FAIR';
+
+  var html=locBar+'<div style="font-size:10px;color:var(--mu);margin-bottom:14px;line-height:1.8">'+
+    '🛰 Visible passes only · Next 7 days · Graded A–F on elevation, duration, darkness &amp; sky</div>';
+
+  scored.forEach(function(item){
+    var p=item.p,sc=item.sc;
     var sd=new Date(p.startMs);
     var tStr=sd.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',second:'2-digit',hour12:true});
     var dStr=sd.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
-    html+='<div class="iss-pass '+cls+'">'+
-      '<div class="iss-pass-top">'+
-        '<div><div class="iss-pass-time">'+tStr+'</div><div class="iss-pass-date">'+dStr+'</div></div>'+
-        '<span class="iss-vis-badge '+cls+'">'+badge+'</span>'+
+    var durSec=Math.round((p.endMs-p.startMs)/1000);
+    var durStr=Math.floor(durSec/60)+'m '+(durSec%60)+'s';
+    var maxC=p.maxEl>=60?'#00d44a':p.maxEl>=30?'#ffcc00':'var(--tx)';
+
+    var borderC=sc.gradeColor;
+    var scoreRow=function(label,stars,col,detail){
+      return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">'+
+        '<span style="font-size:9px;font-weight:700;letter-spacing:1px;color:var(--mu);text-transform:uppercase;min-width:70px">'+label+'</span>'+
+        '<span style="letter-spacing:2px;font-size:11px">'+issDots(stars,col)+'</span>'+
+        '<span style="font-size:10px;color:var(--tx)">'+detail+'</span>'+
+      '</div>';
+    };
+
+    html+='<div class="iss-pass" style="border-left:3px solid '+borderC+'">'+
+      // Header: time + grade badge
+      '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px">'+
+        '<div>'+
+          '<div class="iss-pass-time">'+tStr+'</div>'+
+          '<div class="iss-pass-date">'+dStr+'</div>'+
+        '</div>'+
+        '<div style="text-align:center;background:rgba(0,0,0,.3);border:1px solid '+borderC+';border-radius:4px;padding:8px 14px;min-width:64px">'+
+          '<div style="font-size:22px;font-weight:900;color:'+sc.gradeColor+';line-height:1">'+sc.grade+'</div>'+
+          '<div style="font-size:8px;font-weight:800;letter-spacing:1.5px;color:'+sc.gradeColor+';margin-top:2px">'+sc.gradeLbl+'</div>'+
+          '<div style="font-size:9px;color:var(--mu);margin-top:2px">'+sc.total+'/100</div>'+
+        '</div>'+
       '</div>'+
-      '<div class="iss-pass-meta">'+
-        '<div class="rkt-meta-item"><span class="rkt-meta-lbl">Max Elevation</span>'+
-          '<span class="rkt-meta-val" style="color:'+maxC+'">'+Math.round(p.maxEl)+'° <span style="font-size:9px;font-weight:800;letter-spacing:1px;color:'+maxC+'">'+maxRat+'</span></span></div>'+
+      // Pass facts
+      '<div class="iss-pass-meta" style="margin-bottom:12px">'+
+        '<div class="rkt-meta-item"><span class="rkt-meta-lbl">Max Elevation</span><span class="rkt-meta-val" style="color:'+maxC+'">'+Math.round(p.maxEl)+'°</span></div>'+
         '<div class="rkt-meta-item"><span class="rkt-meta-lbl">Duration</span><span class="rkt-meta-val">'+durStr+'</span></div>'+
-        '<div class="rkt-meta-item"><span class="rkt-meta-lbl">Approach</span><span class="rkt-meta-val">'+issAzDir(p.startAz)+' '+Math.round(p.startAz)+'°</span></div>'+
-        '<div class="rkt-meta-item"><span class="rkt-meta-lbl">Departure</span><span class="rkt-meta-val">'+issAzDir(p.endAz)+' '+Math.round(p.endAz)+'°</span></div>'+
+        '<div class="rkt-meta-item"><span class="rkt-meta-lbl">Approach</span><span class="rkt-meta-val">'+issAzDir(p.startAz)+'</span></div>'+
+        '<div class="rkt-meta-item"><span class="rkt-meta-lbl">Departure</span><span class="rkt-meta-val">'+issAzDir(p.endAz)+'</span></div>'+
       '</div>'+
-      '<div class="iss-pass-path">'+
+      // Path
+      '<div class="iss-pass-path" style="margin-bottom:12px">'+
         '<span class="iss-path-lbl">Path</span>'+
         '<span>'+issAzDir(p.startAz)+' '+Math.round(p.startAz)+'°</span>'+
         '<span class="iss-path-arrow">→</span>'+
@@ -2818,9 +2909,18 @@ function issRender(el,passes,loc){
         '<span class="iss-path-arrow">→</span>'+
         '<span>'+issAzDir(p.endAz)+' '+Math.round(p.endAz)+'°</span>'+
       '</div>'+
+      // Viewing score breakdown
+      '<div style="border-top:1px solid rgba(255,255,255,.07);padding-top:10px">'+
+        '<div style="font-size:9px;font-weight:800;letter-spacing:2px;color:var(--mu);text-transform:uppercase;margin-bottom:8px">Viewing Score Breakdown</div>'+
+        scoreRow('Elevation',sc.elStars,sc.gradeColor,Math.round(p.maxEl)+'° — '+sc.elLbl)+
+        scoreRow('Duration',sc.durStars,sc.gradeColor,durStr)+
+        scoreRow('Darkness',sc.darkStars,sc.gradeColor,sc.darkLbl+' twilight (sun '+Math.round(sc.solEl)+'°)')+
+        scoreRow('Sky',sc.skyStars,sc.gradeColor,sc.skyLbl+(sc.cloudPct!==null?' ('+Math.round(sc.cloudPct)+'% clouds)':''))+
+      '</div>'+
     '</div>';
   });
-  html+='<div class="rkt-note">ISS orbital data: CelesTrak · Propagation: satellite.js SGP4 · Predictions ±2 min · Cached 2 hrs<br>Visibility requires dark observer location + ISS in sunlight — best in ±90 min of sunrise/sunset</div>';
+
+  html+='<div class="rkt-note">Visible passes only (sun &lt;-6°) · satellite.js SGP4 · Sky: Open-Meteo · Cached 2 hrs · Predictions ±2 min</div>';
   el.innerHTML=html;
 }
 
