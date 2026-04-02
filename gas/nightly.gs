@@ -13,6 +13,96 @@
 
 var TZ = 'America/New_York';
 
+// ─────────────────────────────────────────────────────────────
+// WEB APP ENDPOINTS  (Deploy → Manage Deployments → Web app)
+//   Execute as: Me   |   Who has access: Anyone
+//
+// GET  ?tab=Accuracy           → returns { rows: [...] }
+// GET  ?action=write&tab=Accuracy&date=YYYY-MM-DD&col=val...
+//                              → writes values, returns { ok:true }
+// ─────────────────────────────────────────────────────────────
+function doGet(e) {
+  var p = e && e.parameter ? e.parameter : {};
+  var tabName = p.tab || 'Accuracy';
+
+  try {
+    var ss    = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName(tabName);
+    if (!sheet) return jsonOut({ error: 'Sheet not found: ' + tabName });
+
+    // ── WRITE action ──────────────────────────────────────────
+    if (p.action === 'write') {
+      var dateStr = p.date || '';
+      if (!dateStr) return jsonOut({ error: 'Missing date param' });
+
+      // Build key→value map from all params except action/tab/date
+      var updates = {};
+      Object.keys(p).forEach(function(k) {
+        if (k !== 'action' && k !== 'tab' && k !== 'date') updates[k] = p[k];
+      });
+
+      var data    = sheet.getDataRange().getValues();
+      var headers = data[0].map(function(h) { return String(h).trim(); });
+      var dateCol = headers.indexOf('date');
+      if (dateCol < 0) dateCol = 0;
+
+      // Find or create row
+      var rowIdx = -1;
+      for (var i = 1; i < data.length; i++) {
+        if (normDateStr_(data[i][dateCol]) === dateStr) { rowIdx = i; break; }
+      }
+      if (rowIdx < 0) {
+        var newRow = new Array(headers.length).fill('');
+        newRow[dateCol] = dateStr;
+        sheet.appendRow(newRow);
+        data   = sheet.getDataRange().getValues();
+        rowIdx = data.length - 1;
+      }
+
+      // Write each supplied column
+      var wrote = [];
+      Object.keys(updates).forEach(function(k) {
+        var ci = headers.indexOf(k);
+        if (ci >= 0) {
+          sheet.getRange(rowIdx + 1, ci + 1).setValue(updates[k]);
+          wrote.push(k);
+        }
+      });
+
+      return jsonOut({ ok: true, date: dateStr, wrote: wrote });
+    }
+
+    // ── READ (default) ────────────────────────────────────────
+    var data    = sheet.getDataRange().getValues();
+    var headers = data[0].map(function(h) { return String(h).trim(); });
+    var rows = [];
+    for (var i = 1; i < data.length; i++) {
+      var row = data[i];
+      var obj = {};
+      var hasContent = false;
+      for (var c = 0; c < headers.length; c++) {
+        var v = row[c];
+        if (v instanceof Date) {
+          v = Utilities.formatDate(v, TZ, 'yyyy-MM-dd');
+        }
+        obj[headers[c]] = v;
+        if (v !== '' && v !== null && v !== undefined) hasContent = true;
+      }
+      if (hasContent) rows.push(obj);
+    }
+    return jsonOut({ rows: rows });
+
+  } catch (err) {
+    return jsonOut({ error: err.message });
+  }
+}
+
+function jsonOut(obj) {
+  return ContentService
+    .createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
 function installNightlyTrigger() {
   ScriptApp.getProjectTriggers().forEach(function(t) {
     if (t.getHandlerFunction() === 'nightlyLog') ScriptApp.deleteTrigger(t);
