@@ -2359,7 +2359,7 @@ function mcLogTemps(){
 }
 
 function mcFetchHistory(callback){
-  fetch(MC_SHEET_URL)
+  fetch(MC_SHEET_URL+"?tab=Sheet1")
   .then(function(r){return r.json();})
   .then(function(d){callback(d.rows||[]);})
   .catch(function(){callback([]);});
