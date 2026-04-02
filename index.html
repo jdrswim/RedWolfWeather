@@ -2351,15 +2351,15 @@ function mcLogTemps(){
     var p=d.properties,rduTemp=null;
     if(p&&p.temperature&&p.temperature.value!=null)rduTemp=Math.round(p.temperature.value*9/5+32);
     if(rduTemp===null)return;
-    var ts=new Date().toISOString();
-    fetch(MC_SHEET_URL+"?action=write&tab=Sheet1&timestamp="+encodeURIComponent(ts)+"&rwf_temp="+rwfTemp+"&rdu_temp="+rduTemp)
+    var dateStr=new Date().toISOString().split("T")[0];
+    fetch(MC_SHEET_URL+"?action=write&tab=Sheet1&date="+dateStr+"&rwf_temp="+rwfTemp+"&rdu_temp="+rduTemp)
     .then(function(){console.log("MC logged: RWF="+rwfTemp+" RDU="+rduTemp);})
     .catch(function(){});
   }).catch(function(){});
 }
 
 function mcFetchHistory(callback){
-  fetch(MC_SHEET_URL)
+  fetch(MC_SHEET_URL+"?tab=Sheet1")
   .then(function(r){return r.json();})
   .then(function(d){callback(d.rows||[]);})
   .catch(function(){callback([]);});
@@ -2380,7 +2380,9 @@ function mcBuildHistory(rows){
     {label:"All Time",cutoff:new Date(0),rwfSum:0,rduSum:0,count:0}
   ];
   rows.forEach(function(r){
-    var ts=new Date(r.timestamp),rwf=parseFloat(r.rwf_temp),rdu=parseFloat(r.rdu_temp);
+    var dateField=r.date||r.timestamp||'';
+    var ts=dateField?new Date(dateField.length===10?dateField+'T12:00:00':dateField):new Date(NaN);
+    var rwf=parseFloat(r.rwf_temp),rdu=parseFloat(r.rdu_temp);
     if(isNaN(rwf)||isNaN(rdu))return;
     periods.forEach(function(p){if(ts>=p.cutoff){p.rwfSum+=rwf;p.rduSum+=rdu;p.count++;}});
   });
@@ -2406,8 +2408,9 @@ function mcBuildHistory(rows){
   // Daily breakdown last 7 days
   var dayMap={};
   rows.forEach(function(r){
-    var ts=new Date(r.timestamp);
-    if(ts<week1)return;
+    var dateField=r.date||r.timestamp||'';
+    var ts=dateField?new Date(dateField.length===10?dateField+'T12:00:00':dateField):new Date(NaN);
+    if(isNaN(ts.getTime())||ts<week1)return;
     var dayKey=ts.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});
     if(!dayMap[dayKey])dayMap[dayKey]={rwfSum:0,rduSum:0,count:0};
     var rwf=parseFloat(r.rwf_temp),rdu=parseFloat(r.rdu_temp);
@@ -2432,7 +2435,8 @@ function mcBuildHistory(rows){
     html+='</div>';
   }
   if(rows.length>0){
-    var firstDate=new Date(rows[0].timestamp);
+    var firstField=rows[0].date||rows[0].timestamp||'';
+    var firstDate=firstField?new Date(firstField.length===10?firstField+'T12:00:00':firstField):new Date(NaN);
     html+='<div class="mc-note2">Based on '+rows.length+' hourly readings logged since '+firstDate.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})+'<br>Data collection is ongoing — accuracy improves over time</div>';
   }
   return html;
