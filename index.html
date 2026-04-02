@@ -1741,6 +1741,8 @@ function accLogActuals(){
   var now=new Date();
 
   [0,1,2,3,4].forEach(function(daysBack){
+    // Today's high isn't final until ~8 PM — skip today before then
+    if(daysBack===0&&now.getHours()<20)return;
     var target=new Date(now.getFullYear(),now.getMonth(),now.getDate()-daysBack);
     var dStr=accDateStr(target);
     var guardKey="acc_act_done_"+dStr;
@@ -1996,9 +1998,14 @@ function accRender(el,rawRows){
           '<span style="color:'+loDeltaCol+'">Lo '+loSign+Math.round(loDiff)+'°</span>'+
         '</div>';
 
+      var avgFcst=(pH+pL)/2,avgAct=(aH+aL)/2;
+      var avgDiff=avgAct-avgFcst;
+      var avgSign=avgDiff>0?'+':'';
+      var avgColor=Math.abs(avgDiff)<=1?'var(--green)':Math.abs(avgDiff)<=3?'var(--yellow)':'#ef4444';
       if(hiErr<=1&&loErr<=1)badge='<span class="acc-badge hit">HIT</span>';
       else if(avgErr<=4)badge='<span class="acc-badge close">CLOSE</span>';
       else badge='<span class="acc-badge miss">MISS</span>';
+      badge+='<div style="font-size:9px;color:'+avgColor+';font-weight:700;margin-top:4px;letter-spacing:.5px">avg '+avgSign+Math.round(avgDiff*10)/10+'°</div>';
     }
 
     html+=
@@ -2026,6 +2033,15 @@ function accRender(el,rawRows){
   el.innerHTML=html;
 }
 
+/// If it's before 8 PM, scrub any cached actuals for today (incomplete data)
+(function(){
+  var now=new Date();
+  if(now.getHours()<20){
+    var p2=function(n){return n<10?'0'+n:''+n;};
+    var todayStr=now.getFullYear()+'-'+p2(now.getMonth()+1)+'-'+p2(now.getDate());
+    try{localStorage.removeItem('acc_actual_'+todayStr);}catch(e){}
+  }
+})();
 // Actuals: run on every page load (guard keys prevent duplicate sheet writes)
 // This ensures past-day actuals are captured even if 8 PM session was missed
 setTimeout(accLogActuals,6000);
