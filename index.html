@@ -2621,24 +2621,67 @@ function rktRender(el,data){
 // Observer: Red Wolf Farm, 35.624178°N 78.666837°W
 // ============================================================
 var ISS_CACHE_KEY='iss_v2_cache';
-var ISS_LAT=35.624178,ISS_LON=-78.666837,ISS_ALT_KM=0.07;
+var ISS_DEFAULT_LAT=35.624178,ISS_DEFAULT_LON=-78.666837,ISS_DEFAULT_NAME='Red Wolf Farm';
+var ISS_ALT_KM=0.07;
 var _issLoaded=false;
+
+// Returns {lat, lon, name, isCustom} — custom loc stored in localStorage
+function issGetLocation(){
+  try{
+    var s=localStorage.getItem('iss_user_loc');
+    if(s){var o=JSON.parse(s);if(o&&o.lat&&o.lon)return o;}
+  }catch(e){}
+  return{lat:ISS_DEFAULT_LAT,lon:ISS_DEFAULT_LON,name:ISS_DEFAULT_NAME,isCustom:false};
+}
+
+function issUseMyLocation(){
+  var el=document.getElementById('iss-content');
+  if(!navigator.geolocation){
+    alert('Geolocation is not supported by your browser.');return;
+  }
+  el.innerHTML='<div class="alm-ld"><div class="tsps-spinner"></div>Getting your location...</div>';
+  navigator.geolocation.getCurrentPosition(
+    function(pos){
+      var lat=Math.round(pos.coords.latitude*10000)/10000;
+      var lon=Math.round(pos.coords.longitude*10000)/10000;
+      var loc={lat:lat,lon:lon,name:'Your Location ('+lat+'°, '+lon+'°)',isCustom:true};
+      try{localStorage.setItem('iss_user_loc',JSON.stringify(loc));}catch(e){}
+      try{localStorage.removeItem(ISS_CACHE_KEY);}catch(e){}  // clear cache for new location
+      _issLoaded=false;
+      fetchISSPasses();
+    },
+    function(err){
+      _issLoaded=false;
+      el.innerHTML='<div class="rkt-empty">Could not get your location'+(err.message?' ('+err.message+')':'')+
+        '.<br><button onclick="fetchISSPasses()" style="background:var(--red2);border:1px solid var(--red);color:#fff;font-size:10px;font-weight:700;padding:5px 14px;cursor:pointer;font-family:inherit;border-radius:2px;margin-top:6px">Use Default Location</button></div>';
+    },
+    {timeout:10000,maximumAge:300000}
+  );
+}
+
+function issResetLocation(){
+  try{localStorage.removeItem('iss_user_loc');}catch(e){}
+  try{localStorage.removeItem(ISS_CACHE_KEY);}catch(e){}
+  _issLoaded=false;
+  fetchISSPasses();
+}
 
 function fetchISSPasses(){
   _issLoaded=true;
   var el=document.getElementById('iss-content');
   el.innerHTML='<div class="alm-ld"><div class="tsps-spinner"></div>Loading ISS passes...</div>';
-  // Check 2-hour cache
+  var loc=issGetLocation();
+  // Check 2-hour cache (keyed to location)
   try{
     var c=localStorage.getItem(ISS_CACHE_KEY);
-    if(c){var obj=JSON.parse(c);if(Date.now()-obj.ts<7200000){issRender(el,obj.passes);return;}}
+    if(c){var obj=JSON.parse(c);if(Date.now()-obj.ts<7200000&&obj.lat===loc.lat&&obj.lon===loc.lon){issRender(el,obj.passes,loc);return;}}
   }catch(e){}
   // Load satellite.js from CDN then compute
-  if(window.satellite){issFetchTLE(el);}
+  if(window.satellite){issFetchTLE(el,loc);}
   else{
     var s=document.createElement('script');
     s.src='https://cdn.jsdelivr.net/npm/satellite.js@4.1.3/dist/satellite.min.js';
-    s.onload=function(){issFetchTLE(el);};
+    s.onload=function(){issFetchTLE(el,loc);};
     s.onerror=function(){
       _issLoaded=false;
       el.innerHTML='<div class="rkt-empty">Could not load satellite tracking library.<br><button onclick="fetchISSPasses()" style="background:var(--red2);border:1px solid var(--red);color:#fff;font-size:10px;font-weight:700;padding:5px 14px;cursor:pointer;font-family:inherit;border-radius:2px;margin-top:6px">Retry</button></div>';
@@ -2647,33 +2690,22 @@ function fetchISSPasses(){
   }
 }
 
-function issFetchTLE(el){
-  // Try wheretheiss.at first (CORS-friendly, no auth), then ivanstanojevic as fallback
+function issFetchTLE(el,loc){
   function tryFetch(url,parseFunc){
     var ctrl=new AbortController();
     setTimeout(function(){ctrl.abort();},10000);
     return fetch(url,{signal:ctrl.signal})
       .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
-      .then(function(data){
-        var parsed=parseFunc(data);
-        if(!parsed.tle1||!parsed.tle2)throw new Error('No TLE data');
-        return parsed;
-      });
+      .then(function(data){var p=parseFunc(data);if(!p.tle1||!p.tle2)throw new Error('No TLE');return p;});
   }
-
-  tryFetch(
-    'https://api.wheretheiss.at/v1/satellites/25544/tles',
-    function(d){return{tle1:d.tle1,tle2:d.tle2};}
-  ).catch(function(){
-    return tryFetch(
-      'https://tle.ivanstanojevic.me/api/tle/25544',
-      function(d){return{tle1:d.line1,tle2:d.line2};}
-    );
+  tryFetch('https://api.wheretheiss.at/v1/satellites/25544/tles',function(d){return{tle1:d.tle1,tle2:d.tle2};})
+  .catch(function(){
+    return tryFetch('https://tle.ivanstanojevic.me/api/tle/25544',function(d){return{tle1:d.line1,tle2:d.line2};});
   }).then(function(tle){
     var satrec=satellite.twoline2satrec(tle.tle1,tle.tle2);
-    var passes=issComputePasses(satrec,ISS_LAT,ISS_LON,ISS_ALT_KM,7);
-    try{localStorage.setItem(ISS_CACHE_KEY,JSON.stringify({ts:Date.now(),passes:passes}));}catch(e){}
-    issRender(el,passes);
+    var passes=issComputePasses(satrec,loc.lat,loc.lon,ISS_ALT_KM,7);
+    try{localStorage.setItem(ISS_CACHE_KEY,JSON.stringify({ts:Date.now(),passes:passes,lat:loc.lat,lon:loc.lon}));}catch(e){}
+    issRender(el,passes,loc);
   }).catch(function(){
     _issLoaded=false;
     el.innerHTML='<div class="rkt-empty" style="line-height:2">Could not load ISS pass data.<br>'+
@@ -2723,20 +2755,38 @@ function issAzDir(az){
   return d[Math.round(az/22.5)%16];
 }
 
-function issRender(el,passes){
+function issRender(el,passes,loc){
+  if(!loc)loc=issGetLocation();
   var future=(passes||[]).filter(function(p){return p.endMs>Date.now();});
+
+  // Location bar — always shown at top
+  var locBar='<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:3px;padding:10px 14px;margin-bottom:14px">'+
+    '<div>'+
+      '<div style="font-size:9px;font-weight:800;letter-spacing:1.5px;color:var(--mu);text-transform:uppercase;margin-bottom:2px">📍 Location</div>'+
+      '<div style="font-size:12px;font-weight:700;color:var(--white)">'+loc.name+'</div>'+
+    '</div>'+
+    '<div style="display:flex;gap:8px;align-items:center">'+
+      (!loc.isCustom
+        ? '<button onclick="issUseMyLocation()" style="background:rgba(0,204,255,.12);border:1px solid rgba(0,204,255,.3);color:var(--cyan);font-family:inherit;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:6px 14px;border-radius:2px;cursor:pointer">📡 Use My Location</button>'
+        : '<button onclick="issResetLocation()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--mu);font-family:inherit;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:6px 14px;border-radius:2px;cursor:pointer">Reset to Default</button>'+
+          '<button onclick="issUseMyLocation()" style="background:rgba(0,204,255,.12);border:1px solid rgba(0,204,255,.3);color:var(--cyan);font-family:inherit;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:6px 14px;border-radius:2px;cursor:pointer">📡 Update Location</button>'
+      )+
+    '</div>'+
+  '</div>';
+
   if(!future.length){
-    el.innerHTML='<div class="rkt-empty">No ISS passes ≥10° elevation predicted in the next 7 days.<br><span style="font-size:10px;color:var(--mu)">Check back soon — passes repeat on a ~90-minute cycle.</span></div>';
+    el.innerHTML=locBar+'<div class="rkt-empty">No ISS passes ≥10° elevation predicted in the next 7 days.<br><span style="font-size:10px;color:var(--mu)">Check back soon — passes repeat on a ~90-minute cycle.</span></div>';
     return;
   }
-  var html='<div style="font-size:10px;color:var(--mu);margin-bottom:14px;line-height:1.8">'+
-    '🛰 Red Wolf Farm · 35.624°N 78.667°W · Next 7 days · Min 10° elevation<br>'+
+  var html=locBar+
+    '<div style="font-size:10px;color:var(--mu);margin-bottom:14px;line-height:1.8">'+
+    '🛰 Next 7 days · Min 10° elevation &nbsp;·&nbsp; '+
     '<span style="color:#00d44a">▌</span> Dark sky — ISS likely sunlit &nbsp;'+
     '<span style="color:#ffcc00">▌</span> Twilight window &nbsp;'+
     '<span style="color:rgba(255,255,255,.2)">▌</span> Daytime (not visible)'+
     '</div>';
   future.forEach(function(p){
-    var solEl=issSolarEl(p.maxElMs,ISS_LAT,ISS_LON);
+    var solEl=issSolarEl(p.maxElMs,loc.lat,loc.lon);
     var cls,badge;
     if(solEl>-6){cls='iss-day';badge='Day Pass';}
     else if(solEl>-18){cls='iss-twilight';badge='Twilight';}
