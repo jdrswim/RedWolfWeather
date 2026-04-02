@@ -310,13 +310,14 @@ main{max-width:1100px;margin:0 auto;padding:18px;overflow-x:hidden}
 .acc-yday-sep{color:var(--mu2);font-size:9px}
 .acc-key{font-size:9px;color:var(--mu2);text-align:center;margin-bottom:14px;padding:8px 12px;background:var(--p2);border:1px solid var(--bd);border-radius:3px}
 .acc-key strong{color:var(--mu)}
-.acc-log{background:var(--p2);border:1px solid var(--bd);border-radius:4px;overflow:hidden}
-.acc-log-hdr{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 1fr 1.4fr 1fr;gap:4px;padding:10px 16px;background:var(--p1);border-bottom:1px solid var(--bd);font-size:9px;font-weight:800;letter-spacing:1px;color:var(--red);text-transform:uppercase}
-.acc-log-row{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 1fr 1.4fr 1fr;gap:4px;padding:9px 16px;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px;color:var(--white);align-items:center}
+.acc-log-hdr{display:grid;grid-template-columns:1.8fr 1fr 1fr 1.3fr;gap:4px;padding:10px 16px;background:var(--p1);border-bottom:1px solid var(--bd);font-size:9px;font-weight:800;letter-spacing:1px;color:var(--red);text-transform:uppercase}
+.acc-log-row{display:grid;grid-template-columns:1.8fr 1fr 1fr 1.3fr;gap:4px;padding:9px 16px;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px;color:var(--white);align-items:center}
 .acc-log-row:last-child{border-bottom:none}
 .acc-log-row:hover{background:rgba(255,255,255,.02)}
 .acc-date{font-size:11px;color:var(--mu);font-weight:600}
-.acc-delta{font-size:11px;font-weight:700;line-height:1.4}
+.acc-hilostack{display:flex;flex-direction:column;gap:2px;font-size:11px}
+.acc-hilostack span{display:flex;align-items:baseline;gap:3px}
+.acc-hilostack .acc-sublbl{font-size:8px;color:var(--mu);font-weight:700;letter-spacing:.5px;min-width:14px}
 .acc-badge{font-size:9px;font-weight:800;padding:3px 8px;border-radius:3px;letter-spacing:1px;text-transform:uppercase;display:inline-block}
 .acc-badge.hit{background:rgba(0,212,74,.15);color:var(--green)}
 .acc-badge.close{background:rgba(255,204,0,.15);color:var(--yellow)}
@@ -464,8 +465,9 @@ footer strong{color:var(--red)}
   .pws-temp{font-size:32px}
   .pws-name{font-size:13px}
   .acc-score-row{grid-template-columns:repeat(3,1fr)}
-  .acc-log-hdr,.acc-log-row{grid-template-columns:1.4fr 1fr 1fr 1fr 1fr 1.4fr 1fr;font-size:8px;padding:6px 8px}
-  .acc-delta{font-size:10px}
+  .acc-log-hdr,.acc-log-row{font-size:10px;padding:8px 10px}
+  .acc-hilostack{font-size:10px}
+  .acc-badge{font-size:8px;padding:3px 6px}
   .mc-mo-grid{grid-template-columns:repeat(2,1fr)}
   footer{padding:16px 12px;margin-top:20px}
   footer p{font-size:9px}
@@ -2044,8 +2046,8 @@ function accRender(el,rawRows){
   function errClass(e){return e<=1?"good":e<=3?"ok":"poor";}
 
   function renderLeadCard(lead,acc){
+    if(!acc)return''; // building cards rendered separately as a note
     var label=lead+"-Day Out";
-    if(!acc)return'<div class="acc-score-card"><div class="acc-score-lbl">'+label+'</div><div class="acc-score-val" style="font-size:14px;margin-top:8px;color:var(--mu)">Building data…</div><div class="acc-score-sub">Need '+lead+' days of 8 PM logs</div></div>';
     var cls=errClass(acc.avgMeanErr);
     return'<div class="acc-score-card">'+
       '<div class="acc-score-lbl">'+label+'</div>'+
@@ -2059,21 +2061,29 @@ function accRender(el,rawRows){
     '<div class="acc-wrap">'+
       '<div class="acc-hdr">Valvano\'s Forecast Accountability Dashboard <em>- Forecast vs Actual Temperature</em> <div class="tip-btn" onclick="openTip(\'tipAccuracy\')" style="display:inline-flex;vertical-align:middle;margin-left:6px">?</div></div>'+
       accLogStatus()+
-      '<div class="acc-score-row">'+
-        renderLeadCard(1,calcAccuracyForLead(rows,1))+
-        renderLeadCard(2,calcAccuracyForLead(rows,2))+
-        renderLeadCard(3,calcAccuracyForLead(rows,3))+
-        renderLeadCard(4,calcAccuracyForLead(rows,4))+
-        renderLeadCard(5,calcAccuracyForLead(rows,5))+
-      '</div>'+
-      '<div class="acc-log">'+
+      (function(){
+        var accs=[1,2,3,4,5].map(function(l){return{l:l,a:calcAccuracyForLead(rows,l)};});
+        var ready=accs.filter(function(x){return x.a;});
+        var building=accs.filter(function(x){return !x.a;}).map(function(x){return x.l;});
+        var scoreHtml='';
+        if(ready.length){
+          scoreHtml='<div class="acc-score-row" style="grid-template-columns:repeat('+ready.length+',1fr)">';
+          ready.forEach(function(x){scoreHtml+=renderLeadCard(x.l,x.a);});
+          scoreHtml+='</div>';
+        }
+        if(building.length){
+          var note=ready.length===0
+            ?'Accuracy tracking active — data will appear here after the first 8 PM log.'
+            :'<strong style="color:var(--mu)">'+(building.length>1?building[0]+'-'+building[building.length-1]:building[0])+'-day accuracy:</strong> still collecting data';
+          scoreHtml+='<div style="font-size:10px;color:var(--mu2);background:var(--p2);border:1px solid var(--bd);border-radius:3px;padding:9px 14px;margin-bottom:14px">📈 '+note+'</div>';
+        }
+        return scoreHtml;
+      })()+
+      '<div class="acc-log" style="border:1px solid var(--bd);border-radius:4px;overflow:hidden">'+
         '<div class="acc-log-hdr">'+
           '<div>Date</div>'+
-          '<div>Pred Hi</div>'+
-          '<div>Act Hi</div>'+
-          '<div>Pred Lo</div>'+
-          '<div>Act Lo</div>'+
-          '<div>Delta</div>'+
+          '<div>Forecast</div>'+
+          '<div>Actual</div>'+
           '<div>Result</div>'+
         '</div>';
 
@@ -2093,49 +2103,40 @@ function accRender(el,rawRows){
       ?dp.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric",year:"numeric"})
       :r.date;
 
-    // Delta: show signed error for Hi and Lo
-    var deltaHtml='<div class="acc-delta" style="color:var(--mu)">--</div>';
     var badge='<span class="acc-badge pending">PENDING</span>';
-    var hiColor="",loColor="";
+    var actualStack='<div class="acc-hilostack"><span><span class="acc-sublbl">HI</span>--</span><span><span class="acc-sublbl">LO</span>--</span></div>';
 
     if(hasActual){
-      var hiDiff=aH-pH; // positive = ran warmer than predicted
-      var loDiff=aL-pL;
+      var hiDiff=aH-pH,loDiff=aL-pL;
       var hiErr=Math.abs(hiDiff),loErr=Math.abs(loDiff),avgErr=(hiErr+loErr)/2;
-
-      // Color each actual cell
-      hiColor=hiErr<=1?"color:var(--green)":hiErr<=4?"color:var(--yellow)":"color:#ef4444";
-      loColor=loErr<=1?"color:var(--green)":loErr<=4?"color:var(--yellow)":"color:#ef4444";
-
-      // Delta: show "Hi +2° / Lo -1°" format
-      var hiSign=hiDiff>0?"+":"",loSign=loDiff>0?"+":"";
-      var hiDeltaCol=hiErr<=1?"var(--green)":hiErr<=4?"var(--yellow)":"#ef4444";
-      var loDeltaCol=loErr<=1?"var(--green)":loErr<=4?"var(--yellow)":"#ef4444";
-      deltaHtml=
-        '<div class="acc-delta">'+
-          '<span style="color:'+hiDeltaCol+'">Hi '+hiSign+Math.round(hiDiff)+'°</span>'+
-          '<br>'+
-          '<span style="color:'+loDeltaCol+'">Lo '+loSign+Math.round(loDiff)+'°</span>'+
-        '</div>';
-
-      var avgFcst=(pH+pL)/2,avgAct=(aH+aL)/2;
-      var avgDiff=avgAct-avgFcst;
+      var hiC=hiErr<=1?'var(--green)':hiErr<=4?'var(--yellow)':'#ef4444';
+      var loC=loErr<=1?'var(--green)':loErr<=4?'var(--yellow)':'#ef4444';
+      var hiSign=hiDiff>0?'+':'',loSign=loDiff>0?'+':'';
+      actualStack='<div class="acc-hilostack">'+
+        '<span><span class="acc-sublbl">HI</span><span style="color:'+hiC+'">'+Math.round(aH)+'°</span></span>'+
+        '<span><span class="acc-sublbl">LO</span><span style="color:'+loC+'">'+Math.round(aL)+'°</span></span>'+
+      '</div>';
+      var avgFcst=(pH+pL)/2,avgAct=(aH+aL)/2,avgDiff=avgAct-avgFcst;
       var avgSign=avgDiff>0?'+':'';
-      var avgColor=Math.abs(avgDiff)<=1?'var(--green)':Math.abs(avgDiff)<=3?'var(--yellow)':'#ef4444';
+      var avgC=Math.abs(avgDiff)<=1?'var(--green)':Math.abs(avgDiff)<=3?'var(--yellow)':'#ef4444';
       if(hiErr<=1&&loErr<=1)badge='<span class="acc-badge hit">HIT</span>';
       else if(avgErr<=4)badge='<span class="acc-badge close">CLOSE</span>';
       else badge='<span class="acc-badge miss">MISS</span>';
-      badge+='<div style="font-size:9px;color:'+avgColor+';font-weight:700;margin-top:4px;letter-spacing:.5px">avg '+avgSign+Math.round(avgDiff*10)/10+'°</div>';
+      badge+='<div style="font-size:9px;margin-top:4px;line-height:1.6">'+
+        '<span style="color:'+hiC+'">Hi'+hiSign+Math.round(hiDiff)+'°</span> '+
+        '<span style="color:'+loC+'">Lo'+loSign+Math.round(loDiff)+'°</span><br>'+
+        '<span style="color:'+avgC+';font-weight:700">avg '+avgSign+Math.round(avgDiff*10)/10+'°</span>'+
+      '</div>';
     }
 
     html+=
       '<div class="acc-log-row">'+
         '<div class="acc-date">'+dateStr+'</div>'+
-        '<div>'+Math.round(pH)+'°</div>'+
-        '<div style="'+hiColor+'">'+(hasActual?Math.round(aH)+'°':'--')+'</div>'+
-        '<div>'+Math.round(pL)+'°</div>'+
-        '<div style="'+loColor+'">'+(hasActual?Math.round(aL)+'°':'--')+'</div>'+
-        deltaHtml+
+        '<div class="acc-hilostack">'+
+          '<span><span class="acc-sublbl">HI</span>'+Math.round(pH)+'°</span>'+
+          '<span><span class="acc-sublbl">LO</span>'+Math.round(pL)+'°</span>'+
+        '</div>'+
+        actualStack+
         '<div>'+badge+'</div>'+
       '</div>';
     shown++;
