@@ -516,10 +516,10 @@ footer strong{color:var(--red)}
 .rkt-lik-sub{font-size:9px;color:var(--mu);margin-top:2px}
 @media(max-width:600px){.rkt-vis-grid{grid-template-columns:repeat(3,1fr)}.rkt-vis-offset{font-size:13px}}
 /* AEROSPACE SUB-TABS */
-.aero-tab-bar{display:flex;gap:0;margin-bottom:18px;border-bottom:1px solid var(--bd)}
-.aero-tab-btn{background:none;border:none;border-bottom:2px solid transparent;color:var(--mu);font-family:inherit;font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;padding:8px 16px 9px;cursor:pointer;transition:color .15s,border-color .15s;margin-bottom:-1px}
-.aero-tab-btn.active{color:var(--cyan);border-bottom-color:var(--cyan)}
-.aero-tab-btn:hover:not(.active){color:var(--tx)}
+.aero-tab-bar{display:flex;gap:8px;margin-bottom:20px}
+.aero-tab-btn{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:3px;color:var(--mu);font-family:inherit;font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;padding:9px 20px;cursor:pointer;transition:background .15s,color .15s,border-color .15s}
+.aero-tab-btn.active{background:var(--red);border-color:var(--red);color:#fff}
+.aero-tab-btn:hover:not(.active){background:rgba(255,255,255,.09);color:var(--tx)}
 .aero-pane{display:none}.aero-pane.active{display:block}
 /* ISS PASSES */
 .iss-pass{background:var(--p2);border:1px solid var(--bd);border-left:3px solid rgba(255,255,255,.15);border-radius:3px;padding:14px;margin-bottom:10px}
@@ -537,7 +537,7 @@ footer strong{color:var(--red)}
 .iss-pass-path{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06);font-size:11px;font-weight:600;color:var(--tx)}
 .iss-path-lbl{font-size:9px;color:var(--mu);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-right:2px}
 .iss-path-arrow{color:var(--mu);font-size:10px}
-@media(max-width:600px){.aero-tab-btn{font-size:10px;padding:7px 10px 8px}.iss-pass-meta{gap:10px}}
+@media(max-width:600px){.aero-tab-btn{font-size:10px;padding:8px 12px;letter-spacing:1px}.iss-pass-meta{gap:10px}}
 </style>
 </head>
 <body>
@@ -2620,7 +2620,7 @@ function rktRender(el,data){
 // Uses satellite.js (CDN) + CelesTrak TLE for SGP4 propagation.
 // Observer: Red Wolf Farm, 35.624178°N 78.666837°W
 // ============================================================
-var ISS_CACHE_KEY='iss_v1_cache';
+var ISS_CACHE_KEY='iss_v2_cache';
 var ISS_LAT=35.624178,ISS_LON=-78.666837,ISS_ALT_KM=0.07;
 var _issLoaded=false;
 
@@ -2648,22 +2648,37 @@ function fetchISSPasses(){
 }
 
 function issFetchTLE(el){
-  var ctrl=new AbortController();
-  setTimeout(function(){ctrl.abort();},10000);
-  fetch('https://celestrak.org/satcat/elements.php?CATNR=25544&FORMAT=JSON',{signal:ctrl.signal})
-    .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
-    .then(function(data){
-      if(!data||!data.length||!data[0].TLE_LINE1)throw new Error('No TLE');
-      var satrec=satellite.twoline2satrec(data[0].TLE_LINE1,data[0].TLE_LINE2);
-      var passes=issComputePasses(satrec,ISS_LAT,ISS_LON,ISS_ALT_KM,7);
-      try{localStorage.setItem(ISS_CACHE_KEY,JSON.stringify({ts:Date.now(),passes:passes}));}catch(e){}
-      issRender(el,passes);
-    })
-    .catch(function(){
-      _issLoaded=false;
-      el.innerHTML='<div class="rkt-empty" style="line-height:2">Could not load ISS pass data.<br>'+
-        '<button onclick="fetchISSPasses()" style="background:var(--red2);border:1px solid var(--red);color:#fff;font-size:10px;font-weight:700;padding:5px 14px;cursor:pointer;font-family:inherit;border-radius:2px;margin-top:6px">Retry</button></div>';
-    });
+  // Try wheretheiss.at first (CORS-friendly, no auth), then ivanstanojevic as fallback
+  function tryFetch(url,parseFunc){
+    var ctrl=new AbortController();
+    setTimeout(function(){ctrl.abort();},10000);
+    return fetch(url,{signal:ctrl.signal})
+      .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
+      .then(function(data){
+        var parsed=parseFunc(data);
+        if(!parsed.tle1||!parsed.tle2)throw new Error('No TLE data');
+        return parsed;
+      });
+  }
+
+  tryFetch(
+    'https://api.wheretheiss.at/v1/satellites/25544/tles',
+    function(d){return{tle1:d.tle1,tle2:d.tle2};}
+  ).catch(function(){
+    return tryFetch(
+      'https://tle.ivanstanojevic.me/api/tle/25544',
+      function(d){return{tle1:d.line1,tle2:d.line2};}
+    );
+  }).then(function(tle){
+    var satrec=satellite.twoline2satrec(tle.tle1,tle.tle2);
+    var passes=issComputePasses(satrec,ISS_LAT,ISS_LON,ISS_ALT_KM,7);
+    try{localStorage.setItem(ISS_CACHE_KEY,JSON.stringify({ts:Date.now(),passes:passes}));}catch(e){}
+    issRender(el,passes);
+  }).catch(function(){
+    _issLoaded=false;
+    el.innerHTML='<div class="rkt-empty" style="line-height:2">Could not load ISS pass data.<br>'+
+      '<button onclick="fetchISSPasses()" style="background:var(--red2);border:1px solid var(--red);color:#fff;font-size:10px;font-weight:700;padding:5px 14px;cursor:pointer;font-family:inherit;border-radius:2px;margin-top:6px">Retry</button></div>';
+  });
 }
 
 function issComputePasses(satrec,lat,lon,altKm,days){
