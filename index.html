@@ -635,7 +635,7 @@ footer strong{color:var(--red)}
   </div>
 
   <div class="media-row">
-    <div class="media-card"><div class="sec" style="margin-bottom:10px">GOES-East Satellite</div><div class="media-frame" style="height:280px"><img id="goes-img" alt="GOES-East" src="https://cdn.star.nesdis.noaa.gov/GOES16/ABI/CONUS/GEOCOLOR/latest.jpg" style="width:100%;height:100%;object-fit:cover;transform:scale(2.2);transform-origin:73% 47%"/></div><div class="mfooter"><div class="ldot"></div>NOAA GOES-East - Carolinas Region - GeoColor</div></div>
+    <div class="media-card"><div class="sec" style="margin-bottom:10px">GOES-East Satellite</div><div class="media-frame" style="height:280px"><img id="goes-img" alt="GOES-East" src="https://cdn.star.nesdis.noaa.gov/GOES16/ABI/CONUS/GEOCOLOR/GOES16-CONUS-GEOCOLOR-600x600.gif" style="width:100%;height:100%;object-fit:cover;transform:scale(2.2);transform-origin:73% 47%"/></div><div class="mfooter"><div class="ldot"></div>NOAA GOES-East - Carolinas Region - GeoColor · Animated</div></div>
     <div class="media-card"><div class="sec" style="margin-bottom:10px">NWS KRAX Radar</div><div class="media-frame" style="height:280px"><iframe src="https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=in&metricTemp=%C2%B0F&metricWind=mph&zoom=8&overlay=radar&product=radar&level=surface&lat=35.78&lon=-78.64&pressure=false&message=false" title="Radar" loading="lazy"></iframe></div><div class="mfooter"><div class="ldot"></div>Radar - Centered on Raleigh-Durham</div></div>
     <div class="media-card"><div class="sec" style="margin-bottom:10px">Sugar Mountain Base Cam</div><div class="media-frame" style="position:relative" id="sugar-wrap"><img id="sugar-cam" src="" alt="Sugar Mtn" style="width:100%;height:100%;object-fit:cover;display:none" onerror="showCamFb('sugar-wrap','sugar-cam','https://skisugar.com/cams/')"/><div class="cam-overlay"><span>SUGAR MTN - 4,000 ft</span></div></div><div class="mfooter"><div class="ldot"></div>Sugar Mountain Resort - Banner Elk, NC</div></div>
     <div class="media-card"><div class="sec" style="margin-bottom:10px">Cape Hatteras Live Cam</div><div class="media-frame" style="position:relative" id="hat-wrap"><img id="hat-cam" src="" alt="Hatteras" style="width:100%;height:100%;object-fit:cover;display:none" onerror="showCamFb('hat-wrap','hat-cam','https://www.surfchex.com/cams/hatteras-web-cam/')"/><div class="cam-overlay"><span>CAPE HATTERAS - OBX</span></div></div><div class="mfooter"><div class="ldot"></div>Surfchex - Hatteras, NC</div></div>
@@ -776,7 +776,7 @@ function showCamFb(wrapId,imgId,url){
 }
 function refreshCams(){
   var ts=Date.now();
-  var gi=$("goes-img");if(gi)gi.src="https://cdn.star.nesdis.noaa.gov/GOES16/ABI/CONUS/GEOCOLOR/latest.jpg?t="+ts;
+  var gi=$("goes-img");if(gi)gi.src="https://cdn.star.nesdis.noaa.gov/GOES16/ABI/CONUS/GEOCOLOR/GOES16-CONUS-GEOCOLOR-600x600.gif?t="+ts;
   var s=$("sugar-cam");if(s&&!$("sugar-wrap").querySelector(".cam-fb")){s.style.display="block";s.src="https://skisugar.com/webcam/base.jpg?t="+ts;}
   var h=$("hat-cam");if(h&&!$("hat-wrap").querySelector(".cam-fb")){h.style.display="block";h.src="https://www.surfchex.com/webcam-images/hatteras.jpg?t="+ts;}
 }
