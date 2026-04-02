@@ -167,3 +167,62 @@ function nightlyWrite_(sheet, dateStr, key1, val1, key2, val2, overwrite) {
   if (c1 >= 0 && (overwrite || !data[rowIdx][c1])) sheet.getRange(rowIdx + 1, c1 + 1).setValue(val1);
   if (c2 >= 0 && (overwrite || !data[rowIdx][c2])) sheet.getRange(rowIdx + 1, c2 + 1).setValue(val2);
 }
+
+// ─────────────────────────────────────────────────────────────
+// ONE-TIME CLEANUP  — run once to deduplicate the Accuracy sheet
+// Merges all rows with the same date into a single clean row,
+// keeping the first non-empty value for each column.
+// ─────────────────────────────────────────────────────────────
+function cleanupAccuracySheet() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Accuracy');
+  if (!sheet) { Logger.log('ERROR: Accuracy sheet not found'); return; }
+
+  var data    = sheet.getDataRange().getValues();
+  var headers = data[0].map(function(h) { return String(h).trim(); });
+  var dateCol = headers.indexOf('date');
+  if (dateCol < 0) { Logger.log('ERROR: no "date" column found'); return; }
+
+  // Merge all rows by date — for each column keep first non-empty value
+  // EXCEPT actual_high and actual_low where we keep the LAST non-empty value
+  // (most recently written actuals are most accurate)
+  var actualHiCol = headers.indexOf('actual_high');
+  var actualLoCol = headers.indexOf('actual_low');
+  var merged = {}; // date → merged row array
+  var order  = []; // preserve date order
+
+  for (var i = 1; i < data.length; i++) {
+    var row = data[i];
+    var ds  = String(row[dateCol]).trim();
+    if (!ds) continue;
+
+    if (!merged[ds]) {
+      merged[ds] = row.slice(); // copy
+      order.push(ds);
+    } else {
+      var m = merged[ds];
+      for (var c = 0; c < headers.length; c++) {
+        var isActual = (c === actualHiCol || c === actualLoCol);
+        var val = row[c];
+        var hasVal = (val !== '' && val !== null && val !== undefined);
+        if (hasVal) {
+          // Actuals: always take latest (overwrite); predictions: keep first
+          if (isActual || !m[c] || m[c] === '') m[c] = val;
+        }
+      }
+    }
+  }
+
+  // Sort by date ascending
+  order.sort();
+
+  // Rebuild sheet: clear data rows, write merged rows back
+  var lastRow = sheet.getLastRow();
+  if (lastRow > 1) sheet.getRange(2, 1, lastRow - 1, headers.length).clearContent();
+
+  order.forEach(function(ds, i) {
+    sheet.getRange(i + 2, 1, 1, headers.length).setValues([merged[ds]]);
+  });
+
+  Logger.log('✓ Cleanup complete. ' + order.length + ' unique dates, duplicates merged.');
+  Logger.log('Dates: ' + order.join(', '));
+}
