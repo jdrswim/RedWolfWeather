@@ -574,7 +574,10 @@ footer strong{color:var(--red)}
 <!-- ============================================================ LIVE TAB -->
 <div class="tab-pane active" id="tab-live">
 <main>
-  <div class="sec">Current Conditions <em>- Red Wolf Farm - S. Wake County, NC - KNCRALEI761</em></div>
+  <div class="sec" style="justify-content:space-between">
+    <span>Current Conditions <em id="condSecEm">- Red Wolf Farm - S. Wake County, NC - KNCRALEI761</em></span>
+    <button id="wxLocBtn" onclick="wxUseMyLocation()" style="background:rgba(0,204,255,.12);border:1px solid rgba(0,204,255,.3);color:var(--cyan);font-family:inherit;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:5px 12px;border-radius:2px;cursor:pointer;flex-shrink:0">📡 Use My Location</button>
+  </div>
   <div class="cond-card">
     <div class="wx-scene" id="wxScene">
       <div class="wx-sky" id="wxSky"></div>
@@ -583,7 +586,7 @@ footer strong{color:var(--red)}
       <canvas id="wxSceneCanvas"></canvas>
     </div>
     <div class="cond-overlay">
-      <div class="cond-loc">RED WOLF FARM — S. WAKE COUNTY, NC — KNCRALEI761</div>
+      <div class="cond-loc" id="condLoc">RED WOLF FARM — S. WAKE COUNTY, NC — KNCRALEI761</div>
       <div class="cond-top">
         <div class="cond-temp"><span class="ld" id="temp">--</span><sup>° F</sup></div>
         <div class="cond-meta">
@@ -788,9 +791,92 @@ function applyConditions(t,feels,dew,humid,wspd,wdir,gust,pres,prec,uv,hi,lo,cod
   $("uv").textContent=uv;$("uvl").textContent=uvLbl(uv);
   $("hi").textContent=hi;$("lo").textContent=lo;
   $("cdesc").textContent=wmoDesc(code);
-  $("cupd").textContent="KNCRALEI761 - Updated "+new Date().toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit",second:"2-digit"})+" ET";
+  var _cLoc=wxGetCustLoc();
+  var _cStn=(_cLoc&&_cLoc.isCustom)?(_cLoc.name||'Your Location'):'KNCRALEI761';
+  $("cupd").textContent=_cStn+" - Updated "+new Date().toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit",second:"2-digit"})+" ET";
   if(typeof wxSetCondition==="function")wxSetCondition(code,wmoDesc(code));
   if(hourly)buildHourly(hourly);
+}
+
+// ============================================================
+// LIVE WEATHER — CUSTOM LOCATION
+// ============================================================
+var _wxCustLoc=null;
+
+function wxGetCustLoc(){
+  if(_wxCustLoc)return _wxCustLoc;
+  try{var s=localStorage.getItem('wx_user_loc');if(s){_wxCustLoc=JSON.parse(s);return _wxCustLoc;}}catch(e){}
+  return null;
+}
+
+function wxFlagUrl(loc){
+  if(!loc||!loc.isCustom)return'https://redwolfweather.com/images/main.jpg';
+  if(loc.stateCode&&loc.country==='us')return'https://flagcdn.com/w1280/us-'+loc.stateCode+'.png';
+  if(loc.country)return'https://flagcdn.com/w1280/'+loc.country+'.png';
+  return'https://redwolfweather.com/images/main.jpg';
+}
+
+function wxApplyLocUI(loc){
+  var isCustom=loc&&loc.isCustom;
+  var emLbl=isCustom?('— '+loc.name):'- Red Wolf Farm - S. Wake County, NC - KNCRALEI761';
+  var condLbl=isCustom?loc.name.toUpperCase():'RED WOLF FARM — S. WAKE COUNTY, NC — KNCRALEI761';
+  var em=$('condSecEm');if(em)em.textContent=emLbl;
+  var cl=$('condLoc');if(cl)cl.textContent=condLbl;
+  var img=$('wxImg');
+  if(img){
+    img.src=wxFlagUrl(loc);
+    img.style.objectPosition=isCustom?'center center':'center 30%';
+  }
+  var btn=$('wxLocBtn');
+  if(btn){
+    if(isCustom){btn.textContent='↩ Reset to Default';btn.onclick=wxResetLocation;btn.style.background='rgba(255,255,255,.06)';btn.style.borderColor='rgba(255,255,255,.2)';btn.style.color='rgba(255,255,255,.5)';}
+    else{btn.textContent='📡 Use My Location';btn.onclick=wxUseMyLocation;btn.style.background='rgba(0,204,255,.12)';btn.style.borderColor='rgba(0,204,255,.3)';btn.style.color='var(--cyan)';}
+    btn.disabled=false;
+  }
+}
+
+function wxUseMyLocation(){
+  if(!navigator.geolocation){alert('Geolocation is not supported by your browser.');return;}
+  var btn=$('wxLocBtn');if(btn){btn.textContent='Locating...';btn.disabled=true;}
+  navigator.geolocation.getCurrentPosition(
+    function(pos){
+      var lat=Math.round(pos.coords.latitude*10000)/10000;
+      var lon=Math.round(pos.coords.longitude*10000)/10000;
+      fetch('https://nominatim.openstreetmap.org/reverse?lat='+lat+'&lon='+lon+'&format=json',
+        {headers:{'Accept-Language':'en','User-Agent':'WolfpackWeather/2.0'}})
+        .then(function(r){return r.json();})
+        .then(function(g){
+          var a=g.address||{};
+          var city=a.city||a.town||a.village||a.hamlet||a.county||'';
+          var state=a.state||'';
+          var iso=(a['ISO3166-2-lvl4']||'').replace('US-','').toLowerCase();
+          var country=(a.country_code||'').toLowerCase();
+          var place=city&&state?city+', '+state:city||state||'';
+          var name='Your Location'+(place?' — '+place:'');
+          var loc={lat:lat,lon:lon,name:name,stateCode:iso,country:country,isCustom:true};
+          _wxCustLoc=loc;
+          try{localStorage.setItem('wx_user_loc',JSON.stringify(loc));}catch(e){}
+          wxApplyLocUI(loc);fetchConditions();
+        })
+        .catch(function(){
+          var loc={lat:lat,lon:lon,name:'Your Location ('+lat+'°, '+lon+'°)',stateCode:'',country:'',isCustom:true};
+          _wxCustLoc=loc;
+          try{localStorage.setItem('wx_user_loc',JSON.stringify(loc));}catch(e){}
+          wxApplyLocUI(loc);fetchConditions();
+        });
+    },
+    function(err){
+      var btn=$('wxLocBtn');if(btn){btn.textContent='📡 Use My Location';btn.disabled=false;}
+      alert('Could not get your location'+(err.message?': '+err.message:'')+'. Make sure location access is allowed.');
+    },
+    {timeout:12000,maximumAge:300000}
+  );
+}
+
+function wxResetLocation(){
+  _wxCustLoc=null;
+  try{localStorage.removeItem('wx_user_loc');}catch(e){}
+  wxApplyLocUI(null);fetchConditions();
 }
 
 var WU_COMMUNITY_KEY="6532d6454b8aa370768e63d6ba5a832e";
@@ -811,6 +897,22 @@ function todayObsHigh(hourly,dailyMax){
 }
 
 function fetchConditions(){
+  var custLoc=wxGetCustLoc();
+  if(custLoc&&custLoc.isCustom){
+    // Custom location — use Open-Meteo directly (WU PWS is station-specific)
+    var om='https://api.open-meteo.com/v1/forecast?latitude='+custLoc.lat+'&longitude='+custLoc.lon+
+      '&current=temperature_2m,apparent_temperature,relative_humidity_2m,dew_point_2m,wind_speed_10m,wind_gusts_10m,wind_direction_10m,surface_pressure,precipitation,weather_code,uv_index'+
+      '&hourly=temperature_2m,weather_code,precipitation_probability'+
+      '&daily=temperature_2m_max,temperature_2m_min'+
+      '&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=auto&forecast_days=2';
+    fetch(om).then(function(r){return r.json();})
+      .then(function(d){
+        var c=d.current,dl=d.daily;
+        applyConditions(Math.round(c.temperature_2m),Math.round(c.apparent_temperature),Math.round(c.dew_point_2m),Math.round(c.relative_humidity_2m),Math.round(c.wind_speed_10m),Math.round(c.wind_direction_10m),Math.round(c.wind_gusts_10m),(c.surface_pressure*0.02953).toFixed(2),c.precipitation.toFixed(2),Math.round(c.uv_index),todayObsHigh(d.hourly,dl.temperature_2m_max[0]),Math.round(dl.temperature_2m_min[0]),c.weather_code,d.hourly);
+      })
+      .catch(function(){$('cupd').textContent='Weather data unavailable';});
+    return;
+  }
   fetch("https://api.weather.com/v2/pws/observations/current?stationId=KNCRALEI761&format=json&units=e&apiKey="+WU_COMMUNITY_KEY)
   .then(function(r){if(!r.ok)throw new Error("WU");return r.json();})
   .then(function(d){
@@ -1918,19 +2020,20 @@ function accRender(el,rawRows){
     if(total===0)return null;
     var avgHiErr=hiErrors.reduce(function(a,b){return a+b;},0)/hiErrors.length;
     var avgLoErr=loErrors.reduce(function(a,b){return a+b;},0)/loErrors.length;
-    return{total:total,hitPct:Math.round(((hiHits+loHits)/(total*2))*100),avgHiErr:avgHiErr,avgLoErr:avgLoErr};
+    var avgMeanErr=(avgHiErr+avgLoErr)/2;
+    return{total:total,avgMeanErr:avgMeanErr,avgHiErr:avgHiErr,avgLoErr:avgLoErr};
   }
 
-  function scoreClass(pct){return pct>=75?"good":pct>=50?"ok":"poor";}
+  function errClass(e){return e<=1?"good":e<=3?"ok":"poor";}
 
   function renderLeadCard(lead,acc){
     var label=lead+"-Day Out";
-    var sub=lead===1?"Next day":lead===2?"2 days ahead":lead===3?"3 days ahead":lead===4?"4 days ahead":"5 days ahead";
     if(!acc)return'<div class="acc-score-card"><div class="acc-score-lbl">'+label+'</div><div class="acc-score-val" style="font-size:14px;margin-top:8px;color:var(--mu)">Building data…</div><div class="acc-score-sub">Need '+lead+' days of 8 PM logs</div></div>';
+    var cls=errClass(acc.avgMeanErr);
     return'<div class="acc-score-card">'+
       '<div class="acc-score-lbl">'+label+'</div>'+
-      '<div class="acc-score-val '+scoreClass(acc.hitPct)+'">'+acc.hitPct+'%</div>'+
-      '<div class="acc-score-sub">'+acc.total+' day'+(acc.total!==1?"s":"")+'</div>'+
+      '<div class="acc-score-val '+cls+'">±'+acc.avgMeanErr.toFixed(1)+'°</div>'+
+      '<div class="acc-score-sub">avg over '+acc.total+' day'+(acc.total!==1?'s':'')+'</div>'+
       '<div class="acc-score-err">Hi ±'+acc.avgHiErr.toFixed(1)+'° / Lo ±'+acc.avgLoErr.toFixed(1)+'°</div>'+
     '</div>';
   }
@@ -2927,6 +3030,8 @@ function issRender(el,passes,clouds,loc){
 // ============================================================
 // BOOT
 // ============================================================
+// Restore custom location if saved (before first fetchConditions)
+(function(){var loc=wxGetCustLoc();if(loc&&loc.isCustom)wxApplyLocUI(loc);})();
 seedExtended();
 function refreshAll(){fetchConditions();}
 refreshAll();
