@@ -1987,8 +1987,10 @@ function accRender(el,rawRows){
   el.innerHTML=html;
 }
 
-// Schedule prediction logger: runs every 30 min, only acts at 8 PM
-// Actuals are logged automatically inside accLogPrediction at 8 PM
+// Actuals: run on every page load (guard keys prevent duplicate sheet writes)
+// This ensures past-day actuals are captured even if 8 PM session was missed
+setTimeout(accLogActuals,6000);
+// Predictions + actuals: every 30 min, only acts after 8 PM
 setTimeout(accLogPrediction,8000);
 setInterval(accLogPrediction,1800000);
 
@@ -2385,7 +2387,7 @@ function rktLikelihood(netStr,padLat,padLon,statusAbbrev){
     '</div>'
   };
 }
-var RKT_CACHE_KEY='rkt_v1_cache';
+var RKT_CACHE_KEY='rkt_v2_cache'; // bumped to bust old cache (added 90-day filter)
 var RKT_CACHE_TTL=7200000; // 2 hours
 // LL2 dev server (higher rate limits, designed for app development)
 var RKT_URLS=['https://lldev.thespacedevs.com/2.2.0/launch/upcoming/?limit=50&format=json',
@@ -2439,12 +2441,23 @@ function fetchRockets(){
 }
 
 function rktRender(el,data){
+  var nowMs=Date.now();
+  var windowMs=90*24*3600*1000; // 90-day window
   var list=(data.results||[]).filter(function(l){
     if(!l.pad||!l.pad.latitude||!l.pad.longitude)return false;
     var lat=parseFloat(l.pad.latitude),lon=parseFloat(l.pad.longitude);
     // East coast US: lon -84 to -71, lat 25-42 (covers KSC/CCAFS/Wallops)
-    return l.pad.location&&l.pad.location.country_code==='USA'&&lon>=-84&&lon<=-71&&lat>=25&&lat<=42;
+    if(!l.pad.location||l.pad.location.country_code!=='USA')return false;
+    if(lon<-84||lon>-71||lat<25||lat>42)return false;
+    // Only include launches within the next 90 days
+    var netStr=l.net||l.window_start||'';
+    if(!netStr)return false;
+    var t=new Date(netStr).getTime();
+    return !isNaN(t)&&t>nowMs&&t<nowMs+windowMs;
   });
+  // Sort by date, cap at 10
+  list.sort(function(a,b){return new Date(a.net||a.window_start)-new Date(b.net||b.window_start);});
+  list=list.slice(0,10);
   if(!list.length){el.innerHTML='<div class="rkt-empty">No upcoming east coast launches in the next window.<br><span style="font-size:10px;color:var(--mu)">Check back soon — data refreshes every 2 hours.</span></div>';return;}
   var html='';
   list.forEach(function(l){
