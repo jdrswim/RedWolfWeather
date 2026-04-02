@@ -2331,16 +2331,61 @@ function rktVisCalc(padLat,padLon,launchTimeStr){
 }
 function escH(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
-function rktLikelihood(netStr,padLat,padLon,statusAbbrev){
-  // ── Time-of-day score (60%) ──────────────────────────────────
-  // Convert UTC launch time to ET hour
-  var etHour=null,timeLabel='Unknown time';
+function rktTrajFactor(orbit,padLat){
+  // Returns {factor:0-1, label, dir} based on orbit type + pad latitude.
+  // Trajectory direction is the dominant visibility factor — a south-bound
+  // lunar mission from KSC flies AWAY from the NC/SC coast regardless of
+  // how dark or close the launch is.
+  var o=(orbit||'').toUpperCase();
+
+  // ── Cape Canaveral / KSC area (lat < 32) ─────────────────────
+  if(padLat<32){
+    // Lunar / Trans-Lunar Injection — departs south/SE toward the Moon
+    if(o==='TLI'||o==='LUNAR'||o==='BEO'||o==='TLI/MTO'||o.indexOf('LUNAR')>=0||o.indexOf('MOON')>=0)
+      return{factor:0.05,label:'South trajectory (Lunar) — flies away from NC',dir:'S'};
+    // GTO / GEO — roughly due east over the Atlantic (~93° azimuth)
+    if(o==='GTO'||o==='GEO'||o==='IGTO'||o==='SSO-GTO')
+      return{factor:0.25,label:'East trajectory (GTO) — low on horizon from HHI',dir:'E'};
+    // Polar / SSO from KSC must fly south (cannot overfly eastern US)
+    if(o==='SSO'||o==='POLAR'||o==='PO')
+      return{factor:0.1,label:'South trajectory (Polar) — flies away from NC',dir:'S'};
+    // ISS resupply — 51.6° inclination, NNE azimuth ~37°
+    if(o==='ISS')
+      return{factor:1.0,label:'NNE trajectory (ISS) — flies toward NC coast',dir:'NNE'};
+    // Generic LEO — most are NE-ish (Starlink, Dragon, commercial)
+    if(o==='LEO'||o==='VLEO')
+      return{factor:0.85,label:'NE trajectory (LEO) — typically flies toward NC',dir:'NE'};
+    // Sub-orbital — short range, visibility depends on profile
+    if(o==='SO'||o==='SUB'||o.indexOf('SUB')>=0)
+      return{factor:0.5,label:'Sub-orbital — visibility varies',dir:'varies'};
+    // MEO, HEO — various azimuths
+    if(o==='MEO'||o==='HEO')
+      return{factor:0.4,label:'High orbit trajectory — low on horizon',dir:'E'};
+    // Unknown orbit from KSC — optimistic but uncertain
+    return{factor:0.65,label:'Trajectory unknown — check mission details',dir:'?'};
+  }
+
+  // ── Wallops Island / Mid-Atlantic (lat > 36) ─────────────────
+  // Wallops missions are much closer and nearly all go NE over the Atlantic
+  if(padLat>36){
+    if(o==='SSO'||o==='POLAR'||o==='PO')
+      return{factor:0.75,label:'NE trajectory (SSO) — flies over/near NC coast',dir:'NE'};
+    if(o==='ISS'||o==='LEO'||o==='VLEO')
+      return{factor:1.0,label:'NNE trajectory — flies directly over NC',dir:'NNE'};
+    return{factor:0.9,label:'NE trajectory — flies toward NC coast',dir:'NE'};
+  }
+
+  return{factor:0.6,label:'Trajectory unknown — check mission details',dir:'?'};
+}
+
+function rktLikelihood(netStr,padLat,padLon,statusAbbrev,orbit){
+  // ── Trajectory multiplier (applied last — overrides everything) ──
+  var traj=rktTrajFactor(orbit,padLat);
+
+  // ── Time-of-day score (60%) ───────────────────────────────────
+  var etHour=null;
   if(netStr){
-    try{
-      var d=new Date(netStr);
-      etHour=parseInt(d.toLocaleString('en-US',{hour:'numeric',hour12:false,timeZone:'America/New_York'}),10);
-      timeLabel=d.toLocaleString('en-US',{hour:'2-digit',minute:'2-digit',timeZone:'America/New_York',timeZoneName:'short'});
-    }catch(e){}
+    try{etHour=parseInt(new Date(netStr).toLocaleString('en-US',{hour:'numeric',hour12:false,timeZone:'America/New_York'}),10);}catch(e){}
   }
   var tScore=0,tDesc='Unknown';
   if(etHour!==null){
@@ -2351,34 +2396,36 @@ function rktLikelihood(netStr,padLat,padLon,statusAbbrev){
     else if(etHour>=17&&etHour<19){tScore=25;tDesc='Late afternoon';}
     else{tScore=5;tDesc='Daytime';}
   }
-  // ── Distance score (30%) ─────────────────────────────────────
-  // Use average miles from the 3 cities
+  // ── Distance score (30%) ──────────────────────────────────────
   var totalDist=0;
   RKT_CITIES.forEach(function(c){totalDist+=rktHav(c.lat,c.lon,padLat,padLon)/1.609;});
   var avgDist=totalDist/RKT_CITIES.length;
   var dScore=avgDist<200?100:avgDist<400?80:avgDist<600?55:avgDist<800?35:15;
   // ── Status score (10%) ────────────────────────────────────────
   var sScore=statusAbbrev==='Go'?100:statusAbbrev==='Hold'?20:50;
-  // ── Composite ────────────────────────────────────────────────
-  var score=Math.round(tScore*0.6+dScore*0.3+sScore*0.1);
+  // ── Base score × trajectory multiplier ───────────────────────
+  var base=Math.round(tScore*0.6+dScore*0.3+sScore*0.1);
+  var score=Math.round(base*traj.factor);
+
   var tier,color,filled;
   if(score>=75){tier='EXCELLENT';color='#00d44a';filled=5;}
   else if(score>=55){tier='GOOD';color='#00ccff';filled=4;}
   else if(score>=35){tier='FAIR';color='#ffcc00';filled=3;}
   else if(score>=15){tier='LOW';color='#ff6600';filled=2;}
   else{tier='UNLIKELY';color='#cc4444';filled=1;}
+
   var bars='';
   for(var i=1;i<=5;i++){
     bars+='<div class="rkt-lik-seg" style="background:'+(i<=filled?color:'rgba(255,255,255,.1)')+'"></div>';
   }
-  var subParts=[];
-  if(tDesc!=='Unknown')subParts.push(tDesc);
-  subParts.push('~'+Math.round(avgDist)+' mi avg');
+  // Trajectory label color: red if southbound, yellow if uncertain, green if NE
+  var trajColor=traj.factor>=0.8?'#00d44a':traj.factor>=0.4?'#ffcc00':'#ff4444';
   return{
     html:'<div class="rkt-lik">'+
-      '<div>'+
+      '<div style="flex:1;min-width:0">'+
         '<div class="rkt-lik-lbl">Visibility Likelihood</div>'+
-        '<div class="rkt-lik-sub">'+subParts.join(' &middot; ')+'</div>'+
+        '<div class="rkt-lik-sub">'+tDesc+(tDesc!=='Unknown'?' &middot; ':'')+Math.round(avgDist)+' mi avg</div>'+
+        '<div style="font-size:9px;margin-top:3px;font-style:italic" class="rkt-lik-sub"><span style="color:'+trajColor+'">&#9654;</span> '+escH(traj.label)+'</div>'+
       '</div>'+
       '<div class="rkt-lik-right">'+
         '<div class="rkt-lik-bar">'+bars+'</div>'+
@@ -2387,7 +2434,7 @@ function rktLikelihood(netStr,padLat,padLon,statusAbbrev){
     '</div>'
   };
 }
-var RKT_CACHE_KEY='rkt_v2_cache'; // bumped to bust old cache (added 90-day filter)
+var RKT_CACHE_KEY='rkt_v3_cache'; // bumped: added trajectory scoring
 var RKT_CACHE_TTL=7200000; // 2 hours
 // LL2 dev server (higher rate limits, designed for app development)
 var RKT_URLS=['https://lldev.thespacedevs.com/2.2.0/launch/upcoming/?limit=50&format=json',
@@ -2479,7 +2526,7 @@ function rktRender(el,data){
         launchTimeStr=net.toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit',timeZone:'America/New_York',timeZoneName:'short'});
         var padLat=parseFloat(l.pad.latitude),padLon=parseFloat(l.pad.longitude);
         var vis=rktVisCalc(padLat,padLon,netStr);
-        var lik=rktLikelihood(netStr,padLat,padLon,statusAbbrev);
+        var lik=rktLikelihood(netStr,padLat,padLon,statusAbbrev,orbit);
         visHtml='<div class="rkt-vis">'+lik.html+'<div class="rkt-vis-title">Estimated Look Times</div><div class="rkt-vis-grid">'+
           vis.map(function(v){
             return '<div class="rkt-vis-city">'+
