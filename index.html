@@ -191,6 +191,7 @@ main{max-width:1100px;margin:0 auto;padding:18px;overflow-x:hidden}
 .hr-i{font-size:19px;margin-bottom:4px}
 .hr-v{font-size:17px;font-weight:200;color:var(--white)}
 .hr-p{font-size:10px;color:#2255cc;margin-top:3px}
+.hr-wind{font-size:10px;color:var(--mu);margin-top:2px}
 
 /* ============================================================
    7-DAY FORECAST — FIX: wider wmoDescMap, better NWS source
@@ -269,7 +270,7 @@ main{max-width:1100px;margin:0 auto;padding:18px;overflow-x:hidden}
 .tide-loc-btn:hover{background:rgba(0,0,0,0.16);color:rgba(0,0,0,0.9)}
 .tide-loc-btn.tide-loc-on{background:rgba(0,120,220,.2);border-color:rgba(0,150,255,.4);color:#7dd3fc}
 .hhi-short{display:none}
-.sun-card{background:linear-gradient(135deg,#fffbe6,var(--p1));border:1px solid var(--bd);border-top:3px solid var(--gold);border-radius:3px;padding:20px;overflow:hidden}
+.sun-card{background:var(--p1);border:1px solid var(--bd);border-top:3px solid var(--gold);border-radius:3px;padding:20px;overflow:hidden}
 .sun-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
 .sun-stat{background:var(--p2);border:1px solid var(--bd);border-radius:4px;padding:14px;text-align:center}
 .sun-stat-lbl{font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px}
@@ -329,7 +330,7 @@ main{max-width:1100px;margin:0 auto;padding:18px;overflow-x:hidden}
    PWS NETWORK — FIX: proper visual card styles
    ============================================================ */
 .pws-station{background:var(--p1);border:1px solid var(--bd);border-top:3px solid var(--red);border-radius:3px;padding:16px;overflow:hidden}
-.pws-station.own{border-top-color:var(--gold);background:linear-gradient(135deg,var(--p1),#fffbe6)}
+.pws-station.own{border-top-color:var(--gold);background:var(--p1)}
 .pws-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px}
 .pws-name{font-size:15px;font-weight:800;color:var(--white)}
 .pws-loc{font-size:11px;color:var(--mu);margin-top:2px}
@@ -353,7 +354,7 @@ main{max-width:1100px;margin:0 auto;padding:18px;overflow-x:hidden}
 .mc-hdr em{color:var(--mu);font-style:normal;font-weight:500;font-size:11px;letter-spacing:1px}
 .mc-live-grid{display:grid;grid-template-columns:1fr 60px 1fr;gap:0;margin-bottom:18px;border:1px solid var(--bd);border-radius:6px;overflow:hidden}
 .mc-col{padding:16px 18px}
-.mc-col.rwf{background:linear-gradient(135deg,#fffbe6,var(--p1))}
+.mc-col.rwf{background:var(--p1)}
 .mc-col.rdu{background:var(--p1)}
 .mc-vs{display:flex;align-items:center;justify-content:center;background:var(--p2);font-size:10px;font-weight:900;color:var(--mu2);letter-spacing:2px;writing-mode:horizontal-tb}
 .mc-col-title{font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(0,0,0,0.096)}
@@ -920,7 +921,7 @@ function fetchConditions(){
     // Custom location — use Open-Meteo directly (WU PWS is station-specific)
     var om='https://api.open-meteo.com/v1/forecast?latitude='+custLoc.lat+'&longitude='+custLoc.lon+
       '&current=temperature_2m,apparent_temperature,relative_humidity_2m,dew_point_2m,wind_speed_10m,wind_gusts_10m,wind_direction_10m,surface_pressure,precipitation,weather_code,uv_index'+
-      '&hourly=temperature_2m,weather_code,precipitation_probability'+
+      '&hourly=temperature_2m,weather_code,precipitation_probability,wind_speed_10m'+
       '&daily=temperature_2m_max,temperature_2m_min'+
       '&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=auto&forecast_days=2';
     fetch(om).then(function(r){return r.json();})
@@ -950,7 +951,7 @@ function fetchConditions(){
     var prec=imp.precipTotal!=null?Number(imp.precipTotal).toFixed(2):"0.00";
     var uvi=obs.uv!=null?Math.round(obs.uv):0;
     var code=0;
-    fetch("https://api.open-meteo.com/v1/forecast?latitude=35.686&longitude=-78.614&current=weather_code&hourly=temperature_2m,weather_code,precipitation_probability&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=America%2FNew_York&forecast_days=2")
+    fetch("https://api.open-meteo.com/v1/forecast?latitude=35.686&longitude=-78.614&current=weather_code&hourly=temperature_2m,weather_code,precipitation_probability,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=America%2FNew_York&forecast_days=2")
     .then(function(r2){return r2.json();})
     .then(function(d2){
       code=d2.current?d2.current.weather_code:code;
@@ -963,7 +964,7 @@ function fetchConditions(){
     .catch(function(){applyConditions(temp,feels,dew,humid,wspd,wdir,gust,pres,prec,uvi,"--","--",code,null);});
   })
   .catch(function(){
-    fetch("https://api.open-meteo.com/v1/forecast?latitude=35.686&longitude=-78.614&current=temperature_2m,apparent_temperature,relative_humidity_2m,dew_point_2m,wind_speed_10m,wind_gusts_10m,wind_direction_10m,surface_pressure,precipitation,weather_code,uv_index&hourly=temperature_2m,weather_code,precipitation_probability&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=America%2FNew_York&forecast_days=2")
+    fetch("https://api.open-meteo.com/v1/forecast?latitude=35.686&longitude=-78.614&current=temperature_2m,apparent_temperature,relative_humidity_2m,dew_point_2m,wind_speed_10m,wind_gusts_10m,wind_direction_10m,surface_pressure,precipitation,weather_code,uv_index&hourly=temperature_2m,weather_code,precipitation_probability,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=America%2FNew_York&forecast_days=2")
     .then(function(r){return r.json();})
     .then(function(d){
       var c=d.current,dl=d.daily;
@@ -986,7 +987,8 @@ function buildHourly(h){
     var b=document.createElement("div");b.className="hr";
     var lbl=t.toLocaleTimeString("en-US",{hour:"numeric",hour12:true});
     var pp=(h.precipitation_probability||[])[i]||0;
-    b.innerHTML='<div class="hr-t">'+lbl+'</div><div class="hr-i">'+wmoIcon(h.weather_code[i])+'</div><div class="hr-v">'+Math.round(h.temperature_2m[i])+'</div>'+(pp>15?'<div class="hr-p">'+pp+'%</div>':'');
+    var ws=Math.round((h.wind_speed_10m||[])[i]||0);
+    b.innerHTML='<div class="hr-t">'+lbl+'</div><div class="hr-i">'+wmoIcon(h.weather_code[i])+'</div><div class="hr-v">'+Math.round(h.temperature_2m[i])+'</div><div class="hr-p">'+pp+'%</div><div class="hr-wind">💨 '+ws+' mph</div>';
     row.appendChild(b);cnt++;
   }
 }
