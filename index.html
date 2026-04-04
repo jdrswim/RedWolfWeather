@@ -1474,18 +1474,22 @@ function fetchSunData(){
     var dayOfYear=Math.round((today.rise-new Date(today.rise.getFullYear(),0,0))/86400000);
     var decl=23.45*Math.sin(Math.PI/180*(360/365*(284+dayOfYear)));
     var sunElev=Math.round((90-35.78+decl)*10)/10;
-    // Trail: arc from sunrise to current sun position.
-    // large-arc is always 0 — the trail is always < 180° of the ellipse.
-    // sweep=0 (CCW in standard math = upward arc in SVG y-down coords).
-    var trailD=(!isBefore&&sunPct>0.01)?"M "+(cx-rx)+","+cy+" A "+rx+","+ry+" 0 0 0 "+sunP.x+","+sunP.y:null;
+    // Trail: polyline of computed ellipse points — avoids SVG arc center mismatch
+    var trailD=(function(){
+      if(isBefore||sunPct<=0.01)return null;
+      var steps=Math.max(6,Math.ceil(sunPct*28));
+      var pts=[];
+      for(var k=0;k<=steps;k++){var p=arcPt(k/steps*sunPct);pts.push(p.x+','+p.y);}
+      return'M '+pts.join(' L ');
+    })();
     var svg='<svg viewBox="0 0 320 128" style="width:100%;height:auto;display:block;border-radius:8px">'+
       '<defs><linearGradient id="sAG" x1="0%" x2="100%"><stop offset="0%" stop-color="#ff8844"/><stop offset="50%" stop-color="#FFD700"/><stop offset="100%" stop-color="#ff9944"/></linearGradient>'+
       '<filter id="sGl"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'+
       '<filter id="sSun"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>'+
       '<rect x="0" y="0" width="320" height="128" rx="8" fill="#f0f0f2"/>'+
       '<line x1="16" y1="'+cy+'" x2="304" y2="'+cy+'" stroke="rgba(0,0,0,0.1)" stroke-width="1" stroke-dasharray="4,4"/>'+
-      '<path d="'+arcD+'" fill="none" stroke="rgba(0,0,0,0.08)" stroke-width="5" stroke-linecap="butt"/>'+
-      (trailD?'<path d="'+trailD+'" fill="none" stroke="url(#sAG)" stroke-width="6" stroke-linecap="butt" opacity=".9"/>':'')+
+      '<path d="'+arcD+'" fill="none" stroke="rgba(0,0,0,0.08)" stroke-width="5" stroke-linecap="round"/>'+
+      (trailD?'<path d="'+trailD+'" fill="none" stroke="url(#sAG)" stroke-width="6" stroke-linejoin="round" stroke-linecap="round" opacity=".9"/>':'')+
       (!isBefore&&!isPast?'<circle cx="'+sunP.x+'" cy="'+sunP.y+'" r="18" fill="rgba(255,215,0,.15)" filter="url(#sSun)"/><circle cx="'+sunP.x+'" cy="'+sunP.y+'" r="9" fill="#FFD700" filter="url(#sGl)"/><circle cx="'+sunP.x+'" cy="'+sunP.y+'" r="3.5" fill="#fff" fill-opacity=".8"/>':'')+
       '<text x="'+(cx-48)+'" y="'+(cy-44)+'" text-anchor="middle" fill="#d4900a" font-size="15" font-weight="700" font-family="Segoe UI,sans-serif">'+fmtL(todayLen)+'</text>'+
       '<text x="'+(cx-48)+'" y="'+(cy-30)+'" text-anchor="middle" fill="rgba(0,0,0,0.38)" font-size="7" letter-spacing="1.5" font-family="Segoe UI,sans-serif">DAYLIGHT TODAY</text>'+
