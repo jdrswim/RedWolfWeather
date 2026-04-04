@@ -1476,16 +1476,13 @@ function fetchSunData(){
     var sunElev=Math.round((90-35.78+decl)*10)/10;
     // Trail: direct SVG arc from sunrise endpoint to current sun position
     var trailD=(!isBefore&&sunPct>0.01)?"M "+(cx-rx)+","+cy+" A "+rx+","+ry+" 0 "+(sunPct>=0.5?1:0)+" 0 "+sunP.x+","+sunP.y:null;
-    // Future dotted arc: from current sun position to sunset endpoint
-    var futureD=(!isPast&&sunPct<0.99)?"M "+(trailD?sunP.x:(cx-rx))+","+(trailD?sunP.y:cy)+" A "+rx+","+ry+" 0 "+((1-sunPct)>=0.5?1:0)+" 0 "+(cx+rx)+","+cy:null;
     var svg='<svg viewBox="0 0 320 128" style="width:100%;height:auto;display:block;border-radius:8px">'+
       '<defs><linearGradient id="sAG" x1="0%" x2="100%"><stop offset="0%" stop-color="#ff8844"/><stop offset="50%" stop-color="#FFD700"/><stop offset="100%" stop-color="#ff9944"/></linearGradient>'+
       '<filter id="sGl"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'+
       '<filter id="sSun"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>'+
       '<rect x="0" y="0" width="320" height="128" rx="8" fill="#f0f0f2"/>'+
-      '<line x1="16" y1="'+cy+'" x2="304" y2="'+cy+'" stroke="rgba(0,0,0,0.13)" stroke-width="1.5" stroke-dasharray="4,3"/>'+
-      (futureD?'<path d="'+futureD+'" fill="none" stroke="rgba(0,0,0,0.18)" stroke-width="4" stroke-linecap="round" stroke-dasharray="6,5"/>':
-               '<path d="'+arcD+'" fill="none" stroke="rgba(0,0,0,0.07)" stroke-width="6" stroke-linecap="round"/>')+
+      '<line x1="16" y1="'+cy+'" x2="304" y2="'+cy+'" stroke="rgba(0,0,0,0.1)" stroke-width="1" stroke-dasharray="4,4"/>'+
+      '<path d="'+arcD+'" fill="none" stroke="rgba(0,0,0,0.07)" stroke-width="5" stroke-linecap="round"/>'+
       (trailD?'<path d="'+trailD+'" fill="none" stroke="url(#sAG)" stroke-width="6" stroke-linecap="round" opacity=".9"/>':'')+
       (!isBefore&&!isPast?'<circle cx="'+sunP.x+'" cy="'+sunP.y+'" r="18" fill="rgba(255,215,0,.15)" filter="url(#sSun)"/><circle cx="'+sunP.x+'" cy="'+sunP.y+'" r="9" fill="#FFD700" filter="url(#sGl)"/><circle cx="'+sunP.x+'" cy="'+sunP.y+'" r="3.5" fill="#fff" fill-opacity=".8"/>':'')+
       '<text x="'+(cx-48)+'" y="'+(cy-44)+'" text-anchor="middle" fill="#d4900a" font-size="15" font-weight="700" font-family="Segoe UI,sans-serif">'+fmtL(todayLen)+'</text>'+
