@@ -1429,20 +1429,16 @@ function fetchSunData(){
     var dayOfYear=Math.round((today.rise-new Date(today.rise.getFullYear(),0,0))/86400000);
     var decl=23.45*Math.sin(Math.PI/180*(360/365*(284+dayOfYear)));
     var sunElev=Math.round((90-35.78+decl)*10)/10;
-    var svg='<svg viewBox="0 0 320 142" style="width:100%;height:auto;display:block">'+
+    var svg='<svg viewBox="0 0 320 128" style="width:100%;height:auto;display:block;border-radius:8px">'+
       '<defs><linearGradient id="sAG" x1="0%" x2="100%"><stop offset="0%" stop-color="#ff8844"/><stop offset="50%" stop-color="#FFD700"/><stop offset="100%" stop-color="#ff9944"/></linearGradient>'+
       '<filter id="sGl"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'+
       '<filter id="sSun"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>'+
-      '<line x1="24" y1="'+cy+'" x2="296" y2="'+cy+'" stroke="rgba(0,0,0,0.112)" stroke-width="1"/>'+
-      '<path d="'+arcD+'" fill="none" stroke="rgba(0,0,0,0.112)" stroke-width="5" stroke-linecap="round"/>'+
-      (!isBefore&&sunPct>0.01?'<path d="'+arcD+'" fill="none" stroke="url(#sAG)" stroke-width="5" stroke-linecap="round" stroke-dasharray="'+arcLen+'" stroke-dashoffset="'+Math.round(arcLen*(1-sunPct))+'" opacity=".85"/>':'')+
-      '<circle cx="'+(cx-rx)+'" cy="'+cy+'" r="5" fill="#ff8844" filter="url(#sGl)"/>'+
-      '<circle cx="'+(cx+rx)+'" cy="'+cy+'" r="5" fill="#ff9944" filter="url(#sGl)"/>'+
-      (!isBefore&&!isPast?'<circle cx="'+sunP.x+'" cy="'+sunP.y+'" r="16" fill="rgba(255,215,0,.12)" filter="url(#sSun)"/><circle cx="'+sunP.x+'" cy="'+sunP.y+'" r="8" fill="#FFD700" filter="url(#sGl)"/><circle cx="'+sunP.x+'" cy="'+sunP.y+'" r="3" fill="#fff" fill-opacity=".7"/>':'')+
-      '<text x="'+(cx-rx)+'" y="'+(cy+17)+'" text-anchor="middle" fill="rgba(0,0,0,0.64)" font-size="9" font-family="Segoe UI,sans-serif">'+fmtT(today.rise)+'</text>'+
-      '<text x="'+(cx+rx)+'" y="'+(cy+17)+'" text-anchor="middle" fill="rgba(0,0,0,0.64)" font-size="9" font-family="Segoe UI,sans-serif">'+fmtT(today.set)+'</text>'+
-      '<text x="'+(cx-48)+'" y="'+(cy-50)+'" text-anchor="middle" fill="#FFD700" font-size="13" font-weight="700" font-family="Segoe UI,sans-serif">'+fmtL(todayLen)+'</text>'+
-      '<text x="'+(cx-48)+'" y="'+(cy-37)+'" text-anchor="middle" fill="rgba(0,0,0,0.448)" font-size="7" letter-spacing="1.5" font-family="Segoe UI,sans-serif">DAYLIGHT TODAY</text>'+
+      '<rect x="0" y="0" width="320" height="128" rx="8" fill="#f0f0f2"/>'+
+      '<path d="'+arcD+'" fill="none" stroke="rgba(0,0,0,0.08)" stroke-width="6" stroke-linecap="round"/>'+
+      (!isBefore&&sunPct>0.01?'<path d="'+arcD+'" fill="none" stroke="url(#sAG)" stroke-width="6" stroke-linecap="round" stroke-dasharray="'+arcLen+'" stroke-dashoffset="'+Math.round(arcLen*(1-sunPct))+'" opacity=".9"/>':'')+
+      (!isBefore&&!isPast?'<circle cx="'+sunP.x+'" cy="'+sunP.y+'" r="18" fill="rgba(255,215,0,.15)" filter="url(#sSun)"/><circle cx="'+sunP.x+'" cy="'+sunP.y+'" r="9" fill="#FFD700" filter="url(#sGl)"/><circle cx="'+sunP.x+'" cy="'+sunP.y+'" r="3.5" fill="#fff" fill-opacity=".8"/>':'')+
+      '<text x="'+(cx-48)+'" y="'+(cy-44)+'" text-anchor="middle" fill="#d4900a" font-size="15" font-weight="700" font-family="Segoe UI,sans-serif">'+fmtL(todayLen)+'</text>'+
+      '<text x="'+(cx-48)+'" y="'+(cy-30)+'" text-anchor="middle" fill="rgba(0,0,0,0.38)" font-size="7" letter-spacing="1.5" font-family="Segoe UI,sans-serif">DAYLIGHT TODAY</text>'+
       '</svg>';
     var noonPanel=
       '<div style="display:flex;flex-direction:column;justify-content:center;gap:10px;padding:10px 14px;background:rgba(0,0,0,0.064);border:1px solid rgba(0,0,0,0.128);border-radius:6px;min-width:110px;text-align:center">'+
