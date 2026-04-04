@@ -1283,6 +1283,51 @@ function moonAge(date){
 }
 
 // ============================================================
+// MOONRISE / MOONSET (observer lat/lon in degrees, lon positive east)
+// ============================================================
+function moonPosition(date){
+  var JD=date.getTime()/86400000+2440587.5,d=JD-2451545.0;
+  var L=((218.316+13.176396*d)%360+360)%360;
+  var M=((134.963+13.064993*d)%360+360)%360;
+  var F=((93.272+13.229350*d)%360+360)%360;
+  var lon=L+6.289*Math.sin(M*Math.PI/180);
+  var lat=5.128*Math.sin(F*Math.PI/180);
+  var eps=23.4393-0.0000004*d;
+  var RA=Math.atan2(Math.sin(lon*Math.PI/180)*Math.cos(eps*Math.PI/180)-Math.tan(lat*Math.PI/180)*Math.sin(eps*Math.PI/180),Math.cos(lon*Math.PI/180))*180/Math.PI;
+  RA=(RA%360+360)%360;
+  var dec=Math.asin(Math.sin(lat*Math.PI/180)*Math.cos(eps*Math.PI/180)+Math.cos(lat*Math.PI/180)*Math.sin(eps*Math.PI/180)*Math.sin(lon*Math.PI/180))*180/Math.PI;
+  return{ra:RA,dec:dec};
+}
+function moonAltitude(date,lat,lon){
+  var pos=moonPosition(date);
+  var JD=date.getTime()/86400000+2440587.5,d=JD-2451545.0;
+  var GMST=((280.46061837+360.98564736629*d)%360+360)%360;
+  var LST=(GMST+lon%360+360)%360;
+  var HA=LST-pos.ra;
+  var sinAlt=Math.sin(lat*Math.PI/180)*Math.sin(pos.dec*Math.PI/180)+Math.cos(lat*Math.PI/180)*Math.cos(pos.dec*Math.PI/180)*Math.cos(HA*Math.PI/180);
+  return Math.asin(sinAlt)*180/Math.PI;
+}
+function moonRiseSet(date,lat,lon){
+  var start=new Date(date);start.setHours(0,0,0,0);
+  var result={rise:null,set:null};
+  var h0=moonAltitude(start,lat,lon);
+  for(var m=15;m<=1440;m+=15){
+    var t=new Date(start.getTime()+m*60000),h1=moonAltitude(t,lat,lon);
+    if(!result.rise&&h0<0&&h1>=0){
+      var ta=new Date(t.getTime()-900000),tb=t;
+      for(var i=0;i<8;i++){var tm=new Date((ta.getTime()+tb.getTime())/2);(moonAltitude(tm,lat,lon)<0?ta=tm:tb=tm);}
+      result.rise=new Date((ta.getTime()+tb.getTime())/2);
+    }else if(!result.set&&h0>=0&&h1<0){
+      var ta=new Date(t.getTime()-900000),tb=t;
+      for(var i=0;i<8;i++){var tm=new Date((ta.getTime()+tb.getTime())/2);(moonAltitude(tm,lat,lon)>=0?ta=tm:tb=tm);}
+      result.set=new Date((ta.getTime()+tb.getTime())/2);
+    }
+    h0=h1;
+  }
+  return result;
+}
+
+// ============================================================
 // SUNRISE / SUNSET & DAY LENGTH
 // ============================================================
 function sunSetMode(mode){
@@ -1431,10 +1476,12 @@ function fetchSunData(){
     var sunElev=Math.round((90-35.78+decl)*10)/10;
     var svg='<svg viewBox="0 0 320 128" style="width:100%;height:auto;display:block;border-radius:8px">'+
       '<defs><linearGradient id="sAG" x1="0%" x2="100%"><stop offset="0%" stop-color="#ff8844"/><stop offset="50%" stop-color="#FFD700"/><stop offset="100%" stop-color="#ff9944"/></linearGradient>'+
+      '<linearGradient id="sAGd" x1="0%" x2="100%"><stop offset="0%" stop-color="#ff884455"/><stop offset="50%" stop-color="#FFD70055"/><stop offset="100%" stop-color="#ff994455"/></linearGradient>'+
       '<filter id="sGl"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'+
       '<filter id="sSun"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>'+
       '<rect x="0" y="0" width="320" height="128" rx="8" fill="#f0f0f2"/>'+
-      '<path d="'+arcD+'" fill="none" stroke="rgba(0,0,0,0.08)" stroke-width="6" stroke-linecap="round"/>'+
+      '<line x1="16" y1="'+cy+'" x2="304" y2="'+cy+'" stroke="rgba(0,0,0,0.13)" stroke-width="1.5" stroke-dasharray="4,3"/>'+
+      '<path d="'+arcD+'" fill="none" stroke="rgba(0,0,0,0.07)" stroke-width="6" stroke-linecap="round"/>'+
       (!isBefore&&sunPct>0.01?'<path d="'+arcD+'" fill="none" stroke="url(#sAG)" stroke-width="6" stroke-linecap="round" stroke-dasharray="'+arcLen+'" stroke-dashoffset="'+Math.round(arcLen*(1-sunPct))+'" opacity=".9"/>':'')+
       (!isBefore&&!isPast?'<circle cx="'+sunP.x+'" cy="'+sunP.y+'" r="18" fill="rgba(255,215,0,.15)" filter="url(#sSun)"/><circle cx="'+sunP.x+'" cy="'+sunP.y+'" r="9" fill="#FFD700" filter="url(#sGl)"/><circle cx="'+sunP.x+'" cy="'+sunP.y+'" r="3.5" fill="#fff" fill-opacity=".8"/>':'')+
       '<text x="'+(cx-48)+'" y="'+(cy-44)+'" text-anchor="middle" fill="#d4900a" font-size="15" font-weight="700" font-family="Segoe UI,sans-serif">'+fmtL(todayLen)+'</text>'+
@@ -1463,6 +1510,9 @@ function fetchSunData(){
     var mpn=moonPhaseName(moon.phase);
     var mAge=moonAge(now).toFixed(1);
     var mIllum=Math.round(moon.illum*100);
+    var mRS=moonRiseSet(now,35.7113,-78.6141);
+    var mRiseTxt=mRS.rise?fmtT(mRS.rise):"--";
+    var mSetTxt=mRS.set?fmtT(mRS.set):"--";
     // Next 4 phases sorted chronologically
     var phases=[
       {t:0,   label:"New Moon",      emoji:"🌑", col:"#aaa"},
@@ -1519,10 +1569,24 @@ function fetchSunData(){
           '<div style="font-size:18px;margin-top:4px">'+mpn.emoji+'</div>'+
         '</div>'+
         '<div style="flex:1;min-width:140px">'+
-          '<div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:6px">'+mpn.name+'</div>'+
-          '<div style="display:flex;gap:16px;flex-wrap:wrap">'+
-            '<div><div style="font-size:8px;letter-spacing:1.5px;color:rgba(0,0,0,0.608)">ILLUMINATION</div><div style="font-size:20px;font-weight:700;color:#c8d8ff">'+mIllum+'%</div></div>'+
-            '<div><div style="font-size:8px;letter-spacing:1.5px;color:rgba(0,0,0,0.608)">MOON AGE</div><div style="font-size:20px;font-weight:700;color:#aab8cc">'+mAge+'d</div></div>'+
+          '<div style="font-size:15px;font-weight:700;color:var(--white);margin-bottom:10px">'+mpn.name+'</div>'+
+          '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">'+
+            '<div style="background:var(--p2);border:1px solid var(--bd);border-radius:4px;padding:10px;text-align:center">'+
+              '<div style="font-size:8px;letter-spacing:1.5px;color:var(--mu);font-weight:700;margin-bottom:4px">ILLUMINATION</div>'+
+              '<div style="font-size:20px;font-weight:700;color:#3366aa">'+mIllum+'%</div>'+
+            '</div>'+
+            '<div style="background:var(--p2);border:1px solid var(--bd);border-radius:4px;padding:10px;text-align:center">'+
+              '<div style="font-size:8px;letter-spacing:1.5px;color:var(--mu);font-weight:700;margin-bottom:4px">MOON AGE</div>'+
+              '<div style="font-size:20px;font-weight:700;color:#556677">'+mAge+'d</div>'+
+            '</div>'+
+            '<div style="background:var(--p2);border:1px solid var(--bd);border-top:2px solid #aab8cc;border-radius:4px;padding:10px;text-align:center">'+
+              '<div style="font-size:8px;letter-spacing:1.5px;color:var(--mu);font-weight:700;margin-bottom:4px">MOONRISE</div>'+
+              '<div style="font-size:16px;font-weight:600;color:var(--white)">'+mRiseTxt+'</div>'+
+            '</div>'+
+            '<div style="background:var(--p2);border:1px solid var(--bd);border-top:2px solid #778899;border-radius:4px;padding:10px;text-align:center">'+
+              '<div style="font-size:8px;letter-spacing:1.5px;color:var(--mu);font-weight:700;margin-bottom:4px">MOONSET</div>'+
+              '<div style="font-size:16px;font-weight:600;color:var(--white)">'+mSetTxt+'</div>'+
+            '</div>'+
           '</div>'+
         '</div>'+
       '</div>'+
