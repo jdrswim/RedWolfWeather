@@ -1053,6 +1053,7 @@ function fetchExtended(){
       if(periods[i].isDaytime){
         var day={
           name:periods[i].name,
+          startTime:periods[i].startTime,
           hi:periods[i].temperature,
           icon:periods[i].icon,
           shortForecast:periods[i].shortForecast,
@@ -1068,21 +1069,24 @@ function fetchExtended(){
         days.push(day);
       }
     }
-    // Also try to get tonight's low for today if first period is daytime
     var allHi=days.map(function(x){return x.hi;}),allLo=days.filter(function(x){return x.lo!==null;}).map(function(x){return x.lo;});
     var allT=allHi.concat(allLo);
     var mn=allT.length?Math.min.apply(null,allT):32,mx=allT.length?Math.max.apply(null,allT):90;
 
     var now=new Date();
+    var todayDateStr=now.toLocaleDateString("en-US",{month:"short",day:"numeric"});
     var h="";
     days.forEach(function(day,i){
-      var dt=new Date(now.getTime()+i*86400000);
-      var dow=i===0?"Today":dt.toLocaleDateString("en-US",{weekday:"short"});
+      // Use period's actual startTime for correct date — avoids off-by-one when
+      // NWS omits the current day's daytime period (evening hours).
+      var dt=day.startTime?new Date(day.startTime):new Date(now.getTime()+i*86400000);
       var date=dt.toLocaleDateString("en-US",{month:"short",day:"numeric"});
+      var isToday=date===todayDateStr;
+      var dow=isToday?"Today":dt.toLocaleDateString("en-US",{weekday:"short"});
       var icon=nwsIcon(day.icon,true);
       var loStr=day.lo!==null?day.lo+"":"--";
       var bar=day.lo!==null?buildRangeBar(day.hi,day.lo,mn,mx):"";
-      h+='<div class="ext-day'+(i===0?" today":"")+'">'+
+      h+='<div class="ext-day'+(isToday?" today":"")+'">'+
         '<div class="ext-dow">'+dow+'</div>'+
         '<div class="ext-date">'+date+'</div>'+
         '<div class="ext-icon">'+icon+'</div>'+
