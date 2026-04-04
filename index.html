@@ -648,7 +648,7 @@ footer strong{color:var(--red)}
 <div class="tab-pane" id="tab-almanac">
 <div class="alm-wrap">
   <div id="sun-dashboard"></div>
-  <div class="sec">Raleigh Wx Almanac <em>- RDU Airport - Historical Climate Data</em> <div class="tip-btn" onclick="openTip('tipAlmanac')">?</div></div>
+  <div class="sec" style="margin-top:28px">Raleigh Wx Almanac <em>- RDU Airport - Historical Climate Data</em> <div class="tip-btn" onclick="openTip('tipAlmanac')">?</div></div>
   <div id="alm-content"><div class="alm-ld"><div class="tsps-spinner"></div>Loading climate data...</div></div>
   <div id="acc-dashboard"></div>
 </div>
@@ -1385,10 +1385,10 @@ function renderTides(el,preds,locLabel,stationId,waterTemp){
       var ht=parseFloat(p.v).toFixed(1);
       html+='<div style="display:flex;align-items:center;gap:10px;background:rgba(0,0,0,0.048);border:1px solid rgba(0,0,0,0.112);border-left:3px solid '+(isHigh?"rgba(0,150,255,.5)":"rgba(0,0,0,0.24)")+';border-radius:4px;padding:8px 12px">'+
         '<span style="font-size:14px">'+(isHigh?"🔼":"🔽")+'</span>'+
-        '<span style="font-size:11px;font-weight:700;letter-spacing:1px;color:'+(isHigh?"#7dd3fc":"rgba(0,0,0,0.72)")+';min-width:38px">'+(isHigh?"HIGH":"LOW")+'</span>'+
-        '<span style="font-size:13px;color:#fff;font-weight:600;flex:1">'+fmtTime(p.t)+'</span>'+
-        '<span style="font-size:13px;color:'+(isHigh?"#7dd3fc":"rgba(0,0,0,0.85)")+';font-weight:700">'+ht+' ft</span>'+
-        (isNext?'<span style="font-size:9px;background:rgba(0,150,255,.2);border:1px solid rgba(0,150,255,.4);color:#7dd3fc;border-radius:3px;padding:2px 6px;letter-spacing:.8px;font-weight:700">NEXT</span>':'')+
+        '<span style="font-size:11px;font-weight:700;letter-spacing:1px;color:'+(isHigh?"#2255cc":"rgba(0,0,0,0.55)")+';min-width:38px">'+(isHigh?"HIGH":"LOW")+'</span>'+
+        '<span style="font-size:13px;color:rgba(0,0,0,0.75);font-weight:600;flex:1">'+fmtTime(p.t)+'</span>'+
+        '<span style="font-size:13px;color:'+(isHigh?"#2255cc":"rgba(0,0,0,0.85)")+';font-weight:700">'+ht+' ft</span>'+
+        (isNext?'<span style="font-size:9px;background:rgba(34,85,204,.1);border:1px solid rgba(34,85,204,.3);color:#2255cc;border-radius:3px;padding:2px 6px;letter-spacing:.8px;font-weight:700">NEXT</span>':'')+
       '</div>';
     });
     html+='</div></div>';
