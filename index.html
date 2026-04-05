@@ -96,6 +96,7 @@ main{max-width:1100px;margin:0 auto;padding:18px;overflow-x:hidden}
 .slbl{font-size:11px;font-weight:900;letter-spacing:1.5px;color:var(--red);text-transform:uppercase;margin-bottom:6px}
 .sval{font-size:24px;font-weight:300;color:var(--white)}
 .sunit{font-size:12px;color:var(--mu);margin-top:3px}
+.sdaily{font-size:10px;color:var(--mu);opacity:.6;margin-top:5px;letter-spacing:.3px}
 .hlrow{display:flex;border:1px solid var(--bd);border-radius:2px;overflow:hidden}
 .hlbox{flex:1;padding:14px;text-align:center}
 .hlbox:first-child{background:#fff5f5;border-right:1px solid var(--bd)}
@@ -602,12 +603,12 @@ footer strong{color:var(--red)}
         </div>
       </div>
       <div class="sgrid">
-        <div class="sbox"><div class="slbl">Humidity</div><div class="sval" id="humid">--%</div></div>
-        <div class="sbox"><div class="slbl">Wind</div><div class="sval" id="wspd">--</div><div class="sunit" id="wdir">--</div></div>
-        <div class="sbox"><div class="slbl">Gusts</div><div class="sval" id="gust">--</div><div class="sunit">mph</div></div>
-        <div class="sbox"><div class="slbl">Pressure</div><div class="sval" id="pres">--</div><div class="sunit">inHg</div></div>
-        <div class="sbox"><div class="slbl">Precip</div><div class="sval" id="prec">--</div><div class="sunit">in today</div></div>
-        <div class="sbox"><div class="slbl">UV Index</div><div class="sval" id="uv">--</div><div class="sunit" id="uvl">--</div></div>
+        <div class="sbox"><div class="slbl">Humidity</div><div class="sval" id="humid">--%</div><div class="sdaily" id="humidHi"></div></div>
+        <div class="sbox"><div class="slbl">Wind</div><div class="sval" id="wspd">--</div><div class="sunit" id="wdir">--</div><div class="sdaily" id="wspdHi"></div></div>
+        <div class="sbox"><div class="slbl">Gusts</div><div class="sval" id="gust">--</div><div class="sunit">mph</div><div class="sdaily" id="gustHi"></div></div>
+        <div class="sbox"><div class="slbl">Pressure</div><div class="sval" id="pres">--</div><div class="sunit">inHg</div><div class="sdaily" id="presHi"></div></div>
+        <div class="sbox"><div class="slbl">Precip</div><div class="sval" id="prec">--</div><div class="sunit">in today</div><div class="sdaily" id="precRate"></div></div>
+        <div class="sbox"><div class="slbl">UV Index</div><div class="sval" id="uv">--</div><div class="sunit" id="uvl">--</div><div class="sdaily" id="uvHi"></div></div>
       </div>
       <div class="hlrow">
         <div class="hlbox"><div class="hllbl" id="hiLbl">Today High</div><div class="hlval"><span id="hi">--</span>F</div><div style="font-size:9px;color:rgba(255,119,119,.5);margin-top:3px;letter-spacing:.5px" id="hiSub">observed</div></div>
@@ -786,7 +787,7 @@ refreshCams();setInterval(refreshCams,60000);
 // ============================================================
 // CONDITIONS
 // ============================================================
-function applyConditions(t,feels,dew,humid,wspd,wdir,gust,pres,prec,uv,hi,lo,code,hourly){
+function applyConditions(t,feels,dew,humid,wspd,wdir,gust,pres,prec,uv,hi,lo,code,hourly,dayMaxes){
   $("temp").textContent=t;$("temp").classList.remove("ld");
   $("oatemp").textContent=t+"F";
   $("feels").textContent=feels+"F";$("dewpt").textContent=dew+"F";
@@ -795,6 +796,13 @@ function applyConditions(t,feels,dew,humid,wspd,wdir,gust,pres,prec,uv,hi,lo,cod
   $("pres").textContent=pres;$("prec").textContent=prec;
   $("uv").textContent=uv;$("uvl").textContent=uvLbl(uv);
   $("hi").textContent=hi;$("lo").textContent=lo;
+  var dm=dayMaxes||{};
+  if($("humidHi"))$("humidHi").textContent=dm.humidHi!=null?"day hi: "+dm.humidHi+"%":"";
+  if($("wspdHi"))$("wspdHi").textContent=dm.wspdHi!=null?"day max: "+dm.wspdHi+" mph":"";
+  if($("gustHi"))$("gustHi").textContent=dm.gustHi!=null?"day max: "+dm.gustHi+" mph":"";
+  if($("presHi"))$("presHi").textContent=dm.presHi!=null?"day hi: "+dm.presHi+" inHg":"";
+  if($("uvHi"))$("uvHi").textContent=dm.uvHi!=null?"day max: "+dm.uvHi:"";
+  if($("precRate"))$("precRate").textContent=dm.precRate!=null?"max rate: "+Number(dm.precRate).toFixed(2)+" in/hr":"";
   $("cdesc").textContent=wmoDesc(code);
   var _cLoc=wxGetCustLoc();
   var _isCust=_cLoc&&_cLoc.isCustom;
@@ -1021,10 +1029,24 @@ function fetchConditions(){
       .catch(function(){$('cupd').textContent='Weather data unavailable';});
     return;
   }
-  fetch("https://api.weather.com/v2/pws/observations/current?stationId=KNCRALEI761&format=json&units=e&apiKey="+WU_COMMUNITY_KEY)
-  .then(function(r){if(!r.ok)throw new Error("WU");return r.json();})
-  .then(function(d){
-    var obs=d.observations&&d.observations[0];if(!obs)throw new Error("No obs");
+  var _sl=siteGetLoc();
+  var _WU="https://api.weather.com/v2/pws/";
+  var _K=WU_COMMUNITY_KEY;
+  function wuFetch(url){return fetch(url).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;});}
+  Promise.all([
+    wuFetch(_WU+"observations/current?stationId=KNCRALEI761&format=json&units=e&apiKey="+_K),
+    wuFetch(_WU+"dailysummary/7day?stationId=KNCRALEI761&format=json&units=e&apiKey="+_K),
+    wuFetch(_WU+"dailysummary/7day?stationId=KNCRALEI1276&format=json&units=e&apiKey="+_K),
+    fetch("https://api.open-meteo.com/v1/forecast?latitude="+_sl.lat+"&longitude="+_sl.lon+"&current=weather_code&hourly=temperature_2m,weather_code,precipitation_probability,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=America%2FNew_York&forecast_days=2").then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
+  ]).then(function(res){
+    var dCur=res[0],dSum761=res[1],dSum1276=res[2],dOm=res[3];
+    var obs=dCur&&dCur.observations&&dCur.observations[0];
+    if(!obs){
+      // WU current failed — fall back to Open-Meteo
+      if(dOm){var c=dOm.current,dl=dOm.daily;applyConditions(Math.round(c.temperature_2m),Math.round(c.apparent_temperature),Math.round(c.dew_point_2m),Math.round(c.relative_humidity_2m),Math.round(c.wind_speed_10m),Math.round(c.wind_direction_10m),Math.round(c.wind_gusts_10m),(c.surface_pressure*0.02953).toFixed(2),c.precipitation.toFixed(2),Math.round(c.uv_index),todayObsHigh(dOm.hourly,dl.temperature_2m_max[0]),Math.round(dl.temperature_2m_min[0]),c.weather_code,dOm.hourly,null);$("cupd").textContent=$("cupd").textContent+" (Open-Meteo fallback)";}
+      else{$("cupd").textContent="Data unavailable";}
+      return;
+    }
     var imp=obs.imperial||{};
     var temp=imp.temp!=null?Math.round(imp.temp):"--";
     var feels=imp.heatIndex!=null?Math.round(imp.heatIndex):(imp.windChill!=null?Math.round(imp.windChill):temp);
@@ -1034,28 +1056,33 @@ function fetchConditions(){
     var wdir=obs.winddir!=null?obs.winddir:0;
     var gust=imp.windGust!=null?Math.round(imp.windGust):"--";
     var pres=imp.pressure!=null?Number(imp.pressure).toFixed(2):"--";
-    var prec=imp.precipTotal!=null?Number(imp.precipTotal).toFixed(2):"0.00";
     var uvi=obs.uv!=null?Math.round(obs.uv):0;
-    var code=0;
-    var _sl=siteGetLoc();
-    fetch("https://api.open-meteo.com/v1/forecast?latitude="+_sl.lat+"&longitude="+_sl.lon+"&current=weather_code&hourly=temperature_2m,weather_code,precipitation_probability,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=America%2FNew_York&forecast_days=2")
-    .then(function(r2){return r2.json();})
-    .then(function(d2){
-      code=d2.current?d2.current.weather_code:code;
-      var hi=todayObsHigh(d2.hourly,d2.daily?d2.daily.temperature_2m_max[0]:null);
-      // Current WU reading may exceed model hourly data — use whichever is higher
-      if(typeof temp==="number"&&typeof hi==="number")hi=Math.max(hi,temp);
-      var lo=d2.daily?Math.round(d2.daily.temperature_2m_min[0]):"--";
-      applyConditions(temp,feels,dew,humid,wspd,wdir,gust,pres,prec,uvi,hi,lo,code,d2.hourly||null);
-    })
-    .catch(function(){applyConditions(temp,feels,dew,humid,wspd,wdir,gust,pres,prec,uvi,"--","--",code,null);});
-  })
-  .catch(function(){
+    // Precip from KNCRALEI1276
+    var s1276=dSum1276&&dSum1276.summaries&&dSum1276.summaries[0];
+    var i1276=s1276&&s1276.imperial||{};
+    var prec=i1276.precipTotal!=null?Number(i1276.precipTotal).toFixed(2):"0.00";
+    // Day highs from KNCRALEI761 daily summary
+    var s761=dSum761&&dSum761.summaries&&dSum761.summaries[0];
+    var i761=s761&&s761.imperial||{};
+    var dayMaxes={
+      humidHi:s761&&s761.humidityHigh!=null?Math.round(s761.humidityHigh):null,
+      wspdHi:i761.windspeedHigh!=null?Math.round(i761.windspeedHigh):null,
+      gustHi:i761.windgustHigh!=null?Math.round(i761.windgustHigh):null,
+      presHi:i761.pressureMax!=null?Number(i761.pressureMax).toFixed(2):null,
+      uvHi:s761&&s761.uvHigh!=null?Math.round(s761.uvHigh):null,
+      precRate:i1276.precipRate!=null?Number(i1276.precipRate).toFixed(2):null
+    };
+    var code=dOm&&dOm.current?dOm.current.weather_code:0;
+    var hi=todayObsHigh(dOm&&dOm.hourly,dOm&&dOm.daily?dOm.daily.temperature_2m_max[0]:null);
+    if(typeof temp==="number"&&typeof hi==="number")hi=Math.max(hi,temp);
+    var lo=dOm&&dOm.daily?Math.round(dOm.daily.temperature_2m_min[0]):"--";
+    applyConditions(temp,feels,dew,humid,wspd,wdir,gust,pres,prec,uvi,hi,lo,code,dOm&&dOm.hourly||null,dayMaxes);
+  }).catch(function(){
     fetch("https://api.open-meteo.com/v1/forecast?latitude=35.686&longitude=-78.614&current=temperature_2m,apparent_temperature,relative_humidity_2m,dew_point_2m,wind_speed_10m,wind_gusts_10m,wind_direction_10m,surface_pressure,precipitation,weather_code,uv_index&hourly=temperature_2m,weather_code,precipitation_probability,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=America%2FNew_York&forecast_days=2")
     .then(function(r){return r.json();})
     .then(function(d){
       var c=d.current,dl=d.daily;
-      applyConditions(Math.round(c.temperature_2m),Math.round(c.apparent_temperature),Math.round(c.dew_point_2m),Math.round(c.relative_humidity_2m),Math.round(c.wind_speed_10m),Math.round(c.wind_direction_10m),Math.round(c.wind_gusts_10m),(c.surface_pressure*0.02953).toFixed(2),c.precipitation.toFixed(2),Math.round(c.uv_index),todayObsHigh(d.hourly,dl.temperature_2m_max[0]),Math.round(dl.temperature_2m_min[0]),c.weather_code,d.hourly);
+      applyConditions(Math.round(c.temperature_2m),Math.round(c.apparent_temperature),Math.round(c.dew_point_2m),Math.round(c.relative_humidity_2m),Math.round(c.wind_speed_10m),Math.round(c.wind_direction_10m),Math.round(c.wind_gusts_10m),(c.surface_pressure*0.02953).toFixed(2),c.precipitation.toFixed(2),Math.round(c.uv_index),todayObsHigh(d.hourly,dl.temperature_2m_max[0]),Math.round(dl.temperature_2m_min[0]),c.weather_code,d.hourly,null);
       $("cupd").textContent=$("cupd").textContent+" (Open-Meteo fallback)";
     })
     .catch(function(){$("cupd").textContent="Data unavailable";});
