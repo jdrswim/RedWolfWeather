@@ -562,6 +562,7 @@ footer strong{color:var(--red)}
     <div class="clock" id="clock">--:--:--</div>
     <div style="display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap">
       <div class="cdate" id="cdate">Loading...</div>
+      <button id="geoBtn" onclick="siteUseMyLocation()" style="background:rgba(0,120,220,0.1);border:1px solid rgba(0,120,220,0.3);border-radius:20px;color:rgba(0,100,200,0.9);font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:4px 11px;cursor:pointer;font-family:inherit;transition:all .2s;flex-shrink:0" onmouseover="this.style.background='rgba(0,120,220,0.2)'" onmouseout="this.style.background='rgba(0,120,220,0.1)'">📍 My Location</button>
       <button id="feedback-btn" style="background:rgba(0,0,0,0.112);border:1px solid rgba(0,0,0,0.24);border-radius:20px;color:rgba(0,0,0,0.8);font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:4px 11px;cursor:pointer;font-family:inherit;transition:all .2s;flex-shrink:0" onmouseover="this.style.background='rgba(0,0,0,0.224)';this.style.color='rgba(0,0,0,0.85)'" onmouseout="this.style.background='rgba(0,0,0,0.112)';this.style.color='rgba(0,0,0,0.8)'">Feedback</button>
     </div>
   </div>
@@ -579,7 +580,6 @@ footer strong{color:var(--red)}
 <main>
   <div class="sec" style="justify-content:space-between">
     <span>Current Conditions <em id="condSecEm">- Red Wolf Farm - S. Wake County, NC - KNCRALEI761</em></span>
-    <button id="wxLocBtn" onclick="wxUseMyLocation()" style="background:rgba(0,204,255,.12);border:1px solid rgba(0,204,255,.3);color:var(--cyan);font-family:inherit;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:5px 12px;border-radius:2px;cursor:pointer;flex-shrink:0">📡 Use My Location</button>
   </div>
   <div class="cond-card">
     <div class="wx-scene" id="wxScene">
@@ -818,14 +818,109 @@ function applyConditions(t,feels,dew,humid,wspd,wdir,gust,pres,prec,uv,hi,lo,cod
 }
 
 // ============================================================
+// GLOBAL LOCATION SYSTEM — single source of truth for all sections
+// ============================================================
+var SITE_DEFAULT_LOC={lat:35.686,lon:-78.614,name:"Red Wolf Farm — S. Wake County, NC"};
+var _siteCustom=false;
+
+function siteGetLoc(){
+  try{var s=localStorage.getItem('site_user_loc');if(s){var o=JSON.parse(s);if(o&&o.lat&&o.lon)return o;}}catch(e){}
+  return SITE_DEFAULT_LOC;
+}
+
+function siteSetLoc(loc){
+  try{localStorage.setItem('site_user_loc',JSON.stringify(loc));}catch(e){}
+  _siteCustom=true;
+  siteApplyAll();
+}
+
+function siteResetLoc(){
+  try{localStorage.removeItem('site_user_loc');}catch(e){}
+  try{localStorage.removeItem('wx_user_loc');}catch(e){}
+  try{localStorage.removeItem('iss_user_loc');}catch(e){}
+  _siteCustom=false;
+  _wxCustLoc=null;
+  siteUpdateBtn();
+  if(typeof fetchConditions==='function')fetchConditions();
+  if(typeof fetchExtended==='function')fetchExtended();
+  if(typeof fetchSunData==='function')fetchSunData();
+  if(typeof fetchISSPasses==='function'){try{localStorage.removeItem(ISS_CACHE_KEY);}catch(e){}_issLoaded=false;fetchISSPasses();}
+  if(typeof TSPS_CFG!=='undefined'){TSPS_CFG.lat=SITE_DEFAULT_LOC.lat;TSPS_CFG.lon=SITE_DEFAULT_LOC.lon;TSPS_CFG.name=SITE_DEFAULT_LOC.name;}
+  if(typeof tspsRefresh==='function')tspsRefresh();
+  // Reset conditions card location label
+  wxApplyLocUI(null);
+}
+
+function siteUpdateBtn(){
+  var btn=document.getElementById('geoBtn');if(!btn)return;
+  if(_siteCustom){
+    var loc=siteGetLoc();
+    var label=loc.name.split('—')[0].split(',')[0].trim();
+    btn.textContent='📍 '+label;
+    btn.style.background='rgba(0,140,80,0.12)';
+    btn.style.borderColor='rgba(0,140,80,0.35)';
+    btn.style.color='rgba(0,110,60,0.95)';
+  }else{
+    btn.textContent='📍 My Location';
+    btn.style.background='rgba(0,120,220,0.1)';
+    btn.style.borderColor='rgba(0,120,220,0.3)';
+    btn.style.color='rgba(0,100,200,0.9)';
+  }
+}
+
+function siteApplyAll(){
+  var loc=siteGetLoc();
+  _wxCustLoc=loc;
+  if(typeof TSPS_CFG!=='undefined'){TSPS_CFG.lat=loc.lat;TSPS_CFG.lon=loc.lon;TSPS_CFG.name=loc.name;}
+  siteUpdateBtn();
+  // Update conditions header label
+  var cl=document.getElementById('condLoc');if(cl)cl.textContent=loc.name.toUpperCase();
+  var em=document.getElementById('condSecEm');if(em)em.textContent='— '+loc.name;
+  // Refresh all data
+  if(typeof fetchConditions==='function')fetchConditions();
+  if(typeof fetchExtended==='function')fetchExtended();
+  if(typeof fetchSunData==='function')fetchSunData();
+  if(typeof fetchISSPasses==='function'){try{localStorage.removeItem(ISS_CACHE_KEY);}catch(e){}_issLoaded=false;fetchISSPasses();}
+  if(typeof tspsRefresh==='function')tspsRefresh();
+}
+
+function siteUseMyLocation(){
+  if(_siteCustom){siteResetLoc();return;}
+  if(!navigator.geolocation){alert('Geolocation is not supported by your browser.');return;}
+  var btn=document.getElementById('geoBtn');
+  if(btn){btn.textContent='⏳ Locating…';btn.style.background='rgba(180,120,0,0.1)';btn.style.color='rgba(140,90,0,0.9)';}
+  navigator.geolocation.getCurrentPosition(
+    function(pos){
+      var lat=Math.round(pos.coords.latitude*10000)/10000;
+      var lon=Math.round(pos.coords.longitude*10000)/10000;
+      fetch('https://nominatim.openstreetmap.org/reverse?lat='+lat+'&lon='+lon+'&format=json',
+        {headers:{'Accept-Language':'en','User-Agent':'WolfpackWeather/2.0'}})
+        .then(function(r){return r.json();})
+        .then(function(g){
+          var a=g.address||{};
+          var city=a.city||a.town||a.village||a.hamlet||a.county||'';
+          var state=a.state||'';
+          var place=city&&state?city+', '+state:city||state||'';
+          siteSetLoc({lat:lat,lon:lon,name:place||'Your Location',isCustom:true});
+        })
+        .catch(function(){siteSetLoc({lat:lat,lon:lon,name:'Your Location',isCustom:true});});
+    },
+    function(err){
+      siteUpdateBtn();
+      alert('Could not get your location'+(err.message?': '+err.message:'')+'. Check browser permissions.');
+    },
+    {timeout:12000,maximumAge:300000}
+  );
+}
+
+// ============================================================
 // LIVE WEATHER — CUSTOM LOCATION
 // ============================================================
 var _wxCustLoc=null;
 
 function wxGetCustLoc(){
-  if(_wxCustLoc)return _wxCustLoc;
-  try{var s=localStorage.getItem('wx_user_loc');if(s){_wxCustLoc=JSON.parse(s);return _wxCustLoc;}}catch(e){}
-  return null;
+  var loc=siteGetLoc();
+  return loc.isCustom?loc:null;
 }
 
 function wxFlagUrl(loc){
@@ -842,16 +937,7 @@ function wxApplyLocUI(loc){
   var em=$('condSecEm');if(em)em.textContent=emLbl;
   var cl=$('condLoc');if(cl)cl.textContent=condLbl;
   var img=$('wxImg');
-  if(img){
-    img.src=wxFlagUrl(loc);
-    img.style.objectPosition=isCustom?'center center':'center 30%';
-  }
-  var btn=$('wxLocBtn');
-  if(btn){
-    if(isCustom){btn.textContent='↩ Reset to Default';btn.onclick=wxResetLocation;btn.style.background='rgba(0,0,0,0.096)';btn.style.borderColor='rgba(0,0,0,0.32)';btn.style.color='rgba(0,0,0,0.8)';}
-    else{btn.textContent='📡 Use My Location';btn.onclick=wxUseMyLocation;btn.style.background='rgba(0,204,255,.12)';btn.style.borderColor='rgba(0,204,255,.3)';btn.style.color='var(--cyan)';}
-    btn.disabled=false;
-  }
+  if(img){img.src=wxFlagUrl(loc);img.style.objectPosition=isCustom?'center center':'center 30%';}
 }
 
 function wxUseMyLocation(){
@@ -951,7 +1037,8 @@ function fetchConditions(){
     var prec=imp.precipTotal!=null?Number(imp.precipTotal).toFixed(2):"0.00";
     var uvi=obs.uv!=null?Math.round(obs.uv):0;
     var code=0;
-    fetch("https://api.open-meteo.com/v1/forecast?latitude=35.686&longitude=-78.614&current=weather_code&hourly=temperature_2m,weather_code,precipitation_probability,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=America%2FNew_York&forecast_days=2")
+    var _sl=siteGetLoc();
+    fetch("https://api.open-meteo.com/v1/forecast?latitude="+_sl.lat+"&longitude="+_sl.lon+"&current=weather_code&hourly=temperature_2m,weather_code,precipitation_probability,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=America%2FNew_York&forecast_days=2")
     .then(function(r2){return r2.json();})
     .then(function(d2){
       code=d2.current?d2.current.weather_code:code;
@@ -1036,7 +1123,8 @@ function nwsIcon(iconUrl,isDaytime){
 function fetchExtended(){
   var grid=$("ext-grid");if(!grid)return;
   // Primary: NWS 7-day forecast (real text descriptions, accurate conditions)
-  fetch("https://api.weather.gov/points/35.686,-78.614",{headers:{"User-Agent":"WolfpackWeather/2.0 (wolfpackweather.com)"}})
+  var _el=siteGetLoc();
+  fetch("https://api.weather.gov/points/"+_el.lat+","+_el.lon,{headers:{"User-Agent":"WolfpackWeather/2.0 (wolfpackweather.com)"}})
   .then(function(r){if(!r.ok)throw new Error("NWS points "+r.status);return r.json();})
   .then(function(d){
     var furl=d.properties&&d.properties.forecast;
@@ -1102,7 +1190,8 @@ function fetchExtended(){
   .catch(function(e){
     console.log("NWS forecast failed ("+e.message+"), using Open-Meteo fallback");
     // Fallback: Open-Meteo
-    fetch("https://api.open-meteo.com/v1/forecast?latitude=35.686&longitude=-78.614&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max,wind_speed_10m_max&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=7")
+    var _fl=siteGetLoc();
+    fetch("https://api.open-meteo.com/v1/forecast?latitude="+_fl.lat+"&longitude="+_fl.lon+"&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max,wind_speed_10m_max&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=7")
     .then(function(r){return r.json();})
     .then(function(d){
       var dl=d.daily;
@@ -1127,6 +1216,8 @@ function fetchExtended(){
 // TUFFY'S STORM PREDICTION SYSTEM
 // ============================================================
 var TSPS_CFG={lat:35.7113,lon:-78.6141,name:"Red Wolf Farm - S. Wake County, NC",refresh:300000};
+// Apply user location to TSPS if set
+(function(){var sl=siteGetLoc();if(sl.isCustom){TSPS_CFG.lat=sl.lat;TSPS_CFG.lon=sl.lon;TSPS_CFG.name=sl.name;}})();
 var TSPS_HKW={tornado:30,tornadoes:30,funnel:25,"tornado watch":22,"tornado warning":30,"damaging wind":20,"destructive wind":25,derecho:28,"large hail":20,"giant hail":25,"golf ball":20,"severe thunderstorm":18,supercell:22,hurricane:30,"tropical storm":22,flooding:15,"flash flood":20,thunder:8,thunderstorm:10,storm:6,lightning:7,hail:12,"heavy rain":8,downpour:7,gusty:6,windy:5};
 var TSPS_ASEV={Extreme:35,Severe:25,Moderate:15,Minor:8,Unknown:5};
 var TSPS_ACOL={"Tornado Warning":"#ff0000","Severe Thunderstorm Warning":"#ffa500","Tornado Watch":"#ffff00","Flash Flood Warning":"#8b0000","Flood Warning":"#00ff00","Special Weather Statement":"#ffe4b5"};
@@ -1448,7 +1539,8 @@ function renderTides(el,preds,locLabel,stationId,waterTemp){
 function fetchSunData(){
   var el=$("sun-dashboard");if(!el)return;
   el.innerHTML='<div class="alm-ld"><div class="tsps-spinner"></div>Loading sun data...</div>';
-  fetch("https://api.open-meteo.com/v1/forecast?latitude=35.78&longitude=-78.64&daily=sunrise,sunset&timezone=America%2FNew_York&past_days=31&forecast_days=1")
+  var _sun=siteGetLoc();
+  fetch("https://api.open-meteo.com/v1/forecast?latitude="+_sun.lat+"&longitude="+_sun.lon+"&daily=sunrise,sunset&timezone=America%2FNew_York&past_days=31&forecast_days=1")
   .then(function(r){return r.json();})
   .then(function(d){
     var dl=d.daily,byDate={};
@@ -1477,7 +1569,7 @@ function fetchSunData(){
     // Solar elevation angle at solar noon: 90 - lat + declination
     var dayOfYear=Math.round((today.rise-new Date(today.rise.getFullYear(),0,0))/86400000);
     var decl=23.45*Math.sin(Math.PI/180*(360/365*(284+dayOfYear)));
-    var sunElev=Math.round((90-35.78+decl)*10)/10;
+    var sunElev=Math.round((90-_sun.lat+decl)*10)/10;
     // Trail: polyline of computed ellipse points — avoids SVG arc center mismatch
     var trailD=(function(){
       if(isBefore||sunPct<=0.01)return null;
@@ -1521,7 +1613,7 @@ function fetchSunData(){
     var mpn=moonPhaseName(moon.phase);
     var mAge=moonAge(now).toFixed(1);
     var mIllum=Math.round(moon.illum*100);
-    var mRS=moonRiseSet(now,35.7113,-78.6141);
+    var mRS=moonRiseSet(now,_sun.lat,_sun.lon);
     var mRiseTxt=mRS.rise?fmtT(mRS.rise):"--";
     var mSetTxt=mRS.set?fmtT(mRS.set):"--";
     // Next 4 phases sorted chronologically
@@ -2876,14 +2968,8 @@ var ISS_DEFAULT_LAT=35.624178,ISS_DEFAULT_LON=-78.666837,ISS_DEFAULT_NAME='Red W
 var ISS_ALT_KM=0.07;
 var _issLoaded=false;
 
-// Returns {lat, lon, name, isCustom} — custom loc stored in localStorage
-function issGetLocation(){
-  try{
-    var s=localStorage.getItem('iss_user_loc');
-    if(s){var o=JSON.parse(s);if(o&&o.lat&&o.lon)return o;}
-  }catch(e){}
-  return{lat:ISS_DEFAULT_LAT,lon:ISS_DEFAULT_LON,name:ISS_DEFAULT_NAME,isCustom:false};
-}
+// Returns {lat, lon, name, isCustom} — delegates to global location system
+function issGetLocation(){return siteGetLoc();}
 
 function issUseMyLocation(){
   var el=document.getElementById('iss-content');
@@ -3085,15 +3171,9 @@ function issRender(el,passes,clouds,loc){
   if(!loc)loc=issGetLocation();
   if(!clouds)clouds={};
 
-  var locBtns=!loc.isCustom
-    ?'<button onclick="issUseMyLocation()" style="background:rgba(0,204,255,.12);border:1px solid rgba(0,204,255,.3);color:var(--cyan);font-family:inherit;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:6px 14px;border-radius:2px;cursor:pointer">📡 Use My Location</button>'
-    :'<button onclick="issResetLocation()" style="background:rgba(0,0,0,0.096);border:1px solid rgba(0,0,0,0.192);color:var(--mu);font-family:inherit;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:6px 12px;border-radius:2px;cursor:pointer">Reset</button>'+
-     '<button onclick="issUseMyLocation()" style="background:rgba(0,204,255,.12);border:1px solid rgba(0,204,255,.3);color:var(--cyan);font-family:inherit;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:6px 14px;border-radius:2px;cursor:pointer">📡 Update</button>';
-
-  var locBar='<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;background:rgba(0,0,0,0.064);border:1px solid rgba(0,0,0,0.128);border-radius:3px;padding:10px 14px;margin-bottom:14px">'+
+  var locBar='<div style="display:flex;align-items:center;gap:10px;background:rgba(0,0,0,0.064);border:1px solid rgba(0,0,0,0.128);border-radius:3px;padding:10px 14px;margin-bottom:14px">'+
     '<div><div style="font-size:9px;font-weight:800;letter-spacing:1.5px;color:var(--mu);text-transform:uppercase;margin-bottom:2px">📍 Location</div>'+
-    '<div style="font-size:12px;font-weight:700;color:var(--white)">'+loc.name+'</div></div>'+
-    '<div style="display:flex;gap:8px;align-items:center">'+locBtns+'</div></div>';
+    '<div style="font-size:12px;font-weight:700;color:var(--white)">'+loc.name+'</div></div></div>';
 
   // Filter to future visible-only passes (solar elevation < -6°) and score them
   var now=Date.now();
@@ -3184,6 +3264,16 @@ function issRender(el,passes,clouds,loc){
 (function(){var loc=wxGetCustLoc();if(loc&&loc.isCustom)wxApplyLocUI(loc);})();
 seedExtended();
 function refreshAll(){fetchConditions();}
+// Restore global location button state on page load
+(function(){
+  var sl=siteGetLoc();
+  if(sl.isCustom){
+    _siteCustom=true;
+    siteUpdateBtn();
+    var cl=document.getElementById('condLoc');if(cl)cl.textContent=sl.name.toUpperCase();
+    var em=document.getElementById('condSecEm');if(em)em.textContent='— '+sl.name;
+  }
+})();
 refreshAll();
 fetchExtended();
 setInterval(refreshAll,300000);
