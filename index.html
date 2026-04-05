@@ -1032,17 +1032,16 @@ function fetchConditions(){
   var _sl=siteGetLoc();
   var _WU="https://api.weather.com/v2/pws/";
   var _K=WU_COMMUNITY_KEY;
-  var _now=new Date();
-  var _pad=function(n){return n<10?"0"+n:""+n;};
-  var _date=_now.getFullYear()+""+_pad(_now.getMonth()+1)+""+_pad(_now.getDate());
   function wuFetch(url){return fetch(url).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;});}
+  // localStorage: track max precip rate from KNCRALEI1276 (only thing needing cross-session tracking)
+  function _prGet(){try{var d=JSON.parse(localStorage.getItem('rww_pr')||'{}');if(d.dt===new Date().toDateString())return d.v!=null?d.v:null;}catch(e){}return null;}
+  function _prSet(v){try{localStorage.setItem('rww_pr',JSON.stringify({dt:new Date().toDateString(),v:v}));}catch(e){}}
   Promise.all([
     wuFetch(_WU+"observations/current?stationId=KNCRALEI761&format=json&units=e&apiKey="+_K),
-    wuFetch(_WU+"history/daily?stationId=KNCRALEI761&format=json&units=e&numericPrecision=decimal&date="+_date+"&apiKey="+_K),
-    wuFetch(_WU+"history/daily?stationId=KNCRALEI1276&format=json&units=e&numericPrecision=decimal&date="+_date+"&apiKey="+_K),
-    fetch("https://api.open-meteo.com/v1/forecast?latitude="+_sl.lat+"&longitude="+_sl.lon+"&current=weather_code&hourly=temperature_2m,weather_code,precipitation_probability,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=America%2FNew_York&forecast_days=2").then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
+    wuFetch(_WU+"observations/current?stationId=KNCRALEI1276&format=json&units=e&apiKey="+_K),
+    fetch("https://api.open-meteo.com/v1/forecast?latitude="+_sl.lat+"&longitude="+_sl.lon+"&current=weather_code&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m,wind_gusts_10m,surface_pressure,uv_index,weather_code,precipitation_probability&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=America%2FNew_York&forecast_days=2").then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
   ]).then(function(res){
-    var dCur=res[0],dHist761=res[1],dHist1276=res[2],dOm=res[3];
+    var dCur=res[0],dCur1276=res[1],dOm=res[2];
     var obs=dCur&&dCur.observations&&dCur.observations[0];
     if(!obs){
       // WU current failed — fall back to Open-Meteo
@@ -1060,20 +1059,37 @@ function fetchConditions(){
     var gust=imp.windGust!=null?Math.round(imp.windGust):"--";
     var pres=imp.pressure!=null?Number(imp.pressure).toFixed(2):"--";
     var uvi=obs.uv!=null?Math.round(obs.uv):0;
-    // Precip total + max rate from KNCRALEI1276 daily history
-    var sum1276=dHist1276&&dHist1276.summaries&&dHist1276.summaries[0];
-    var imp1276=sum1276&&sum1276.imperial||{};
+    // Precip from KNCRALEI1276
+    var obs1276=dCur1276&&dCur1276.observations&&dCur1276.observations[0];
+    var imp1276=obs1276&&obs1276.imperial||{};
     var prec=imp1276.precipTotal!=null?Number(imp1276.precipTotal).toFixed(2):"0.00";
-    // Day highs from KNCRALEI761 daily history
-    var sum761=dHist761&&dHist761.summaries&&dHist761.summaries[0];
-    var ih761=sum761&&sum761.imperial||{};
+    var curRate=imp1276.precipRate!=null?Number(imp1276.precipRate):null;
+    // Track max rain rate via localStorage
+    var maxRate=_prGet();
+    if(curRate!=null&&(maxRate==null||curRate>maxRate)){maxRate=curRate;_prSet(maxRate);}
+    // Day maxes from Open-Meteo past hourly data (available from midnight for all visitors)
+    var h=dOm&&dOm.hourly;
+    var _n=new Date();var _p2=function(n){return n<10?"0"+n:""+n;};
+    var _ds=_n.getFullYear()+"-"+_p2(_n.getMonth()+1)+"-"+_p2(_n.getDate());
+    var mH=-Infinity,mW=-Infinity,mG=-Infinity,mP=-Infinity,mU=-Infinity;
+    if(h&&h.time){
+      h.time.forEach(function(t,i){
+        if(t.startsWith(_ds)&&new Date(t)<=_n){
+          if(h.relative_humidity_2m&&h.relative_humidity_2m[i]!=null)mH=Math.max(mH,h.relative_humidity_2m[i]);
+          if(h.wind_speed_10m&&h.wind_speed_10m[i]!=null)mW=Math.max(mW,h.wind_speed_10m[i]);
+          if(h.wind_gusts_10m&&h.wind_gusts_10m[i]!=null)mG=Math.max(mG,h.wind_gusts_10m[i]);
+          if(h.surface_pressure&&h.surface_pressure[i]!=null)mP=Math.max(mP,h.surface_pressure[i]*0.02953);
+          if(h.uv_index&&h.uv_index[i]!=null)mU=Math.max(mU,h.uv_index[i]);
+        }
+      });
+    }
     var dayMaxes={
-      humidHi:sum761&&sum761.humidityHigh!=null?Math.round(sum761.humidityHigh):null,
-      wspdHi:ih761.windspeedHigh!=null?Math.round(ih761.windspeedHigh):null,
-      gustHi:ih761.windgustHigh!=null?Math.round(ih761.windgustHigh):null,
-      presHi:ih761.pressureMax!=null?Number(ih761.pressureMax).toFixed(2):null,
-      uvHi:sum761&&sum761.uvHigh!=null?Math.round(sum761.uvHigh):null,
-      precRate:imp1276.precipRate!=null?Number(imp1276.precipRate).toFixed(2):null
+      humidHi:mH>-Infinity?Math.round(mH):null,
+      wspdHi:mW>-Infinity?Math.round(mW):null,
+      gustHi:mG>-Infinity?Math.round(mG):null,
+      presHi:mP>-Infinity?Number(mP).toFixed(2):null,
+      uvHi:mU>-Infinity?Math.round(mU):null,
+      precRate:maxRate!=null?Number(maxRate).toFixed(2):null
     };
     var code=dOm&&dOm.current?dOm.current.weather_code:0;
     var hi=todayObsHigh(dOm&&dOm.hourly,dOm&&dOm.daily?dOm.daily.temperature_2m_max[0]:null);
