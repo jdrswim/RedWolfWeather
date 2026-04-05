@@ -1542,65 +1542,65 @@ if(!sr.current.hasCar)return;
 const go=gameObjRef.current;
 go.playerCar.position.copy(go.pg.position);
 go.playerCar.rotation.copy(go.pg.rotation);
-setDriving(true);notify(“🚗 Driving!”);
+setDriving(true);notify("🚗 Driving!");
 },[notify]);
 const exitCar=useCallback(()=>{
 const go=gameObjRef.current;
 go.pg.position.copy(go.playerCar.position);
 go.pg.position.x+=2;
-setDriving(false);notify(“🚶 On foot”);
+setDriving(false);notify("🚶 On foot");
 },[notify]);
 
 const STORE_ITEMS={
 shop:[
-{id:“coffee”,name:“Coffee”,emoji:“☕”,cost:5,desc:“Wake up!”},
-{id:“sandwich”,name:“Sandwich”,emoji:“🥪”,cost:8,desc:“Delicious lunch”},
-{id:“backpack”,name:“Backpack”,emoji:“🎒”,cost:25,desc:“Carry your stuff”},
-{id:“umbrella”,name:“Umbrella”,emoji:“🌂”,cost:15,desc:“Stay dry”},
-{id:“watch”,name:“Watch”,emoji:“⌚”,cost:50,desc:“Tell time in style”},
-{id:“sunglasses”,name:“Sunglasses”,emoji:“🕶️”,cost:20,desc:“Look cool”},
+{id:"coffee",name:"Coffee",emoji:"☕",cost:5,desc:"Wake up!"},
+{id:"sandwich",name:"Sandwich",emoji:"🥪",cost:8,desc:"Delicious lunch"},
+{id:"backpack",name:"Backpack",emoji:"🎒",cost:25,desc:"Carry your stuff"},
+{id:"umbrella",name:"Umbrella",emoji:"🌂",cost:15,desc:"Stay dry"},
+{id:"watch",name:"Watch",emoji:"⌚",cost:50,desc:"Tell time in style"},
+{id:"sunglasses",name:"Sunglasses",emoji:"🕶️",cost:20,desc:"Look cool"},
 ],
 device:[
-{id:“phone”,name:“Smartphone”,emoji:“📱”,cost:30,desc:”+25% pay bonus”},
-{id:“laptop”,name:“Laptop”,emoji:“💻”,cost:80,desc:“Work from anywhere”},
-{id:“headphones”,name:“Headphones”,emoji:“🎧”,cost:25,desc:“Music on the go”},
-{id:“tablet”,name:“Tablet”,emoji:“📲”,cost:50,desc:“Browse the web”},
-{id:“smartwatch”,name:“Smart Watch”,emoji:“⌚”,cost:40,desc:“Track fitness”},
-{id:“camera”,name:“Camera”,emoji:“📷”,cost:60,desc:“Take photos”},
+{id:"phone",name:"Smartphone",emoji:"📱",cost:30,desc:"+25% pay bonus"},
+{id:"laptop",name:"Laptop",emoji:"💻",cost:80,desc:"Work from anywhere"},
+{id:"headphones",name:"Headphones",emoji:"🎧",cost:25,desc:"Music on the go"},
+{id:"tablet",name:"Tablet",emoji:"📲",cost:50,desc:"Browse the web"},
+{id:"smartwatch",name:"Smart Watch",emoji:"⌚",cost:40,desc:"Track fitness"},
+{id:"camera",name:"Camera",emoji:"📷",cost:60,desc:"Take photos"},
 ],
 car:[
-{id:“sedan”,name:“Sedan”,emoji:“🚗”,cost:30,desc:“Reliable ride”},
-{id:“suv”,name:“SUV”,emoji:“🚙”,cost:80,desc:“Big and comfy”},
-{id:“sports”,name:“Sports Car”,emoji:“🏎️”,cost:200,desc:“Fast and flashy”},
-{id:“truck”,name:“Pickup Truck”,emoji:“🛻”,cost:100,desc:“Haul stuff”},
-{id:“fuel”,name:“Gas Tank”,emoji:“⛽”,cost:10,desc:“Keep driving”},
+{id:"sedan",name:"Sedan",emoji:"🚗",cost:30,desc:"Reliable ride"},
+{id:"suv",name:"SUV",emoji:"🚙",cost:80,desc:"Big and comfy"},
+{id:"sports",name:"Sports Car",emoji:"🏎️",cost:200,desc:"Fast and flashy"},
+{id:"truck",name:"Pickup Truck",emoji:"🛻",cost:100,desc:"Haul stuff"},
+{id:"fuel",name:"Gas Tank",emoji:"⛽",cost:10,desc:"Keep driving"},
 ],
 landmark:[
-{id:“postcard”,name:“Postcard”,emoji:“🏙️”,cost:3,desc:“Raleigh souvenir”},
-{id:“tshirt”,name:“T-Shirt”,emoji:“👕”,cost:20,desc:“I ❤️ Raleigh”},
-{id:“hat”,name:“Baseball Cap”,emoji:“🧢”,cost:15,desc:“Rep your city”},
-{id:“magnet”,name:“Fridge Magnet”,emoji:“🧲”,cost:5,desc:“For your fridge”},
-{id:“mug”,name:“Coffee Mug”,emoji:“☕”,cost:10,desc:“Raleigh mug”},
+{id:"postcard",name:"Postcard",emoji:"🏙️",cost:3,desc:"Raleigh souvenir"},
+{id:"tshirt",name:"T-Shirt",emoji:"👕",cost:20,desc:"I ❤️ Raleigh"},
+{id:"hat",name:"Baseball Cap",emoji:"🧢",cost:15,desc:"Rep your city"},
+{id:"magnet",name:"Fridge Magnet",emoji:"🧲",cost:5,desc:"For your fridge"},
+{id:"mug",name:"Coffee Mug",emoji:"☕",cost:10,desc:"Raleigh mug"},
 ],
 food:[
-{id:“pizza”,name:“Pizza Slice”,emoji:“🍕”,cost:5,desc:“Cheesy goodness”},
-{id:“burger”,name:“Burger”,emoji:“🍔”,cost:8,desc:“Classic American”},
-{id:“fries”,name:“Fries”,emoji:“🍟”,cost:4,desc:“Crispy golden”},
-{id:“soda”,name:“Soda”,emoji:“🥤”,cost:3,desc:“Refreshing”},
-{id:“icecream”,name:“Ice Cream”,emoji:“🍦”,cost:5,desc:“Sweet treat”},
-{id:“cake”,name:“Cake Slice”,emoji:“🍰”,cost:7,desc:“Delicious”},
+{id:"pizza",name:"Pizza Slice",emoji:"🍕",cost:5,desc:"Cheesy goodness"},
+{id:"burger",name:"Burger",emoji:"🍔",cost:8,desc:"Classic American"},
+{id:"fries",name:"Fries",emoji:"🍟",cost:4,desc:"Crispy golden"},
+{id:"soda",name:"Soda",emoji:"🥤",cost:3,desc:"Refreshing"},
+{id:"icecream",name:"Ice Cream",emoji:"🍦",cost:5,desc:"Sweet treat"},
+{id:"cake",name:"Cake Slice",emoji:"🍰",cost:7,desc:"Delicious"},
 ],
 };
 
 const getStoreType=(b)=>{
 if(!b)return null;
-if(b.type===“shop”)return “shop”;
-if(b.type===“device”)return “device”;
-if(b.type===“car”)return “car”;
-if(b.jobId===“chef”)return “food”;
-if(b.type===“landmark”||b.type===“park”)return “landmark”;
-const nm=(b.name||””).toLowerCase();
-if(nm.includes(“shop”)||nm.includes(“small shop”))return “shop”;
+if(b.type==="shop")return "shop";
+if(b.type==="device")return "device";
+if(b.type==="car")return "car";
+if(b.jobId==="chef")return "food";
+if(b.type==="landmark"||b.type==="park")return "landmark";
+const nm=(b.name||"").toLowerCase();
+if(nm.includes("shop")||nm.includes("small shop"))return "shop";
 return null;
 };
 
@@ -1611,25 +1611,25 @@ setMoney(p=>p-item.cost);
 setInventory(p=>[...p,{name:item.name,emoji:item.emoji}]);
 notify(`${item.emoji} Bought ${item.name}!`);
 // Special effects for key items
-if(item.id===“phone”&&!st.hasDev){setHasDev(true);}
-if(item.id===“sedan”||item.id===“suv”||item.id===“sports”||item.id===“truck”){if(!st.hasCar)setHasCar(true);}
+if(item.id==="phone"&&!st.hasDev){setHasDev(true);}
+if(item.id==="sedan"||item.id==="suv"||item.id==="sports"||item.id==="truck"){if(!st.hasCar)setHasCar(true);}
 },[notify]);
 
 const getInteriorAction=useCallback((b)=>{
 if(!b)return{label:null,enabled:false};
 const st=sr.current;
-if(b.type===“job”){
+if(b.type==="job"){
 const job=JOBS.find(j=>j.id===b.jobId);if(!job)return{label:null};
 if(!st.uJobs.includes(job.id))return{label:`Unlock ${job.name} — $${job.unlockCost}`,enabled:st.money>=job.unlockCost,action:()=>{if(st.money>=job.unlockCost){setMoney(p=>p-job.unlockCost);setUJobs(p=>[...p,job.id]);notify(`${job.emoji} Unlocked!`);}}};
 if(st.cj!==job.id)return{label:`Start as ${job.name}`,enabled:true,action:()=>{setCJ(job.id);notify(`Started as ${job.name}!`);}};
 return{label:`Work (+$${job.pay})`,enabled:!st.isWorking,action:()=>{doWork();setInside(null);}};
 }
-if(b.type===“shop”)return{label:“🛍️ Browse Store / Hire ($10)”,enabled:true,action:()=>{const st2=getStoreType(b);if(st2){setShowStore(st2);}else if(sr.current.money>=10){setMoney(p=>p-10);setEmp(p=>p+1);notify(`👤 Hired! (${sr.current.emp+1})`);}}};    if(b.type===“car”)return st.hasCar?{label:“🛍️ Browse More Cars”,enabled:true,action:()=>setShowStore(“car”)}:{label:“Buy Car — $30”,enabled:st.money>=30,action:()=>{setMoney(p=>p-30);setHasCar(true);notify(“🚗 Bought a car!”);setInventory(p=>[...p,{name:“Sedan”,emoji:“🚗”}]);}};
-if(b.type===“device”)return{label:“🛍️ Browse Tech Store”,enabled:true,action:()=>setShowStore(“device”)};
-if(b.type===“mayor”)return st.isMayor?{label:“👑 You are the Mayor!”,enabled:false}:{label:“Become Mayor — $1,000”,enabled:st.money>=1000,action:()=>{setMoney(p=>p-1000);setIsMayor(true);notify(“🏛️ You are MAYOR!”);}};
-if(b.jobId===“chef”)return{label:“🍽️ Order Food”,enabled:true,action:()=>setShowStore(“food”)};
+if(b.type==="shop")return{label:"🛍️ Browse Store / Hire ($10)",enabled:true,action:()=>{const st2=getStoreType(b);if(st2){setShowStore(st2);}else if(sr.current.money>=10){setMoney(p=>p-10);setEmp(p=>p+1);notify(`👤 Hired! (${sr.current.emp+1})`);}}};    if(b.type==="car")return st.hasCar?{label:"🛍️ Browse More Cars",enabled:true,action:()=>setShowStore("car")}:{label:"Buy Car — $30",enabled:st.money>=30,action:()=>{setMoney(p=>p-30);setHasCar(true);notify("🚗 Bought a car!");setInventory(p=>[...p,{name:"Sedan",emoji:"🚗"}]);}};
+if(b.type==="device")return{label:"🛍️ Browse Tech Store",enabled:true,action:()=>setShowStore("device")};
+if(b.type==="mayor")return st.isMayor?{label:"👑 You are the Mayor!",enabled:false}:{label:"Become Mayor — $1,000",enabled:st.money>=1000,action:()=>{setMoney(p=>p-1000);setIsMayor(true);notify("🏛️ You are MAYOR!");}};
+if(b.jobId==="chef")return{label:"🍽️ Order Food",enabled:true,action:()=>setShowStore("food")};
 const storeT=getStoreType(b);
-if(storeT)return{label:“🛍️ Browse Store”,enabled:true,action:()=>setShowStore(storeT)};
+if(storeT)return{label:"🛍️ Browse Store",enabled:true,action:()=>setShowStore(storeT)};
 return{label:null,enabled:false};
 },[doWork,notify]);
 
@@ -1639,10 +1639,10 @@ const jE=useCallback(e=>{for(let i=0;i<e.changedTouches.length;i++){if(e.changed
 
 // Look-drag for first person — any touch NOT on joystick area
 const lookStart=useCallback(e=>{
-if(povRef.current!==“first”&&povRef.current!==“shoulder”) return;
+if(povRef.current!=="first"&&povRef.current!=="shoulder") return;
 for(let i=0;i<e.changedTouches.length;i++){
 const t=e.changedTouches[i];
-// Ignore if it’s on the joystick (bottom-left corner)
+// Ignore if it's on the joystick (bottom-left corner)
 if(t.clientX<140&&t.clientY>window.innerHeight-120) continue;
 if(lookTouchRef.current===null){
 lookTouchRef.current={id:t.identifier,x:t.clientX,y:t.clientY};
@@ -1672,33 +1672,33 @@ lookTouchRef.current=null;
 }
 },[]);
 
-const F=”‘Segoe UI’,system-ui,sans-serif”;
+const F="'Segoe UI',system-ui,sans-serif";
 const cjDef=JOBS.find(j=>j.id===cj);
 
 if(!started)return(
-<div style={{minHeight:“100vh”,background:“linear-gradient(170deg,#0a1628,#162a50 30%,#1a4a7a 60%,#2a6a9a 80%,#4a9aba)”,display:“flex”,flexDirection:“column”,alignItems:“center”,justifyContent:“center”,fontFamily:F,padding:20,position:“relative”,overflow:“hidden”}}>
+<div style={{minHeight:"100vh",background:"linear-gradient(170deg,#0a1628,#162a50 30%,#1a4a7a 60%,#2a6a9a 80%,#4a9aba)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",fontFamily:F,padding:20,position:"relative",overflow:"hidden"}}>
 <style>{`@keyframes glow{0%,100%{text-shadow:0 0 20px rgba(255,215,0,0.6)}50%{text-shadow:0 0 40px rgba(255,215,0,0.9)}} @keyframes rise{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}} @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.6}}`}</style>
-{[...Array(25)].map((_,i)=>(<div key={i} style={{position:“absolute”,width:2,height:2,borderRadius:“50%”,background:”#fff”,opacity:0.2+Math.random()*0.5,top:Math.random()*40+”%”,left:Math.random()*100+”%”}}/>))}
-<div style={{fontSize:52,marginBottom:16,animation:“rise 3s ease-in-out infinite”}}>🏙️</div>
-<h1 style={{color:”#ffd700”,fontSize:20,textAlign:“center”,lineHeight:1.8,animation:“glow 3s ease-in-out infinite”,fontWeight:800,letterSpacing:2}}>DOWNTOWN<br/>RALEIGH</h1>
-<div style={{color:”#88bbee”,fontSize:11,letterSpacing:6,marginBottom:16,fontWeight:600}}>S I M U L A T I O N</div>
-<div style={{color:“rgba(255,255,255,0.35)”,fontSize:9,marginBottom:16,textAlign:“center”,lineHeight:1.8}}>Walk the streets • Enter buildings • Drive cars<br/>PNC Plaza • State Capitol • 8 Jobs • Become Mayor</div>
-<div style={{display:“flex”,gap:10,marginBottom:20,fontSize:24}}>
-{[“🏦”,“🏛️”,“🚗”,“🚒”,“👑”,“🍳”,“📚”].map((e,i)=>(<span key={i} style={{animation:`rise 2s ease-in-out ${i*0.1}s infinite`}}>{e}</span>))}
+{[...Array(25)].map((_,i)=>(<div key={i} style={{position:"absolute",width:2,height:2,borderRadius:"50%",background:"#fff",opacity:0.2+Math.random()*0.5,top:Math.random()*40+"%",left:Math.random()*100+"%"}}/>))}
+<div style={{fontSize:52,marginBottom:16,animation:"rise 3s ease-in-out infinite"}}>🏙️</div>
+<h1 style={{color:"#ffd700",fontSize:20,textAlign:"center",lineHeight:1.8,animation:"glow 3s ease-in-out infinite",fontWeight:800,letterSpacing:2}}>DOWNTOWN<br/>RALEIGH</h1>
+<div style={{color:"#88bbee",fontSize:11,letterSpacing:6,marginBottom:16,fontWeight:600}}>S I M U L A T I O N</div>
+<div style={{color:"rgba(255,255,255,0.35)",fontSize:9,marginBottom:16,textAlign:"center",lineHeight:1.8}}>Walk the streets • Enter buildings • Drive cars<br/>PNC Plaza • State Capitol • 8 Jobs • Become Mayor</div>
+<div style={{display:"flex",gap:10,marginBottom:20,fontSize:24}}>
+{["🏦","🏛️","🚗","🚒","👑","🍳","📚"].map((e,i)=>(<span key={i} style={{animation:`rise 2s ease-in-out ${i*0.1}s infinite`}}>{e}</span>))}
 </div>
-<div style={{background:“rgba(255,255,255,0.08)”,borderRadius:12,padding:“10px 20px”,marginBottom:20,border:“1px solid rgba(255,255,255,0.1)”}}>
-<span style={{color:“rgba(255,255,255,0.6)”,fontSize:11}}>Starter: </span><span style={{color:”#ffd700”,fontSize:11}}>$1,000</span>
+<div style={{background:"rgba(255,255,255,0.08)",borderRadius:12,padding:"10px 20px",marginBottom:20,border:"1px solid rgba(255,255,255,0.1)"}}>
+<span style={{color:"rgba(255,255,255,0.6)",fontSize:11}}>Starter: </span><span style={{color:"#ffd700",fontSize:11}}>$1,000</span>
 </div>
-<button onClick={()=>setStarted(true)} style={{fontFamily:F,fontSize:15,fontWeight:700,padding:“14px 44px”,background:“linear-gradient(135deg,#ffd700,#ff9500)”,color:”#1a1a2e”,border:“none”,borderRadius:12,cursor:“pointer”,boxShadow:“0 4px 24px rgba(255,215,0,0.4)”,animation:“pulse 2s ease-in-out infinite”}}>START GAME</button>
-<div style={{color:“rgba(255,255,255,0.2)”,fontSize:9,marginTop:12}}>WASD / Arrows / Touch</div>
+<button onClick={()=>setStarted(true)} style={{fontFamily:F,fontSize:15,fontWeight:700,padding:"14px 44px",background:"linear-gradient(135deg,#ffd700,#ff9500)",color:"#1a1a2e",border:"none",borderRadius:12,cursor:"pointer",boxShadow:"0 4px 24px rgba(255,215,0,0.4)",animation:"pulse 2s ease-in-out infinite"}}>START GAME</button>
+<div style={{color:"rgba(255,255,255,0.2)",fontSize:9,marginTop:12}}>WASD / Arrows / Touch</div>
 </div>
 );
 
 const ia=inside?getInteriorAction(inside):{};
 
 return(
-<div style={{width:“100%”,height:“100vh”,position:“relative”,overflow:“hidden”,background:”#000”,fontFamily:F}}>
-<div ref={mountRef} onTouchStart={lookStart} onTouchMove={lookMove} onTouchEnd={lookEnd} style={{width:“100%”,height:“100%”,touchAction:“none”}}/>
+<div style={{width:"100%",height:"100vh",position:"relative",overflow:"hidden",background:"#000",fontFamily:F}}>
+<div ref={mountRef} onTouchStart={lookStart} onTouchMove={lookMove} onTouchEnd={lookEnd} style={{width:"100%",height:"100%",touchAction:"none"}}/>
 
   {/* Interior */}
   {inside&&<InteriorView building={inside} onLeave={()=>{keysRef.current={};joyRef.current={x:0,y:0,active:false};setInside(null);setShowStore(null);}} actionLabel={ia.label} actionEnabled={ia.enabled} onAction={ia.action} keysRef={keysRef} joyRef={joyRef}/>}
