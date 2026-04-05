@@ -1033,13 +1033,20 @@ function fetchConditions(){
   var _WU="https://api.weather.com/v2/pws/";
   var _K=WU_COMMUNITY_KEY;
   function wuFetch(url){return fetch(url).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;});}
+  function obsMax(obsArr,key,sub){
+    // Compute max of a field across all WU observations for the day
+    var best=-Infinity;
+    if(!obsArr)return null;
+    obsArr.forEach(function(o){var v=(sub?(o[sub]||{}):o)[key];if(v!=null&&v>best)best=v;});
+    return best>-Infinity?best:null;
+  }
   Promise.all([
     wuFetch(_WU+"observations/current?stationId=KNCRALEI761&format=json&units=e&apiKey="+_K),
-    wuFetch(_WU+"dailysummary/7day?stationId=KNCRALEI761&format=json&units=e&apiKey="+_K),
-    wuFetch(_WU+"dailysummary/7day?stationId=KNCRALEI1276&format=json&units=e&apiKey="+_K),
+    wuFetch(_WU+"observations/all/1day?stationId=KNCRALEI761&format=json&units=e&apiKey="+_K),
+    wuFetch(_WU+"observations/all/1day?stationId=KNCRALEI1276&format=json&units=e&apiKey="+_K),
     fetch("https://api.open-meteo.com/v1/forecast?latitude="+_sl.lat+"&longitude="+_sl.lon+"&current=weather_code&hourly=temperature_2m,weather_code,precipitation_probability,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=America%2FNew_York&forecast_days=2").then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
   ]).then(function(res){
-    var dCur=res[0],dSum761=res[1],dSum1276=res[2],dOm=res[3];
+    var dCur=res[0],dAll761=res[1],dAll1276=res[2],dOm=res[3];
     var obs=dCur&&dCur.observations&&dCur.observations[0];
     if(!obs){
       // WU current failed — fall back to Open-Meteo
@@ -1057,20 +1064,21 @@ function fetchConditions(){
     var gust=imp.windGust!=null?Math.round(imp.windGust):"--";
     var pres=imp.pressure!=null?Number(imp.pressure).toFixed(2):"--";
     var uvi=obs.uv!=null?Math.round(obs.uv):0;
-    // Precip from KNCRALEI1276
-    var s1276=dSum1276&&dSum1276.summaries&&dSum1276.summaries[0];
-    var i1276=s1276&&s1276.imperial||{};
-    var prec=i1276.precipTotal!=null?Number(i1276.precipTotal).toFixed(2):"0.00";
-    // Day highs from KNCRALEI761 daily summary
-    var s761=dSum761&&dSum761.summaries&&dSum761.summaries[0];
-    var i761=s761&&s761.imperial||{};
+    // Precip total + max rate from KNCRALEI1276 all-day observations
+    var obs1276=dAll1276&&dAll1276.observations;
+    var lastObs1276=obs1276&&obs1276.length?obs1276[obs1276.length-1]:null;
+    var imp1276=lastObs1276&&lastObs1276.imperial||{};
+    var prec=imp1276.precipTotal!=null?Number(imp1276.precipTotal).toFixed(2):"0.00";
+    var maxRate1276=obsMax(obs1276,"precipRate","imperial");
+    // Day maxes from KNCRALEI761 all-day observations
+    var obs761=dAll761&&dAll761.observations;
     var dayMaxes={
-      humidHi:s761&&s761.humidityHigh!=null?Math.round(s761.humidityHigh):null,
-      wspdHi:i761.windspeedHigh!=null?Math.round(i761.windspeedHigh):null,
-      gustHi:i761.windgustHigh!=null?Math.round(i761.windgustHigh):null,
-      presHi:i761.pressureMax!=null?Number(i761.pressureMax).toFixed(2):null,
-      uvHi:s761&&s761.uvHigh!=null?Math.round(s761.uvHigh):null,
-      precRate:i1276.precipRate!=null?Number(i1276.precipRate).toFixed(2):null
+      humidHi:(function(){var v=obsMax(obs761,"humidity",null);return v!=null?Math.round(v):null;})(),
+      wspdHi:(function(){var v=obsMax(obs761,"windSpeed","imperial");return v!=null?Math.round(v):null;})(),
+      gustHi:(function(){var v=obsMax(obs761,"windGust","imperial");return v!=null?Math.round(v):null;})(),
+      presHi:(function(){var v=obsMax(obs761,"pressure","imperial");return v!=null?Number(v).toFixed(2):null;})(),
+      uvHi:(function(){var v=obsMax(obs761,"uv",null);return v!=null?Math.round(v):null;})(),
+      precRate:maxRate1276!=null?Number(maxRate1276).toFixed(2):null
     };
     var code=dOm&&dOm.current?dOm.current.weather_code:0;
     var hi=todayObsHigh(dOm&&dOm.hourly,dOm&&dOm.daily?dOm.daily.temperature_2m_max[0]:null);
