@@ -1442,7 +1442,7 @@ var TIDE_STATIONS={
   hiltonhead: {id:"8670870",label:"Coligny Beach · Hilton Head Island, SC"},
   wrightsville:{id:"8658120",label:"Wrightsville Beach, NC"},
   emerald:     {id:"8656483",label:"Emerald Isle, NC"},
-  oakisland:   {id:"8658163",label:"Oak Island Beach, NC"},
+  oakisland:   {id:"8658163",label:"Oak Island Beach, NC",wtStation:"8658120"},
   hatteras:    {id:"8654467",label:"Cape Hatteras · Hatteras Inlet, NC"},
   corolla:     {id:"8651370",label:"Corolla Beach · Duck, NC"}
 };
@@ -1455,10 +1455,10 @@ function setTideLoc(loc){
     var b=$("tl-"+k);if(b)b.classList.toggle("tide-loc-on",k===loc);
   });
   var st=TIDE_STATIONS[loc];
-  fetchTides(st.id,st.label);
+  fetchTides(st.id,st.label,st.wtStation||null);
 }
 
-function fetchTides(stationId,locLabel){
+function fetchTides(stationId,locLabel,wtStationId){
   var el=$("tide-content");if(!el)return;
   if(_tideCache[stationId]){var c=_tideCache[stationId];renderTides(el,c.preds,locLabel,stationId,c.wt);return;}
   el.innerHTML='<div class="alm-ld"><div class="tsps-spinner"></div></div>';
@@ -1468,7 +1468,10 @@ function fetchTides(stationId,locLabel){
   var predsFetch=fetch("https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date="+today+"&end_date="+tomorrow+"&station="+stationId+"&product=predictions&datum=MLLW&time_zone=lst_ldt&interval=hilo&units=english&application=RedWolfWeather&format=json")
     .then(function(r){return r.json();})
     .then(function(d){if(d.error)throw new Error(d.error.message);return d.predictions;});
-  var wtFetch=fetch("https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=water_temperature&station="+stationId+"&date=latest&time_zone=lst_ldt&units=english&application=RedWolfWeather&format=json")
+  // Some subordinate stations (e.g. Oak Island 8658163) have no live sensors —
+  // use wtStationId fallback (nearest primary station) for water temp.
+  var wtId=wtStationId||stationId;
+  var wtFetch=fetch("https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=water_temperature&station="+wtId+"&date=latest&time_zone=lst_ldt&units=english&application=RedWolfWeather&format=json")
     .then(function(r){return r.json();})
     .then(function(d){
       if(d.error||!d.data||!d.data.length)return null;
