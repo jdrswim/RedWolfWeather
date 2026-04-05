@@ -1033,20 +1033,16 @@ function fetchConditions(){
   var _WU="https://api.weather.com/v2/pws/";
   var _K=WU_COMMUNITY_KEY;
   function wuFetch(url){return fetch(url).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;});}
-  function obsMax(obsArr,key,sub){
-    // Compute max of a field across all WU observations for the day
-    var best=-Infinity;
-    if(!obsArr)return null;
-    obsArr.forEach(function(o){var v=(sub?(o[sub]||{}):o)[key];if(v!=null&&v>best)best=v;});
-    return best>-Infinity?best:null;
-  }
+  // Daily max tracking via localStorage — resets at midnight, updates every refresh
+  function _dmGet(){try{var d=JSON.parse(localStorage.getItem('rww_dmx')||'{}');if(d.dt===new Date().toDateString())return d;}catch(e){}return{dt:new Date().toDateString()};}
+  function _dmSave(o){try{localStorage.setItem('rww_dmx',JSON.stringify(o));}catch(e){}}
+  function _dmUpd(o,k,v){if(v!=null&&!isNaN(v)&&(o[k]==null||v>o[k]))o[k]=v;}
   Promise.all([
     wuFetch(_WU+"observations/current?stationId=KNCRALEI761&format=json&units=e&apiKey="+_K),
-    wuFetch(_WU+"observations/all/1day?stationId=KNCRALEI761&format=json&units=e&apiKey="+_K),
-    wuFetch(_WU+"observations/all/1day?stationId=KNCRALEI1276&format=json&units=e&apiKey="+_K),
+    wuFetch(_WU+"observations/current?stationId=KNCRALEI1276&format=json&units=e&apiKey="+_K),
     fetch("https://api.open-meteo.com/v1/forecast?latitude="+_sl.lat+"&longitude="+_sl.lon+"&current=weather_code&hourly=temperature_2m,weather_code,precipitation_probability,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=America%2FNew_York&forecast_days=2").then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
   ]).then(function(res){
-    var dCur=res[0],dAll761=res[1],dAll1276=res[2],dOm=res[3];
+    var dCur=res[0],dCur1276=res[1],dOm=res[2];
     var obs=dCur&&dCur.observations&&dCur.observations[0];
     if(!obs){
       // WU current failed — fall back to Open-Meteo
@@ -1064,21 +1060,27 @@ function fetchConditions(){
     var gust=imp.windGust!=null?Math.round(imp.windGust):"--";
     var pres=imp.pressure!=null?Number(imp.pressure).toFixed(2):"--";
     var uvi=obs.uv!=null?Math.round(obs.uv):0;
-    // Precip total + max rate from KNCRALEI1276 all-day observations
-    var obs1276=dAll1276&&dAll1276.observations;
-    var lastObs1276=obs1276&&obs1276.length?obs1276[obs1276.length-1]:null;
-    var imp1276=lastObs1276&&lastObs1276.imperial||{};
+    // Precip total + current rate from KNCRALEI1276
+    var obs1276=dCur1276&&dCur1276.observations&&dCur1276.observations[0];
+    var imp1276=obs1276&&obs1276.imperial||{};
     var prec=imp1276.precipTotal!=null?Number(imp1276.precipTotal).toFixed(2):"0.00";
-    var maxRate1276=obsMax(obs1276,"precipRate","imperial");
-    // Day maxes from KNCRALEI761 all-day observations
-    var obs761=dAll761&&dAll761.observations;
+    var curRate1276=imp1276.precipRate!=null?Number(imp1276.precipRate):null;
+    // Update rolling daily maxes in localStorage
+    var dm=_dmGet();
+    _dmUpd(dm,'humidHi',obs.humidity);
+    _dmUpd(dm,'wspdHi',imp.windSpeed);
+    _dmUpd(dm,'gustHi',imp.windGust);
+    _dmUpd(dm,'presHi',imp.pressure);
+    _dmUpd(dm,'uvHi',obs.uv);
+    _dmUpd(dm,'precRate',curRate1276);
+    _dmSave(dm);
     var dayMaxes={
-      humidHi:(function(){var v=obsMax(obs761,"humidity",null);return v!=null?Math.round(v):null;})(),
-      wspdHi:(function(){var v=obsMax(obs761,"windSpeed","imperial");return v!=null?Math.round(v):null;})(),
-      gustHi:(function(){var v=obsMax(obs761,"windGust","imperial");return v!=null?Math.round(v):null;})(),
-      presHi:(function(){var v=obsMax(obs761,"pressure","imperial");return v!=null?Number(v).toFixed(2):null;})(),
-      uvHi:(function(){var v=obsMax(obs761,"uv",null);return v!=null?Math.round(v):null;})(),
-      precRate:maxRate1276!=null?Number(maxRate1276).toFixed(2):null
+      humidHi:dm.humidHi!=null?Math.round(dm.humidHi):null,
+      wspdHi:dm.wspdHi!=null?Math.round(dm.wspdHi):null,
+      gustHi:dm.gustHi!=null?Math.round(dm.gustHi):null,
+      presHi:dm.presHi!=null?Number(dm.presHi).toFixed(2):null,
+      uvHi:dm.uvHi!=null?Math.round(dm.uvHi):null,
+      precRate:dm.precRate!=null?Number(dm.precRate).toFixed(2):null
     };
     var code=dOm&&dOm.current?dOm.current.weather_code:0;
     var hi=todayObsHigh(dOm&&dOm.hourly,dOm&&dOm.daily?dOm.daily.temperature_2m_max[0]:null);
