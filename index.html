@@ -2102,13 +2102,52 @@ function accLogActuals(){
 }
 
 var _accCachedRows=[];
+var ACC_CACHE_KEY='acc_rows_v1';
+var ACC_CACHE_MAX_MS=15*60*1000; // 15 minutes
+
+function _accLoadCache(){
+  try{
+    var s=localStorage.getItem(ACC_CACHE_KEY);
+    if(!s)return null;
+    var obj=JSON.parse(s);
+    if(Date.now()-obj.ts>ACC_CACHE_MAX_MS)return null;
+    return obj.rows;
+  }catch(e){return null;}
+}
+function _accSaveCache(rows){
+  try{localStorage.setItem(ACC_CACHE_KEY,JSON.stringify({ts:Date.now(),rows:rows}));}catch(e){}
+}
+
 function accFetchAndRender(){
   var el=$("acc-dashboard");if(!el)return;
-  el.innerHTML='<div class="acc-wrap"><div class="acc-hdr">Valvano\'s Forecast Accountability Dashboard <em>- Loading...</em></div><div class="alm-ld"><div class="tsps-spinner"></div></div></div>';
+  // Render cached data immediately (no spinner) if available
+  var cached=_accCachedRows.length?_accCachedRows:_accLoadCache();
+  if(cached&&cached.length){
+    _accCachedRows=cached;
+    accRender(el,_accCachedRows);
+  } else {
+    el.innerHTML='<div class="acc-wrap"><div class="acc-hdr">Valvano\'s Forecast Accountability Dashboard <em>- Loading...</em></div><div class="alm-ld"><div class="tsps-spinner"></div></div></div>';
+  }
+  // Always fetch fresh data in the background
   fetch(SHEET_URL+"?tab=Accuracy")
   .then(function(r){return r.text();})
-  .then(function(txt){var d=JSON.parse(txt);_accCachedRows=d.rows||[];accRender(el,_accCachedRows);})
-  .catch(function(){accRender(el,_accCachedRows);});
+  .then(function(txt){
+    var d=JSON.parse(txt);
+    _accCachedRows=d.rows||[];
+    _accSaveCache(_accCachedRows);
+    accRender(el,_accCachedRows);
+  })
+  .catch(function(){if(!_accCachedRows.length)accRender(el,[]);});
+}
+
+// Pre-fetch accuracy data in the background shortly after page load so
+// the Almanac tab renders instantly when the user first clicks it.
+function accPrefetch(){
+  if(_accCachedRows.length)return; // already have data
+  fetch(SHEET_URL+"?tab=Accuracy")
+  .then(function(r){return r.text();})
+  .then(function(txt){var d=JSON.parse(txt);_accCachedRows=d.rows||[];_accSaveCache(_accCachedRows);})
+  .catch(function(){});
 }
 // Re-render immediately using cached rows + localStorage (no sheet round-trip, no spinner)
 function accQuickRender(){
@@ -2358,6 +2397,8 @@ function accRender(el,rawRows){
     try{localStorage.removeItem('acc_actual_'+todayStr);}catch(e){}
   }
 })();
+// Pre-fetch accuracy sheet data so Almanac tab renders instantly on first click
+setTimeout(accPrefetch,3000);
 // Actuals: run on every page load (guard keys prevent duplicate sheet writes)
 // This ensures past-day actuals are captured even if 8 PM session was missed
 setTimeout(accLogActuals,6000);
