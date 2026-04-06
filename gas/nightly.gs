@@ -154,9 +154,18 @@ function nightlyLogPredictions_(sheet) {
   periods.forEach(function(p) {
     var ds = p.startTime ? p.startTime.substring(0, 10) : '';
     if (!ds) return;
-    if (!byDate[ds]) byDate[ds] = { hi: null, lo: null };
-    if ( p.isDaytime && byDate[ds].hi === null) byDate[ds].hi = p.temperature;
-    if (!p.isDaytime && byDate[ds].lo === null) byDate[ds].lo = p.temperature;
+    if (p.isDaytime) {
+      // Daytime high belongs to the same date
+      if (!byDate[ds]) byDate[ds] = { hi: null, lo: null };
+      if (byDate[ds].hi === null) byDate[ds].hi = p.temperature;
+    } else {
+      // Night period leads into next morning — assign lo to D+1
+      var d = new Date(ds + 'T12:00:00');
+      d.setDate(d.getDate() + 1);
+      var nextDs = Utilities.formatDate(d, TZ, 'yyyy-MM-dd');
+      if (!byDate[nextDs]) byDate[nextDs] = { hi: null, lo: null };
+      if (byDate[nextDs].lo === null) byDate[nextDs].lo = p.temperature;
+    }
   });
 
   var now = new Date();
@@ -185,7 +194,9 @@ function nightlyLogActuals_(sheet) {
   var opts = { headers: { 'User-Agent': 'WolfpackWeather/2.0' }, muteHttpExceptions: true };
   var now  = new Date();
 
-  for (var daysBack = 0; daysBack <= 4; daysBack++) {
+  var hourET = parseInt(Utilities.formatDate(now, TZ, 'H'));
+  var startBack = (hourET >= 20) ? 0 : 1;
+  for (var daysBack = startBack; daysBack <= 4; daysBack++) {
     var td = new Date(now.getFullYear(), now.getMonth(), now.getDate() - daysBack);
     var ds = Utilities.formatDate(td, TZ, 'yyyy-MM-dd');
 
