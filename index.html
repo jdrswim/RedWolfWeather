@@ -1163,8 +1163,14 @@ function fetchExtended(){
           lo:null,
           nightForecast:""
         };
+        // Previous night period leads into this morning — use it for lo
+        if(i>0&&!periods[i-1].isDaytime){
+          day.lo=periods[i-1].temperature;
+        } else if(i+1<periods.length&&!periods[i+1].isDaytime){
+          day.lo=periods[i+1].temperature;  // fallback for first day (no prior night)
+        }
+        // nightForecast describes the coming night (always forward-looking)
         if(i+1<periods.length&&!periods[i+1].isDaytime){
-          day.lo=periods[i+1].temperature;
           day.nightForecast=periods[i+1].shortForecast;
         }
         days.push(day);
@@ -2006,9 +2012,15 @@ function accLogPrediction(){
     periods.forEach(function(p){
       var ds=p.startTime?p.startTime.substring(0,10):"";
       if(!ds)return;
-      if(!byDate[ds])byDate[ds]={hi:null,lo:null};
-      if(p.isDaytime&&byDate[ds].hi===null)byDate[ds].hi=p.temperature;
-      if(!p.isDaytime&&byDate[ds].lo===null)byDate[ds].lo=p.temperature;
+      if(p.isDaytime){
+        if(!byDate[ds])byDate[ds]={hi:null,lo:null};
+        if(byDate[ds].hi===null)byDate[ds].hi=p.temperature;
+      } else {
+        var d=new Date(ds+"T12:00:00");d.setDate(d.getDate()+1);
+        var nextDs=d.toLocaleDateString("en-CA");
+        if(!byDate[nextDs])byDate[nextDs]={hi:null,lo:null};
+        if(byDate[nextDs].lo===null)byDate[nextDs].lo=p.temperature;
+      }
     });
     // Write D1–D5: each target date gets its own column name
     var writes=[];
