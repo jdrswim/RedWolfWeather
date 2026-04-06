@@ -234,9 +234,12 @@ function nightlyWrite_(sheet, dateStr, key1, val1, key2, val2, overwrite) {
   if (dateCol < 0) dateCol = 0;
 
   // Find existing row for this date
+  // Use normDateStr_ so Date objects stored by Sheets are handled correctly —
+  // without this, Sheets Date values compare as "Mon Mar 27 2026..." and never
+  // match, causing nightlyWrite_ to append a duplicate row every night.
   var rowIdx = -1;
   for (var i = 1; i < data.length; i++) {
-    if (String(data[i][dateCol]).trim() === dateStr) { rowIdx = i; break; }
+    if (normDateStr_(data[i][dateCol]) === dateStr) { rowIdx = i; break; }
   }
 
   // If no row exists, append one
@@ -274,12 +277,9 @@ function normDateStr_(val) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// ONE-TIME FULL RECOVERY + CLEANUP
-// Run "recoverAndCleanup" once to:
-//   1. Restore the two rows lost in the previous cleanup (03-27, 03-28)
-//   2. Re-fetch actuals for 04-02 from NWS KRDU
-//   3. Merge all duplicate rows into one row per date
-//   4. Sort by date ascending
+// DEDUP + SORT CLEANUP
+// Run "recoverAndCleanup" any time the sheet gets duplicate rows.
+// Merges all rows sharing the same date into one, then sorts by date.
 // ─────────────────────────────────────────────────────────────
 function recoverAndCleanup() {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Accuracy');
@@ -293,7 +293,8 @@ function recoverAndCleanup() {
   var actualHiCol = headers.indexOf('actual_high');
   var actualLoCol = headers.indexOf('actual_low');
 
-  // ── Step 1: merge existing rows, normalising date format ────
+  // Merge all rows for the same date into one, keeping the best value per cell.
+  // Actuals always overwrite (they are ground truth); predictions only fill blanks.
   var merged = {};
   var order  = [];
 
@@ -303,9 +304,8 @@ function recoverAndCleanup() {
     if (!ds) continue;
 
     if (!merged[ds]) {
-      // Store a plain-value copy with the normalised date string
       var copy = row.slice();
-      copy[dateCol] = ds;
+      copy[dateCol] = ds;   // ensure stored as plain string
       merged[ds] = copy;
       order.push(ds);
     } else {
@@ -314,65 +314,13 @@ function recoverAndCleanup() {
         var isActual = (c === actualHiCol || c === actualLoCol);
         var val = row[c];
         var hasVal = (val !== '' && val !== null && val !== undefined);
-        if (hasVal) {
-          if (isActual || !m[c] || m[c] === '') m[c] = val;
+        if (hasVal && (isActual || !m[c] || m[c] === '')) {
+          m[c] = val;
         }
       }
     }
   }
 
-  // ── Step 2: restore the two rows lost in the previous cleanup ─
-  // Values confirmed from the original sheet screenshot.
-  var recover = [
-    { date:'2026-03-27', pred_high:88, pred_low:53, actual_high:87, actual_low:51 },
-    { date:'2026-03-28', pred_high:56, pred_low:40, actual_high:55, actual_low:41 }
-  ];
-  recover.forEach(function(r) {
-    if (!merged[r.date]) {
-      var newRow = new Array(headers.length).fill('');
-      newRow[dateCol] = r.date;
-      Object.keys(r).forEach(function(k) {
-        var ci = headers.indexOf(k);
-        if (ci >= 0) newRow[ci] = r[k];
-      });
-      merged[r.date] = newRow;
-      order.push(r.date);
-      Logger.log('Recovered: ' + r.date);
-    } else {
-      Logger.log('Already present, skipping recovery: ' + r.date);
-    }
-  });
-
-  // ── Step 3: re-fetch actuals for 04-02 from NWS KRDU ────────
-  var fetchDate = '2026-04-02';
-  var td = new Date(2026, 3, 2); // month is 0-indexed
-  var startLocal = new Date(td.getFullYear(), td.getMonth(), td.getDate(),  0,  0,  0);
-  var endLocal   = new Date(td.getFullYear(), td.getMonth(), td.getDate(), 23, 59, 59);
-  var obsS = encodeURIComponent(startLocal.toISOString());
-  var obsE = encodeURIComponent(endLocal.toISOString());
-  var url  = 'https://api.weather.gov/stations/KRDU/observations?start=' + obsS + '&end=' + obsE + '&limit=200';
-  var opts = { headers: { 'User-Agent': 'WolfpackWeather/2.0' }, muteHttpExceptions: true };
-  var resp = UrlFetchApp.fetch(url, opts);
-
-  if (resp.getResponseCode() === 200) {
-    var features = JSON.parse(resp.getContentText()).features || [];
-    var temps = features.reduce(function(a, f) {
-      var t = f.properties && f.properties.temperature && f.properties.temperature.value;
-      if (t != null) a.push(t * 9/5 + 32);
-      return a;
-    }, []);
-    if (temps.length && merged[fetchDate]) {
-      var hi = Math.round(Math.max.apply(null, temps));
-      var lo = Math.round(Math.min.apply(null, temps));
-      if (actualHiCol >= 0) merged[fetchDate][actualHiCol] = hi;
-      if (actualLoCol >= 0) merged[fetchDate][actualLoCol] = lo;
-      Logger.log('Fetched actuals for ' + fetchDate + ': Hi:' + hi + ' Lo:' + lo + ' (' + temps.length + ' obs)');
-    }
-  } else {
-    Logger.log('NWS fetch for ' + fetchDate + ' failed: HTTP ' + resp.getResponseCode());
-  }
-
-  // ── Step 4: sort and rewrite ──────────────────────────────────
   order.sort();
 
   var lastRow = sheet.getLastRow();
@@ -382,6 +330,6 @@ function recoverAndCleanup() {
     sheet.getRange(i + 2, 1, 1, headers.length).setValues([merged[ds]]);
   });
 
-  Logger.log('✓ Recovery + cleanup complete. ' + order.length + ' unique dates.');
+  Logger.log('✓ Dedup + sort complete. ' + order.length + ' unique dates.');
   Logger.log('Dates: ' + order.join(', '));
 }
