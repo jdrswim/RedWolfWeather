@@ -375,6 +375,9 @@ main{max-width:1100px;margin:0 auto;padding:18px;overflow-x:hidden}
 .mc-diff-lbl{font-size:8px;font-weight:800;letter-spacing:1.5px;color:var(--gold);text-transform:uppercase;margin-bottom:8px}
 .mc-diff-val{font-size:24px;font-weight:200;color:var(--white);line-height:1}
 .mc-diff-note{font-size:9px;color:var(--mu);margin-top:5px}
+.mc-diff-row{display:flex;align-items:center;gap:6px;justify-content:center;flex-wrap:wrap;margin:6px 0 2px}
+.mc-diff-metric{font-size:8px;font-weight:800;letter-spacing:1px;color:var(--mu);text-transform:uppercase;min-width:28px}
+.mc-diff-sub{font-size:9px;color:var(--mu2)}
 .mc-diff-tag{display:inline-block;font-size:9px;font-weight:700;padding:2px 8px;border-radius:3px;margin-top:6px}
 .mc-diff-tag.cooler{background:rgba(34,85,204,.1);color:#2255cc}
 .mc-diff-tag.warmer{background:rgba(180,60,0,.1);color:#b03800}
@@ -2520,24 +2523,8 @@ function fetchMicroclimate(){
 // ============================================================
 var MC_SHEET_URL="https://script.google.com/macros/s/AKfycbzgcFyiIsyyYlXnUPVekTGin4N-_GIJ6qlsq9kPZg1oMbuaGnwF-mZ-xp8-4rTGPZLP/exec";
 
-function mcLogTemps(){
-  var rwfTemp=$("temp")?parseFloat($("temp").textContent):null;
-  if(rwfTemp===null||isNaN(rwfTemp))return;
-  fetch("https://api.weather.gov/stations/KRDU/observations/latest",{headers:{"User-Agent":"WolfpackWeather/2.0","Accept":"application/geo+json"}})
-  .then(function(r){return r.json();})
-  .then(function(d){
-    var p=d.properties,rduTemp=null;
-    if(p&&p.temperature&&p.temperature.value!=null)rduTemp=Math.round(p.temperature.value*9/5+32);
-    if(rduTemp===null)return;
-    var dateStr=new Date().toISOString().split("T")[0];
-    fetch(MC_SHEET_URL+"?action=write&tab=Sheet1&date="+dateStr+"&rwf_temp="+rwfTemp+"&rdu_temp="+rduTemp)
-    .then(function(){console.log("MC logged: RWF="+rwfTemp+" RDU="+rduTemp);})
-    .catch(function(){});
-  }).catch(function(){});
-}
-
 function mcFetchHistory(callback){
-  fetch(MC_SHEET_URL+"?tab=Sheet1")
+  fetch(MC_SHEET_URL+"?tab=Microclimate")
   .then(function(r){return r.json();})
   .then(function(d){callback(d.rows||[]);})
   .catch(function(){callback([]);});
@@ -2547,87 +2534,125 @@ function mcBuildHistory(rows){
   if(!rows.length){
     return'<div style="background:var(--p2);border:1px solid var(--bd);border-radius:4px;padding:24px;text-align:center;margin-top:18px">'+
       '<div style="font-size:14px;color:var(--mu);margin-bottom:8px">Historical data collection has started.</div>'+
-      '<div style="font-size:12px;color:var(--mu2)">Check back in a few hours for your first RWF vs RDU comparison.</div>'+
+      '<div style="font-size:12px;color:var(--mu2)">Daily High &amp; Low temps are recorded each evening at 8 PM ET. Check back tomorrow for your first RWF vs RDU comparison.</div>'+
     '</div>';
   }
-  var now=new Date(),day1=new Date(now.getTime()-86400000),week1=new Date(now.getTime()-604800000),month1=new Date(now.getTime()-2592000000);
-  var periods=[
-    {label:"24 Hours",cutoff:day1,rwfSum:0,rduSum:0,count:0},
-    {label:"7 Days",cutoff:week1,rwfSum:0,rduSum:0,count:0},
-    {label:"30 Days",cutoff:month1,rwfSum:0,rduSum:0,count:0},
-    {label:"All Time",cutoff:new Date(0),rwfSum:0,rduSum:0,count:0}
-  ];
-  rows.forEach(function(r){
-    var dateField=r.date||r.timestamp||'';
+  // Parse rows — each has: date, rwf_high, rwf_low, rdu_high, rdu_low
+  var now=new Date();
+  var todayStr=now.toISOString().split("T")[0];
+  var ytdCutoff=new Date(now.getFullYear(),0,1); // Jan 1 this year
+  // Yesterday = previous calendar day
+  var yest=new Date(now.getFullYear(),now.getMonth(),now.getDate()-1);
+  var yestStr=yest.toISOString().split("T")[0];
+  var week1=new Date(now.getFullYear(),now.getMonth(),now.getDate()-7);
+  var month1=new Date(now.getFullYear(),now.getMonth(),now.getDate()-30);
+
+  function parseRow(r){
+    var dateField=r.date||'';
     var ts=dateField?new Date(dateField.length===10?dateField+'T12:00:00':dateField):new Date(NaN);
-    var rwf=parseFloat(r.rwf_temp),rdu=parseFloat(r.rdu_temp);
-    if(isNaN(rwf)||isNaN(rdu))return;
-    periods.forEach(function(p){if(ts>=p.cutoff){p.rwfSum+=rwf;p.rduSum+=rdu;p.count++;}});
-  });
-  var html='<div class="mc-subhdr">Temperature Differential — Logged History</div>'+
-    '<div class="mc-hist-grid">';
-  periods.forEach(function(p){
-    if(p.count===0){
-      html+='<div class="mc-diff-card"><div class="mc-diff-lbl">'+p.label+'</div><div class="mc-diff-val" style="color:var(--mu)">--</div><div class="mc-diff-note">No data yet</div></div>';
-      return;
-    }
-    var rwfAvg=p.rwfSum/p.count,rduAvg=p.rduSum/p.count,diff=rwfAvg-rduAvg;
-    var tag=Math.abs(diff)<0.3?"same":(diff<0?"cooler":"warmer");
-    var tagLbl=Math.abs(diff)<0.3?"SAME":(diff<0?"COOLER":"WARMER");
-    html+='<div class="mc-diff-card">'+
-      '<div class="mc-diff-lbl">'+p.label+'</div>'+
-      '<div class="mc-diff-val">'+(diff>0?"+":"")+diff.toFixed(1)+'F</div>'+
-      '<div class="mc-diff-note">'+p.count+' readings</div>'+
-      '<div class="mc-diff-note">RWF '+rwfAvg.toFixed(1)+'° vs RDU '+rduAvg.toFixed(1)+'°</div>'+
-      '<div class="mc-diff-tag '+tag+'">'+tagLbl+'</div>'+
-    '</div>';
-  });
-  html+='</div>';
-  // Daily breakdown last 7 days
-  var dayMap={};
-  rows.forEach(function(r){
-    var dateField=r.date||r.timestamp||'';
-    var ts=dateField?new Date(dateField.length===10?dateField+'T12:00:00':dateField):new Date(NaN);
-    if(isNaN(ts.getTime())||ts<week1)return;
-    var dayKey=ts.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});
-    if(!dayMap[dayKey])dayMap[dayKey]={rwfSum:0,rduSum:0,count:0};
-    var rwf=parseFloat(r.rwf_temp),rdu=parseFloat(r.rdu_temp);
-    if(isNaN(rwf)||isNaN(rdu))return;
-    dayMap[dayKey].rwfSum+=rwf;dayMap[dayKey].rduSum+=rdu;dayMap[dayKey].count++;
-  });
-  var dayKeys=Object.keys(dayMap);
-  if(dayKeys.length>1){
-    html+='<div class="mc-subhdr">Daily Breakdown — Last 7 Days</div>'+
-      '<div class="mc-mo-grid">';
-    dayKeys.forEach(function(k){
-      var d=dayMap[k],rwfAvg=d.rwfSum/d.count,rduAvg=d.rduSum/d.count,diff=rwfAvg-rduAvg;
-      var tag=Math.abs(diff)<0.3?"same":(diff<0?"cooler":"warmer");
-      var tagLbl=Math.abs(diff)<0.3?"SAME":(diff<0?"COOLER":"WARMER");
-      html+='<div class="mc-mo">'+
-        '<div class="mc-mo-name">'+k+'</div>'+
-        '<div class="mc-mo-val">'+(diff>0?"+":"")+diff.toFixed(1)+'F</div>'+
-        '<div class="mc-mo-sub">RWF '+rwfAvg.toFixed(0)+'° / RDU '+rduAvg.toFixed(0)+'°</div>'+
-        '<div class="mc-diff-tag '+tag+'" style="font-size:7px;margin-top:4px">'+tagLbl+'</div>'+
-      '</div>';
+    var rwfHi=parseFloat(r.rwf_high),rwfLo=parseFloat(r.rwf_low);
+    var rduHi=parseFloat(r.rdu_high),rduLo=parseFloat(r.rdu_low);
+    if(isNaN(ts.getTime())||isNaN(rwfHi)||isNaN(rwfLo)||isNaN(rduHi)||isNaN(rduLo))return null;
+    return{ts:ts,date:dateField,rwfHi:rwfHi,rwfLo:rwfLo,rduHi:rduHi,rduLo:rduLo};
+  }
+  var parsed=rows.map(parseRow).filter(Boolean);
+
+  function accumulate(cutoff,singleDay){
+    var acc={rwfHiSum:0,rwfLoSum:0,rduHiSum:0,rduLoSum:0,count:0};
+    parsed.forEach(function(r){
+      if(singleDay){if(r.date!==singleDay)return;}
+      else{if(r.ts<cutoff||r.date===todayStr)return;} // exclude today (not complete yet)
+      acc.rwfHiSum+=r.rwfHi;acc.rwfLoSum+=r.rwfLo;
+      acc.rduHiSum+=r.rduHi;acc.rduLoSum+=r.rduLo;
+      acc.count++;
     });
-    html+='</div>';
+    return acc;
   }
-  if(rows.length>0){
-    var firstField=rows[0].date||rows[0].timestamp||'';
-    var firstDate=firstField?new Date(firstField.length===10?firstField+'T12:00:00':firstField):new Date(NaN);
-    html+='<div class="mc-note2">Based on '+rows.length+' hourly readings logged since '+firstDate.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})+'<br>Data collection is ongoing — accuracy improves over time</div>';
+
+  function diffSign(v){return(v>0?"+":"")+v.toFixed(1);}
+  function tag(diff){return Math.abs(diff)<0.3?"same":(diff<0?"cooler":"warmer");}
+  function tagLbl(diff){return Math.abs(diff)<0.3?"SAME":(diff<0?"COOLER":"WARMER");}
+
+  function buildCard(label,acc){
+    if(acc.count===0){
+      return'<div class="mc-diff-card">'+
+        '<div class="mc-diff-lbl">'+label+'</div>'+
+        '<div class="mc-diff-val" style="color:var(--mu)">--</div>'+
+        '<div class="mc-diff-note">No data yet</div>'+
+      '</div>';
+    }
+    var n=acc.count;
+    var rwfHiAvg=acc.rwfHiSum/n,rwfLoAvg=acc.rwfLoSum/n;
+    var rduHiAvg=acc.rduHiSum/n,rduLoAvg=acc.rduLoSum/n;
+    var hiDiff=rwfHiAvg-rduHiAvg,loDiff=rwfLoAvg-rduLoAvg;
+    return'<div class="mc-diff-card">'+
+      '<div class="mc-diff-lbl">'+label+'</div>'+
+      '<div class="mc-diff-row">'+
+        '<span class="mc-diff-metric">HIGH</span>'+
+        '<span class="mc-diff-val" style="font-size:15px">'+diffSign(hiDiff)+'°F</span>'+
+        '<span class="mc-diff-sub">RWF '+rwfHiAvg.toFixed(0)+'° vs RDU '+rduHiAvg.toFixed(0)+'°</span>'+
+        '<span class="mc-diff-tag '+tag(hiDiff)+'">'+tagLbl(hiDiff)+'</span>'+
+      '</div>'+
+      '<div class="mc-diff-row">'+
+        '<span class="mc-diff-metric">LOW</span>'+
+        '<span class="mc-diff-val" style="font-size:15px">'+diffSign(loDiff)+'°F</span>'+
+        '<span class="mc-diff-sub">RWF '+rwfLoAvg.toFixed(0)+'° vs RDU '+rduLoAvg.toFixed(0)+'°</span>'+
+        '<span class="mc-diff-tag '+tag(loDiff)+'">'+tagLbl(loDiff)+'</span>'+
+      '</div>'+
+      '<div class="mc-diff-note">'+n+(n===1?' day':' days')+'</div>'+
+    '</div>';
   }
+
+  var periods=[
+    {label:"Yesterday", acc:accumulate(null,yestStr)},
+    {label:"Last 7 Days", acc:accumulate(week1,null)},
+    {label:"Last 30 Days", acc:accumulate(month1,null)},
+    {label:"YTD "+now.getFullYear(), acc:accumulate(ytdCutoff,null)}
+  ];
+
+  var html='<div class="mc-subhdr">Daily High &amp; Low Differential — Red Wolf Farm vs RDU Airport</div>'+
+    '<div class="mc-hist-grid">';
+  periods.forEach(function(p){html+=buildCard(p.label,p.acc);});
+  html+='</div>';
+
+  // Daily breakdown last 7 days
+  var recent=parsed.filter(function(r){return r.ts>=week1&&r.date!==todayStr;});
+  recent.sort(function(a,b){return b.ts-a.ts;}); // newest first
+  if(recent.length>0){
+    html+='<div class="mc-subhdr">Daily Breakdown — Last 7 Days</div>'+
+      '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">'+
+      '<thead><tr style="color:var(--mu);text-align:left">'+
+        '<th style="padding:6px 8px;border-bottom:1px solid var(--bd)">Date</th>'+
+        '<th style="padding:6px 8px;border-bottom:1px solid var(--bd);text-align:center">RWF Hi</th>'+
+        '<th style="padding:6px 8px;border-bottom:1px solid var(--bd);text-align:center">RWF Lo</th>'+
+        '<th style="padding:6px 8px;border-bottom:1px solid var(--bd);text-align:center">RDU Hi</th>'+
+        '<th style="padding:6px 8px;border-bottom:1px solid var(--bd);text-align:center">RDU Lo</th>'+
+        '<th style="padding:6px 8px;border-bottom:1px solid var(--bd);text-align:center">Hi Diff</th>'+
+        '<th style="padding:6px 8px;border-bottom:1px solid var(--bd);text-align:center">Lo Diff</th>'+
+      '</tr></thead><tbody>';
+    recent.forEach(function(r,i){
+      var hiDiff=r.rwfHi-r.rduHi,loDiff=r.rwfLo-r.rduLo;
+      var hiTag=tag(hiDiff),loTag=tag(loDiff);
+      var bg=i%2===0?'background:var(--p2)':'';
+      var dateLabel=r.ts.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});
+      html+='<tr style="'+bg+'">'+
+        '<td style="padding:6px 8px">'+dateLabel+'</td>'+
+        '<td style="padding:6px 8px;text-align:center">'+r.rwfHi+'°</td>'+
+        '<td style="padding:6px 8px;text-align:center">'+r.rwfLo+'°</td>'+
+        '<td style="padding:6px 8px;text-align:center">'+r.rduHi+'°</td>'+
+        '<td style="padding:6px 8px;text-align:center">'+r.rduLo+'°</td>'+
+        '<td style="padding:6px 8px;text-align:center"><span class="mc-diff-tag '+hiTag+'" style="font-size:9px">'+diffSign(hiDiff)+'°</span></td>'+
+        '<td style="padding:6px 8px;text-align:center"><span class="mc-diff-tag '+loTag+'" style="font-size:9px">'+diffSign(loDiff)+'°</span></td>'+
+      '</tr>';
+    });
+    html+='</tbody></table></div>';
+  }
+
+  html+='<div class="mc-note2">'+parsed.length+' daily readings recorded at 8 PM ET · KNCRALEI761 via Weather Underground · RDU via NWS (KRDU)</div>';
   return html;
 }
 
-// Log temps on load then every top-of-hour
-setTimeout(mcLogTemps,15000);
-function scheduleMcLog(){
-  var n=new Date();
-  var ms=(60-n.getMinutes())*60000-n.getSeconds()*1000-n.getMilliseconds();
-  setTimeout(function(){mcLogTemps();setInterval(mcLogTemps,3600000);},ms);
-}
-scheduleMcLog();
+// Microclimate temps are logged server-side at 8 PM ET daily via nightly.gs
 
 // ============================================================
 // WEATHER SCENE ENGINE

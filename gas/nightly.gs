@@ -124,6 +124,7 @@ function nightlyLog() {
   Logger.log('=== nightlyLog START ' + Utilities.formatDate(new Date(), TZ, 'yyyy-MM-dd HH:mm z') + ' ===');
   nightlyLogPredictions_(sheet);
   nightlyLogActuals_(sheet);
+  nightlyLogMicroclimate_(ss);
   Logger.log('=== nightlyLog END ===');
 }
 
@@ -222,6 +223,103 @@ function nightlyLogActuals_(sheet) {
     nightlyWrite_(sheet, ds, 'actual_high', hi, 'actual_low', lo, true);
     Logger.log('Actuals ' + ds + ':  Hi:' + hi + '  Lo:' + lo + '  (' + temps.length + ' obs)');
   }
+}
+
+// ─────────────────────────────────────────────────────────────
+// MICROCLIMATE  (daily High/Low for KNCRALEI761 vs KRDU)
+// Writes to "Microclimate" tab: date, rwf_high, rwf_low, rdu_high, rdu_low
+// ─────────────────────────────────────────────────────────────
+function nightlyLogMicroclimate_(ss) {
+  var sheet = ss.getSheetByName('Microclimate');
+  if (!sheet) { Logger.log('WARNING: Microclimate sheet not found — skipping microclimate log'); return; }
+
+  var opts = { headers: { 'User-Agent': 'WolfpackWeather/2.0' }, muteHttpExceptions: true };
+  var now  = new Date();
+  var ds   = Utilities.formatDate(now, TZ, 'yyyy-MM-dd');
+  var dateCompact = Utilities.formatDate(now, TZ, 'yyyyMMdd');
+
+  // ── Red Wolf Farm (KNCRALEI761) via Weather Underground ──────
+  var WU_KEY = '6532d6454b8aa370768e63d6ba5a832e';
+  var wuUrl  = 'https://api.weather.com/v2/pws/history/daily?stationId=KNCRALEI761&format=json&units=e&date=' + dateCompact + '&apiKey=' + WU_KEY;
+  var rwfHigh = null, rwfLow = null;
+  try {
+    var wuResp = UrlFetchApp.fetch(wuUrl, opts);
+    if (wuResp.getResponseCode() === 200) {
+      var wuObs = JSON.parse(wuResp.getContentText()).observations;
+      if (wuObs && wuObs.length > 0) {
+        var imp = wuObs[0].imperial;
+        if (imp && imp.highTemp != null) rwfHigh = Math.round(imp.highTemp);
+        if (imp && imp.lowTemp  != null) rwfLow  = Math.round(imp.lowTemp);
+      }
+    } else {
+      Logger.log('MC WU fetch failed: HTTP ' + wuResp.getResponseCode());
+    }
+  } catch (e) {
+    Logger.log('MC WU fetch error: ' + e.message);
+  }
+
+  // ── RDU Airport (KRDU) via NWS hourly observations ──────────
+  var startLocal = new Date(now.getFullYear(), now.getMonth(), now.getDate(),  0,  0,  0);
+  var endLocal   = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+  var obsS = encodeURIComponent(startLocal.toISOString());
+  var obsE = encodeURIComponent(endLocal.toISOString());
+  var nwsUrl = 'https://api.weather.gov/stations/KRDU/observations?start=' + obsS + '&end=' + obsE + '&limit=200';
+  var rduHigh = null, rduLow = null;
+  try {
+    var nwsResp = UrlFetchApp.fetch(nwsUrl, opts);
+    if (nwsResp.getResponseCode() === 200) {
+      var features = JSON.parse(nwsResp.getContentText()).features || [];
+      var temps = features.reduce(function(a, f) {
+        var t = f.properties && f.properties.temperature && f.properties.temperature.value;
+        if (t != null) a.push(t * 9/5 + 32);
+        return a;
+      }, []);
+      if (temps.length) {
+        rduHigh = Math.round(Math.max.apply(null, temps));
+        rduLow  = Math.round(Math.min.apply(null, temps));
+      } else {
+        Logger.log('MC NWS: 0 temperature readings for ' + ds);
+      }
+    } else {
+      Logger.log('MC NWS fetch failed: HTTP ' + nwsResp.getResponseCode());
+    }
+  } catch (e) {
+    Logger.log('MC NWS fetch error: ' + e.message);
+  }
+
+  // ── Write to Microclimate sheet ──────────────────────────────
+  if (rwfHigh === null && rwfLow === null && rduHigh === null && rduLow === null) {
+    Logger.log('MC: no data retrieved — skipping write for ' + ds);
+    return;
+  }
+
+  var data    = sheet.getDataRange().getValues();
+  var headers = data[0].map(function(h) { return String(h).trim(); });
+  var dateCol = headers.indexOf('date');
+  if (dateCol < 0) dateCol = 0;
+
+  // Find or create row for today
+  var rowIdx = -1;
+  for (var i = 1; i < data.length; i++) {
+    if (normDateStr_(data[i][dateCol]) === ds) { rowIdx = i; break; }
+  }
+  if (rowIdx < 0) {
+    var newRow = new Array(headers.length).fill('');
+    newRow[dateCol] = ds;
+    sheet.appendRow(newRow);
+    data   = sheet.getDataRange().getValues();
+    rowIdx = data.length - 1;
+    Logger.log('MC: created new row for ' + ds);
+  }
+
+  var cols = { rwf_high: rwfHigh, rwf_low: rwfLow, rdu_high: rduHigh, rdu_low: rduLow };
+  Object.keys(cols).forEach(function(k) {
+    var ci = headers.indexOf(k);
+    if (ci >= 0 && cols[k] !== null) sheet.getRange(rowIdx + 1, ci + 1).setValue(cols[k]);
+    else if (ci < 0) Logger.log('MC WARNING: column "' + k + '" not found in Microclimate sheet headers');
+  });
+
+  Logger.log('MC ' + ds + ':  RWF Hi:' + rwfHigh + ' Lo:' + rwfLow + '  |  RDU Hi:' + rduHigh + ' Lo:' + rduLow);
 }
 
 // ─────────────────────────────────────────────────────────────
