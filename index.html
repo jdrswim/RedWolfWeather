@@ -1005,6 +1005,19 @@ function todayObsHigh(hourly,dailyMax){
   });
   return best>-Infinity?Math.round(best):(dailyMax!=null?Math.round(dailyMax):"--");
 }
+function todayObsLow(hourly,dailyMin){
+  // Use observed hourly temps up to NOW so we don't show tonight's forecast low as today's low
+  if(!hourly||!hourly.time)return dailyMin!=null?Math.round(dailyMin):"--";
+  var now=new Date();
+  var pad=function(n){return n<10?"0"+n:""+n;};
+  var ds=now.getFullYear()+"-"+pad(now.getMonth()+1)+"-"+pad(now.getDate());
+  var best=Infinity;
+  hourly.time.forEach(function(t,i){
+    if(t.substring(0,10)===ds&&new Date(t)<=now&&hourly.temperature_2m[i]!=null)
+      best=Math.min(best,hourly.temperature_2m[i]);
+  });
+  return best<Infinity?Math.round(best):(dailyMin!=null?Math.round(dailyMin):"--");
+}
 
 function fetchConditions(){
   var custLoc=wxGetCustLoc();
@@ -1040,7 +1053,7 @@ function fetchConditions(){
     var obs=dCur&&dCur.observations&&dCur.observations[0];
     if(!obs){
       // WU current failed — fall back to Open-Meteo
-      if(dOm){var c=dOm.current,dl=dOm.daily;applyConditions(Math.round(c.temperature_2m),Math.round(c.apparent_temperature),Math.round(c.dew_point_2m),Math.round(c.relative_humidity_2m),Math.round(c.wind_speed_10m),Math.round(c.wind_direction_10m),Math.round(c.wind_gusts_10m),(c.surface_pressure*0.02953).toFixed(2),c.precipitation.toFixed(2),Math.round(c.uv_index),todayObsHigh(dOm.hourly,dl.temperature_2m_max[0]),Math.round(dl.temperature_2m_min[0]),c.weather_code,dOm.hourly);$("cupd").textContent=$("cupd").textContent+" (Open-Meteo fallback)";}
+      if(dOm){var c=dOm.current,dl=dOm.daily;applyConditions(Math.round(c.temperature_2m),Math.round(c.apparent_temperature),Math.round(c.dew_point_2m),Math.round(c.relative_humidity_2m),Math.round(c.wind_speed_10m),Math.round(c.wind_direction_10m),Math.round(c.wind_gusts_10m),(c.surface_pressure*0.02953).toFixed(2),c.precipitation.toFixed(2),Math.round(c.uv_index),todayObsHigh(dOm.hourly,dl.temperature_2m_max[0]),todayObsLow(dOm.hourly,dl.temperature_2m_min[0]),c.weather_code,dOm.hourly);$("cupd").textContent=$("cupd").textContent+" (Open-Meteo fallback)";}
       else{$("cupd").textContent="Data unavailable";}
       return;
     }
@@ -1061,7 +1074,7 @@ function fetchConditions(){
     var code=dOm&&dOm.current?dOm.current.weather_code:0;
     var hi=todayObsHigh(dOm&&dOm.hourly,dOm&&dOm.daily?dOm.daily.temperature_2m_max[0]:null);
     if(typeof temp==="number"&&typeof hi==="number")hi=Math.max(hi,temp);
-    var lo=dOm&&dOm.daily?Math.round(dOm.daily.temperature_2m_min[0]):"--";
+    var lo=todayObsLow(dOm&&dOm.hourly,dOm&&dOm.daily?dOm.daily.temperature_2m_min[0]:null);
     window._todayObsLo=lo;
     applyConditions(temp,feels,dew,humid,wspd,wdir,gust,pres,prec,uvi,hi,lo,code,dOm&&dOm.hourly||null);
   }).catch(function(){
@@ -1069,8 +1082,8 @@ function fetchConditions(){
     .then(function(r){return r.json();})
     .then(function(d){
       var c=d.current,dl=d.daily;
-      window._todayObsLo=Math.round(dl.temperature_2m_min[0]);
-      applyConditions(Math.round(c.temperature_2m),Math.round(c.apparent_temperature),Math.round(c.dew_point_2m),Math.round(c.relative_humidity_2m),Math.round(c.wind_speed_10m),Math.round(c.wind_direction_10m),Math.round(c.wind_gusts_10m),(c.surface_pressure*0.02953).toFixed(2),c.precipitation.toFixed(2),Math.round(c.uv_index),todayObsHigh(d.hourly,dl.temperature_2m_max[0]),Math.round(dl.temperature_2m_min[0]),c.weather_code,d.hourly);
+      window._todayObsLo=todayObsLow(d.hourly,dl.temperature_2m_min[0]);
+      applyConditions(Math.round(c.temperature_2m),Math.round(c.apparent_temperature),Math.round(c.dew_point_2m),Math.round(c.relative_humidity_2m),Math.round(c.wind_speed_10m),Math.round(c.wind_direction_10m),Math.round(c.wind_gusts_10m),(c.surface_pressure*0.02953).toFixed(2),c.precipitation.toFixed(2),Math.round(c.uv_index),todayObsHigh(d.hourly,dl.temperature_2m_max[0]),todayObsLow(d.hourly,dl.temperature_2m_min[0]),c.weather_code,d.hourly);
       $("cupd").textContent=$("cupd").textContent+" (Open-Meteo fallback)";
     })
     .catch(function(){$("cupd").textContent="Data unavailable";});
@@ -1915,7 +1928,7 @@ function fetchYesterdayExtremes(){
   var now=new Date();
   var yestDate=new Date(now.getTime()-24*60*60*1000);
   var yestStr=yestDate.toLocaleDateString('en-CA',{timeZone:'America/New_York'});
-  var cacheKey='extremes_v9_'+yestStr;
+  var cacheKey='extremes_v10_'+yestStr;
   try{
     var cached=JSON.parse(localStorage.getItem(cacheKey)||'null');
     if(cached){renderExtremes(cached);return;}
@@ -1969,15 +1982,25 @@ function fetchYesterdayExtremes(){
     });
     hiCands.sort(function(a,b){return b.temp-a.temp;});
     loCands.sort(function(a,b){return a.temp-b.temp;});
-    // Gap filter: if the most extreme reading is >12°F isolated from its neighbors, it's a bad sensor.
-    // A legitimate cold mountain station will have other stations in the same ballpark;
-    // a broken sensor (e.g. FFA reporting 19°F when everyone else is 33°F+) has a huge gap.
-    while(loCands.length>=2&&(loCands[1].temp-loCands[0].temp)>12)loCands.shift();
-    while(hiCands.length>=2&&(hiCands[0].temp-hiCands[1].temp)>12)hiCands.shift();
+    // Gap filter: drop the extreme reading if it's isolated from its nearest neighbor by >8°F.
+    // Catches single bad sensors (e.g. coastal station reporting 19°F while everyone else is 33°F+).
+    while(loCands.length>=2&&(loCands[1].temp-loCands[0].temp)>8)loCands.shift();
+    while(hiCands.length>=2&&(hiCands[0].temp-hiCands[1].temp)>8)hiCands.shift();
+    // Percentile outlier filter: if the extreme is >12°F away from the 10th-percentile reading,
+    // it's a cluster of bad sensors (e.g. two malfunctioning stations near each other).
+    // This catches cases where the gap filter misses multiple co-located bad sensors.
+    if(loCands.length>=10){
+      var p10lo=loCands[Math.floor(loCands.length*0.1)];
+      while(loCands.length>=10&&(p10lo.temp-loCands[0].temp)>12){loCands.shift();p10lo=loCands[Math.floor(loCands.length*0.1)];}
+    }
+    if(hiCands.length>=10){
+      var p10hi=hiCands[Math.floor(hiCands.length*0.9)];
+      while(hiCands.length>=10&&(hiCands[0].temp-p10hi.temp)>12){hiCands.shift();p10hi=hiCands[Math.floor(hiCands.length*0.9)];}
+    }
     // Physics filter: a sea-level station cannot be colder than a mountain station.
-    // If the coldest candidate is at <500ft but there are stations at >2000ft that are
+    // If the coldest candidate is at <500ft but there are stations at >1500ft that are
     // WARMER, that's physically impossible — the low-elevation reading is bad data.
-    var highland=loCands.filter(function(c){return c.elev!=null&&c.elev>2000;});
+    var highland=loCands.filter(function(c){return c.elev!=null&&c.elev>1500;});
     while(loCands.length>=2&&highland.length>0&&loCands[0].elev!=null&&loCands[0].elev<500&&loCands[0].temp<highland[0].temp){
       loCands.shift();
     }
