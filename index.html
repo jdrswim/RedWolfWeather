@@ -656,6 +656,7 @@ footer strong{color:var(--red)}
 <!-- ============================================================ ALMANAC TAB -->
 <div class="tab-pane" id="tab-almanac">
 <div class="alm-wrap">
+  <div id="extremes-section"></div>
   <div id="sun-dashboard"></div>
   <div class="sec" style="margin-top:28px">Raleigh Wx Almanac <em>- RDU Airport - Historical Climate Data</em> <div class="tip-btn" onclick="openTip('tipAlmanac')">?</div></div>
   <div id="alm-content"><div class="alm-ld"><div class="tsps-spinner"></div>Loading climate data...</div></div>
@@ -711,8 +712,8 @@ function switchTab(name,btn){
   $("tab-"+name).classList.add("active");
   btn.classList.add("active");
   if(window.pendo){pendo.pageLoad({url:'/#'+name});}
-  if(name==="almanac"&&!window._almLoaded){fetchAlmanac();fetchSunData();accFetchAndRender();}
-  else if(name==="almanac"){fetchSunData();accFetchAndRender();}
+  if(name==="almanac"&&!window._almLoaded){fetchAlmanac();fetchSunData();accFetchAndRender();fetchYesterdayExtremes();}
+  else if(name==="almanac"){fetchSunData();accFetchAndRender();fetchYesterdayExtremes();}
   if(name==="pws"){fetchPWS();}
   if(name==="aerospace"&&!window._rktLoaded){fetchRockets();}
 }
@@ -1905,6 +1906,79 @@ function almRender(byDay,el,now,yr,curMo,curDay,src){
   window._almLoaded=true;
 }
 
+function fetchYesterdayExtremes(){
+  var el=$('extremes-section');if(!el)return;
+  var now=new Date();
+  var yest=new Date(now.getFullYear(),now.getMonth(),now.getDate()-1);
+  var yestStr=yest.toISOString().split('T')[0];
+  var cacheKey='extremes_v1_'+yestStr;
+  try{
+    var cached=JSON.parse(localStorage.getItem(cacheKey)||'null');
+    if(cached){renderExtremes(cached);return;}
+  }catch(e){}
+  el.innerHTML='<div class="acc-score-row" style="margin-bottom:20px">'+
+    ['NC HIGH','NC LOW','USA HIGH','USA LOW'].map(function(lbl){
+      return'<div class="acc-score-card"><div class="acc-score-lbl">'+lbl+'</div>'+
+        '<div class="acc-score-val" style="color:var(--mu)">--</div>'+
+        '<div class="acc-score-sub" style="min-height:18px"><div class="tsps-spinner" style="width:14px;height:14px;margin:0 auto"></div></div></div>';
+    }).join('')+'</div>';
+  var IEM='https://mesonet.agron.iastate.edu/api/1/daily.geojson?date='+yestStr+'&network=';
+  var US_NETS=['AL_ASOS','AK_ASOS','AZ_ASOS','AR_ASOS','CA_ASOS','CO_ASOS','CT_ASOS','DE_ASOS',
+    'FL_ASOS','GA_ASOS','HI_ASOS','ID_ASOS','IL_ASOS','IN_ASOS','IA_ASOS','KS_ASOS','KY_ASOS',
+    'LA_ASOS','ME_ASOS','MD_ASOS','MA_ASOS','MI_ASOS','MN_ASOS','MS_ASOS','MO_ASOS','MT_ASOS',
+    'NE_ASOS','NV_ASOS','NH_ASOS','NJ_ASOS','NM_ASOS','NY_ASOS','NC_ASOS','ND_ASOS','OH_ASOS',
+    'OK_ASOS','OR_ASOS','PA_ASOS','RI_ASOS','SC_ASOS','SD_ASOS','TN_ASOS','TX_ASOS','UT_ASOS',
+    'VT_ASOS','VA_ASOS','WA_ASOS','WV_ASOS','WI_ASOS','WY_ASOS'];
+  function fetchNet(net){
+    return fetch(IEM+net).then(function(r){return r.json();}).catch(function(){return null;});
+  }
+  function extractExtremes(data){
+    var hi=null,hiStn='',lo=null,loStn='';
+    if(!data||!data.features)return{hi:hi,hiStn:hiStn,lo:lo,loStn:loStn};
+    data.features.forEach(function(f){
+      var p=f.properties;
+      var mx=p.max_tmpf,mn=p.min_tmpf,stn=p.station||'';
+      if(mx!==null&&mx!==undefined&&!isNaN(mx)){if(hi===null||mx>hi){hi=mx;hiStn=stn;}}
+      if(mn!==null&&mn!==undefined&&!isNaN(mn)){if(lo===null||mn<lo){lo=mn;loStn=stn;}}
+    });
+    return{hi:hi,hiStn:hiStn,lo:lo,loStn:loStn};
+  }
+  Promise.all(US_NETS.map(fetchNet)).then(function(results){
+    var ncEx={hi:null,hiStn:'',lo:null,loStn:''};
+    var usHi=null,usHiStn='',usLo=null,usLoStn='';
+    results.forEach(function(data,i){
+      var ex=extractExtremes(data);
+      if(US_NETS[i]==='NC_ASOS')ncEx=ex;
+      if(ex.hi!==null&&(usHi===null||ex.hi>usHi)){usHi=ex.hi;usHiStn=ex.hiStn;}
+      if(ex.lo!==null&&(usLo===null||ex.lo<usLo)){usLo=ex.lo;usLoStn=ex.loStn;}
+    });
+    var result={ncHi:ncEx.hi,ncHiStn:ncEx.hiStn,ncLo:ncEx.lo,ncLoStn:ncEx.loStn,usHi:usHi,usHiStn:usHiStn,usLo:usLo,usLoStn:usLoStn,yestStr:yestStr};
+    try{localStorage.setItem(cacheKey,JSON.stringify(result));}catch(e){}
+    renderExtremes(result);
+  }).catch(function(){
+    el.innerHTML='<div style="color:var(--mu);font-size:13px;text-align:center;padding:12px">Could not load temperature extremes.</div>';
+  });
+  function renderExtremes(r){
+    var yestLabel=yest.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+    function card(lbl,temp,stn,color){
+      var val=temp!==null?Math.round(temp)+'°F':'--';
+      return'<div class="acc-score-card">'+
+        '<div class="acc-score-lbl">'+lbl+'</div>'+
+        '<div class="acc-score-val" style="color:'+(temp!==null?color:'var(--mu)')+'">'+val+'</div>'+
+        '<div class="acc-score-sub">'+(stn||'N/A')+'</div>'+
+      '</div>';
+    }
+    el.innerHTML=
+      '<div class="mc-subhdr" style="margin-top:0">Yesterday\'s Temperature Extremes <em>— '+yestLabel+'</em></div>'+
+      '<div class="acc-score-row" style="margin-bottom:20px">'+
+        card('NC HIGH',r.ncHi,r.ncHiStn,'#ef4444')+
+        card('NC LOW',r.ncLo,r.ncLoStn,'#60a5fa')+
+        card('USA HIGH',r.usHi,r.usHiStn,'#ef4444')+
+        card('USA LOW',r.usLo,r.usLoStn,'#60a5fa')+
+      '</div>';
+  }
+}
+
 function fetchAlmanac(){
   var el=$('alm-content');
   var now=new Date(),yr=now.getFullYear(),curMo=now.getMonth(),curDay=now.getDate();
@@ -2650,8 +2724,9 @@ function mcBuildHistory(rows){
   }
 
   var periods=[
-    {label:"Yesterday", acc:accumulate(null,yestStr)},
-    {label:"Last 7 Days", acc:accumulate(week1,null)},
+    {label:"Today",        acc:accumulate(null,todayStr)},
+    {label:"Yesterday",    acc:accumulate(null,yestStr)},
+    {label:"Last 7 Days",  acc:accumulate(week1,null)},
     {label:"Last 30 Days", acc:accumulate(month1,null)},
     {label:"YTD "+now.getFullYear(), acc:accumulate(ytdCutoff,null)}
   ];
