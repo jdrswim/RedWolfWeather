@@ -2431,7 +2431,7 @@ function fetchPWS(){
     .catch(function(){return{id:st.id,name:st.name,loc:st.loc,own:st.own,ok:false};});
   });
   Promise.all(promises).then(function(results){
-    var html='<div class="mc-subhdr" style="margin-top:28px">🌿 Friends of the Farm <em style="font-weight:500;font-size:11px;color:var(--mu);letter-spacing:1px">— Local Stations Around Wake County</em></div>'+
+    var html='<div class="mc-hdr" style="margin-top:28px">🌿 Friends of the Farm <em>— Local Stations Around Wake County</em></div>'+
       '<div style="display:flex;flex-direction:column;gap:16px">';
     results.forEach(function(st){
       var isOwn=st.own;
