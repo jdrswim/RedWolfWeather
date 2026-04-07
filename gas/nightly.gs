@@ -259,8 +259,8 @@ function nightlyLogMicroclimate_(ss) {
       var wuObs = JSON.parse(wuResp.getContentText()).observations;
       if (wuObs && wuObs.length > 0) {
         var imp = wuObs[0].imperial;
-        if (imp && imp.highTemp != null) rwfHigh = Math.round(imp.highTemp);
-        if (imp && imp.lowTemp  != null) rwfLow  = Math.round(imp.lowTemp);
+        if (imp && imp.tempHigh != null) rwfHigh = Math.round(imp.tempHigh);
+        if (imp && imp.tempLow  != null) rwfLow  = Math.round(imp.tempLow);
       }
     } else {
       Logger.log('MC WU fetch failed: HTTP ' + wuResp.getResponseCode());

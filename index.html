@@ -2605,8 +2605,8 @@ function mcBuildHistory(rows){
     var ts=dateField?new Date(dateField.length===10?dateField+'T12:00:00':dateField):new Date(NaN);
     var rwfHi=parseFloat(r.rwf_high),rwfLo=parseFloat(r.rwf_low);
     var rduHi=parseFloat(r.rdu_high),rduLo=parseFloat(r.rdu_low);
-    if(isNaN(ts.getTime())||isNaN(rwfHi)||isNaN(rwfLo)||isNaN(rduHi)||isNaN(rduLo))return null;
-    return{ts:ts,date:dateField,rwfHi:rwfHi,rwfLo:rwfLo,rduHi:rduHi,rduLo:rduLo};
+    if(isNaN(ts.getTime())||isNaN(rduHi)||isNaN(rduLo))return null;
+    return{ts:ts,date:dateField,rwfHi:isNaN(rwfHi)?null:rwfHi,rwfLo:isNaN(rwfLo)?null:rwfLo,rduHi:rduHi,rduLo:rduLo};
   }
   var parsed=rows.map(parseRow).filter(Boolean);
 
@@ -2614,7 +2614,8 @@ function mcBuildHistory(rows){
     var acc={rwfHiSum:0,rwfLoSum:0,rduHiSum:0,rduLoSum:0,count:0};
     parsed.forEach(function(r){
       if(singleDay){if(r.date!==singleDay)return;}
-      else{if(r.ts<cutoff||r.date===todayStr)return;} // exclude today (not complete yet)
+      else{if(r.ts<cutoff||r.date===todayStr)return;}
+      if(r.rwfHi===null||r.rwfLo===null)return; // need both stations for differential
       acc.rwfHiSum+=r.rwfHi;acc.rwfLoSum+=r.rwfLo;
       acc.rduHiSum+=r.rduHi;acc.rduLoSum+=r.rduLo;
       acc.count++;
@@ -2684,18 +2685,18 @@ function mcBuildHistory(rows){
         '<th style="padding:6px 8px;border-bottom:1px solid var(--bd);text-align:center">Lo Diff</th>'+
       '</tr></thead><tbody>';
     recent.forEach(function(r,i){
-      var hiDiff=r.rwfHi-r.rduHi,loDiff=r.rwfLo-r.rduLo;
-      var hiTag=tag(hiDiff),loTag=tag(loDiff);
+      var hasRwf=r.rwfHi!==null&&r.rwfLo!==null;
+      var hiDiff=hasRwf?r.rwfHi-r.rduHi:null,loDiff=hasRwf?r.rwfLo-r.rduLo:null;
       var bg=i%2===0?'background:var(--p2)':'';
       var dateLabel=r.ts.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});
       html+='<tr style="'+bg+'">'+
         '<td style="padding:6px 8px">'+dateLabel+'</td>'+
-        '<td style="padding:6px 8px;text-align:center">'+r.rwfHi+'°</td>'+
-        '<td style="padding:6px 8px;text-align:center">'+r.rwfLo+'°</td>'+
+        '<td style="padding:6px 8px;text-align:center">'+(hasRwf?r.rwfHi+'°':'--')+'</td>'+
+        '<td style="padding:6px 8px;text-align:center">'+(hasRwf?r.rwfLo+'°':'--')+'</td>'+
         '<td style="padding:6px 8px;text-align:center">'+r.rduHi+'°</td>'+
         '<td style="padding:6px 8px;text-align:center">'+r.rduLo+'°</td>'+
-        '<td style="padding:6px 8px;text-align:center"><span class="mc-diff-tag '+hiTag+'" style="font-size:9px">'+diffSign(hiDiff)+'°</span></td>'+
-        '<td style="padding:6px 8px;text-align:center"><span class="mc-diff-tag '+loTag+'" style="font-size:9px">'+diffSign(loDiff)+'°</span></td>'+
+        '<td style="padding:6px 8px;text-align:center">'+(hiDiff!==null?'<span class="mc-diff-tag '+tag(hiDiff)+'" style="font-size:9px">'+diffSign(hiDiff)+'°</span>':'--')+'</td>'+
+        '<td style="padding:6px 8px;text-align:center">'+(loDiff!==null?'<span class="mc-diff-tag '+tag(loDiff)+'" style="font-size:9px">'+diffSign(loDiff)+'°</span>':'--')+'</td>'+
       '</tr>';
     });
     html+='</tbody></table></div>';
