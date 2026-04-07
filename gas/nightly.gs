@@ -371,6 +371,86 @@ function nightlyWrite_(sheet, dateStr, key1, val1, key2, val2, overwrite) {
 }
 
 // ─────────────────────────────────────────────────────────────
+// MICROCLIMATE  (RWF vs RDU daily hi/lo — logged at 8 PM)
+// Sheet tab: "Microclimate"
+// Columns:   date | rwf_hi | rwf_lo | rdu_hi | rdu_lo
+//
+// TO SET UP (one time):
+//   In the Google Sheet, add a tab named "Microclimate" with
+//   row 1 headers:  date  rwf_hi  rwf_lo  rdu_hi  rdu_lo
+// ─────────────────────────────────────────────────────────────
+var WU_API_KEY = '6532d6454b8aa370768e63d6ba5a832e';
+
+function nightlyLogMicroclimate_(ss) {
+  var sheet = ss.getSheetByName('Microclimate');
+  if (!sheet) { Logger.log('SKIP microclimate: "Microclimate" tab not found — create it with headers: date|rwf_hi|rwf_lo|rdu_hi|rdu_lo'); return; }
+
+  var opts = { headers: { 'User-Agent': 'WolfpackWeather/2.0' }, muteHttpExceptions: true };
+  var now  = new Date();
+
+  // ── RWF: Weather Underground 7-day daily summary ─────────────
+  var wuUrl = 'https://api.weather.com/v2/pws/dailysummary/7day?stationId=KNCRALEI761' +
+              '&format=json&units=e&apiKey=' + WU_API_KEY;
+  var wuResp = UrlFetchApp.fetch(wuUrl, opts);
+  var rwfByDate = {};
+  if (wuResp.getResponseCode() === 200) {
+    var summaries = JSON.parse(wuResp.getContentText()).summaries || [];
+    summaries.forEach(function(s) {
+      var ds = s.obsTimeLocal ? s.obsTimeLocal.substring(0, 10) : '';
+      if (!ds) return;
+      var imp = s.imperial || {};
+      var hi = (imp.tempHigh != null) ? imp.tempHigh : null;
+      var lo = (imp.tempLow  != null) ? imp.tempLow  : null;
+      if (hi !== null && lo !== null) rwfByDate[ds] = { hi: hi, lo: lo };
+    });
+    Logger.log('MC RWF WU summaries: ' + Object.keys(rwfByDate).length + ' days');
+  } else {
+    Logger.log('MC WU daily summary failed: HTTP ' + wuResp.getResponseCode());
+  }
+
+  // ── RDU: NWS KRDU hourly observations → daily hi/lo ──────────
+  var rduByDate = {};
+  for (var daysBack = 0; daysBack <= 6; daysBack++) {
+    var td = new Date(now.getFullYear(), now.getMonth(), now.getDate() - daysBack);
+    var ds = Utilities.formatDate(td, TZ, 'yyyy-MM-dd');
+    var startLocal = new Date(td.getFullYear(), td.getMonth(), td.getDate(),  0,  0,  0);
+    var endLocal   = new Date(td.getFullYear(), td.getMonth(), td.getDate(), 23, 59, 59);
+    var url = 'https://api.weather.gov/stations/KRDU/observations?start=' +
+              encodeURIComponent(startLocal.toISOString()) + '&end=' +
+              encodeURIComponent(endLocal.toISOString()) + '&limit=200';
+    var resp = UrlFetchApp.fetch(url, opts);
+    if (resp.getResponseCode() !== 200) {
+      Logger.log('MC RDU obs failed ' + ds + ' (HTTP ' + resp.getResponseCode() + ')');
+      continue;
+    }
+    var temps = (JSON.parse(resp.getContentText()).features || []).reduce(function(a, f) {
+      var t = f.properties && f.properties.temperature && f.properties.temperature.value;
+      if (t != null) a.push(t * 9/5 + 32);
+      return a;
+    }, []);
+    if (temps.length) {
+      rduByDate[ds] = {
+        hi: Math.round(Math.max.apply(null, temps)),
+        lo: Math.round(Math.min.apply(null, temps))
+      };
+    }
+  }
+
+  // ── Write rows where both RWF and RDU data are available ──────
+  var wrote = 0;
+  Object.keys(rwfByDate).forEach(function(ds) {
+    if (!rduByDate[ds]) return;
+    var rwf = rwfByDate[ds], rdu = rduByDate[ds];
+    nightlyWrite_(sheet, ds, 'rwf_hi', rwf.hi, 'rwf_lo', rwf.lo, true);
+    nightlyWrite_(sheet, ds, 'rdu_hi', rdu.hi, 'rdu_lo', rdu.lo, true);
+    Logger.log('MC ' + ds + ':  RWF H:' + rwf.hi + ' L:' + rwf.lo +
+               '  RDU H:' + rdu.hi + ' L:' + rdu.lo);
+    wrote++;
+  });
+  Logger.log('MC microclimate written: ' + wrote + ' dates');
+}
+
+// ─────────────────────────────────────────────────────────────
 // HELPERS
 // ─────────────────────────────────────────────────────────────
 

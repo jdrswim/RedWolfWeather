@@ -1062,12 +1062,14 @@ function fetchConditions(){
     var hi=todayObsHigh(dOm&&dOm.hourly,dOm&&dOm.daily?dOm.daily.temperature_2m_max[0]:null);
     if(typeof temp==="number"&&typeof hi==="number")hi=Math.max(hi,temp);
     var lo=dOm&&dOm.daily?Math.round(dOm.daily.temperature_2m_min[0]):"--";
+    window._todayObsLo=lo;
     applyConditions(temp,feels,dew,humid,wspd,wdir,gust,pres,prec,uvi,hi,lo,code,dOm&&dOm.hourly||null);
   }).catch(function(){
     fetch("https://api.open-meteo.com/v1/forecast?latitude=35.686&longitude=-78.614&current=temperature_2m,apparent_temperature,relative_humidity_2m,dew_point_2m,wind_speed_10m,wind_gusts_10m,wind_direction_10m,surface_pressure,precipitation,weather_code,uv_index&hourly=temperature_2m,weather_code,precipitation_probability,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=America%2FNew_York&forecast_days=2")
     .then(function(r){return r.json();})
     .then(function(d){
       var c=d.current,dl=d.daily;
+      window._todayObsLo=Math.round(dl.temperature_2m_min[0]);
       applyConditions(Math.round(c.temperature_2m),Math.round(c.apparent_temperature),Math.round(c.dew_point_2m),Math.round(c.relative_humidity_2m),Math.round(c.wind_speed_10m),Math.round(c.wind_direction_10m),Math.round(c.wind_gusts_10m),(c.surface_pressure*0.02953).toFixed(2),c.precipitation.toFixed(2),Math.round(c.uv_index),todayObsHigh(d.hourly,dl.temperature_2m_max[0]),Math.round(dl.temperature_2m_min[0]),c.weather_code,d.hourly);
       $("cupd").textContent=$("cupd").textContent+" (Open-Meteo fallback)";
     })
@@ -1191,8 +1193,10 @@ function fetchExtended(){
       var isToday=date===todayDateStr;
       var dow=isToday?"Today":dt.toLocaleDateString("en-US",{weekday:"short"});
       var icon=nwsIcon(day.icon,true);
-      var loStr=day.lo!==null?day.lo+"":"--";
-      var bar=day.lo!==null?buildRangeBar(day.hi,day.lo,mn,mx):"";
+      // For "Today": use the observed daily low (already happened) rather than tonight's forecast low
+      var loVal=isToday&&window._todayObsLo!=null?window._todayObsLo:day.lo;
+      var loStr=loVal!==null?loVal+"":"--";
+      var bar=loVal!==null?buildRangeBar(day.hi,loVal,mn,mx):"";
       h+='<div class="ext-day'+(isToday?" today":"")+'">'+
         '<div class="ext-dow">'+dow+'</div>'+
         '<div class="ext-date">'+date+'</div>'+
@@ -2765,10 +2769,13 @@ function mcBuildHistory(rows){
   }
 
   function diffSign(v){return(v>0?"+":"")+v.toFixed(1);}
-  function tag(diff){return Math.abs(diff)<0.3?"same":(diff<0?"cooler":"warmer");}
-  function tagLbl(diff){return Math.abs(diff)<0.3?"SAME":(diff<0?"COOLER":"WARMER");}
-
   function diffColor(d){return Math.abs(d)<0.3?'var(--green)':(d>0?'#ef4444':'#60a5fa');}
+  function whoWarmer(v){
+    if(Math.abs(v)<0.5)return'<span style="color:var(--mu);font-size:9px">SAME</span>';
+    return v>0
+      ?'<span style="color:#ef6c6c;font-size:9px">RDU WARMER</span>'
+      :'<span style="color:#6ab4f5;font-size:9px">RWF WARMER</span>';
+  }
 
   function buildSummaryCard(label,acc){
     var noData=acc.count===0;
@@ -2803,6 +2810,41 @@ function mcBuildHistory(rows){
     '<div class="acc-score-row" style="margin-bottom:20px">';
   periods.forEach(function(p){html+=buildSummaryCard(p.label,p.acc);});
   html+='</div>';
+
+  // Yesterday detail card
+  var yest=parsed.find(function(r){return r.date===yestStr;});
+  if(yest&&yest.rwfHi!==null){
+    var yhiD=yest.rduHi-yest.rwfHi, yloD=yest.rduLo-yest.rwfLo;
+    var yLabel=new Date(yestStr+'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+    html+='<div style="background:var(--p2);border:1px solid var(--bd);border-radius:10px;padding:14px 16px;margin-bottom:12px">'+
+      '<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:var(--mu);text-transform:uppercase;margin-bottom:8px">Yesterday &mdash; '+yLabel+'</div>'+
+      '<div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center">'+
+        '<div style="text-align:center">'+
+          '<div style="font-size:9px;color:#d4a843;font-weight:700;letter-spacing:1px">🐺 RED WOLF FARM</div>'+
+          '<div style="margin-top:4px;font-size:13px;font-weight:700;color:var(--wh)">'+Math.round(yest.rwfHi)+'° <span style="color:#6ab4f5">'+Math.round(yest.rwfLo)+'°</span></div>'+
+          '<div style="font-size:8px;color:var(--mu)">Hi / Lo</div>'+
+        '</div>'+
+        '<div style="text-align:center;font-size:10px;color:var(--mu)">vs</div>'+
+        '<div style="text-align:center">'+
+          '<div style="font-size:9px;color:#44aaee;font-weight:700;letter-spacing:1px">✈ RDU AIRPORT</div>'+
+          '<div style="margin-top:4px;font-size:13px;font-weight:700;color:var(--wh)">'+Math.round(yest.rduHi)+'° <span style="color:#6ab4f5">'+Math.round(yest.rduLo)+'°</span></div>'+
+          '<div style="font-size:8px;color:var(--mu)">Hi / Lo</div>'+
+        '</div>'+
+      '</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--bd)">'+
+        '<div style="text-align:center">'+
+          '<div style="font-size:8px;color:var(--mu);margin-bottom:2px">HIGH DIFF</div>'+
+          '<div style="font-size:15px;font-weight:700;color:'+diffColor(yhiD)+'">'+diffSign(yhiD)+'°</div>'+
+          whoWarmer(yhiD)+
+        '</div>'+
+        '<div style="text-align:center">'+
+          '<div style="font-size:8px;color:var(--mu);margin-bottom:2px">LOW DIFF</div>'+
+          '<div style="font-size:15px;font-weight:700;color:'+diffColor(yloD)+'">'+diffSign(yloD)+'°</div>'+
+          whoWarmer(yloD)+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  }
 
   // Daily breakdown last 7 days
   var recent=parsed.filter(function(r){return r.ts>=week1&&r.date!==todayStr;});
