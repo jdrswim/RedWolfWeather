@@ -656,7 +656,6 @@ footer strong{color:var(--red)}
 <!-- ============================================================ ALMANAC TAB -->
 <div class="tab-pane" id="tab-almanac">
 <div class="alm-wrap">
-  <div id="extremes-section"></div>
   <div id="sun-dashboard"></div>
   <div class="sec" style="margin-top:28px">Raleigh Wx Almanac <em>- RDU Airport - Historical Climate Data</em> <div class="tip-btn" onclick="openTip('tipAlmanac')">?</div></div>
   <div id="alm-content"><div class="alm-ld"><div class="tsps-spinner"></div>Loading climate data...</div></div>
@@ -712,8 +711,8 @@ function switchTab(name,btn){
   $("tab-"+name).classList.add("active");
   btn.classList.add("active");
   if(window.pendo){pendo.pageLoad({url:'/#'+name});}
-  if(name==="almanac"&&!window._almLoaded){fetchAlmanac();fetchSunData();accFetchAndRender();fetchYesterdayExtremes();}
-  else if(name==="almanac"){fetchSunData();accFetchAndRender();fetchYesterdayExtremes();}
+  if(name==="almanac"&&!window._almLoaded){fetchAlmanac();fetchSunData();accFetchAndRender();}
+  else if(name==="almanac"){fetchSunData();accFetchAndRender();}
   if(name==="pws"){fetchPWS();}
   if(name==="aerospace"&&!window._rktLoaded){fetchRockets();}
 }
@@ -1182,7 +1181,7 @@ function fetchExtended(){
         if(i>0&&!periods[i-1].isDaytime){
           day.lo=periods[i-1].temperature;
         } else if(i+1<periods.length&&!periods[i+1].isDaytime){
-          day.lo=periods[i+1].temperature;  // fallback for first day (no prior night)
+          day.lo=periods[i+1].temperature;  // tonight's forecast (used for future days only)
         }
         // nightForecast describes the coming night (always forward-looking)
         if(i+1<periods.length&&!periods[i+1].isDaytime){
@@ -1194,7 +1193,22 @@ function fetchExtended(){
     var allHi=days.map(function(x){return x.hi;}),allLo=days.filter(function(x){return x.lo!==null;}).map(function(x){return x.lo;});
     var allT=allHi.concat(allLo);
     var mn=allT.length?Math.min.apply(null,allT):32,mx=allT.length?Math.max.apply(null,allT):90;
-
+    // Fetch today's actual observed hourly temps NOW, in the same promise chain,
+    // so there is zero race condition — the grid never renders without the observed lo.
+    var _el2=siteGetLoc();
+    var omHrUrl="https://api.open-meteo.com/v1/forecast?latitude="+_el2.lat+"&longitude="+_el2.lon+
+      "&hourly=temperature_2m&temperature_unit=fahrenheit&timezone=America%2FNew_York&forecast_days=1";
+    return Promise.all([
+      Promise.resolve({days:days,mn:mn,mx:mx}),
+      fetch(omHrUrl).then(function(r){return r.json();}).catch(function(){return null;})
+    ]);
+  })
+  .then(function(results){
+    var nws=results[0],omData=results[1];
+    var days=nws.days,mn=nws.mn,mx=nws.mx;
+    // Compute observed low from hourly temps up to NOW (not tonight's forecast)
+    var obsLo=todayObsLow(omData&&omData.hourly,null);
+    if(obsLo!=="--")window._todayObsLo=obsLo;
     var now=new Date();
     var todayDateStr=now.toLocaleDateString("en-US",{month:"short",day:"numeric"});
     var h="";
@@ -1206,8 +1220,8 @@ function fetchExtended(){
       var isToday=date===todayDateStr;
       var dow=isToday?"Today":dt.toLocaleDateString("en-US",{weekday:"short"});
       var icon=nwsIcon(day.icon,true);
-      // For "Today": use the observed daily low (already happened) rather than tonight's forecast low
-      var loVal=isToday&&window._todayObsLo!=null?window._todayObsLo:day.lo;
+      // For "Today": use the observed low (already happened this morning), not tonight's forecast low
+      var loVal=isToday?(obsLo!=="--"?obsLo:day.lo):day.lo;
       var loStr=loVal!==null?loVal+"":"--";
       var bar=loVal!==null?buildRangeBar(day.hi,loVal,mn,mx):"";
       h+='<div class="ext-day'+(isToday?" today":"")+'">'+
@@ -1921,155 +1935,6 @@ function almRender(byDay,el,now,yr,curMo,curDay,src){
     '</div>'+
     '<div class="alm-note">Data: ASOS KRDU via Iowa State Mesonet'+srcNote+' · 30-yr normals: 1991–2020 NCEI</div>';
   window._almLoaded=true;
-}
-
-function fetchYesterdayExtremes(){
-  var el=$('extremes-section');if(!el)return;
-  var now=new Date();
-  var yestDate=new Date(now.getTime()-24*60*60*1000);
-  var yestStr=yestDate.toLocaleDateString('en-CA',{timeZone:'America/New_York'});
-  var cacheKey='extremes_v10_'+yestStr;
-  try{
-    var cached=JSON.parse(localStorage.getItem(cacheKey)||'null');
-    if(cached){renderExtremes(cached);return;}
-  }catch(e){}
-  el.innerHTML='<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-bottom:20px">'+
-    ['NC HIGH','NC LOW','USA HIGH','USA LOW'].map(function(lbl){
-      return'<div class="acc-score-card"><div class="acc-score-lbl">'+lbl+'</div>'+
-        '<div class="acc-score-val" style="color:var(--mu)">--</div>'+
-        '<div class="acc-score-sub" style="min-height:18px"><div class="tsps-spinner" style="width:14px;height:14px;margin:0 auto"></div></div></div>';
-    }).join('')+'</div>';
-  var IEM='https://mesonet.agron.iastate.edu/api/1/daily.geojson?date='+yestStr+'&network=';
-  // NC: merge multiple networks so mountain road/climate sensors supplement airport ASOS
-  var NC_NETS=['NC_ASOS','NC_RWIS','NCALERT'];
-  // All other US state ASOS networks (NC handled separately above)
-  var OTHER_NETS=['AL_ASOS','AK_ASOS','AZ_ASOS','AR_ASOS','CA_ASOS','CO_ASOS','CT_ASOS','DE_ASOS',
-    'FL_ASOS','GA_ASOS','HI_ASOS','ID_ASOS','IL_ASOS','IN_ASOS','IA_ASOS','KS_ASOS','KY_ASOS',
-    'LA_ASOS','ME_ASOS','MD_ASOS','MA_ASOS','MI_ASOS','MN_ASOS','MS_ASOS','MO_ASOS','MT_ASOS',
-    'NE_ASOS','NV_ASOS','NH_ASOS','NJ_ASOS','NM_ASOS','NY_ASOS','ND_ASOS','OH_ASOS',
-    'OK_ASOS','OR_ASOS','PA_ASOS','RI_ASOS','SC_ASOS','SD_ASOS','TN_ASOS','TX_ASOS','UT_ASOS',
-    'VT_ASOS','VA_ASOS','WA_ASOS','WV_ASOS','WI_ASOS','WY_ASOS'];
-  function toTitleCase(s){return s.toLowerCase().replace(/\b\w/g,function(c){return c.toUpperCase();});}
-  function fetchNet(net){
-    return fetch(IEM+net).then(function(r){return r.json();}).then(function(d){return{net:net,data:d};}).catch(function(){return{net:net,data:null};});
-  }
-  function fetchNcMerged(){
-    return Promise.all(NC_NETS.map(function(net){
-      return fetch(IEM+net).then(function(r){return r.json();}).catch(function(){return null;});
-    })).then(function(results){
-      var features=[];
-      results.forEach(function(d){if(d&&d.features)features=features.concat(d.features);});
-      return{net:'NC',data:{features:features}};
-    });
-  }
-  function extractExtremes(data){
-    var hiCands=[],loCands=[];
-    if(!data||!data.features)return{hi:null,hiStn:'',hiName:'',hiLat:null,hiLon:null,hiElev:null,lo:null,loStn:'',loName:'',loLat:null,loLon:null,loElev:null};
-    data.features.forEach(function(f){
-      var p=f.properties;
-      var mx=p.max_tmpf,mn=p.min_tmpf;
-      var stn=p.station||'';
-      var name=p.name?toTitleCase(p.name):stn;
-      var coords=f.geometry&&f.geometry.coordinates;
-      var lon=coords?coords[0]:null,lat=coords?coords[1]:null;
-      // Elevation: IEM stores in meters under various field names
-      var elevM=p.elevation!=null?p.elevation:(p.elev!=null?p.elev:(p.elevation_m!=null?p.elevation_m:null));
-      var elevFt=elevM!=null?Math.round(elevM*3.28084):null;
-      var meta={stn:stn,name:name,lat:lat,lon:lon,elev:elevFt};
-      // Only filter physically impossible readings
-      if(mx!=null&&!isNaN(mx)&&mx>-65&&mx<135)hiCands.push(Object.assign({temp:mx},meta));
-      if(mn!=null&&!isNaN(mn)&&mn>-65&&mn<135)loCands.push(Object.assign({temp:mn},meta));
-    });
-    hiCands.sort(function(a,b){return b.temp-a.temp;});
-    loCands.sort(function(a,b){return a.temp-b.temp;});
-    // Gap filter: drop the extreme reading if it's isolated from its nearest neighbor by >8°F.
-    // Catches single bad sensors (e.g. coastal station reporting 19°F while everyone else is 33°F+).
-    while(loCands.length>=2&&(loCands[1].temp-loCands[0].temp)>8)loCands.shift();
-    while(hiCands.length>=2&&(hiCands[0].temp-hiCands[1].temp)>8)hiCands.shift();
-    // Percentile outlier filter: if the extreme is >12°F away from the 10th-percentile reading,
-    // it's a cluster of bad sensors (e.g. two malfunctioning stations near each other).
-    // This catches cases where the gap filter misses multiple co-located bad sensors.
-    if(loCands.length>=10){
-      var p10lo=loCands[Math.floor(loCands.length*0.1)];
-      while(loCands.length>=10&&(p10lo.temp-loCands[0].temp)>12){loCands.shift();p10lo=loCands[Math.floor(loCands.length*0.1)];}
-    }
-    if(hiCands.length>=10){
-      var p10hi=hiCands[Math.floor(hiCands.length*0.9)];
-      while(hiCands.length>=10&&(hiCands[0].temp-p10hi.temp)>12){hiCands.shift();p10hi=hiCands[Math.floor(hiCands.length*0.9)];}
-    }
-    // Physics filter: a sea-level station cannot be colder than a mountain station.
-    // If the coldest candidate is at <500ft but there are stations at >1500ft that are
-    // WARMER, that's physically impossible — the low-elevation reading is bad data.
-    var highland=loCands.filter(function(c){return c.elev!=null&&c.elev>1500;});
-    while(loCands.length>=2&&highland.length>0&&loCands[0].elev!=null&&loCands[0].elev<500&&loCands[0].temp<highland[0].temp){
-      loCands.shift();
-    }
-    // If the same station is both the high and low it has bad sensor data — blacklist it
-    var badStn=(hiCands.length&&loCands.length&&hiCands[0].stn&&hiCands[0].stn===loCands[0].stn)?hiCands[0].stn:'';
-    function pick(arr){for(var i=0;i<arr.length;i++){if(arr[i].stn!==badStn)return arr[i];}return null;}
-    var hW=pick(hiCands),lW=pick(loCands);
-    return{
-      hi:hW?hW.temp:null,hiStn:hW?hW.stn:'',hiName:hW?hW.name:'',hiLat:hW?hW.lat:null,hiLon:hW?hW.lon:null,hiElev:hW?hW.elev:null,
-      lo:lW?lW.temp:null,loStn:lW?lW.stn:'',loName:lW?lW.name:'',loLat:lW?lW.lat:null,loLon:lW?lW.lon:null,loElev:lW?lW.elev:null
-    };
-  }
-  Promise.all([fetchNcMerged()].concat(OTHER_NETS.map(fetchNet))).then(function(results){
-    var ncEx={hi:null,hiStn:'',hiName:'',hiLat:null,hiLon:null,hiElev:null,lo:null,loStn:'',loName:'',loLat:null,loLon:null,loElev:null};
-    var usHi=null,usHiStn='',usHiName='',usHiState='',usHiLat=null,usHiLon=null,usHiElev=null;
-    var usLo=null,usLoStn='',usLoName='',usLoState='',usLoLat=null,usLoLon=null,usLoElev=null;
-    results.forEach(function(item){
-      var ex=extractExtremes(item.data);
-      var state=item.net==='NC'?'NC':item.net.replace('_ASOS','');
-      if(item.net==='NC')ncEx=ex;
-      if(ex.hi!==null&&(usHi===null||ex.hi>usHi)){usHi=ex.hi;usHiStn=ex.hiStn;usHiName=ex.hiName;usHiState=state;usHiLat=ex.hiLat;usHiLon=ex.hiLon;usHiElev=ex.hiElev;}
-      if(ex.lo!==null&&(usLo===null||ex.lo<usLo)){usLo=ex.lo;usLoStn=ex.loStn;usLoName=ex.loName;usLoState=state;usLoLat=ex.loLat;usLoLon=ex.loLon;usLoElev=ex.loElev;}
-    });
-    var result={
-      ncHi:ncEx.hi,ncHiStn:ncEx.hiStn,ncHiName:ncEx.hiName,ncHiLat:ncEx.hiLat,ncHiLon:ncEx.hiLon,ncHiElev:ncEx.hiElev,
-      ncLo:ncEx.lo,ncLoStn:ncEx.loStn,ncLoName:ncEx.loName,ncLoLat:ncEx.loLat,ncLoLon:ncEx.loLon,ncLoElev:ncEx.loElev,
-      usHi:usHi,usHiStn:usHiStn,usHiName:usHiName,usHiState:usHiState,usHiLat:usHiLat,usHiLon:usHiLon,usHiElev:usHiElev,
-      usLo:usLo,usLoStn:usLoStn,usLoName:usLoName,usLoState:usLoState,usLoLat:usLoLat,usLoLon:usLoLon,usLoElev:usLoElev,
-      yestStr:yestStr
-    };
-    try{localStorage.setItem(cacheKey,JSON.stringify(result));}catch(e){}
-    renderExtremes(result);
-  }).catch(function(){
-    el.innerHTML='<div style="color:var(--mu);font-size:13px;text-align:center;padding:12px">Could not load temperature extremes.</div>';
-  });
-  function fmtCoord(lat,lon){
-    if(lat==null||lon==null)return'';
-    var la=Math.abs(lat).toFixed(2)+(lat>=0?'°N':'°S');
-    var lo=Math.abs(lon).toFixed(2)+(lon<=0?'°W':'°E');
-    return la+' '+lo;
-  }
-  function renderExtremes(r){
-    var yestLabel=yestDate.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric',timeZone:'America/New_York'});
-    function card(lbl,temp,name,stn,state,lat,lon,elev,color){
-      var val=temp!==null?Math.round(temp)+'°F':'--';
-      var nameLine=name?(name+(stn&&stn!==name?' · '+stn:''))+' · '+state:'N/A';
-      var coordLine=fmtCoord(lat,lon);
-      var elevLine=elev!=null?elev.toLocaleString()+' ft':'';
-      var meta=(coordLine||elevLine)?
-        '<div style="font-size:9px;color:var(--mu2);margin-top:3px;line-height:1.5">'+
-          (coordLine?coordLine:'')+(coordLine&&elevLine?' &nbsp;·&nbsp; ':'')+
-          (elevLine?elevLine:'')+
-        '</div>':'';
-      return'<div class="acc-score-card">'+
-        '<div class="acc-score-lbl">'+lbl+'</div>'+
-        '<div class="acc-score-val" style="color:'+(temp!==null?color:'var(--mu)')+'">'+val+'</div>'+
-        '<div class="acc-score-sub" style="line-height:1.4">'+nameLine+'</div>'+
-        meta+
-      '</div>';
-    }
-    el.innerHTML=
-      '<div class="sun-sec" style="justify-content:center;border-left:none;margin-top:0">Yesterday\'s Temperature Extremes <em>— '+yestLabel+'</em></div>'+
-      '<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-bottom:20px">'+
-        card('NC HIGH',r.ncHi,r.ncHiName,r.ncHiStn,'NC',r.ncHiLat,r.ncHiLon,r.ncHiElev,'#ef4444')+
-        card('NC LOW',r.ncLo,r.ncLoName,r.ncLoStn,'NC',r.ncLoLat,r.ncLoLon,r.ncLoElev,'#60a5fa')+
-        card('USA HIGH',r.usHi,r.usHiName,r.usHiStn,r.usHiState,r.usHiLat,r.usHiLon,r.usHiElev,'#ef4444')+
-        card('USA LOW',r.usLo,r.usLoName,r.usLoStn,r.usLoState,r.usLoLat,r.usLoLon,r.usLoElev,'#60a5fa')+
-      '</div>';
-  }
 }
 
 function fetchAlmanac(){
