@@ -1911,7 +1911,7 @@ function fetchYesterdayExtremes(){
   var now=new Date();
   var yestDate=new Date(now.getTime()-24*60*60*1000);
   var yestStr=yestDate.toLocaleDateString('en-CA',{timeZone:'America/New_York'});
-  var cacheKey='extremes_v7_'+yestStr;
+  var cacheKey='extremes_v8_'+yestStr;
   try{
     var cached=JSON.parse(localStorage.getItem(cacheKey)||'null');
     if(cached){renderExtremes(cached);return;}
@@ -1923,15 +1923,27 @@ function fetchYesterdayExtremes(){
         '<div class="acc-score-sub" style="min-height:18px"><div class="tsps-spinner" style="width:14px;height:14px;margin:0 auto"></div></div></div>';
     }).join('')+'</div>';
   var IEM='https://mesonet.agron.iastate.edu/api/1/daily.geojson?date='+yestStr+'&network=';
-  var US_NETS=['AL_ASOS','AK_ASOS','AZ_ASOS','AR_ASOS','CA_ASOS','CO_ASOS','CT_ASOS','DE_ASOS',
+  // NC: merge multiple networks so mountain road/climate sensors supplement airport ASOS
+  var NC_NETS=['NC_ASOS','NC_RWIS','NCALERT'];
+  // All other US state ASOS networks (NC handled separately above)
+  var OTHER_NETS=['AL_ASOS','AK_ASOS','AZ_ASOS','AR_ASOS','CA_ASOS','CO_ASOS','CT_ASOS','DE_ASOS',
     'FL_ASOS','GA_ASOS','HI_ASOS','ID_ASOS','IL_ASOS','IN_ASOS','IA_ASOS','KS_ASOS','KY_ASOS',
     'LA_ASOS','ME_ASOS','MD_ASOS','MA_ASOS','MI_ASOS','MN_ASOS','MS_ASOS','MO_ASOS','MT_ASOS',
-    'NE_ASOS','NV_ASOS','NH_ASOS','NJ_ASOS','NM_ASOS','NY_ASOS','NC_ASOS','ND_ASOS','OH_ASOS',
+    'NE_ASOS','NV_ASOS','NH_ASOS','NJ_ASOS','NM_ASOS','NY_ASOS','ND_ASOS','OH_ASOS',
     'OK_ASOS','OR_ASOS','PA_ASOS','RI_ASOS','SC_ASOS','SD_ASOS','TN_ASOS','TX_ASOS','UT_ASOS',
     'VT_ASOS','VA_ASOS','WA_ASOS','WV_ASOS','WI_ASOS','WY_ASOS'];
   function toTitleCase(s){return s.toLowerCase().replace(/\b\w/g,function(c){return c.toUpperCase();});}
   function fetchNet(net){
     return fetch(IEM+net).then(function(r){return r.json();}).then(function(d){return{net:net,data:d};}).catch(function(){return{net:net,data:null};});
+  }
+  function fetchNcMerged(){
+    return Promise.all(NC_NETS.map(function(net){
+      return fetch(IEM+net).then(function(r){return r.json();}).catch(function(){return null;});
+    })).then(function(results){
+      var features=[];
+      results.forEach(function(d){if(d&&d.features)features=features.concat(d.features);});
+      return{net:'NC',data:{features:features}};
+    });
   }
   function extractExtremes(data){
     var hiCands=[],loCands=[];
@@ -1967,14 +1979,14 @@ function fetchYesterdayExtremes(){
       lo:lW?lW.temp:null,loStn:lW?lW.stn:'',loName:lW?lW.name:'',loLat:lW?lW.lat:null,loLon:lW?lW.lon:null,loElev:lW?lW.elev:null
     };
   }
-  Promise.all(US_NETS.map(fetchNet)).then(function(results){
+  Promise.all([fetchNcMerged()].concat(OTHER_NETS.map(fetchNet))).then(function(results){
     var ncEx={hi:null,hiStn:'',hiName:'',hiLat:null,hiLon:null,hiElev:null,lo:null,loStn:'',loName:'',loLat:null,loLon:null,loElev:null};
     var usHi=null,usHiStn='',usHiName='',usHiState='',usHiLat=null,usHiLon=null,usHiElev=null;
     var usLo=null,usLoStn='',usLoName='',usLoState='',usLoLat=null,usLoLon=null,usLoElev=null;
     results.forEach(function(item){
       var ex=extractExtremes(item.data);
-      var state=item.net.replace('_ASOS','');
-      if(item.net==='NC_ASOS')ncEx=ex;
+      var state=item.net==='NC'?'NC':item.net.replace('_ASOS','');
+      if(item.net==='NC')ncEx=ex;
       if(ex.hi!==null&&(usHi===null||ex.hi>usHi)){usHi=ex.hi;usHiStn=ex.hiStn;usHiName=ex.hiName;usHiState=state;usHiLat=ex.hiLat;usHiLon=ex.hiLon;usHiElev=ex.hiElev;}
       if(ex.lo!==null&&(usLo===null||ex.lo<usLo)){usLo=ex.lo;usLoStn=ex.loStn;usLoName=ex.loName;usLoState=state;usLoLat=ex.loLat;usLoLon=ex.loLon;usLoElev=ex.loElev;}
     });
