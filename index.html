@@ -1911,7 +1911,7 @@ function fetchYesterdayExtremes(){
   var now=new Date();
   var yestDate=new Date(now.getTime()-24*60*60*1000);
   var yestStr=yestDate.toLocaleDateString('en-CA',{timeZone:'America/New_York'});
-  var cacheKey='extremes_v4_'+yestStr;
+  var cacheKey='extremes_v5_'+yestStr;
   try{
     var cached=JSON.parse(localStorage.getItem(cacheKey)||'null');
     if(cached){renderExtremes(cached);return;}
@@ -1935,15 +1935,21 @@ function fetchYesterdayExtremes(){
   }
   function extractExtremes(data){
     var hiCands=[],loCands=[];
-    if(!data||!data.features)return{hi:null,hiStn:'',hiName:'',lo:null,loStn:'',loName:''};
+    if(!data||!data.features)return{hi:null,hiStn:'',hiName:'',hiLat:null,hiLon:null,hiElev:null,lo:null,loStn:'',loName:'',loLat:null,loLon:null,loElev:null};
     data.features.forEach(function(f){
       var p=f.properties;
       var mx=p.max_tmpf,mn=p.min_tmpf;
       var stn=p.station||'';
       var name=p.name?toTitleCase(p.name):stn;
+      var coords=f.geometry&&f.geometry.coordinates;
+      var lon=coords?coords[0]:null,lat=coords?coords[1]:null;
+      // Elevation: IEM stores in meters under various field names
+      var elevM=p.elevation!=null?p.elevation:(p.elev!=null?p.elev:(p.elevation_m!=null?p.elevation_m:null));
+      var elevFt=elevM!=null?Math.round(elevM*3.28084):null;
+      var meta={stn:stn,name:name,lat:lat,lon:lon,elev:elevFt};
       // Only filter physically impossible readings
-      if(mx!=null&&!isNaN(mx)&&mx>-65&&mx<135)hiCands.push({temp:mx,stn:stn,name:name});
-      if(mn!=null&&!isNaN(mn)&&mn>-65&&mn<135)loCands.push({temp:mn,stn:stn,name:name});
+      if(mx!=null&&!isNaN(mx)&&mx>-65&&mx<135)hiCands.push(Object.assign({temp:mx},meta));
+      if(mn!=null&&!isNaN(mn)&&mn>-65&&mn<135)loCands.push(Object.assign({temp:mn},meta));
     });
     hiCands.sort(function(a,b){return b.temp-a.temp;});
     loCands.sort(function(a,b){return a.temp-b.temp;});
@@ -1952,26 +1958,26 @@ function fetchYesterdayExtremes(){
     function pick(arr){for(var i=0;i<arr.length;i++){if(arr[i].stn!==badStn)return arr[i];}return null;}
     var hW=pick(hiCands),lW=pick(loCands);
     return{
-      hi:hW?hW.temp:null,hiStn:hW?hW.stn:'',hiName:hW?hW.name:'',
-      lo:lW?lW.temp:null,loStn:lW?lW.stn:'',loName:lW?lW.name:''
+      hi:hW?hW.temp:null,hiStn:hW?hW.stn:'',hiName:hW?hW.name:'',hiLat:hW?hW.lat:null,hiLon:hW?hW.lon:null,hiElev:hW?hW.elev:null,
+      lo:lW?lW.temp:null,loStn:lW?lW.stn:'',loName:lW?lW.name:'',loLat:lW?lW.lat:null,loLon:lW?lW.lon:null,loElev:lW?lW.elev:null
     };
   }
   Promise.all(US_NETS.map(fetchNet)).then(function(results){
-    var ncEx={hi:null,hiStn:'',hiName:'',lo:null,loStn:'',loName:''};
-    var usHi=null,usHiStn='',usHiName='',usHiState='';
-    var usLo=null,usLoStn='',usLoName='',usLoState='';
+    var ncEx={hi:null,hiStn:'',hiName:'',hiLat:null,hiLon:null,hiElev:null,lo:null,loStn:'',loName:'',loLat:null,loLon:null,loElev:null};
+    var usHi=null,usHiStn='',usHiName='',usHiState='',usHiLat=null,usHiLon=null,usHiElev=null;
+    var usLo=null,usLoStn='',usLoName='',usLoState='',usLoLat=null,usLoLon=null,usLoElev=null;
     results.forEach(function(item){
       var ex=extractExtremes(item.data);
       var state=item.net.replace('_ASOS','');
       if(item.net==='NC_ASOS')ncEx=ex;
-      if(ex.hi!==null&&(usHi===null||ex.hi>usHi)){usHi=ex.hi;usHiStn=ex.hiStn;usHiName=ex.hiName;usHiState=state;}
-      if(ex.lo!==null&&(usLo===null||ex.lo<usLo)){usLo=ex.lo;usLoStn=ex.loStn;usLoName=ex.loName;usLoState=state;}
+      if(ex.hi!==null&&(usHi===null||ex.hi>usHi)){usHi=ex.hi;usHiStn=ex.hiStn;usHiName=ex.hiName;usHiState=state;usHiLat=ex.hiLat;usHiLon=ex.hiLon;usHiElev=ex.hiElev;}
+      if(ex.lo!==null&&(usLo===null||ex.lo<usLo)){usLo=ex.lo;usLoStn=ex.loStn;usLoName=ex.loName;usLoState=state;usLoLat=ex.loLat;usLoLon=ex.loLon;usLoElev=ex.loElev;}
     });
     var result={
-      ncHi:ncEx.hi,ncHiStn:ncEx.hiStn,ncHiName:ncEx.hiName,
-      ncLo:ncEx.lo,ncLoStn:ncEx.loStn,ncLoName:ncEx.loName,
-      usHi:usHi,usHiStn:usHiStn,usHiName:usHiName,usHiState:usHiState,
-      usLo:usLo,usLoStn:usLoStn,usLoName:usLoName,usLoState:usLoState,
+      ncHi:ncEx.hi,ncHiStn:ncEx.hiStn,ncHiName:ncEx.hiName,ncHiLat:ncEx.hiLat,ncHiLon:ncEx.hiLon,ncHiElev:ncEx.hiElev,
+      ncLo:ncEx.lo,ncLoStn:ncEx.loStn,ncLoName:ncEx.loName,ncLoLat:ncEx.loLat,ncLoLon:ncEx.loLon,ncLoElev:ncEx.loElev,
+      usHi:usHi,usHiStn:usHiStn,usHiName:usHiName,usHiState:usHiState,usHiLat:usHiLat,usHiLon:usHiLon,usHiElev:usHiElev,
+      usLo:usLo,usLoStn:usLoStn,usLoName:usLoName,usLoState:usLoState,usLoLat:usLoLat,usLoLon:usLoLon,usLoElev:usLoElev,
       yestStr:yestStr
     };
     try{localStorage.setItem(cacheKey,JSON.stringify(result));}catch(e){}
@@ -1979,24 +1985,38 @@ function fetchYesterdayExtremes(){
   }).catch(function(){
     el.innerHTML='<div style="color:var(--mu);font-size:13px;text-align:center;padding:12px">Could not load temperature extremes.</div>';
   });
+  function fmtCoord(lat,lon){
+    if(lat==null||lon==null)return'';
+    var la=Math.abs(lat).toFixed(2)+(lat>=0?'°N':'°S');
+    var lo=Math.abs(lon).toFixed(2)+(lon<=0?'°W':'°E');
+    return la+' '+lo;
+  }
   function renderExtremes(r){
     var yestLabel=yestDate.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric',timeZone:'America/New_York'});
-    function card(lbl,temp,name,stn,state,color){
+    function card(lbl,temp,name,stn,state,lat,lon,elev,color){
       var val=temp!==null?Math.round(temp)+'°F':'--';
-      var loc=name?(name+(stn&&stn!==name?' · '+stn:'')+' · '+state):'N/A';
+      var nameLine=name?(name+(stn&&stn!==name?' · '+stn:''))+' · '+state:'N/A';
+      var coordLine=fmtCoord(lat,lon);
+      var elevLine=elev!=null?elev.toLocaleString()+' ft':'';
+      var meta=(coordLine||elevLine)?
+        '<div style="font-size:9px;color:var(--mu2);margin-top:3px;line-height:1.5">'+
+          (coordLine?coordLine:'')+(coordLine&&elevLine?' &nbsp;·&nbsp; ':'')+
+          (elevLine?elevLine:'')+
+        '</div>':'';
       return'<div class="acc-score-card">'+
         '<div class="acc-score-lbl">'+lbl+'</div>'+
         '<div class="acc-score-val" style="color:'+(temp!==null?color:'var(--mu)')+'">'+val+'</div>'+
-        '<div class="acc-score-sub" style="line-height:1.4">'+loc+'</div>'+
+        '<div class="acc-score-sub" style="line-height:1.4">'+nameLine+'</div>'+
+        meta+
       '</div>';
     }
     el.innerHTML=
       '<div class="mc-subhdr" style="margin-top:0">Yesterday\'s Temperature Extremes <em>— '+yestLabel+'</em></div>'+
       '<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-bottom:20px">'+
-        card('NC HIGH',r.ncHi,r.ncHiName,r.ncHiStn,'NC','#ef4444')+
-        card('NC LOW',r.ncLo,r.ncLoName,r.ncLoStn,'NC','#60a5fa')+
-        card('USA HIGH',r.usHi,r.usHiName,r.usHiStn,r.usHiState,'#ef4444')+
-        card('USA LOW',r.usLo,r.usLoName,r.usLoStn,r.usLoState,'#60a5fa')+
+        card('NC HIGH',r.ncHi,r.ncHiName,r.ncHiStn,'NC',r.ncHiLat,r.ncHiLon,r.ncHiElev,'#ef4444')+
+        card('NC LOW',r.ncLo,r.ncLoName,r.ncLoStn,'NC',r.ncLoLat,r.ncLoLon,r.ncLoElev,'#60a5fa')+
+        card('USA HIGH',r.usHi,r.usHiName,r.usHiStn,r.usHiState,r.usHiLat,r.usHiLon,r.usHiElev,'#ef4444')+
+        card('USA LOW',r.usLo,r.usLoName,r.usLoStn,r.usLoState,r.usLoLat,r.usLoLon,r.usLoElev,'#60a5fa')+
       '</div>';
   }
 }
