@@ -1911,7 +1911,7 @@ function fetchYesterdayExtremes(){
   var now=new Date();
   var yestDate=new Date(now.getTime()-24*60*60*1000);
   var yestStr=yestDate.toLocaleDateString('en-CA',{timeZone:'America/New_York'});
-  var cacheKey='extremes_v3_'+yestStr;
+  var cacheKey='extremes_v4_'+yestStr;
   try{
     var cached=JSON.parse(localStorage.getItem(cacheKey)||'null');
     if(cached){renderExtremes(cached);return;}
@@ -1934,22 +1934,27 @@ function fetchYesterdayExtremes(){
     return fetch(IEM+net).then(function(r){return r.json();}).then(function(d){return{net:net,data:d};}).catch(function(){return{net:net,data:null};});
   }
   function extractExtremes(data){
-    var hi=null,hiStn='',hiName='',lo=null,loStn='',loName='';
-    if(!data||!data.features)return{hi:hi,hiStn:hiStn,hiName:hiName,lo:lo,loStn:loStn,loName:loName};
+    var hiCands=[],loCands=[];
+    if(!data||!data.features)return{hi:null,hiStn:'',hiName:'',lo:null,loStn:'',loName:''};
     data.features.forEach(function(f){
       var p=f.properties;
       var mx=p.max_tmpf,mn=p.min_tmpf;
       var stn=p.station||'';
       var name=p.name?toTitleCase(p.name):stn;
-      // Quality filter: skip stations with implausible daily range (>55°F swing = bad sensor)
-      if(mx!=null&&mn!=null&&!isNaN(mx)&&!isNaN(mn)&&(mx-mn)>55)return;
-      // Absolute bounds: physically impossible temps
-      if(mx!=null&&!isNaN(mx)&&mx<=-65)mx=null;
-      if(mn!=null&&!isNaN(mn)&&mn>=130)mn=null;
-      if(mx!=null&&!isNaN(mx)){if(hi===null||mx>hi){hi=mx;hiStn=stn;hiName=name;}}
-      if(mn!=null&&!isNaN(mn)){if(lo===null||mn<lo){lo=mn;loStn=stn;loName=name;}}
+      // Only filter physically impossible readings
+      if(mx!=null&&!isNaN(mx)&&mx>-65&&mx<135)hiCands.push({temp:mx,stn:stn,name:name});
+      if(mn!=null&&!isNaN(mn)&&mn>-65&&mn<135)loCands.push({temp:mn,stn:stn,name:name});
     });
-    return{hi:hi,hiStn:hiStn,hiName:hiName,lo:lo,loStn:loStn,loName:loName};
+    hiCands.sort(function(a,b){return b.temp-a.temp;});
+    loCands.sort(function(a,b){return a.temp-b.temp;});
+    // If the same station is both the high and low it has bad sensor data — blacklist it
+    var badStn=(hiCands.length&&loCands.length&&hiCands[0].stn&&hiCands[0].stn===loCands[0].stn)?hiCands[0].stn:'';
+    function pick(arr){for(var i=0;i<arr.length;i++){if(arr[i].stn!==badStn)return arr[i];}return null;}
+    var hW=pick(hiCands),lW=pick(loCands);
+    return{
+      hi:hW?hW.temp:null,hiStn:hW?hW.stn:'',hiName:hW?hW.name:'',
+      lo:lW?lW.temp:null,loStn:lW?lW.stn:'',loName:lW?lW.name:''
+    };
   }
   Promise.all(US_NETS.map(fetchNet)).then(function(results){
     var ncEx={hi:null,hiStn:'',hiName:'',lo:null,loStn:'',loName:''};
@@ -1986,7 +1991,7 @@ function fetchYesterdayExtremes(){
       '</div>';
     }
     el.innerHTML=
-      '<div class="mc-subhdr" style="margin-top:0">Yesterday\'s Temperature Extremes <em>— '+yestLabel+'</em></div>'+
+      '<div class="mc-subhdr" style="margin-top:0;text-align:center">Yesterday\'s Temperature Extremes <em>— '+yestLabel+'</em></div>'+
       '<div class="acc-score-row" style="margin-bottom:20px;justify-content:center">'+
         card('NC HIGH',r.ncHi,r.ncHiName,r.ncHiStn,'NC','#ef4444')+
         card('NC LOW',r.ncLo,r.ncLoName,r.ncLoStn,'NC','#60a5fa')+
