@@ -2626,33 +2626,38 @@ function mcBuildHistory(rows){
   function tag(diff){return Math.abs(diff)<0.3?"same":(diff<0?"cooler":"warmer");}
   function tagLbl(diff){return Math.abs(diff)<0.3?"SAME":(diff<0?"COOLER":"WARMER");}
 
-  function buildCard(label,acc){
-    if(acc.count===0){
-      return'<div class="mc-diff-card">'+
-        '<div class="mc-diff-lbl">'+label+'</div>'+
-        '<div class="mc-diff-val" style="color:var(--mu)">--</div>'+
-        '<div class="mc-diff-note">No data yet</div>'+
-      '</div>';
-    }
+  function diffBadge(diff){
+    if(diff===null)return'<span class="acc-badge pending">--</span>';
+    var cls=Math.abs(diff)<0.3?'hit':(diff>0?'miss':'close');
+    var lbl=Math.abs(diff)<0.3?'SAME':(diff>0?'WARMER':'COOLER');
+    return'<span class="acc-badge '+cls+'">'+lbl+'</span>'+
+      '<div style="font-size:9px;margin-top:4px;font-weight:700;color:'+(Math.abs(diff)<0.3?'var(--green)':(diff>0?'#ef4444':'#60a5fa'))+'">'+diffSign(diff)+'°F</div>';
+  }
+
+  function buildSummaryRow(label,acc){
+    var noData=acc.count===0;
     var n=acc.count;
-    var rwfHiAvg=acc.rwfHiSum/n,rwfLoAvg=acc.rwfLoSum/n;
-    var rduHiAvg=acc.rduHiSum/n,rduLoAvg=acc.rduLoSum/n;
-    var hiDiff=rwfHiAvg-rduHiAvg,loDiff=rwfLoAvg-rduLoAvg;
-    return'<div class="mc-diff-card">'+
-      '<div class="mc-diff-lbl">'+label+'</div>'+
-      '<div class="mc-diff-row">'+
-        '<span class="mc-diff-metric">HIGH</span>'+
-        '<span class="mc-diff-val" style="font-size:15px">'+diffSign(hiDiff)+'°F</span>'+
-        '<span class="mc-diff-sub">RWF '+rwfHiAvg.toFixed(0)+'° vs RDU '+rduHiAvg.toFixed(0)+'°</span>'+
-        '<span class="mc-diff-tag '+tag(hiDiff)+'">'+tagLbl(hiDiff)+'</span>'+
-      '</div>'+
-      '<div class="mc-diff-row">'+
-        '<span class="mc-diff-metric">LOW</span>'+
-        '<span class="mc-diff-val" style="font-size:15px">'+diffSign(loDiff)+'°F</span>'+
-        '<span class="mc-diff-sub">RWF '+rwfLoAvg.toFixed(0)+'° vs RDU '+rduLoAvg.toFixed(0)+'°</span>'+
-        '<span class="mc-diff-tag '+tag(loDiff)+'">'+tagLbl(loDiff)+'</span>'+
-      '</div>'+
-      '<div class="mc-diff-note">'+n+(n===1?' day':' days')+'</div>'+
+    var rwfHiAvg=noData?null:acc.rwfHiSum/n, rwfLoAvg=noData?null:acc.rwfLoSum/n;
+    var rduHiAvg=noData?null:acc.rduHiSum/n, rduLoAvg=noData?null:acc.rduLoSum/n;
+    var hiDiff=noData?null:rwfHiAvg-rduHiAvg, loDiff=noData?null:rwfLoAvg-rduLoAvg;
+    var rwfStack=noData?
+      '<div class="acc-hilostack"><span><span class="acc-sublbl">HI</span>--</span><span><span class="acc-sublbl">LO</span>--</span></div>':
+      '<div class="acc-hilostack"><span><span class="acc-sublbl">HI</span>'+rwfHiAvg.toFixed(0)+'°</span><span><span class="acc-sublbl">LO</span>'+rwfLoAvg.toFixed(0)+'°</span></div>';
+    var rduStack=noData?
+      '<div class="acc-hilostack"><span><span class="acc-sublbl">HI</span>--</span><span><span class="acc-sublbl">LO</span>--</span></div>':
+      '<div class="acc-hilostack"><span><span class="acc-sublbl">HI</span>'+rduHiAvg.toFixed(0)+'°</span><span><span class="acc-sublbl">LO</span>'+rduLoAvg.toFixed(0)+'°</span></div>';
+    var diffStack=noData?
+      '<div><span class="acc-badge pending">No data</span></div>':
+      '<div>'+
+        '<div style="font-size:9px;color:var(--mu);font-weight:800;letter-spacing:.5px;margin-bottom:3px">HI&nbsp;'+
+          '<span style="color:'+(Math.abs(hiDiff)<0.3?'var(--green)':(hiDiff>0?'#ef4444':'#60a5fa'))+';font-weight:700">'+diffSign(hiDiff)+'°</span>'+
+        '&nbsp;&nbsp;LO&nbsp;'+
+          '<span style="color:'+(Math.abs(loDiff)<0.3?'var(--green)':(loDiff>0?'#ef4444':'#60a5fa'))+';font-weight:700">'+diffSign(loDiff)+'°</span></div>'+
+        '<div style="font-size:9px;color:var(--mu2)">'+n+(n===1?' day':' days')+'</div>'+
+      '</div>';
+    return'<div class="acc-log-row">'+
+      '<div class="acc-date">'+label+'</div>'+
+      rwfStack+rduStack+'<div>'+diffStack+'</div>'+
     '</div>';
   }
 
@@ -2664,41 +2669,39 @@ function mcBuildHistory(rows){
   ];
 
   var html='<div class="mc-subhdr">Daily High &amp; Low Differential — Red Wolf Farm vs RDU Airport</div>'+
-    '<div class="mc-hist-grid">';
-  periods.forEach(function(p){html+=buildCard(p.label,p.acc);});
+    '<div style="background:var(--p1);border:1px solid var(--bd);border-radius:4px;overflow:hidden;margin-bottom:20px">'+
+    '<div class="acc-log-hdr">'+
+      '<div>PERIOD</div><div>RWF</div><div>RDU</div><div>DIFFERENTIAL</div>'+
+    '</div>';
+  periods.forEach(function(p){html+=buildSummaryRow(p.label,p.acc);});
   html+='</div>';
 
   // Daily breakdown last 7 days
   var recent=parsed.filter(function(r){return r.ts>=week1&&r.date!==todayStr;});
-  recent.sort(function(a,b){return b.ts-a.ts;}); // newest first
+  recent.sort(function(a,b){return b.ts-a.ts;});
   if(recent.length>0){
     html+='<div class="mc-subhdr">Daily Breakdown — Last 7 Days</div>'+
-      '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">'+
-      '<thead><tr style="color:var(--mu);text-align:left">'+
-        '<th style="padding:6px 8px;border-bottom:1px solid var(--bd)">Date</th>'+
-        '<th style="padding:6px 8px;border-bottom:1px solid var(--bd);text-align:center">RWF Hi</th>'+
-        '<th style="padding:6px 8px;border-bottom:1px solid var(--bd);text-align:center">RWF Lo</th>'+
-        '<th style="padding:6px 8px;border-bottom:1px solid var(--bd);text-align:center">RDU Hi</th>'+
-        '<th style="padding:6px 8px;border-bottom:1px solid var(--bd);text-align:center">RDU Lo</th>'+
-        '<th style="padding:6px 8px;border-bottom:1px solid var(--bd);text-align:center">Hi Diff</th>'+
-        '<th style="padding:6px 8px;border-bottom:1px solid var(--bd);text-align:center">Lo Diff</th>'+
-      '</tr></thead><tbody>';
-    recent.forEach(function(r,i){
+      '<div style="background:var(--p1);border:1px solid var(--bd);border-radius:4px;overflow:hidden">'+
+      '<div class="acc-log-hdr"><div>DATE</div><div>RWF</div><div>RDU</div><div>DIFFERENTIAL</div></div>';
+    recent.forEach(function(r){
       var hasRwf=r.rwfHi!==null&&r.rwfLo!==null;
-      var hiDiff=hasRwf?r.rwfHi-r.rduHi:null,loDiff=hasRwf?r.rwfLo-r.rduLo:null;
-      var bg=i%2===0?'background:var(--p2)':'';
-      var dateLabel=r.ts.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});
-      html+='<tr style="'+bg+'">'+
-        '<td style="padding:6px 8px">'+dateLabel+'</td>'+
-        '<td style="padding:6px 8px;text-align:center">'+(hasRwf?r.rwfHi+'°':'--')+'</td>'+
-        '<td style="padding:6px 8px;text-align:center">'+(hasRwf?r.rwfLo+'°':'--')+'</td>'+
-        '<td style="padding:6px 8px;text-align:center">'+r.rduHi+'°</td>'+
-        '<td style="padding:6px 8px;text-align:center">'+r.rduLo+'°</td>'+
-        '<td style="padding:6px 8px;text-align:center">'+(hiDiff!==null?'<span class="mc-diff-tag '+tag(hiDiff)+'" style="font-size:9px">'+diffSign(hiDiff)+'°</span>':'--')+'</td>'+
-        '<td style="padding:6px 8px;text-align:center">'+(loDiff!==null?'<span class="mc-diff-tag '+tag(loDiff)+'" style="font-size:9px">'+diffSign(loDiff)+'°</span>':'--')+'</td>'+
-      '</tr>';
+      var hiDiff=hasRwf?r.rwfHi-r.rduHi:null, loDiff=hasRwf?r.rwfLo-r.rduLo:null;
+      var dateLabel=r.ts.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric",year:"numeric"});
+      var rwfStack=hasRwf?
+        '<div class="acc-hilostack"><span><span class="acc-sublbl">HI</span>'+r.rwfHi+'°</span><span><span class="acc-sublbl">LO</span>'+r.rwfLo+'°</span></div>':
+        '<div class="acc-hilostack"><span><span class="acc-sublbl">HI</span>--</span><span><span class="acc-sublbl">LO</span>--</span></div>';
+      var rduStack='<div class="acc-hilostack"><span><span class="acc-sublbl">HI</span>'+r.rduHi+'°</span><span><span class="acc-sublbl">LO</span>'+r.rduLo+'°</span></div>';
+      var diffCol=hasRwf?
+        '<div>'+
+          '<div style="font-size:9px;color:var(--mu);font-weight:800;letter-spacing:.5px;margin-bottom:3px">HI&nbsp;'+
+            '<span style="color:'+(Math.abs(hiDiff)<0.3?'var(--green)':(hiDiff>0?'#ef4444':'#60a5fa'))+';font-weight:700">'+diffSign(hiDiff)+'°</span>'+
+          '&nbsp;&nbsp;LO&nbsp;'+
+            '<span style="color:'+(Math.abs(loDiff)<0.3?'var(--green)':(loDiff>0?'#ef4444':'#60a5fa'))+';font-weight:700">'+diffSign(loDiff)+'°</span></div>'+
+        '</div>':
+        '<div><span class="acc-badge pending">No RWF data</span></div>';
+      html+='<div class="acc-log-row"><div class="acc-date">'+dateLabel+'</div>'+rwfStack+rduStack+diffCol+'</div>';
     });
-    html+='</tbody></table></div>';
+    html+='</div>';
   }
 
   html+='<div class="mc-note2">'+parsed.length+' daily readings recorded at 8 PM ET · KNCRALEI761 via Weather Underground · RDU via NWS (KRDU)</div>';
