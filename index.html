@@ -2626,38 +2626,26 @@ function mcBuildHistory(rows){
   function tag(diff){return Math.abs(diff)<0.3?"same":(diff<0?"cooler":"warmer");}
   function tagLbl(diff){return Math.abs(diff)<0.3?"SAME":(diff<0?"COOLER":"WARMER");}
 
-  function diffBadge(diff){
-    if(diff===null)return'<span class="acc-badge pending">--</span>';
-    var cls=Math.abs(diff)<0.3?'hit':(diff>0?'miss':'close');
-    var lbl=Math.abs(diff)<0.3?'SAME':(diff>0?'WARMER':'COOLER');
-    return'<span class="acc-badge '+cls+'">'+lbl+'</span>'+
-      '<div style="font-size:9px;margin-top:4px;font-weight:700;color:'+(Math.abs(diff)<0.3?'var(--green)':(diff>0?'#ef4444':'#60a5fa'))+'">'+diffSign(diff)+'°F</div>';
-  }
+  function diffColor(d){return Math.abs(d)<0.3?'var(--green)':(d>0?'#ef4444':'#60a5fa');}
 
-  function buildSummaryRow(label,acc){
+  function buildSummaryCard(label,acc){
     var noData=acc.count===0;
-    var n=acc.count;
-    var rwfHiAvg=noData?null:acc.rwfHiSum/n, rwfLoAvg=noData?null:acc.rwfLoSum/n;
-    var rduHiAvg=noData?null:acc.rduHiSum/n, rduLoAvg=noData?null:acc.rduLoSum/n;
-    var hiDiff=noData?null:rwfHiAvg-rduHiAvg, loDiff=noData?null:rwfLoAvg-rduLoAvg;
-    var rwfStack=noData?
-      '<div class="acc-hilostack"><span><span class="acc-sublbl">HI</span>--</span><span><span class="acc-sublbl">LO</span>--</span></div>':
-      '<div class="acc-hilostack"><span><span class="acc-sublbl">HI</span>'+rwfHiAvg.toFixed(0)+'°</span><span><span class="acc-sublbl">LO</span>'+rwfLoAvg.toFixed(0)+'°</span></div>';
-    var rduStack=noData?
-      '<div class="acc-hilostack"><span><span class="acc-sublbl">HI</span>--</span><span><span class="acc-sublbl">LO</span>--</span></div>':
-      '<div class="acc-hilostack"><span><span class="acc-sublbl">HI</span>'+rduHiAvg.toFixed(0)+'°</span><span><span class="acc-sublbl">LO</span>'+rduLoAvg.toFixed(0)+'°</span></div>';
-    var diffStack=noData?
-      '<div><span class="acc-badge pending">No data</span></div>':
-      '<div>'+
-        '<div style="font-size:9px;color:var(--mu);font-weight:800;letter-spacing:.5px;margin-bottom:3px">HI&nbsp;'+
-          '<span style="color:'+(Math.abs(hiDiff)<0.3?'var(--green)':(hiDiff>0?'#ef4444':'#60a5fa'))+';font-weight:700">'+diffSign(hiDiff)+'°</span>'+
-        '&nbsp;&nbsp;LO&nbsp;'+
-          '<span style="color:'+(Math.abs(loDiff)<0.3?'var(--green)':(loDiff>0?'#ef4444':'#60a5fa'))+';font-weight:700">'+diffSign(loDiff)+'°</span></div>'+
-        '<div style="font-size:9px;color:var(--mu2)">'+n+(n===1?' day':' days')+'</div>'+
+    if(noData){
+      return'<div class="acc-score-card">'+
+        '<div class="acc-score-lbl">'+label+'</div>'+
+        '<div class="acc-score-val" style="font-size:32px;color:var(--mu)">--</div>'+
+        '<div class="acc-score-sub">No data yet</div>'+
       '</div>';
-    return'<div class="acc-log-row">'+
-      '<div class="acc-date">'+label+'</div>'+
-      rwfStack+rduStack+'<div>'+diffStack+'</div>'+
+    }
+    var n=acc.count;
+    var hiDiff=(acc.rwfHiSum-acc.rduHiSum)/n, loDiff=(acc.rwfLoSum-acc.rduLoSum)/n;
+    var avgDiff=(hiDiff+loDiff)/2;
+    var valColor=diffColor(avgDiff);
+    return'<div class="acc-score-card">'+
+      '<div class="acc-score-lbl">'+label+'</div>'+
+      '<div class="acc-score-val" style="color:'+valColor+'">'+diffSign(avgDiff)+'°</div>'+
+      '<div class="acc-score-sub">avg over '+n+(n===1?' day':' days')+'</div>'+
+      '<div class="acc-score-err">Hi '+diffSign(hiDiff)+'° / Lo '+diffSign(loDiff)+'°</div>'+
     '</div>';
   }
 
@@ -2669,11 +2657,8 @@ function mcBuildHistory(rows){
   ];
 
   var html='<div class="mc-subhdr">Daily High &amp; Low Differential — Red Wolf Farm vs RDU Airport</div>'+
-    '<div style="background:var(--p1);border:1px solid var(--bd);border-radius:4px;overflow:hidden;margin-bottom:20px">'+
-    '<div class="acc-log-hdr">'+
-      '<div>PERIOD</div><div>RWF</div><div>RDU</div><div>DIFFERENTIAL</div>'+
-    '</div>';
-  periods.forEach(function(p){html+=buildSummaryRow(p.label,p.acc);});
+    '<div class="acc-score-row" style="margin-bottom:20px">';
+  periods.forEach(function(p){html+=buildSummaryCard(p.label,p.acc);});
   html+='</div>';
 
   // Daily breakdown last 7 days
