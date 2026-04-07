@@ -2489,8 +2489,7 @@ function fetchPWS(){
     });
     html+='</div>';
     html+='<div class="alm-note" style="margin-top:14px">Data: Weather Underground Personal Weather Stations — Wake County, NC<br>🐺 Red Wolf Farm (your station) highlighted in gold — Refreshes each tab switch</div>';
-    html+='<div id="mc-section"></div>';
-    el.innerHTML=html;
+    el.innerHTML='<div id="mc-section"></div>'+html;
     fetchMicroclimate();
   });
 }
@@ -2500,7 +2499,7 @@ function fetchPWS(){
 // ============================================================
 function fetchMicroclimate(){
   var mcEl=document.getElementById("mc-section");if(!mcEl)return;
-  mcEl.innerHTML='<div class="mc-wrap"><div class="mc-hdr">🌡 Microclimate Intelligence <em>- Red Wolf Farm vs RDU Airport</em></div><div class="alm-ld"><div class="tsps-spinner"></div>Analyzing microclimate data...</div></div>';
+  mcEl.innerHTML='<div class="mc-wrap"><div class="mc-hdr">🌡 Wake Microclimate <em>- Red Wolf Farm vs RDU Airport</em></div><div class="alm-ld"><div class="tsps-spinner"></div>Analyzing microclimate data...</div></div>';
   var yr=new Date().getFullYear(),today=new Date().toISOString().split("T")[0];
   var rduLive={temp:"--",humid:"--",dewpt:"--",wind:"--",pres:"--"};
   function fetchRduLive(){
@@ -2537,7 +2536,7 @@ function fetchMicroclimate(){
     function mcRow(lbl,val){return'<div class="mc-row"><span class="mc-row-lbl">'+lbl+'</span><span class="mc-row-val">'+val+'</span></div>';}
     // Build live comparison section
     var html='<div class="mc-wrap">'+
-      '<div class="mc-hdr">🌡 Microclimate Intelligence <em>- Red Wolf Farm vs RDU Airport</em></div>'+
+      '<div class="mc-hdr">🌡 Wake Microclimate <em>- Red Wolf Farm vs RDU Airport</em></div>'+
       '<div class="mc-live-grid">'+
         '<div class="mc-col rwf">'+
           '<div class="mc-col-title">🐺 Red Wolf Farm (Live)</div>'+
@@ -2567,7 +2566,7 @@ function fetchMicroclimate(){
       if(histEl)histEl.innerHTML=mcBuildHistory(rows);
     });
   }).catch(function(e){
-    mcEl.innerHTML='<div class="mc-wrap"><div class="mc-hdr">🌡 Microclimate Intelligence</div><div class="alm-ld" style="color:#ef4444">Could not load: '+e.message+'</div></div>';
+    mcEl.innerHTML='<div class="mc-wrap"><div class="mc-hdr">🌡 Wake Microclimate</div><div class="alm-ld" style="color:#ef4444">Could not load: '+e.message+'</div></div>';
   });
 }
 
