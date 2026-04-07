@@ -1911,7 +1911,7 @@ function fetchYesterdayExtremes(){
   var now=new Date();
   var yestDate=new Date(now.getTime()-24*60*60*1000);
   var yestStr=yestDate.toLocaleDateString('en-CA',{timeZone:'America/New_York'});
-  var cacheKey='extremes_v8_'+yestStr;
+  var cacheKey='extremes_v9_'+yestStr;
   try{
     var cached=JSON.parse(localStorage.getItem(cacheKey)||'null');
     if(cached){renderExtremes(cached);return;}
@@ -1970,6 +1970,13 @@ function fetchYesterdayExtremes(){
     // a broken sensor (e.g. FFA reporting 19°F when everyone else is 33°F+) has a huge gap.
     while(loCands.length>=2&&(loCands[1].temp-loCands[0].temp)>12)loCands.shift();
     while(hiCands.length>=2&&(hiCands[0].temp-hiCands[1].temp)>12)hiCands.shift();
+    // Physics filter: a sea-level station cannot be colder than a mountain station.
+    // If the coldest candidate is at <500ft but there are stations at >2000ft that are
+    // WARMER, that's physically impossible — the low-elevation reading is bad data.
+    var highland=loCands.filter(function(c){return c.elev!=null&&c.elev>2000;});
+    while(loCands.length>=2&&highland.length>0&&loCands[0].elev!=null&&loCands[0].elev<500&&loCands[0].temp<highland[0].temp){
+      loCands.shift();
+    }
     // If the same station is both the high and low it has bad sensor data — blacklist it
     var badStn=(hiCands.length&&loCands.length&&hiCands[0].stn&&hiCands[0].stn===loCands[0].stn)?hiCands[0].stn:'';
     function pick(arr){for(var i=0;i<arr.length;i++){if(arr[i].stn!==badStn)return arr[i];}return null;}
