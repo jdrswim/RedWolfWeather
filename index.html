@@ -1916,7 +1916,7 @@ function fetchYesterdayExtremes(){
     var cached=JSON.parse(localStorage.getItem(cacheKey)||'null');
     if(cached){renderExtremes(cached);return;}
   }catch(e){}
-  el.innerHTML='<div class="acc-score-row" style="margin-bottom:20px;justify-content:center">'+
+  el.innerHTML='<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-bottom:20px">'+
     ['NC HIGH','NC LOW','USA HIGH','USA LOW'].map(function(lbl){
       return'<div class="acc-score-card"><div class="acc-score-lbl">'+lbl+'</div>'+
         '<div class="acc-score-val" style="color:var(--mu)">--</div>'+
@@ -1991,8 +1991,8 @@ function fetchYesterdayExtremes(){
       '</div>';
     }
     el.innerHTML=
-      '<div class="mc-subhdr" style="margin-top:0;text-align:center">Yesterday\'s Temperature Extremes <em>— '+yestLabel+'</em></div>'+
-      '<div class="acc-score-row" style="margin-bottom:20px;justify-content:center">'+
+      '<div class="mc-subhdr" style="margin-top:0">Yesterday\'s Temperature Extremes <em>— '+yestLabel+'</em></div>'+
+      '<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-bottom:20px">'+
         card('NC HIGH',r.ncHi,r.ncHiName,r.ncHiStn,'NC','#ef4444')+
         card('NC LOW',r.ncLo,r.ncLoName,r.ncLoStn,'NC','#60a5fa')+
         card('USA HIGH',r.usHi,r.usHiName,r.usHiStn,r.usHiState,'#ef4444')+
