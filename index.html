@@ -1911,7 +1911,7 @@ function fetchYesterdayExtremes(){
   var now=new Date();
   var yestDate=new Date(now.getTime()-24*60*60*1000);
   var yestStr=yestDate.toLocaleDateString('en-CA',{timeZone:'America/New_York'});
-  var cacheKey='extremes_v5_'+yestStr;
+  var cacheKey='extremes_v6_'+yestStr;
   try{
     var cached=JSON.parse(localStorage.getItem(cacheKey)||'null');
     if(cached){renderExtremes(cached);return;}
@@ -1953,6 +1953,18 @@ function fetchYesterdayExtremes(){
     });
     hiCands.sort(function(a,b){return b.temp-a.temp;});
     loCands.sort(function(a,b){return a.temp-b.temp;});
+    // Z-score outlier filter: remove readings >3σ from the network mean (bad sensors)
+    function zFilter(arr,extreme){
+      if(arr.length<6)return arr;
+      var sum=arr.reduce(function(s,c){return s+c.temp;},0);
+      var mean=sum/arr.length;
+      var variance=arr.reduce(function(s,c){return s+Math.pow(c.temp-mean,2);},0)/arr.length;
+      var std=Math.sqrt(variance);
+      if(std<1)return arr;
+      return arr.filter(function(c){return Math.abs(c.temp-mean)/std<3.0;});
+    }
+    hiCands=zFilter(hiCands,'hi');
+    loCands=zFilter(loCands,'lo');
     // If the same station is both the high and low it has bad sensor data — blacklist it
     var badStn=(hiCands.length&&loCands.length&&hiCands[0].stn&&hiCands[0].stn===loCands[0].stn)?hiCands[0].stn:'';
     function pick(arr){for(var i=0;i<arr.length;i++){if(arr[i].stn!==badStn)return arr[i];}return null;}
@@ -2011,7 +2023,7 @@ function fetchYesterdayExtremes(){
       '</div>';
     }
     el.innerHTML=
-      '<div class="mc-subhdr" style="margin-top:0">Yesterday\'s Temperature Extremes <em>— '+yestLabel+'</em></div>'+
+      '<div class="sun-sec" style="justify-content:center;border-left:none;margin-top:0">Yesterday\'s Temperature Extremes <em>— '+yestLabel+'</em></div>'+
       '<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-bottom:20px">'+
         card('NC HIGH',r.ncHi,r.ncHiName,r.ncHiStn,'NC',r.ncHiLat,r.ncHiLon,r.ncHiElev,'#ef4444')+
         card('NC LOW',r.ncLo,r.ncLoName,r.ncLoStn,'NC',r.ncLoLat,r.ncLoLon,r.ncLoElev,'#60a5fa')+
