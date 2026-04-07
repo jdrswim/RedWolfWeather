@@ -1909,14 +1909,14 @@ function almRender(byDay,el,now,yr,curMo,curDay,src){
 function fetchYesterdayExtremes(){
   var el=$('extremes-section');if(!el)return;
   var now=new Date();
-  var yest=new Date(now.getFullYear(),now.getMonth(),now.getDate()-1);
-  var yestStr=yest.toISOString().split('T')[0];
-  var cacheKey='extremes_v1_'+yestStr;
+  var yestDate=new Date(now.getTime()-24*60*60*1000);
+  var yestStr=yestDate.toLocaleDateString('en-CA',{timeZone:'America/New_York'});
+  var cacheKey='extremes_v3_'+yestStr;
   try{
     var cached=JSON.parse(localStorage.getItem(cacheKey)||'null');
     if(cached){renderExtremes(cached);return;}
   }catch(e){}
-  el.innerHTML='<div class="acc-score-row" style="margin-bottom:20px">'+
+  el.innerHTML='<div class="acc-score-row" style="margin-bottom:20px;justify-content:center">'+
     ['NC HIGH','NC LOW','USA HIGH','USA LOW'].map(function(lbl){
       return'<div class="acc-score-card"><div class="acc-score-lbl">'+lbl+'</div>'+
         '<div class="acc-score-val" style="color:var(--mu)">--</div>'+
@@ -1929,52 +1929,69 @@ function fetchYesterdayExtremes(){
     'NE_ASOS','NV_ASOS','NH_ASOS','NJ_ASOS','NM_ASOS','NY_ASOS','NC_ASOS','ND_ASOS','OH_ASOS',
     'OK_ASOS','OR_ASOS','PA_ASOS','RI_ASOS','SC_ASOS','SD_ASOS','TN_ASOS','TX_ASOS','UT_ASOS',
     'VT_ASOS','VA_ASOS','WA_ASOS','WV_ASOS','WI_ASOS','WY_ASOS'];
+  function toTitleCase(s){return s.toLowerCase().replace(/\b\w/g,function(c){return c.toUpperCase();});}
   function fetchNet(net){
-    return fetch(IEM+net).then(function(r){return r.json();}).catch(function(){return null;});
+    return fetch(IEM+net).then(function(r){return r.json();}).then(function(d){return{net:net,data:d};}).catch(function(){return{net:net,data:null};});
   }
   function extractExtremes(data){
-    var hi=null,hiStn='',lo=null,loStn='';
-    if(!data||!data.features)return{hi:hi,hiStn:hiStn,lo:lo,loStn:loStn};
+    var hi=null,hiStn='',hiName='',lo=null,loStn='',loName='';
+    if(!data||!data.features)return{hi:hi,hiStn:hiStn,hiName:hiName,lo:lo,loStn:loStn,loName:loName};
     data.features.forEach(function(f){
       var p=f.properties;
-      var mx=p.max_tmpf,mn=p.min_tmpf,stn=p.station||'';
-      if(mx!==null&&mx!==undefined&&!isNaN(mx)){if(hi===null||mx>hi){hi=mx;hiStn=stn;}}
-      if(mn!==null&&mn!==undefined&&!isNaN(mn)){if(lo===null||mn<lo){lo=mn;loStn=stn;}}
+      var mx=p.max_tmpf,mn=p.min_tmpf;
+      var stn=p.station||'';
+      var name=p.name?toTitleCase(p.name):stn;
+      // Quality filter: skip stations with implausible daily range (>55°F swing = bad sensor)
+      if(mx!=null&&mn!=null&&!isNaN(mx)&&!isNaN(mn)&&(mx-mn)>55)return;
+      // Absolute bounds: physically impossible temps
+      if(mx!=null&&!isNaN(mx)&&mx<=-65)mx=null;
+      if(mn!=null&&!isNaN(mn)&&mn>=130)mn=null;
+      if(mx!=null&&!isNaN(mx)){if(hi===null||mx>hi){hi=mx;hiStn=stn;hiName=name;}}
+      if(mn!=null&&!isNaN(mn)){if(lo===null||mn<lo){lo=mn;loStn=stn;loName=name;}}
     });
-    return{hi:hi,hiStn:hiStn,lo:lo,loStn:loStn};
+    return{hi:hi,hiStn:hiStn,hiName:hiName,lo:lo,loStn:loStn,loName:loName};
   }
   Promise.all(US_NETS.map(fetchNet)).then(function(results){
-    var ncEx={hi:null,hiStn:'',lo:null,loStn:''};
-    var usHi=null,usHiStn='',usLo=null,usLoStn='';
-    results.forEach(function(data,i){
-      var ex=extractExtremes(data);
-      if(US_NETS[i]==='NC_ASOS')ncEx=ex;
-      if(ex.hi!==null&&(usHi===null||ex.hi>usHi)){usHi=ex.hi;usHiStn=ex.hiStn;}
-      if(ex.lo!==null&&(usLo===null||ex.lo<usLo)){usLo=ex.lo;usLoStn=ex.loStn;}
+    var ncEx={hi:null,hiStn:'',hiName:'',lo:null,loStn:'',loName:''};
+    var usHi=null,usHiStn='',usHiName='',usHiState='';
+    var usLo=null,usLoStn='',usLoName='',usLoState='';
+    results.forEach(function(item){
+      var ex=extractExtremes(item.data);
+      var state=item.net.replace('_ASOS','');
+      if(item.net==='NC_ASOS')ncEx=ex;
+      if(ex.hi!==null&&(usHi===null||ex.hi>usHi)){usHi=ex.hi;usHiStn=ex.hiStn;usHiName=ex.hiName;usHiState=state;}
+      if(ex.lo!==null&&(usLo===null||ex.lo<usLo)){usLo=ex.lo;usLoStn=ex.loStn;usLoName=ex.loName;usLoState=state;}
     });
-    var result={ncHi:ncEx.hi,ncHiStn:ncEx.hiStn,ncLo:ncEx.lo,ncLoStn:ncEx.loStn,usHi:usHi,usHiStn:usHiStn,usLo:usLo,usLoStn:usLoStn,yestStr:yestStr};
+    var result={
+      ncHi:ncEx.hi,ncHiStn:ncEx.hiStn,ncHiName:ncEx.hiName,
+      ncLo:ncEx.lo,ncLoStn:ncEx.loStn,ncLoName:ncEx.loName,
+      usHi:usHi,usHiStn:usHiStn,usHiName:usHiName,usHiState:usHiState,
+      usLo:usLo,usLoStn:usLoStn,usLoName:usLoName,usLoState:usLoState,
+      yestStr:yestStr
+    };
     try{localStorage.setItem(cacheKey,JSON.stringify(result));}catch(e){}
     renderExtremes(result);
   }).catch(function(){
     el.innerHTML='<div style="color:var(--mu);font-size:13px;text-align:center;padding:12px">Could not load temperature extremes.</div>';
   });
   function renderExtremes(r){
-    var yestLabel=yest.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
-    function card(lbl,temp,stn,color){
+    var yestLabel=yestDate.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric',timeZone:'America/New_York'});
+    function card(lbl,temp,name,stn,state,color){
       var val=temp!==null?Math.round(temp)+'°F':'--';
+      var loc=name?(name+(stn&&stn!==name?' · '+stn:'')+' · '+state):'N/A';
       return'<div class="acc-score-card">'+
         '<div class="acc-score-lbl">'+lbl+'</div>'+
         '<div class="acc-score-val" style="color:'+(temp!==null?color:'var(--mu)')+'">'+val+'</div>'+
-        '<div class="acc-score-sub">'+(stn||'N/A')+'</div>'+
+        '<div class="acc-score-sub" style="line-height:1.4">'+loc+'</div>'+
       '</div>';
     }
     el.innerHTML=
       '<div class="mc-subhdr" style="margin-top:0">Yesterday\'s Temperature Extremes <em>— '+yestLabel+'</em></div>'+
-      '<div class="acc-score-row" style="margin-bottom:20px">'+
-        card('NC HIGH',r.ncHi,r.ncHiStn,'#ef4444')+
-        card('NC LOW',r.ncLo,r.ncLoStn,'#60a5fa')+
-        card('USA HIGH',r.usHi,r.usHiStn,'#ef4444')+
-        card('USA LOW',r.usLo,r.usLoStn,'#60a5fa')+
+      '<div class="acc-score-row" style="margin-bottom:20px;justify-content:center">'+
+        card('NC HIGH',r.ncHi,r.ncHiName,r.ncHiStn,'NC','#ef4444')+
+        card('NC LOW',r.ncLo,r.ncLoName,r.ncLoStn,'NC','#60a5fa')+
+        card('USA HIGH',r.usHi,r.usHiName,r.usHiStn,r.usHiState,'#ef4444')+
+        card('USA LOW',r.usLo,r.usLoName,r.usLoStn,r.usLoState,'#60a5fa')+
       '</div>';
   }
 }
@@ -2199,7 +2216,7 @@ function accFetchAndRender(){
     _accCachedRows=cached;
     accRender(el,_accCachedRows);
   } else {
-    el.innerHTML='<div class="acc-wrap"><div class="acc-hdr">Valvano\'s Forecast Accountability Dashboard <em>- Loading...</em></div><div class="alm-ld"><div class="tsps-spinner"></div></div></div>';
+    el.innerHTML='<div class="acc-wrap"><div class="acc-hdr">Valvano\'s Forecast Accountability <em>- Loading...</em></div><div class="alm-ld"><div class="tsps-spinner"></div></div></div>';
   }
   // Always fetch fresh data in the background
   fetch(SHEET_URL+"?tab=Accuracy")
@@ -2303,7 +2320,7 @@ function accRender(el,rawRows){
   if(!rows.length){
     el.innerHTML=
       '<div class="acc-wrap">'+
-        '<div class="acc-hdr">Valvano\'s Forecast Accountability Dashboard <em>- Forecast vs Actual Temperature</em> <div class="tip-btn" onclick="openTip(\'tipAccuracy\')" style="display:inline-flex;vertical-align:middle;margin-left:6px">?</div></div>'+
+        '<div class="acc-hdr">Valvano\'s Forecast Accountability <em>- Forecast vs Actual Temperature</em> <div class="tip-btn" onclick="openTip(\'tipAccuracy\')" style="display:inline-flex;vertical-align:middle;margin-left:6px">?</div></div>'+
         accLogStatus()+
         '<div style="background:var(--p2);border:1px solid var(--bd);border-radius:4px;padding:28px;text-align:center">'+
           '<div style="font-size:36px;margin-bottom:14px">📊</div>'+
@@ -2366,7 +2383,7 @@ function accRender(el,rawRows){
 
   var html=
     '<div class="acc-wrap">'+
-      '<div class="acc-hdr">Valvano\'s Forecast Accountability Dashboard <em>- Forecast vs Actual Temperature</em> <div class="tip-btn" onclick="openTip(\'tipAccuracy\')" style="display:inline-flex;vertical-align:middle;margin-left:6px">?</div></div>'+
+      '<div class="acc-hdr">Valvano\'s Forecast Accountability <em>- Forecast vs Actual Temperature</em> <div class="tip-btn" onclick="openTip(\'tipAccuracy\')" style="display:inline-flex;vertical-align:middle;margin-left:6px">?</div></div>'+
       accLogStatus()+
       (function(){
         var accs=[1,2,3,4,5].map(function(l){return{l:l,a:calcAccuracyForLead(rows,l)};});
@@ -2665,13 +2682,15 @@ function mcBuildHistory(rows){
   }
   // Parse rows — each has: date, rwf_high, rwf_low, rdu_high, rdu_low
   var now=new Date();
-  var todayStr=now.toISOString().split("T")[0];
-  var ytdCutoff=new Date(now.getFullYear(),0,1); // Jan 1 this year
-  // Yesterday = previous calendar day
-  var yest=new Date(now.getFullYear(),now.getMonth(),now.getDate()-1);
-  var yestStr=yest.toISOString().split("T")[0];
-  var week1=new Date(now.getFullYear(),now.getMonth(),now.getDate()-7);
-  var month1=new Date(now.getFullYear(),now.getMonth(),now.getDate()-30);
+  // Use ET timezone so "today" matches nightly log dates (which run at 8 PM ET)
+  var todayStr=now.toLocaleDateString('en-CA',{timeZone:'America/New_York'});
+  var yestDate=new Date(now.getTime()-24*60*60*1000);
+  var yestStr=yestDate.toLocaleDateString('en-CA',{timeZone:'America/New_York'});
+  // Anchor cutoff dates to ET today
+  var etAnchor=new Date(todayStr+'T12:00:00');
+  var ytdCutoff=new Date(etAnchor.getFullYear(),0,1); // Jan 1 this year
+  var week1=new Date(etAnchor.getFullYear(),etAnchor.getMonth(),etAnchor.getDate()-7);
+  var month1=new Date(etAnchor.getFullYear(),etAnchor.getMonth(),etAnchor.getDate()-30);
 
   function parseRow(r){
     var dateField=r.date||'';
