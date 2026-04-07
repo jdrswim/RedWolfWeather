@@ -1,11 +1,15 @@
 // =============================================================
-// WOLFPACK WEATHER — NIGHTLY SERVER-SIDE LOGGER
+// RED WOLF WEATHER — NIGHTLY SERVER-SIDE LOGGER
 // =============================================================
 // SETUP (one time only):
 //   1. Open your Google Sheet → Extensions → Apps Script
 //   2. Paste this entire file, replacing your existing script
 //   3. Select "installNightlyTrigger" in the function dropdown
 //   4. Click Run — done. Fires every night at 8 PM ET automatically.
+//
+// MICROCLIMATE SETUP (one time):
+//   In the Google Sheet, add a tab named "Microclimate" with
+//   row 1 headers:  date  rwf_high  rwf_low  rdu_high  rdu_low
 //
 // TO TEST MANUALLY:
 //   Select "testNightlyLog" and click Run — writes real data now.
@@ -35,7 +39,6 @@ function doGet(e) {
       var dateStr = p.date || '';
       if (!dateStr) return jsonOut({ error: 'Missing date param' });
 
-      // Build key→value map from all params except action/tab/date
       var updates = {};
       Object.keys(p).forEach(function(k) {
         if (k !== 'action' && k !== 'tab' && k !== 'date') updates[k] = p[k];
@@ -46,7 +49,6 @@ function doGet(e) {
       var dateCol = headers.indexOf('date');
       if (dateCol < 0) dateCol = 0;
 
-      // Find or create row
       var rowIdx = -1;
       for (var i = 1; i < data.length; i++) {
         if (normDateStr_(data[i][dateCol]) === dateStr) { rowIdx = i; break; }
@@ -59,7 +61,6 @@ function doGet(e) {
         rowIdx = data.length - 1;
       }
 
-      // Write each supplied column
       var wrote = [];
       Object.keys(updates).forEach(function(k) {
         var ci = headers.indexOf(k);
@@ -155,7 +156,6 @@ function nightlyLogPredictions_(sheet) {
     var ds = p.startTime ? p.startTime.substring(0, 10) : '';
     if (!ds) return;
     if (p.isDaytime) {
-      // Daytime high belongs to the same date
       if (!byDate[ds]) byDate[ds] = { hi: null, lo: null };
       if (byDate[ds].hi === null) byDate[ds].hi = p.temperature;
     } else {
@@ -200,10 +200,6 @@ function nightlyLogActuals_(sheet) {
     var td = new Date(now.getFullYear(), now.getMonth(), now.getDate() - daysBack);
     var ds = Utilities.formatDate(td, TZ, 'yyyy-MM-dd');
 
-    // FIX: build UTC timestamps from local midnight/11:59 PM so the window
-    // is correct in both EST (UTC-5) and EDT (UTC-4).
-    // new Date(y, m, d, h, min, sec) in Apps Script uses the SCRIPT timezone,
-    // so .toISOString() returns the matching UTC time automatically.
     var startLocal = new Date(td.getFullYear(), td.getMonth(), td.getDate(),  0,  0,  0);
     var endLocal   = new Date(td.getFullYear(), td.getMonth(), td.getDate(), 23, 59, 59);
     var obsS = encodeURIComponent(startLocal.toISOString());
@@ -225,7 +221,7 @@ function nightlyLogActuals_(sheet) {
     }, []);
 
     if (!temps.length) {
-      Logger.log('Actuals ' + ds + ': 0 temperature readings returned (NWS may not have data yet)');
+      Logger.log('Actuals ' + ds + ': 0 temperature readings returned');
       continue;
     }
 
@@ -342,26 +338,20 @@ function nightlyWrite_(sheet, dateStr, key1, val1, key2, val2, overwrite) {
   var dateCol = headers.indexOf('date');
   if (dateCol < 0) dateCol = 0;
 
-  // Find existing row for this date
-  // Use normDateStr_ so Date objects stored by Sheets are handled correctly —
-  // without this, Sheets Date values compare as "Mon Mar 27 2026..." and never
-  // match, causing nightlyWrite_ to append a duplicate row every night.
   var rowIdx = -1;
   for (var i = 1; i < data.length; i++) {
     if (normDateStr_(data[i][dateCol]) === dateStr) { rowIdx = i; break; }
   }
 
-  // If no row exists, append one
   if (rowIdx < 0) {
     var newRow = new Array(headers.length).fill('');
     newRow[dateCol] = dateStr;
     sheet.appendRow(newRow);
-    data   = sheet.getDataRange().getValues();  // re-read after append
+    data   = sheet.getDataRange().getValues();
     rowIdx = data.length - 1;
     Logger.log('  Created new row for ' + dateStr);
   }
 
-  // Write values (overwrite=true for actuals, false for predictions)
   var c1 = headers.indexOf(key1);
   var c2 = headers.indexOf(key2);
   if (c1 < 0) Logger.log('  WARNING: column "' + key1 + '" not found in sheet headers');
@@ -371,92 +361,11 @@ function nightlyWrite_(sheet, dateStr, key1, val1, key2, val2, overwrite) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// MICROCLIMATE  (RWF vs RDU daily hi/lo — logged at 8 PM)
-// Sheet tab: "Microclimate"
-// Columns:   date | rwf_hi | rwf_lo | rdu_hi | rdu_lo
-//
-// TO SET UP (one time):
-//   In the Google Sheet, add a tab named "Microclimate" with
-//   row 1 headers:  date  rwf_hi  rwf_lo  rdu_hi  rdu_lo
-// ─────────────────────────────────────────────────────────────
-var WU_API_KEY = '6532d6454b8aa370768e63d6ba5a832e';
-
-function nightlyLogMicroclimate_(ss) {
-  var sheet = ss.getSheetByName('Microclimate');
-  if (!sheet) { Logger.log('SKIP microclimate: "Microclimate" tab not found — create it with headers: date|rwf_hi|rwf_lo|rdu_hi|rdu_lo'); return; }
-
-  var opts = { headers: { 'User-Agent': 'WolfpackWeather/2.0' }, muteHttpExceptions: true };
-  var now  = new Date();
-
-  // ── RWF: Weather Underground 7-day daily summary ─────────────
-  var wuUrl = 'https://api.weather.com/v2/pws/dailysummary/7day?stationId=KNCRALEI761' +
-              '&format=json&units=e&apiKey=' + WU_API_KEY;
-  var wuResp = UrlFetchApp.fetch(wuUrl, opts);
-  var rwfByDate = {};
-  if (wuResp.getResponseCode() === 200) {
-    var summaries = JSON.parse(wuResp.getContentText()).summaries || [];
-    summaries.forEach(function(s) {
-      var ds = s.obsTimeLocal ? s.obsTimeLocal.substring(0, 10) : '';
-      if (!ds) return;
-      var imp = s.imperial || {};
-      var hi = (imp.tempHigh != null) ? imp.tempHigh : null;
-      var lo = (imp.tempLow  != null) ? imp.tempLow  : null;
-      if (hi !== null && lo !== null) rwfByDate[ds] = { hi: hi, lo: lo };
-    });
-    Logger.log('MC RWF WU summaries: ' + Object.keys(rwfByDate).length + ' days');
-  } else {
-    Logger.log('MC WU daily summary failed: HTTP ' + wuResp.getResponseCode());
-  }
-
-  // ── RDU: NWS KRDU hourly observations → daily hi/lo ──────────
-  var rduByDate = {};
-  for (var daysBack = 0; daysBack <= 6; daysBack++) {
-    var td = new Date(now.getFullYear(), now.getMonth(), now.getDate() - daysBack);
-    var ds = Utilities.formatDate(td, TZ, 'yyyy-MM-dd');
-    var startLocal = new Date(td.getFullYear(), td.getMonth(), td.getDate(),  0,  0,  0);
-    var endLocal   = new Date(td.getFullYear(), td.getMonth(), td.getDate(), 23, 59, 59);
-    var url = 'https://api.weather.gov/stations/KRDU/observations?start=' +
-              encodeURIComponent(startLocal.toISOString()) + '&end=' +
-              encodeURIComponent(endLocal.toISOString()) + '&limit=200';
-    var resp = UrlFetchApp.fetch(url, opts);
-    if (resp.getResponseCode() !== 200) {
-      Logger.log('MC RDU obs failed ' + ds + ' (HTTP ' + resp.getResponseCode() + ')');
-      continue;
-    }
-    var temps = (JSON.parse(resp.getContentText()).features || []).reduce(function(a, f) {
-      var t = f.properties && f.properties.temperature && f.properties.temperature.value;
-      if (t != null) a.push(t * 9/5 + 32);
-      return a;
-    }, []);
-    if (temps.length) {
-      rduByDate[ds] = {
-        hi: Math.round(Math.max.apply(null, temps)),
-        lo: Math.round(Math.min.apply(null, temps))
-      };
-    }
-  }
-
-  // ── Write rows where both RWF and RDU data are available ──────
-  var wrote = 0;
-  Object.keys(rwfByDate).forEach(function(ds) {
-    if (!rduByDate[ds]) return;
-    var rwf = rwfByDate[ds], rdu = rduByDate[ds];
-    nightlyWrite_(sheet, ds, 'rwf_hi', rwf.hi, 'rwf_lo', rwf.lo, true);
-    nightlyWrite_(sheet, ds, 'rdu_hi', rdu.hi, 'rdu_lo', rdu.lo, true);
-    Logger.log('MC ' + ds + ':  RWF H:' + rwf.hi + ' L:' + rwf.lo +
-               '  RDU H:' + rdu.hi + ' L:' + rdu.lo);
-    wrote++;
-  });
-  Logger.log('MC microclimate written: ' + wrote + ' dates');
-}
-
-// ─────────────────────────────────────────────────────────────
 // HELPERS
 // ─────────────────────────────────────────────────────────────
 
 // Normalize any cell value to "YYYY-MM-DD" string.
-// Sheets sometimes stores dates as Date objects instead of strings —
-// this handles both cases so deduplication works correctly.
+// Sheets sometimes stores dates as Date objects — this handles both cases.
 function normDateStr_(val) {
   if (!val && val !== 0) return '';
   if (val instanceof Date) {
@@ -467,7 +376,7 @@ function normDateStr_(val) {
 
 // ─────────────────────────────────────────────────────────────
 // DEDUP + SORT CLEANUP
-// Run "recoverAndCleanup" any time the sheet gets duplicate rows.
+// Run "recoverAndCleanup" any time the Accuracy sheet gets duplicate rows.
 // Merges all rows sharing the same date into one, then sorts by date.
 // ─────────────────────────────────────────────────────────────
 function recoverAndCleanup() {
@@ -482,8 +391,6 @@ function recoverAndCleanup() {
   var actualHiCol = headers.indexOf('actual_high');
   var actualLoCol = headers.indexOf('actual_low');
 
-  // Merge all rows for the same date into one, keeping the best value per cell.
-  // Actuals always overwrite (they are ground truth); predictions only fill blanks.
   var merged = {};
   var order  = [];
 
@@ -494,7 +401,7 @@ function recoverAndCleanup() {
 
     if (!merged[ds]) {
       var copy = row.slice();
-      copy[dateCol] = ds;   // ensure stored as plain string
+      copy[dateCol] = ds;
       merged[ds] = copy;
       order.push(ds);
     } else {
