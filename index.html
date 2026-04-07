@@ -1911,7 +1911,7 @@ function fetchYesterdayExtremes(){
   var now=new Date();
   var yestDate=new Date(now.getTime()-24*60*60*1000);
   var yestStr=yestDate.toLocaleDateString('en-CA',{timeZone:'America/New_York'});
-  var cacheKey='extremes_v6_'+yestStr;
+  var cacheKey='extremes_v7_'+yestStr;
   try{
     var cached=JSON.parse(localStorage.getItem(cacheKey)||'null');
     if(cached){renderExtremes(cached);return;}
@@ -1953,18 +1953,11 @@ function fetchYesterdayExtremes(){
     });
     hiCands.sort(function(a,b){return b.temp-a.temp;});
     loCands.sort(function(a,b){return a.temp-b.temp;});
-    // Z-score outlier filter: remove readings >3σ from the network mean (bad sensors)
-    function zFilter(arr,extreme){
-      if(arr.length<6)return arr;
-      var sum=arr.reduce(function(s,c){return s+c.temp;},0);
-      var mean=sum/arr.length;
-      var variance=arr.reduce(function(s,c){return s+Math.pow(c.temp-mean,2);},0)/arr.length;
-      var std=Math.sqrt(variance);
-      if(std<1)return arr;
-      return arr.filter(function(c){return Math.abs(c.temp-mean)/std<3.0;});
-    }
-    hiCands=zFilter(hiCands,'hi');
-    loCands=zFilter(loCands,'lo');
+    // Gap filter: if the most extreme reading is >12°F isolated from its neighbors, it's a bad sensor.
+    // A legitimate cold mountain station will have other stations in the same ballpark;
+    // a broken sensor (e.g. FFA reporting 19°F when everyone else is 33°F+) has a huge gap.
+    while(loCands.length>=2&&(loCands[1].temp-loCands[0].temp)>12)loCands.shift();
+    while(hiCands.length>=2&&(hiCands[0].temp-hiCands[1].temp)>12)hiCands.shift();
     // If the same station is both the high and low it has bad sensor data — blacklist it
     var badStn=(hiCands.length&&loCands.length&&hiCands[0].stn&&hiCands[0].stn===loCands[0].stn)?hiCands[0].stn:'';
     function pick(arr){for(var i=0;i<arr.length;i++){if(arr[i].stn!==badStn)return arr[i];}return null;}
