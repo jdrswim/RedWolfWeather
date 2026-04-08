@@ -291,11 +291,11 @@ main{max-width:1100px;margin:0 auto;padding:18px;overflow-x:hidden}
 /* ============================================================
    ACCURACY DASHBOARD — FIX: proper CSS, date parsing, actuals
    ============================================================ */
-.acc-wrap{margin-top:20px}
+.acc-wrap{margin-top:20px;overflow-x:auto;-webkit-overflow-scrolling:touch}
 .acc-hdr{font-size:13px;font-weight:900;letter-spacing:2px;color:var(--red);text-transform:uppercase;border-left:3px solid var(--red);padding-left:10px;margin-bottom:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .acc-hdr em{color:var(--mu);font-style:normal;font-weight:500;font-size:11px;letter-spacing:1px}
-.acc-score-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px}
-.acc-score-card{background:var(--p2);border:1px solid var(--bd);border-top:3px solid var(--red);border-radius:4px;padding:16px;text-align:center}
+.acc-score-row{display:flex;flex-wrap:nowrap;gap:12px;margin-bottom:16px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px}
+.acc-score-card{background:var(--p2);border:1px solid var(--bd);border-top:3px solid var(--red);border-radius:4px;padding:16px;text-align:center;min-width:130px;flex:1 1 130px}
 .acc-score-lbl{font-size:9px;font-weight:800;letter-spacing:1.5px;color:var(--red);text-transform:uppercase;margin-bottom:8px}
 .acc-score-val{font-size:32px;font-weight:200;color:var(--white);line-height:1}
 .acc-score-val.good{color:var(--green)}
@@ -405,7 +405,6 @@ footer strong{color:var(--red)}
   .media-row{grid-template-columns:1fr 1fr}
   .ext-grid{grid-template-columns:repeat(4,1fr)}
   .alm-grid{grid-template-columns:1fr}
-  .acc-score-row{grid-template-columns:repeat(3,1fr)}
 }
 @media(max-width:760px){
   .ext-grid{grid-template-columns:repeat(3,1fr)}
@@ -466,7 +465,7 @@ footer strong{color:var(--red)}
   .pws-grid{grid-template-columns:repeat(2,1fr)}
   .pws-temp{font-size:32px}
   .pws-name{font-size:13px}
-  .acc-score-row{grid-template-columns:repeat(3,1fr)}
+  .acc-log{min-width:360px}
   .acc-log-hdr,.acc-log-row{font-size:10px;padding:8px 10px}
   .acc-hilostack{font-size:10px}
   .acc-badge{font-size:8px;padding:3px 6px}
@@ -549,7 +548,7 @@ footer strong{color:var(--red)}
 <!-- TOOLTIPS -->
 <div class="tip-overlay" id="tipTSPS"><div class="tip-panel"><button class="tip-close" onclick="closeTip('tipTSPS')">&times;</button><div class="tip-title">About Tuffy's Storm Prediction System</div><div class="tip-body"><div class="tip-label">What Is This?</div>A <strong>proprietary severe weather intelligence engine</strong> generating a <strong>Severe Weather Index (0-100)</strong> and occurrence likelihood for +3, +6, +9, +12, and +24 hour windows.<div class="tip-divider"></div><div class="tip-label">Data Sources</div>All data from the <strong>National Weather Service (NWS) API</strong>: hourly forecast and active alerts.<div class="tip-divider"></div><div class="tip-label">6-Component Algorithm</div><strong>Wind</strong> (0-20), <strong>Gusts</strong> (0-18), <strong>Precip</strong> (0-14), <strong>Instability</strong> (0-16), <strong>Forecast Text</strong> (0-22), <strong>Alerts</strong> (0-10).<div class="tip-divider"></div><div class="tip-label">Threat Levels</div><div class="tip-color-row"><div class="tip-swatch" style="background:#1a6b3a"></div><strong>0-9 NONE</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#22c55e"></div><strong>10-24 LOW</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#eab308"></div><strong>25-49 GUARDED</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#f97316"></div><strong>50-74 ELEVATED</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#ef4444"></div><strong>75-89 HIGH</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#dc2626"></div><strong>90-100 EXTREME</strong></div></div></div></div>
 <div class="tip-overlay" id="tipForecast"><div class="tip-panel"><button class="tip-close" onclick="closeTip('tipForecast')">&times;</button><div class="tip-title">Reading the 7-Day Forecast</div><div class="tip-body"><div class="tip-label">Temperature Range Bar</div>Each bar spans <strong style="color:#2255cc">Low</strong> to <strong style="color:#b05800">High</strong>, positioned relative to the full week.<div class="tip-divider"></div><div class="tip-color-row"><div class="tip-swatch" style="background:#ff6600"></div><strong>Orange</strong> 80F+</div><div class="tip-color-row"><div class="tip-swatch" style="background:#ffcc00"></div><strong>Yellow</strong> 60-79F</div><div class="tip-color-row"><div class="tip-swatch" style="background:#4488ff"></div><strong>Blue</strong> Below 60F</div></div></div></div>
-<div class="tip-overlay" id="tipAccuracy"><div class="tip-panel"><button class="tip-close" onclick="closeTip('tipAccuracy')">&times;</button><div class="tip-title">Valvano's Forecast Accountability</div><div class="tip-body"><div class="tip-color-row"><div class="tip-swatch" style="background:#00d44a"></div><strong>HIT</strong> — Hi &amp; Lo both within 1° of actual</div><div class="tip-color-row"><div class="tip-swatch" style="background:#FFD700"></div><strong>CLOSE</strong> — Average error 2–4°</div><div class="tip-color-row"><div class="tip-swatch" style="background:#ef4444"></div><strong>MISS</strong> — Average error 5°+</div><div class="tip-divider"></div><div class="tip-label">Lead-Time Cards</div>Each card shows NWS accuracy for forecasts made <strong>N days before</strong> the target date. 1-Day Out = next-day forecast; 5-Day Out = five days ahead. Accuracy naturally decreases with lead time.<div class="tip-divider"></div><div class="tip-label">Methodology</div>At <strong>8 PM</strong> each evening, forecasts are recorded for all 5 upcoming days from NWS Raleigh. Actuals are the observed <strong>high &amp; low from NWS KRDU</strong> station data.</div></div></div>
+<div class="tip-overlay" id="tipAccuracy"><div class="tip-panel"><button class="tip-close" onclick="closeTip('tipAccuracy')">&times;</button><div class="tip-title">Justin Gainey's Forecast %</div><div class="tip-body"><div class="tip-color-row"><div class="tip-swatch" style="background:#00d44a"></div><strong>HIT</strong> — Hi &amp; Lo both within 1° of actual</div><div class="tip-color-row"><div class="tip-swatch" style="background:#FFD700"></div><strong>CLOSE</strong> — Average error 2–4°</div><div class="tip-color-row"><div class="tip-swatch" style="background:#ef4444"></div><strong>MISS</strong> — Average error 5°+</div><div class="tip-divider"></div><div class="tip-label">Lead-Time Cards</div>Each card shows NWS accuracy for forecasts made <strong>N days before</strong> the target date. 1-Day Out = next-day forecast; 5-Day Out = five days ahead. Accuracy naturally decreases with lead time.<div class="tip-divider"></div><div class="tip-label">Methodology</div>At <strong>8 PM</strong> each evening, forecasts are recorded for all 5 upcoming days from NWS Raleigh. Actuals are the observed <strong>high &amp; low from NWS KRDU</strong> station data.</div></div></div>
 <div class="tip-overlay" id="tipAlmanac"><div class="tip-panel"><button class="tip-close" onclick="closeTip('tipAlmanac')">&times;</button><div class="tip-title">Raleigh Wx Almanac</div><div class="tip-body"><strong>Year-to-date climate stats</strong> vs 30-year normals (1991-2020). Data from <strong>Open-Meteo Archive</strong> (ERA5). Reference: RDU Airport.<div class="tip-divider"></div><div class="tip-color-row"><div class="tip-swatch" style="background:#ff8844"></div><strong>Orange</strong> Above normal</div><div class="tip-color-row"><div class="tip-swatch" style="background:#77aaff"></div><strong>Blue</strong> Below normal</div><div class="tip-color-row"><div class="tip-swatch" style="background:#00d44a"></div><strong>Green</strong> Near normal</div></div></div></div>
 
 <span id="oatemp" style="display:none"></span>
@@ -2116,7 +2115,7 @@ function accLogActuals(){
 var _accCachedRows=[];
 function accFetchAndRender(){
   var el=$("acc-dashboard");if(!el)return;
-  el.innerHTML='<div class="acc-wrap"><div class="acc-hdr">Valvano\'s Forecast Accountability Dashboard <em>- Loading...</em></div><div class="alm-ld"><div class="tsps-spinner"></div></div></div>';
+  el.innerHTML='<div class="acc-wrap"><div class="acc-hdr">Justin Gainey\'s Forecast % <em>- Loading...</em></div><div class="alm-ld"><div class="tsps-spinner"></div></div></div>';
   fetch(SHEET_URL+"?tab=Accuracy")
   .then(function(r){return r.text();})
   .then(function(txt){var d=JSON.parse(txt);_accCachedRows=d.rows||[];accRender(el,_accCachedRows);})
@@ -2203,7 +2202,7 @@ function accRender(el,rawRows){
   if(!rows.length){
     el.innerHTML=
       '<div class="acc-wrap">'+
-        '<div class="acc-hdr">Valvano\'s Forecast Accountability Dashboard <em>- Forecast vs Actual Temperature</em> <div class="tip-btn" onclick="openTip(\'tipAccuracy\')" style="display:inline-flex;vertical-align:middle;margin-left:6px">?</div></div>'+
+        '<div class="acc-hdr">Justin Gainey\'s Forecast % <em>- Forecast vs Actual Temperature</em> <div class="tip-btn" onclick="openTip(\'tipAccuracy\')" style="display:inline-flex;vertical-align:middle;margin-left:6px">?</div></div>'+
         accLogStatus()+
         '<div style="background:var(--p2);border:1px solid var(--bd);border-radius:4px;padding:28px;text-align:center">'+
           '<div style="font-size:36px;margin-bottom:14px">📊</div>'+
@@ -2266,7 +2265,7 @@ function accRender(el,rawRows){
 
   var html=
     '<div class="acc-wrap">'+
-      '<div class="acc-hdr">Valvano\'s Forecast Accountability Dashboard <em>- Forecast vs Actual Temperature</em> <div class="tip-btn" onclick="openTip(\'tipAccuracy\')" style="display:inline-flex;vertical-align:middle;margin-left:6px">?</div></div>'+
+      '<div class="acc-hdr">Justin Gainey\'s Forecast % <em>- Forecast vs Actual Temperature</em> <div class="tip-btn" onclick="openTip(\'tipAccuracy\')" style="display:inline-flex;vertical-align:middle;margin-left:6px">?</div></div>'+
       accLogStatus()+
       (function(){
         var accs=[1,2,3,4,5].map(function(l){return{l:l,a:calcAccuracyForLead(rows,l)};});
