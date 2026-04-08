@@ -1,23 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
-<title>Gunnar's Raleigh Sim</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-html,body{width:100%;height:100%;overflow:hidden;background:#000}
-#root{width:100%;height:100vh}
-</style>
-</head>
-<body>
-<div id="root"></div>
-<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<script type="text/babel">
-const { useState, useEffect, useRef, useCallback } = React;
+import { useState, useEffect, useRef, useCallback } from "react";
+import * as THREE from "three";
 
 const JOBS = [
   { id:"taxi", name:"Taxi Driver", pay:5, emoji:"🚕", unlockCost:0 },
@@ -1287,7 +1269,7 @@ function GameMap({px,pz,onClose,F}){
   );
 }
 
-function App(){
+export default function App(){
   const mountRef=useRef(null);
   const keysRef=useRef({});
   const joyRef=useRef({x:0,y:0,active:false});
@@ -1575,10 +1557,10 @@ function App(){
     });
     vRoads.forEach(pos=>{
       const len=vLen(pos)+4;const w2=roadW(pos);
-      mkSw(swW,curbH,len,pos-w2/2-swW/2,curbH/2,0);
-      mkSw(swW,curbH,len,pos+w2/2+swW/2,curbH/2,0);
-      scene.add(mp(new THREE.BoxGeometry(0.12,curbH+0.04,len),curbMat,pos-w2/2-0.06,curbH/2+0.02,0));
-      scene.add(mp(new THREE.BoxGeometry(0.12,curbH+0.04,len),curbMat,pos+w2/2+0.06,curbH/2+0.02,0));
+      mkSw(swW,curbH,len,pos-w2/2-swW/2,curbH/2+0.01,0);
+      mkSw(swW,curbH,len,pos+w2/2+swW/2,curbH/2+0.01,0);
+      scene.add(mp(new THREE.BoxGeometry(0.12,curbH+0.04,len),curbMat,pos-w2/2-0.06,curbH/2+0.03,0));
+      scene.add(mp(new THREE.BoxGeometry(0.12,curbH+0.04,len),curbMat,pos+w2/2+0.06,curbH/2+0.03,0));
     });
 
     // 10. CORNER FILLS at intersections
@@ -1587,7 +1569,7 @@ function App(){
         const rw2=roadW(vx);const hw2=isMainH(hz)?mainW:rdW;
         [[-1,-1],[-1,1],[1,-1],[1,1]].forEach(([sx,sz])=>{
           const corner=new THREE.Mesh(new THREE.BoxGeometry(swW+0.5,curbH,swW+0.5),swMat3);
-          corner.position.set(vx+sx*(rw2/2+swW/2),curbH/2,hz+sz*(hw2/2+swW/2));
+          corner.position.set(vx+sx*(rw2/2+swW/2),curbH/2+0.02,hz+sz*(hw2/2+swW/2));
           corner.receiveShadow=true;scene.add(corner);
         });
       });
@@ -2629,13 +2611,7 @@ function App(){
           checkPos.z+Math.cos(dir2)*4
         );
       } else {
-        // Third person — camera stays behind character
-        // Smoothly follow character's facing direction
-        let targetCamAngle=target.rotation.y+Math.PI;
-        let angleDiff=targetCamAngle-camAngleRef.current;
-        while(angleDiff>Math.PI)angleDiff-=Math.PI*2;
-        while(angleDiff<-Math.PI)angleDiff+=Math.PI*2;
-        camAngleRef.current+=angleDiff*Math.min(1,4*dt);
+        // Third person — fixed orbit camera, user controls with Q/E/mouse
         const cAngle2=camAngleRef.current;
         const camY2=Math.sin(cPitch)*cDist;
         const camHoriz=Math.cos(cPitch)*cDist;
@@ -3048,8 +3024,3 @@ function App(){
     </div>
   );
 }
-
-ReactDOM.createRoot(document.getElementById('root')).render(<App />);
-</script>
-</body>
-</html>
