@@ -2343,6 +2343,54 @@ function accRender(el,rawRows){
         }
         return scoreHtml;
       })()+
+      (function(){
+        // Biggest bust in last 30 days
+        var cutoff30=new Date();cutoff30.setDate(cutoff30.getDate()-30);
+        var bust=null,bustErr=0;
+        rows.forEach(function(r){
+          var dp=accParseDate(r.date);
+          if(isNaN(dp.getTime())||dp<cutoff30)return;
+          var pH=parseFloat(r.pred_high),pL=parseFloat(r.pred_low);
+          var aH=parseFloat(r.actual_high),aL=parseFloat(r.actual_low);
+          if(isNaN(pH)||isNaN(pL)||isNaN(aH)||isNaN(aL))return;
+          var avgErr=(Math.abs(aH-pH)+Math.abs(aL-pL))/2;
+          if(avgErr>bustErr){bustErr=avgErr;bust={r:r,dp:dp,pH:pH,pL:pL,aH:aH,aL:aL,hiDiff:aH-pH,loDiff:aL-pL,avgErr:avgErr};}
+        });
+        if(!bust||bustErr<2)return'';
+        var b=bust;
+        var dateStr=b.dp.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});
+        var hiSign=b.hiDiff>0?'+':'',loSign=b.loDiff>0?'+':'';
+        var hiC=Math.abs(b.hiDiff)<=1?'var(--green)':Math.abs(b.hiDiff)<=4?'var(--yellow)':'#ef4444';
+        var loC=Math.abs(b.loDiff)<=1?'var(--green)':Math.abs(b.loDiff)<=4?'var(--yellow)':'#ef4444';
+        // Generate 1-liner
+        var oneLiner;
+        var hiMiss=Math.abs(b.hiDiff),loMiss=Math.abs(b.loDiff);
+        var warmBias=(b.hiDiff<0&&b.loDiff<0);
+        var coldBias=(b.hiDiff>0&&b.loDiff>0);
+        if(warmBias&&(hiMiss>loMiss?hiMiss:loMiss)>=5){
+          oneLiner='NWS ran too warm — reality came in colder than expected across both high and low.';
+        } else if(coldBias&&(hiMiss>loMiss?hiMiss:loMiss)>=5){
+          oneLiner='NWS ran too cold — temperatures ended up warmer than the forecast.';
+        } else if(hiMiss>loMiss&&hiMiss>=5){
+          oneLiner='High temp '+(b.hiDiff<0?'fell well short of':'blew past')+' the forecast while the low was closer to on-target.';
+        } else if(loMiss>=5){
+          oneLiner='Low temp '+(b.loDiff<0?'crashed much colder than':'held much warmer than')+' expected overnight.';
+        } else {
+          oneLiner='Both high and low missed — the day-of pattern didn\'t verify as modeled.';
+        }
+        return'<div style="background:var(--p2);border:1px solid var(--bd);border-left:3px solid #ef4444;border-radius:4px;padding:14px 16px;margin-bottom:14px;display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">'+
+          '<div style="flex-shrink:0;font-size:20px;line-height:1">💥</div>'+
+          '<div style="flex:1;min-width:0">'+
+            '<div style="font-size:9px;font-weight:800;letter-spacing:1.5px;color:#ef4444;text-transform:uppercase;margin-bottom:5px">Biggest Bust · Last 30 Days</div>'+
+            '<div style="display:flex;gap:20px;flex-wrap:wrap;align-items:baseline;margin-bottom:6px">'+
+              '<span style="font-size:12px;font-weight:700;color:var(--white)">'+dateStr+'</span>'+
+              '<span style="font-size:11px;color:var(--mu)">Fcst '+Math.round(b.pH)+'°/'+Math.round(b.pL)+'° · Actual '+Math.round(b.aH)+'°/'+Math.round(b.aL)+'°</span>'+
+              '<span style="font-size:11px;font-weight:700"><span style="color:'+hiC+'">Hi'+hiSign+Math.round(b.hiDiff)+'°</span> <span style="color:'+loC+'">Lo'+loSign+Math.round(b.loDiff)+'°</span> <span style="color:#ef4444">avg ±'+b.avgErr.toFixed(1)+'°</span></span>'+
+            '</div>'+
+            '<div style="font-size:11px;color:var(--mu);line-height:1.5;font-style:italic">'+oneLiner+'</div>'+
+          '</div>'+
+        '</div>';
+      })()+
       '<div class="acc-log" style="border:1px solid var(--bd);border-radius:4px;overflow:hidden">'+
         '<div class="acc-log-hdr">'+
           '<div>Date</div>'+
@@ -2351,11 +2399,13 @@ function accRender(el,rawRows){
           '<div>Result</div>'+
         '</div>';
 
-  // Sort descending by date, one row per day (already deduped)
+  // Sort descending by date — show last 7 days only
+  var cutoff7=new Date();cutoff7.setDate(cutoff7.getDate()-7);
   var sortedRows=rows.slice().sort(function(a,b){return accParseDate(b.date)-accParseDate(a.date);});
   var shown=0;
   sortedRows.forEach(function(r){
-    if(shown>=60)return;
+    var dp=accParseDate(r.date);
+    if(isNaN(dp.getTime())||dp<cutoff7)return;
     var pH=parseFloat(r.pred_high),pL=parseFloat(r.pred_low);
     var aH=parseFloat(r.actual_high),aL=parseFloat(r.actual_low);
     var hasPred=!isNaN(pH)&&!isNaN(pL);
@@ -2410,9 +2460,8 @@ function accRender(el,rawRows){
   html+=
     '</div>'+
     '<div class="acc-note">'+
-      'Predictions: NWS Raleigh forecast logged at 8 PM for days 1–5 out · '+
-      'Actuals: NWS KRDU station hourly obs (fallback: Open-Meteo) · '+
-      'One row per day · '+rows.length+' day'+(rows.length!==1?"s":"")+' tracked'+
+      'Showing last 7 days · Bust card = worst 1-day forecast in last 30 days · '+
+      'Predictions logged at 8 PM · Actuals: NWS KRDU · '+rows.length+' day'+(rows.length!==1?"s":"")+' total on record'+
     '</div>'+
   '</div>';
   el.innerHTML=html;
