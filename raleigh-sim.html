@@ -1,5 +1,23 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import * as THREE from "three";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+<title>Gunnar's Raleigh Sim</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;background:#000}
+#root{width:100%;height:100vh}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
 
 const JOBS = [
   { id:"taxi", name:"Taxi Driver", pay:5, emoji:"🚕", unlockCost:0 },
@@ -1269,7 +1287,7 @@ function GameMap({px,pz,onClose,F}){
   );
 }
 
-export default function App(){
+function App(){
   const mountRef=useRef(null);
   const keysRef=useRef({});
   const joyRef=useRef({x:0,y:0,active:false});
@@ -3024,3 +3042,8 @@ export default function App(){
     </div>
   );
 }
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
