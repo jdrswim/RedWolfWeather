@@ -300,7 +300,8 @@ main{max-width:1100px;margin:0 auto;padding:18px;overflow-x:hidden}
 .acc-hdr{font-size:13px;font-weight:900;letter-spacing:2px;color:var(--red);text-transform:uppercase;border-left:3px solid var(--red);padding-left:10px;margin-bottom:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .acc-hdr em{color:var(--mu);font-style:normal;font-weight:500;font-size:11px;letter-spacing:1px}
 .acc-score-row{display:flex;flex-wrap:nowrap;gap:12px;margin-bottom:16px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px}
-.acc-score-card{background:var(--p2);border:1px solid var(--bd);border-top:3px solid var(--red);border-radius:4px;padding:16px;text-align:center;min-width:130px;flex:1 1 130px}
+.acc-score-card{background:var(--p2);border:1px solid var(--bd);border-top:3px solid var(--red);border-radius:4px;padding:16px;text-align:center;min-width:130px;flex:1 1 130px;cursor:pointer}
+.acc-score-card.acc-lead-active{border-top-color:var(--gold)!important;box-shadow:0 0 0 1px var(--gold)}
 .acc-score-lbl{font-size:9px;font-weight:800;letter-spacing:1.5px;color:var(--red);text-transform:uppercase;margin-bottom:8px}
 .acc-score-val{font-size:32px;font-weight:200;color:var(--white);line-height:1}
 .acc-score-val.good{color:var(--green)}
@@ -2253,7 +2254,19 @@ function accLogStatus(){
   return html;
 }
 
+window._accSelectedLead=window._accSelectedLead||1;
+window._accLastEl=null;
+window._accLastRaw=null;
+
+function accSelectLead(lead){
+  window._accSelectedLead=lead;
+  if(window._accLastEl&&window._accLastRaw)accRender(window._accLastEl,window._accLastRaw);
+}
+
 function accRender(el,rawRows){
+  window._accLastEl=el;
+  window._accLastRaw=rawRows;
+  var selectedLead=window._accSelectedLead||1;
   // Deduplicate first
   var rows=accDedupeRows(rawRows);
 
@@ -2313,7 +2326,8 @@ function accRender(el,rawRows){
     if(!acc)return''; // building cards rendered separately as a note
     var label=lead+"-Day Out";
     var cls=errClass(acc.avgMeanErr);
-    return'<div class="acc-score-card">'+
+    var activeCls=lead===selectedLead?' acc-lead-active':'';
+    return'<div class="acc-score-card'+activeCls+'" id="acc-lead-card-'+lead+'" onclick="accSelectLead('+lead+')">'+
       '<div class="acc-score-lbl">'+label+'</div>'+
       '<div class="acc-score-val '+cls+'">±'+acc.avgMeanErr.toFixed(1)+'°</div>'+
       '<div class="acc-score-sub">avg over '+acc.total+' day'+(acc.total!==1?'s':'')+'</div>'+
@@ -2394,7 +2408,7 @@ function accRender(el,rawRows){
       '<div class="acc-log" style="border:1px solid var(--bd);border-radius:4px;overflow:hidden">'+
         '<div class="acc-log-hdr">'+
           '<div>Date</div>'+
-          '<div>Forecast</div>'+
+          '<div>Fcst ('+selectedLead+'-Day Out)</div>'+
           '<div>Actual</div>'+
           '<div>Result</div>'+
         '</div>';
@@ -2406,7 +2420,9 @@ function accRender(el,rawRows){
   sortedRows.forEach(function(r){
     var dp=accParseDate(r.date);
     if(isNaN(dp.getTime())||dp<cutoff7)return;
-    var pH=parseFloat(r.pred_high),pL=parseFloat(r.pred_low);
+    var hiKey=selectedLead===1?'pred_high':'pred_hi_d'+selectedLead;
+    var loKey=selectedLead===1?'pred_low':'pred_lo_d'+selectedLead;
+    var pH=parseFloat(r[hiKey]),pL=parseFloat(r[loKey]);
     var aH=parseFloat(r.actual_high),aL=parseFloat(r.actual_low);
     var hasPred=!isNaN(pH)&&!isNaN(pL);
     var hasActual=!isNaN(aH)&&!isNaN(aL);
@@ -2460,7 +2476,7 @@ function accRender(el,rawRows){
   html+=
     '</div>'+
     '<div class="acc-note">'+
-      'Showing last 7 days · Bust card = worst 1-day forecast in last 30 days · '+
+      'Showing last 7 days ('+selectedLead+'-day-out forecast) · Bust card = worst 1-day forecast in last 30 days · '+
       'Predictions logged at 8 PM · Actuals: NWS KRDU · '+rows.length+' day'+(rows.length!==1?"s":"")+' total on record'+
     '</div>'+
   '</div>';
