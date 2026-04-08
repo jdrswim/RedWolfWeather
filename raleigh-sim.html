@@ -399,6 +399,18 @@ function genBuildings() {
     s: "house",
     type: "home",
     desc: "Home sweet home!"
+  }, {
+    id: "colonial",
+    name: "The Gainey House",
+    bx: -1,
+    bz: 2,
+    w: 13,
+    h: 6.5,
+    d: 9,
+    c: 0xc8b870,
+    s: "colonial",
+    type: "landmark",
+    desc: "A classic 2-story colonial with front porch, dark shutters, and an orange door."
   }];
   // Place named buildings
   var usedBlocks = new Set();
@@ -746,6 +758,97 @@ function buildB(scene, b) {
     rf.rotation.y = Math.PI / 4;
     rf.castShadow = true;
     g.add(rf);
+  } else if (b.s === "colonial") {
+    // ── Gainey House: tan colonial, dark shutters, orange door, Xmas wreaths ──
+    var roofMat = new THREE.MeshLambertMaterial({ color: 0x2a2a2a });
+    var shutterMat = new THREE.MeshLambertMaterial({ color: 0x1a1a1a });
+    var doorMat = new THREE.MeshLambertMaterial({ color: 0xc85010 });
+    var colMat = new THREE.MeshLambertMaterial({ color: 0x1a1a1a });
+    var brickMat = new THREE.MeshLambertMaterial({ color: 0xaa5533 });
+    var wreathMat = new THREE.MeshLambertMaterial({ color: 0x1a6a22 });
+    var bowMat = new THREE.MeshLambertMaterial({ color: 0xcc0000 });
+    var bushMat = new THREE.MeshLambertMaterial({ color: 0x2d6a2d });
+
+    // Main gable roof (pyramid over full width)
+    var rfC = new THREE.Mesh(new THREE.CylinderGeometry(0, b.w * 0.58, 2.8, 4), roofMat);
+    rfC.position.set(b.x, b.h + 1.4, b.z);
+    rfC.rotation.y = Math.PI / 4;
+    rfC.castShadow = true;
+    g.add(rfC);
+
+    // Left-side gable section (forward projecting dormer)
+    var rfL = new THREE.Mesh(new THREE.CylinderGeometry(0, 3.8, 2.2, 4), roofMat);
+    rfL.position.set(b.x - b.w * 0.3, b.h + 1.1, b.z - 1.0);
+    rfL.rotation.y = Math.PI / 4;
+    rfL.castShadow = true;
+    g.add(rfL);
+
+    // Front porch overhang (runs full width, ~3 units deep in front)
+    g.add(mp(new THREE.BoxGeometry(b.w + 0.4, 0.35, 3.2), roofMat,
+      b.x, b.h + 0.18, b.z - b.d / 2 - 1.6));
+
+    // Porch floor (brick-ish)
+    g.add(mp(new THREE.BoxGeometry(b.w - 1, 0.22, 3.0), brickMat,
+      b.x, 0.11, b.z - b.d / 2 - 1.5));
+
+    // Porch columns — 4 square dark columns
+    [-4.5, -1.5, 1.5, 4.5].forEach(function(cx) {
+      g.add(mp(new THREE.BoxGeometry(0.28, b.h, 0.28), colMat,
+        b.x + cx, b.h / 2, b.z - b.d / 2 - 3.0, true));
+    });
+
+    // Orange front door (centered on porch front)
+    g.add(mp(new THREE.BoxGeometry(0.9, 1.9, 0.12), doorMat,
+      b.x, 0.95, b.z - b.d / 2 - 0.06, false));
+
+    // Sidelights beside door (slim cream panels)
+    var slMat = new THREE.MeshLambertMaterial({ color: 0xddd8c0 });
+    g.add(mp(new THREE.BoxGeometry(0.22, 1.6, 0.1), slMat, b.x - 0.58, 0.8, b.z - b.d / 2 - 0.06));
+    g.add(mp(new THREE.BoxGeometry(0.22, 1.6, 0.1), slMat, b.x + 0.58, 0.8, b.z - b.d / 2 - 0.06));
+
+    // Brick steps leading up to porch
+    g.add(mp(new THREE.BoxGeometry(2.2, 0.22, 1.1), brickMat, b.x, 0.11, b.z - b.d / 2 - 4.1));
+    g.add(mp(new THREE.BoxGeometry(2.0, 0.22, 1.0), brickMat, b.x, 0.33, b.z - b.d / 2 - 3.6));
+
+    // Dark shutters on 1st-floor front windows (2 pairs)
+    [-3.2, 3.2].forEach(function(wx) {
+      g.add(mp(new THREE.BoxGeometry(0.28, 1.3, 0.1), shutterMat, b.x + wx - 0.72, 1.8, b.z - b.d / 2 - 0.05));
+      g.add(mp(new THREE.BoxGeometry(0.28, 1.3, 0.1), shutterMat, b.x + wx + 0.72, 1.8, b.z - b.d / 2 - 0.05));
+    });
+
+    // Dark shutters on 2nd-floor front windows (4 pairs)
+    [-4.5, -2.0, 2.0, 4.5].forEach(function(wx) {
+      g.add(mp(new THREE.BoxGeometry(0.26, 1.2, 0.1), shutterMat, b.x + wx - 0.65, b.h * 0.72, b.z - b.d / 2 - 0.05));
+      g.add(mp(new THREE.BoxGeometry(0.26, 1.2, 0.1), shutterMat, b.x + wx + 0.65, b.h * 0.72, b.z - b.d / 2 - 0.05));
+    });
+
+    // Christmas wreaths on 2nd-floor windows
+    [-4.5, -2.0, 2.0, 4.5].forEach(function(wx) {
+      var wreath = new THREE.Mesh(new THREE.TorusGeometry(0.32, 0.09, 7, 14), wreathMat);
+      wreath.position.set(b.x + wx, b.h * 0.72, b.z - b.d / 2 - 0.12);
+      g.add(wreath);
+      // Red bow at bottom of wreath
+      g.add(mp(new THREE.BoxGeometry(0.22, 0.11, 0.06), bowMat,
+        b.x + wx, b.h * 0.72 - 0.3, b.z - b.d / 2 - 0.12));
+    });
+
+    // Red ribbon bows on 1st-floor shutters
+    [-3.2, 3.2].forEach(function(wx) {
+      g.add(mp(new THREE.BoxGeometry(0.38, 0.14, 0.08), bowMat, b.x + wx, 1.65, b.z - b.d / 2 - 0.12));
+    });
+
+    // Landscaping — round bushes along porch base
+    [-4.5, -2.8, -1.2, 1.2, 2.8, 4.5].forEach(function(bx2) {
+      var bush = new THREE.Mesh(new THREE.SphereGeometry(0.55, 7, 5), bushMat);
+      bush.position.set(b.x + bx2, 0.42, b.z - b.d / 2 - 3.2);
+      g.add(bush);
+    });
+
+    // Porch swing (two chains + seat)
+    var swingMat = new THREE.MeshLambertMaterial({ color: 0x8b7355 });
+    g.add(mp(new THREE.BoxGeometry(1.6, 0.12, 0.55), swingMat, b.x + 3.5, 2.2, b.z - b.d / 2 - 1.5));
+    g.add(mp(new THREE.BoxGeometry(0.06, 0.9, 0.06), swingMat, b.x + 2.8, 2.65, b.z - b.d / 2 - 1.5));
+    g.add(mp(new THREE.BoxGeometry(0.06, 0.9, 0.06), swingMat, b.x + 4.2, 2.65, b.z - b.d / 2 - 1.5));
   } else if (b.s === "commercial") {
     g.add(mp(new THREE.BoxGeometry(b.w * 0.7, 0.12, 1.2), new THREE.MeshLambertMaterial({
       color: 0xcc4444
