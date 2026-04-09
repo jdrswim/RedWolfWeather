@@ -319,9 +319,15 @@ main{max-width:1100px;margin:0 auto;padding:18px;overflow-x:hidden}
 .acc-key{font-size:9px;color:var(--mu2);text-align:center;margin-bottom:14px;padding:8px 12px;background:var(--p2);border:1px solid var(--bd);border-radius:3px}
 .acc-key strong{color:var(--mu)}
 .acc-log-hdr{display:grid;grid-template-columns:1.8fr 1fr 1fr 1.3fr;gap:4px;padding:10px 16px;background:var(--p1);border-bottom:1px solid var(--bd);font-size:9px;font-weight:800;letter-spacing:1px;color:var(--red);text-transform:uppercase}
-.acc-log-row{display:grid;grid-template-columns:1.8fr 1fr 1fr 1.3fr;gap:4px;padding:9px 16px;border-bottom:1px solid rgba(0,0,0,0.064);font-size:12px;color:var(--white);align-items:center}
-.acc-log-row:last-child{border-bottom:none}
-.acc-log-row:hover{background:rgba(0,0,0,0.032)}
+.acc-log-row{display:grid;grid-template-columns:1.8fr 1fr 1fr 1.3fr;gap:4px;padding:9px 16px;border-bottom:1px solid rgba(0,0,0,0.064);font-size:12px;color:var(--white);align-items:center;cursor:pointer;transition:background .12s}
+.acc-log-row:hover{background:rgba(255,255,255,0.05)}
+.acc-day-detail{border-bottom:1px solid rgba(0,0,0,0.064);background:var(--p1);padding:10px 16px;display:none}
+.acc-day-detail.open{display:block}
+.acc-leads-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.acc-lead-chip{background:var(--p2);border:1px solid var(--bd);border-top:2px solid var(--red);border-radius:4px;padding:8px 10px;min-width:90px;flex:1 1 90px;text-align:center}
+.acc-lead-chip-lbl{font-size:8px;font-weight:800;letter-spacing:1.5px;color:var(--red);text-transform:uppercase;margin-bottom:4px}
+.acc-lead-chip-val{font-size:11px;color:var(--white)}
+.acc-lead-chip-err{font-size:10px;font-weight:700;margin-top:3px}
 .acc-date{font-size:11px;color:var(--mu);font-weight:600}
 .acc-hilostack{display:flex;flex-direction:column;gap:2px;font-size:11px}
 .acc-hilostack span{display:flex;align-items:baseline;gap:3px}
@@ -2269,19 +2275,19 @@ function accLogStatus(){
   return html;
 }
 
-window._accSelectedLead=window._accSelectedLead||1;
+window._accExpandedDay=window._accExpandedDay||null;
 window._accLastEl=null;
 window._accLastRaw=null;
 
-function accSelectLead(lead){
-  window._accSelectedLead=lead;
+function accToggleDay(ds){
+  window._accExpandedDay=(window._accExpandedDay===ds?null:ds);
   if(window._accLastEl&&window._accLastRaw)accRender(window._accLastEl,window._accLastRaw);
 }
 
 function accRender(el,rawRows){
   window._accLastEl=el;
   window._accLastRaw=rawRows;
-  var selectedLead=window._accSelectedLead||1;
+  var expandedDay=window._accExpandedDay||null;
   // Deduplicate first
   var rows=accDedupeRows(rawRows);
 
@@ -2337,41 +2343,10 @@ function accRender(el,rawRows){
 
   function errClass(e){return e<=1?"good":e<=3?"ok":"poor";}
 
-  function renderLeadCard(lead,acc){
-    if(!acc)return''; // building cards rendered separately as a note
-    var label=lead+"-Day Out";
-    var cls=errClass(acc.avgMeanErr);
-    var activeCls=lead===selectedLead?' acc-lead-active':'';
-    return'<div class="acc-score-card'+activeCls+'" id="acc-lead-card-'+lead+'" onclick="accSelectLead('+lead+')">'+
-      '<div class="acc-score-lbl">'+label+'</div>'+
-      '<div class="acc-score-val '+cls+'">±'+acc.avgMeanErr.toFixed(1)+'°</div>'+
-      '<div class="acc-score-sub">avg over '+acc.total+' day'+(acc.total!==1?'s':'')+'</div>'+
-      '<div class="acc-score-err">Hi ±'+acc.avgHiErr.toFixed(1)+'° / Lo ±'+acc.avgLoErr.toFixed(1)+'°</div>'+
-    '</div>';
-  }
-
   var html=
     '<div class="acc-wrap">'+
       '<div class="acc-hdr">Justin Gainey\'s Forecast % <em>- Forecast vs Actual Temperature</em> <div class="tip-btn" onclick="openTip(\'tipAccuracy\')" style="display:inline-flex;vertical-align:middle;margin-left:6px">?</div></div>'+
       accLogStatus()+
-      (function(){
-        var accs=[1,2,3,4,5].map(function(l){return{l:l,a:calcAccuracyForLead(rows,l)};});
-        var ready=accs.filter(function(x){return x.a;});
-        var building=accs.filter(function(x){return !x.a;}).map(function(x){return x.l;});
-        var scoreHtml='';
-        if(ready.length){
-          scoreHtml='<div class="acc-score-row" style="grid-template-columns:repeat('+ready.length+',1fr)">';
-          ready.forEach(function(x){scoreHtml+=renderLeadCard(x.l,x.a);});
-          scoreHtml+='</div>';
-        }
-        if(building.length){
-          var note=ready.length===0
-            ?'Accuracy tracking active — data will appear here after the first 8 PM log.'
-            :'<strong style="color:var(--mu)">'+(building.length>1?building[0]+'-'+building[building.length-1]:building[0])+'-day accuracy:</strong> still collecting data';
-          scoreHtml+='<div style="font-size:10px;color:var(--mu2);background:var(--p2);border:1px solid var(--bd);border-radius:3px;padding:9px 14px;margin-bottom:14px">📈 '+note+'</div>';
-        }
-        return scoreHtml;
-      })()+
       (function(){
         // Biggest bust in last 30 days
         var cutoff30=new Date();cutoff30.setDate(cutoff30.getDate()-30);
@@ -2423,7 +2398,7 @@ function accRender(el,rawRows){
       '<div class="acc-log" style="border:1px solid var(--bd);border-radius:4px;overflow:hidden">'+
         '<div class="acc-log-hdr">'+
           '<div>Date</div>'+
-          '<div>Fcst ('+selectedLead+'-Day Out)</div>'+
+          '<div>Forecast (1-Day Out)</div>'+
           '<div>Actual</div>'+
           '<div>Result</div>'+
         '</div>';
@@ -2435,18 +2410,19 @@ function accRender(el,rawRows){
   sortedRows.forEach(function(r){
     var dp=accParseDate(r.date);
     if(isNaN(dp.getTime())||dp<cutoff7)return;
-    var hiKey=selectedLead===1?'pred_high':'pred_hi_d'+selectedLead;
-    var loKey=selectedLead===1?'pred_low':'pred_lo_d'+selectedLead;
-    var pH=parseFloat(r[hiKey]),pL=parseFloat(r[loKey]);
+    var ds=(r.date||"").substring(0,10);
+    var pH=parseFloat(r.pred_high),pL=parseFloat(r.pred_low);
     var aH=parseFloat(r.actual_high),aL=parseFloat(r.actual_low);
     var hasPred=!isNaN(pH)&&!isNaN(pL);
     var hasActual=!isNaN(aH)&&!isNaN(aL);
     if(!hasPred)return;
 
-    var dp=accParseDate(r.date);
     var dateStr=!isNaN(dp.getTime())
       ?dp.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric",year:"numeric"})
       :r.date;
+
+    var isExpanded=expandedDay===ds;
+    var chevron=isExpanded?'▾':'▸';
 
     var badge='<span class="acc-badge pending">PENDING</span>';
     var actualStack='<div class="acc-hilostack"><span><span class="acc-sublbl">HI</span>--</span><span><span class="acc-sublbl">LO</span>--</span></div>';
@@ -2475,8 +2451,11 @@ function accRender(el,rawRows){
     }
 
     html+=
-      '<div class="acc-log-row">'+
-        '<div class="acc-date">'+dateStr+'</div>'+
+      '<div class="acc-log-row" onclick="accToggleDay(\''+ds+'\')">'+
+        '<div class="acc-date">'+
+          '<div>'+dateStr+'</div>'+
+          '<div style="font-size:9px;color:var(--red);margin-top:3px;letter-spacing:.5px;font-weight:600">'+chevron+' all lead days</div>'+
+        '</div>'+
         '<div class="acc-hilostack">'+
           '<span><span class="acc-sublbl">HI</span>'+Math.round(pH)+'°</span>'+
           '<span><span class="acc-sublbl">LO</span>'+Math.round(pL)+'°</span>'+
@@ -2484,6 +2463,37 @@ function accRender(el,rawRows){
         actualStack+
         '<div>'+badge+'</div>'+
       '</div>';
+
+    // Expanded lead-day detail
+    var detailCls='acc-day-detail'+(isExpanded?' open':'');
+    var actualLbl=hasActual?'Hi '+Math.round(aH)+'° / Lo '+Math.round(aL)+'°':'pending';
+    var chipsHtml='<div class="acc-leads-grid">';
+    [1,2,3,4,5].forEach(function(lead){
+      var hk=lead===1?'pred_high':'pred_hi_d'+lead;
+      var lk=lead===1?'pred_low':'pred_lo_d'+lead;
+      var fH=parseFloat(r[hk]),fL=parseFloat(r[lk]);
+      var chipVal,chipErr='';
+      if(isNaN(fH)||isNaN(fL)){
+        chipVal='<div style="color:var(--mu);font-size:10px;margin-top:4px">No data</div>';
+      }else{
+        chipVal='<div class="acc-lead-chip-val">Hi '+Math.round(fH)+'° / Lo '+Math.round(fL)+'°</div>';
+        if(hasActual){
+          var chErr=(Math.abs(aH-fH)+Math.abs(aL-fL))/2;
+          var chC=chErr<=1?'var(--green)':chErr<=3?'var(--yellow)':'#ef4444';
+          chipErr='<div class="acc-lead-chip-err" style="color:'+chC+'">±'+chErr.toFixed(1)+'°</div>';
+        }
+      }
+      chipsHtml+='<div class="acc-lead-chip">'+
+        '<div class="acc-lead-chip-lbl">'+lead+'-Day Out</div>'+
+        chipVal+chipErr+
+      '</div>';
+    });
+    chipsHtml+='</div>';
+    html+='<div class="'+detailCls+'">'+
+      '<div style="font-size:9px;color:var(--mu);letter-spacing:.5px;margin-bottom:2px">All lead-day forecasts for <strong style="color:var(--white)">'+dateStr+'</strong> · Actual: <strong style="color:var(--white)">'+actualLbl+'</strong></div>'+
+      chipsHtml+
+    '</div>';
+
     shown++;
   });
 
@@ -2491,7 +2501,8 @@ function accRender(el,rawRows){
   html+=
     '</div>'+
     '<div class="acc-note">'+
-      'Showing last 7 days ('+selectedLead+'-day-out forecast) · Bust card = worst 1-day forecast in last 30 days · '+
+      'Last 7 days shown · Click any row to see all lead-day forecasts · '+
+      'Bust card = worst 1-day forecast in last 30 days · '+
       'Predictions logged at 8 PM · Actuals: NWS KRDU · '+rows.length+' day'+(rows.length!==1?"s":"")+' total on record'+
     '</div>'+
   '</div>';
