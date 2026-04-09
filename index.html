@@ -2561,10 +2561,7 @@ function accRender(el,rawRows){
 })();
 // Pre-fetch accuracy sheet data so Almanac tab renders instantly on first click
 setTimeout(accPrefetch,3000);
-// Actuals: run on every page load (guard keys prevent duplicate sheet writes)
-// This ensures past-day actuals are captured even if 8 PM session was missed
-setTimeout(accLogActuals,6000);
-// Predictions + actuals: every 30 min, only acts after 8 PM
+// Predictions + actuals: only fires after 8 PM, once per calendar day via localStorage guard
 setTimeout(accLogPrediction,8000);
 setInterval(accLogPrediction,1800000);
 
