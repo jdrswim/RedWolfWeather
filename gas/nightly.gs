@@ -196,14 +196,16 @@ function nightlyLogActuals_(sheet) {
 
   var hourET = parseInt(Utilities.formatDate(now, TZ, 'H'));
   var startBack = (hourET >= 20) ? 0 : 1;
-  for (var daysBack = startBack; daysBack <= 4; daysBack++) {
+  for (var daysBack = startBack; daysBack <= 6; daysBack++) {
     var td = new Date(now.getFullYear(), now.getMonth(), now.getDate() - daysBack);
     var ds = Utilities.formatDate(td, TZ, 'yyyy-MM-dd');
 
-    var startLocal = new Date(td.getFullYear(), td.getMonth(), td.getDate(),  0,  0,  0);
-    var endLocal   = new Date(td.getFullYear(), td.getMonth(), td.getDate(), 23, 59, 59);
-    var obsS = encodeURIComponent(startLocal.toISOString());
-    var obsE = encodeURIComponent(endLocal.toISOString());
+    // Build explicit ET-timezone ISO timestamps so the NWS query always covers
+    // midnight-to-midnight Eastern Time, regardless of GAS runtime timezone (UTC).
+    var tzOff = Utilities.formatDate(td, TZ, 'Z');            // e.g. "-0400" (EDT) or "-0500" (EST)
+    var tzIso = tzOff.substring(0, 3) + ':' + tzOff.substring(3); // "-04:00"
+    var obsS = encodeURIComponent(ds + 'T00:00:00' + tzIso);
+    var obsE = encodeURIComponent(ds + 'T23:59:59' + tzIso);
 
     var url  = 'https://api.weather.gov/stations/KRDU/observations?start=' + obsS + '&end=' + obsE + '&limit=200';
     var resp = UrlFetchApp.fetch(url, opts);
@@ -273,10 +275,10 @@ function nightlyLogMicroclimate_(ss) {
     }
 
     // ── RDU Airport (KRDU) via NWS hourly observations ──────────
-    var startLocal = new Date(td.getFullYear(), td.getMonth(), td.getDate(),  0,  0,  0);
-    var endLocal   = new Date(td.getFullYear(), td.getMonth(), td.getDate(), 23, 59, 59);
-    var obsS = encodeURIComponent(startLocal.toISOString());
-    var obsE = encodeURIComponent(endLocal.toISOString());
+    var tzOff2 = Utilities.formatDate(td, TZ, 'Z');
+    var tzIso2 = tzOff2.substring(0, 3) + ':' + tzOff2.substring(3);
+    var obsS = encodeURIComponent(ds + 'T00:00:00' + tzIso2);
+    var obsE = encodeURIComponent(ds + 'T23:59:59' + tzIso2);
     var nwsUrl = 'https://api.weather.gov/stations/KRDU/observations?start=' + obsS + '&end=' + obsE + '&limit=200';
     var rduHigh = null, rduLow = null;
     try {

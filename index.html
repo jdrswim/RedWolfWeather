@@ -2087,12 +2087,12 @@ function accLogPrediction(){
 function accLogActuals(){
   var now=new Date();
 
-  [0,1,2,3,4].forEach(function(daysBack){
+  [0,1,2,3,4,5,6].forEach(function(daysBack){
     // Today's high isn't final until ~8 PM — skip today before then
     if(daysBack===0&&now.getHours()<20)return;
     var target=new Date(now.getFullYear(),now.getMonth(),now.getDate()-daysBack);
     var dStr=accDateStr(target);
-    var guardKey="acc_act_done_"+dStr;
+    var guardKey="acc_act_done2_"+dStr;
     if(daysBack>=2){try{if(localStorage.getItem(guardKey))return;}catch(e){}}
 
     // Cache locally first (survives sheet write failures) then write to sheet
@@ -2113,8 +2113,14 @@ function accLogActuals(){
     }
 
     // NWS KRDU hourly observations — official station, matches NOWData record
-    var obsS=new Date(target.getFullYear(),target.getMonth(),target.getDate(),0,0,0).toISOString();
-    var obsE=new Date(target.getFullYear(),target.getMonth(),target.getDate(),23,59,59).toISOString();
+    // Use explicit local-timezone ISO strings so the query always covers
+    // midnight-to-midnight in the browser's local time (ET), not UTC.
+    var _tzOff=-target.getTimezoneOffset(); // minutes ahead of UTC (negative for US)
+    var _tzSign=_tzOff>=0?'+':'-';
+    var _tzAbs=Math.abs(_tzOff);
+    var _tzIso=_tzSign+((_tzAbs/60|0)<10?'0':'')+(_tzAbs/60|0)+':'+((_tzAbs%60)<10?'0':'')+(_tzAbs%60);
+    var obsS=dStr+'T00:00:00'+_tzIso;
+    var obsE=dStr+'T23:59:59'+_tzIso;
     fetch("https://api.weather.gov/stations/KRDU/observations?start="+encodeURIComponent(obsS)+"&end="+encodeURIComponent(obsE)+"&limit=200",
       {headers:{"User-Agent":"WolfpackWeather/2.0"}})
     .then(function(r){if(!r.ok)throw new Error("NWS HTTP "+r.status);return r.json();})
