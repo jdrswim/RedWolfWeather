@@ -2275,9 +2275,15 @@ function accLogStatus(){
   return html;
 }
 
+window._accSelectedLead=window._accSelectedLead||1;
 window._accExpandedDay=window._accExpandedDay||null;
 window._accLastEl=null;
 window._accLastRaw=null;
+
+function accSelectLead(lead){
+  window._accSelectedLead=lead;
+  if(window._accLastEl&&window._accLastRaw)accRender(window._accLastEl,window._accLastRaw);
+}
 
 function accToggleDay(ds){
   window._accExpandedDay=(window._accExpandedDay===ds?null:ds);
@@ -2287,6 +2293,7 @@ function accToggleDay(ds){
 function accRender(el,rawRows){
   window._accLastEl=el;
   window._accLastRaw=rawRows;
+  var selectedLead=window._accSelectedLead||1;
   var expandedDay=window._accExpandedDay||null;
   // Deduplicate first
   var rows=accDedupeRows(rawRows);
@@ -2343,10 +2350,42 @@ function accRender(el,rawRows){
 
   function errClass(e){return e<=1?"good":e<=3?"ok":"poor";}
 
+  function renderLeadCard(lead,acc){
+    if(!acc)return'';
+    var label=lead+"-Day Out";
+    var cls=errClass(acc.avgMeanErr);
+    var activeCls=lead===selectedLead?' acc-lead-active':'';
+    return'<div class="acc-score-card'+activeCls+'" id="acc-lead-card-'+lead+'" onclick="accSelectLead('+lead+')">'+
+      '<div class="acc-score-lbl">'+label+'</div>'+
+      '<div class="acc-score-val '+cls+'">±'+acc.avgMeanErr.toFixed(1)+'°</div>'+
+      '<div class="acc-score-sub">avg over '+acc.total+' day'+(acc.total!==1?'s':'')+'</div>'+
+      '<div class="acc-score-err">Hi ±'+acc.avgHiErr.toFixed(1)+'° / Lo ±'+acc.avgLoErr.toFixed(1)+'°</div>'+
+      '<div style="font-size:8px;color:var(--mu);margin-top:6px;letter-spacing:.3px">tap a row below ↓ for daily detail</div>'+
+    '</div>';
+  }
+
   var html=
     '<div class="acc-wrap">'+
       '<div class="acc-hdr">Justin Gainey\'s Forecast % <em>- Forecast vs Actual Temperature</em> <div class="tip-btn" onclick="openTip(\'tipAccuracy\')" style="display:inline-flex;vertical-align:middle;margin-left:6px">?</div></div>'+
       accLogStatus()+
+      (function(){
+        var accs=[1,2,3,4,5].map(function(l){return{l:l,a:calcAccuracyForLead(rows,l)};});
+        var ready=accs.filter(function(x){return x.a;});
+        var building=accs.filter(function(x){return !x.a;}).map(function(x){return x.l;});
+        var scoreHtml='';
+        if(ready.length){
+          scoreHtml='<div class="acc-score-row" style="grid-template-columns:repeat('+ready.length+',1fr)">';
+          ready.forEach(function(x){scoreHtml+=renderLeadCard(x.l,x.a);});
+          scoreHtml+='</div>';
+        }
+        if(building.length){
+          var note=ready.length===0
+            ?'Accuracy tracking active — data will appear here after the first 8 PM log.'
+            :'<strong style="color:var(--mu)">'+(building.length>1?building[0]+'-'+building[building.length-1]:building[0])+'-day accuracy:</strong> still collecting data';
+          scoreHtml+='<div style="font-size:10px;color:var(--mu2);background:var(--p2);border:1px solid var(--bd);border-radius:3px;padding:9px 14px;margin-bottom:14px">📈 '+note+'</div>';
+        }
+        return scoreHtml;
+      })()+
       (function(){
         // Biggest bust in last 30 days
         var cutoff30=new Date();cutoff30.setDate(cutoff30.getDate()-30);
@@ -2398,7 +2437,7 @@ function accRender(el,rawRows){
       '<div class="acc-log" style="border:1px solid var(--bd);border-radius:4px;overflow:hidden">'+
         '<div class="acc-log-hdr">'+
           '<div>Date</div>'+
-          '<div>Forecast (1-Day Out)</div>'+
+          '<div>Fcst ('+selectedLead+'-Day Out)</div>'+
           '<div>Actual</div>'+
           '<div>Result</div>'+
         '</div>';
@@ -2411,7 +2450,9 @@ function accRender(el,rawRows){
     var dp=accParseDate(r.date);
     if(isNaN(dp.getTime())||dp<cutoff7)return;
     var ds=(r.date||"").substring(0,10);
-    var pH=parseFloat(r.pred_high),pL=parseFloat(r.pred_low);
+    var hiKey=selectedLead===1?'pred_high':'pred_hi_d'+selectedLead;
+    var loKey=selectedLead===1?'pred_low':'pred_lo_d'+selectedLead;
+    var pH=parseFloat(r[hiKey]),pL=parseFloat(r[loKey]);
     var aH=parseFloat(r.actual_high),aL=parseFloat(r.actual_low);
     var hasPred=!isNaN(pH)&&!isNaN(pL);
     var hasActual=!isNaN(aH)&&!isNaN(aL);
@@ -2501,7 +2542,7 @@ function accRender(el,rawRows){
   html+=
     '</div>'+
     '<div class="acc-note">'+
-      'Last 7 days shown · Click any row to see all lead-day forecasts · '+
+      'Showing last 7 days ('+selectedLead+'-day-out forecast) · Click any row to see all lead-day forecasts · '+
       'Bust card = worst 1-day forecast in last 30 days · '+
       'Predictions logged at 8 PM · Actuals: NWS KRDU · '+rows.length+' day'+(rows.length!==1?"s":"")+' total on record'+
     '</div>'+
