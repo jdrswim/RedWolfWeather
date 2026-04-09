@@ -620,7 +620,7 @@ footer strong{color:var(--red)}
       </div>
       <div class="hlrow">
         <div class="hlbox"><div class="hllbl" id="hiLbl">Today High</div><div class="hlval"><span id="hi">--</span>F</div><div style="font-size:9px;color:rgba(255,119,119,.5);margin-top:3px;letter-spacing:.5px" id="hiSub">observed</div></div>
-        <div class="hlbox"><div class="hllbl" id="loLbl">Tonight Low</div><div class="hlval"><span id="lo">--</span>F</div><div style="font-size:9px;color:rgba(119,170,255,.5);margin-top:3px;letter-spacing:.5px" id="loSub">forecast</div></div>
+        <div class="hlbox"><div class="hllbl" id="loLbl">Tonight's Forecasted Low</div><div class="hlval"><span id="lo">--</span>F</div><div style="font-size:9px;color:rgba(119,170,255,.5);margin-top:3px;letter-spacing:.5px" id="loSub">forecast</div></div>
       </div>
     </div>
   </div>
@@ -798,10 +798,12 @@ function applyConditions(t,feels,dew,humid,wspd,wdir,gust,pres,prec,uv,hi,lo,cod
   $("wdir").textContent=deg2dir(wdir)+" "+wdir;$("gust").textContent=gust;
   $("pres").textContent=pres;$("prec").textContent=prec;
   $("uv").textContent=uv;$("uvl").textContent=uvLbl(uv);
-  $("hi").textContent=hi;$("lo").textContent=lo;
-  $("cdesc").textContent=wmoDesc(code);
   var _cLoc=wxGetCustLoc();
   var _isCust=_cLoc&&_cLoc.isCustom;
+  var _pastSr=!_isCust&&!!(window._pastSunrise);
+  var _loDisplay=(_pastSr&&window._tomorrowFcstLo!=null)?window._tomorrowFcstLo:lo;
+  $("hi").textContent=hi;$("lo").textContent=_loDisplay;
+  $("cdesc").textContent=wmoDesc(code);
   var _cStn=_isCust?(_cLoc.name||'Your Location'):'KNCRALEI761';
   $("cupd").textContent=_cStn+" - Updated "+new Date().toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit",second:"2-digit"})+" ET";
   // Update hi/lo labels to clarify observed vs forecast
@@ -813,7 +815,12 @@ function applyConditions(t,feels,dew,humid,wspd,wdir,gust,pres,prec,uv,hi,lo,cod
     if(loSub)loSub.textContent="full day";
   }else{
     if(hiLbl)hiLbl.textContent="Today High";
-    if(loLbl)loLbl.textContent="Tonight Low";
+    if(_pastSr){
+      var _dayName=new Date().toLocaleDateString("en-US",{weekday:"long"});
+      if(loLbl)loLbl.textContent=_dayName+" Night's Forecasted Low";
+    }else{
+      if(loLbl)loLbl.textContent="Tonight's Forecasted Low";
+    }
     if(hiSub)hiSub.textContent="observed so far";
     if(loSub)loSub.textContent="forecast";
   }
@@ -1046,9 +1053,10 @@ function fetchConditions(){
   Promise.all([
     wuFetch(_WU+"observations/current?stationId=KNCRALEI761&format=json&units=e&apiKey="+_K),
     wuFetch(_WU+"observations/current?stationId=KNCRALEI1276&format=json&units=e&apiKey="+_K),
-    fetch("https://api.open-meteo.com/v1/forecast?latitude="+_sl.lat+"&longitude="+_sl.lon+"&current=weather_code&hourly=temperature_2m,weather_code,precipitation_probability,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=America%2FNew_York&forecast_days=2").then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
+    fetch("https://api.open-meteo.com/v1/forecast?latitude="+_sl.lat+"&longitude="+_sl.lon+"&current=weather_code&hourly=temperature_2m,weather_code,precipitation_probability,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,sunrise&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=America%2FNew_York&forecast_days=2").then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
   ]).then(function(res){
     var dCur=res[0],dCur1276=res[1],dOm=res[2];
+    if(dOm&&dOm.daily&&dOm.daily.sunrise){var _sr=new Date(dOm.daily.sunrise[0]);window._pastSunrise=new Date()>_sr;window._tomorrowFcstLo=dOm.daily.temperature_2m_min&&dOm.daily.temperature_2m_min[1]!=null?Math.round(dOm.daily.temperature_2m_min[1]):null;}
     var obs=dCur&&dCur.observations&&dCur.observations[0];
     if(!obs){
       // WU current failed — fall back to Open-Meteo
@@ -1077,10 +1085,11 @@ function fetchConditions(){
     window._todayObsLo=lo;
     applyConditions(temp,feels,dew,humid,wspd,wdir,gust,pres,prec,uvi,hi,lo,code,dOm&&dOm.hourly||null);
   }).catch(function(){
-    fetch("https://api.open-meteo.com/v1/forecast?latitude=35.686&longitude=-78.614&current=temperature_2m,apparent_temperature,relative_humidity_2m,dew_point_2m,wind_speed_10m,wind_gusts_10m,wind_direction_10m,surface_pressure,precipitation,weather_code,uv_index&hourly=temperature_2m,weather_code,precipitation_probability,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=America%2FNew_York&forecast_days=2")
+    fetch("https://api.open-meteo.com/v1/forecast?latitude=35.686&longitude=-78.614&current=temperature_2m,apparent_temperature,relative_humidity_2m,dew_point_2m,wind_speed_10m,wind_gusts_10m,wind_direction_10m,surface_pressure,precipitation,weather_code,uv_index&hourly=temperature_2m,weather_code,precipitation_probability,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,sunrise&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=America%2FNew_York&forecast_days=2")
     .then(function(r){return r.json();})
     .then(function(d){
       var c=d.current,dl=d.daily;
+      if(dl&&dl.sunrise){var _sr2=new Date(dl.sunrise[0]);window._pastSunrise=new Date()>_sr2;window._tomorrowFcstLo=dl.temperature_2m_min&&dl.temperature_2m_min[1]!=null?Math.round(dl.temperature_2m_min[1]):null;}
       window._todayObsLo=todayObsLow(d.hourly,dl.temperature_2m_min[0]);
       applyConditions(Math.round(c.temperature_2m),Math.round(c.apparent_temperature),Math.round(c.dew_point_2m),Math.round(c.relative_humidity_2m),Math.round(c.wind_speed_10m),Math.round(c.wind_direction_10m),Math.round(c.wind_gusts_10m),(c.surface_pressure*0.02953).toFixed(2),c.precipitation.toFixed(2),Math.round(c.uv_index),todayObsHigh(d.hourly,dl.temperature_2m_max[0]),todayObsLow(d.hourly,dl.temperature_2m_min[0]),c.weather_code,d.hourly);
       $("cupd").textContent=$("cupd").textContent+" (Open-Meteo fallback)";
