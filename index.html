@@ -2141,8 +2141,14 @@ function accLogActuals(){
     .then(function(r){if(!r.ok)throw new Error("NWS HTTP "+r.status);return r.json();})
     .then(function(d){
       var temps=(d.features||[]).reduce(function(a,f){
-        var t=f.properties&&f.properties.temperature&&f.properties.temperature.value;
-        if(t!=null)a.push(t*9/5+32);return a;
+        var props=f.properties||{};
+        var t=props.temperature&&props.temperature.value;
+        if(t!=null)a.push(t*9/5+32);
+        var mn6=props.minTemperatureLast6Hours&&props.minTemperatureLast6Hours.value;
+        var mx6=props.maxTemperatureLast6Hours&&props.maxTemperatureLast6Hours.value;
+        if(mn6!=null)a.push(mn6*9/5+32);
+        if(mx6!=null)a.push(mx6*9/5+32);
+        return a;
       },[]);
       if(!temps.length)throw new Error("NWS KRDU returned no temperature readings for "+dStr);
       return storeAndWrite(Math.round(Math.max.apply(null,temps)),Math.round(Math.min.apply(null,temps)),"NWS KRDU");

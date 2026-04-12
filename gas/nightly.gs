@@ -217,8 +217,15 @@ function nightlyLogActuals_(sheet) {
 
     var features = JSON.parse(resp.getContentText()).features || [];
     var temps = features.reduce(function(a, f) {
-      var t = f.properties && f.properties.temperature && f.properties.temperature.value;
+      var props = f.properties || {};
+      var t = props.temperature && props.temperature.value;
       if (t != null) a.push(t * 9/5 + 32);
+      // Include 6-hour synoptic extremes (reported at 00Z/06Z/12Z/18Z) —
+      // these capture true highs/lows even when hourly temp values are null.
+      var mn6 = props.minTemperatureLast6Hours && props.minTemperatureLast6Hours.value;
+      var mx6 = props.maxTemperatureLast6Hours && props.maxTemperatureLast6Hours.value;
+      if (mn6 != null) a.push(mn6 * 9/5 + 32);
+      if (mx6 != null) a.push(mx6 * 9/5 + 32);
       return a;
     }, []);
 
@@ -286,8 +293,13 @@ function nightlyLogMicroclimate_(ss) {
       if (nwsResp.getResponseCode() === 200) {
         var features = JSON.parse(nwsResp.getContentText()).features || [];
         var temps = features.reduce(function(a, f) {
-          var t = f.properties && f.properties.temperature && f.properties.temperature.value;
+          var props = f.properties || {};
+          var t = props.temperature && props.temperature.value;
           if (t != null) a.push(t * 9/5 + 32);
+          var mn6 = props.minTemperatureLast6Hours && props.minTemperatureLast6Hours.value;
+          var mx6 = props.maxTemperatureLast6Hours && props.maxTemperatureLast6Hours.value;
+          if (mn6 != null) a.push(mn6 * 9/5 + 32);
+          if (mx6 != null) a.push(mx6 * 9/5 + 32);
           return a;
         }, []);
         if (temps.length) {
