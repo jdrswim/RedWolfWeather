@@ -3112,11 +3112,11 @@ function rktLikelihood(netStr,padLat,padLon,statusAbbrev,orbit){
     '</div>'
   };
 }
-var RKT_CACHE_KEY='rkt_v3_cache'; // bumped: added trajectory scoring
+var RKT_CACHE_KEY='rkt_v4_cache'; // bumped: production API first
 var RKT_CACHE_TTL=7200000; // 2 hours
-// LL2 dev server (higher rate limits, designed for app development)
-var RKT_URLS=['https://lldev.thespacedevs.com/2.2.0/launch/upcoming/?limit=50&format=json',
-              'https://ll2.thespacedevs.com/2.2.0/launch/upcoming/?limit=50&format=json'];
+// Production server first; dev server as fallback
+var RKT_URLS=['https://ll2.thespacedevs.com/2.2.0/launch/upcoming/?limit=50&format=json',
+              'https://lldev.thespacedevs.com/2.2.0/launch/upcoming/?limit=50&format=json'];
 
 function rktFetchWithTimeout(url,ms){
   var ctrl=typeof AbortController!=='undefined'?new AbortController():null;
