@@ -124,8 +124,8 @@ function nightlyLog() {
   if (!sheet) { Logger.log('ERROR: Accuracy sheet not found'); return; }
   Logger.log('=== nightlyLog START ' + Utilities.formatDate(new Date(), TZ, 'yyyy-MM-dd HH:mm z') + ' ===');
   nightlyLogPredictions_(sheet);
-  nightlyLogActuals_(sheet);
-  nightlyLogMicroclimate_(ss);
+  nightlyLogMicroclimate_(ss);   // must run before nightlyLogActuals_ so it can read from Microclimate
+  nightlyLogActuals_(sheet, ss);
   Logger.log('=== nightlyLog END ===');
 }
 
@@ -188,27 +188,65 @@ function nightlyLogPredictions_(sheet) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// ACTUALS  (NWS KRDU hourly observations, last 5 days)
+// ACTUALS  (primary: Microclimate sheet rdu_high/rdu_low;
+//           fallback: NWS KRDU hourly observations)
 // ─────────────────────────────────────────────────────────────
-function nightlyLogActuals_(sheet) {
-  var opts = { headers: { 'User-Agent': 'WolfpackWeather/2.0' }, muteHttpExceptions: true };
-  var now  = new Date();
+function nightlyLogActuals_(sheet, ss) {
+  var now = new Date();
 
-  var hourET = parseInt(Utilities.formatDate(now, TZ, 'H'));
+  // ── Load Microclimate sheet as source of truth for RDU temps ──
+  // The Microclimate sheet is written first each night and uses the same
+  // NWS KRDU source but is known to produce accurate daily highs/lows.
+  // Using it directly avoids the hourly-null-temperature bug in the
+  // observations API that causes incorrect actuals in the Accuracy sheet.
+  var mcMap = {};
+  var mcSheet = ss ? ss.getSheetByName('Microclimate') : null;
+  if (mcSheet) {
+    var mcData    = mcSheet.getDataRange().getValues();
+    var mcHeaders = mcData[0].map(function(h) { return String(h).trim(); });
+    var mcDateCol  = mcHeaders.indexOf('date');
+    var mcRduHiCol = mcHeaders.indexOf('rdu_high');
+    var mcRduLoCol = mcHeaders.indexOf('rdu_low');
+    if (mcDateCol >= 0 && mcRduHiCol >= 0 && mcRduLoCol >= 0) {
+      for (var i = 1; i < mcData.length; i++) {
+        var mcDs = normDateStr_(mcData[i][mcDateCol]);
+        var mcHi = mcData[i][mcRduHiCol];
+        var mcLo = mcData[i][mcRduLoCol];
+        if (mcDs && mcHi !== '' && mcHi != null && mcLo !== '' && mcLo != null) {
+          mcMap[mcDs] = { hi: Math.round(Number(mcHi)), lo: Math.round(Number(mcLo)) };
+        }
+      }
+    }
+    Logger.log('Actuals: loaded ' + Object.keys(mcMap).length + ' dates from Microclimate sheet');
+  } else {
+    Logger.log('Actuals WARNING: Microclimate sheet not found — will use NWS fallback for all dates');
+  }
+
+  var opts = { headers: { 'User-Agent': 'WolfpackWeather/2.0' }, muteHttpExceptions: true };
+  var hourET    = parseInt(Utilities.formatDate(now, TZ, 'H'));
   var startBack = (hourET >= 20) ? 0 : 1;
+
   for (var daysBack = startBack; daysBack <= 6; daysBack++) {
     var td = new Date(now.getFullYear(), now.getMonth(), now.getDate() - daysBack);
     var ds = Utilities.formatDate(td, TZ, 'yyyy-MM-dd');
 
-    // Build explicit ET-timezone ISO timestamps so the NWS query always covers
-    // midnight-to-midnight Eastern Time, regardless of GAS runtime timezone (UTC).
-    var tzOff = Utilities.formatDate(td, TZ, 'Z');            // e.g. "-0400" (EDT) or "-0500" (EST)
-    var tzIso = tzOff.substring(0, 3) + ':' + tzOff.substring(3); // "-04:00"
-    var obsS = encodeURIComponent(ds + 'T00:00:00' + tzIso);
-    var obsE = encodeURIComponent(ds + 'T23:59:59' + tzIso);
+    // ── Primary: Microclimate sheet rdu_high/rdu_low ──────────
+    if (mcMap[ds]) {
+      var hi = mcMap[ds].hi;
+      var lo = mcMap[ds].lo;
+      nightlyWrite_(sheet, ds, 'actual_high', hi, 'actual_low', lo, true);
+      Logger.log('Actuals ' + ds + ':  Hi:' + hi + '  Lo:' + lo + '  (source: Microclimate)');
+      continue;
+    }
 
-    var url  = 'https://api.weather.gov/stations/KRDU/observations?start=' + obsS + '&end=' + obsE + '&limit=200';
-    var resp = UrlFetchApp.fetch(url, opts);
+    // ── Fallback: NWS KRDU hourly observations ────────────────
+    Logger.log('Actuals ' + ds + ': no Microclimate data — falling back to NWS KRDU');
+    var tzOff = Utilities.formatDate(td, TZ, 'Z');
+    var tzIso = tzOff.substring(0, 3) + ':' + tzOff.substring(3);
+    var obsS  = encodeURIComponent(ds + 'T00:00:00' + tzIso);
+    var obsE  = encodeURIComponent(ds + 'T23:59:59' + tzIso);
+    var url   = 'https://api.weather.gov/stations/KRDU/observations?start=' + obsS + '&end=' + obsE + '&limit=200';
+    var resp  = UrlFetchApp.fetch(url, opts);
 
     if (resp.getResponseCode() !== 200) {
       Logger.log('NWS obs FAILED ' + ds + ' (HTTP ' + resp.getResponseCode() + ')');
@@ -218,10 +256,8 @@ function nightlyLogActuals_(sheet) {
     var features = JSON.parse(resp.getContentText()).features || [];
     var temps = features.reduce(function(a, f) {
       var props = f.properties || {};
-      var t = props.temperature && props.temperature.value;
-      if (t != null) a.push(t * 9/5 + 32);
-      // Include 6-hour synoptic extremes (reported at 00Z/06Z/12Z/18Z) —
-      // these capture true highs/lows even when hourly temp values are null.
+      var t  = props.temperature && props.temperature.value;
+      if (t  != null) a.push(t  * 9/5 + 32);
       var mn6 = props.minTemperatureLast6Hours && props.minTemperatureLast6Hours.value;
       var mx6 = props.maxTemperatureLast6Hours && props.maxTemperatureLast6Hours.value;
       if (mn6 != null) a.push(mn6 * 9/5 + 32);
@@ -230,14 +266,14 @@ function nightlyLogActuals_(sheet) {
     }, []);
 
     if (!temps.length) {
-      Logger.log('Actuals ' + ds + ': 0 temperature readings returned');
+      Logger.log('Actuals ' + ds + ': 0 temperature readings returned from NWS');
       continue;
     }
 
     var hi = Math.round(Math.max.apply(null, temps));
     var lo = Math.round(Math.min.apply(null, temps));
     nightlyWrite_(sheet, ds, 'actual_high', hi, 'actual_low', lo, true);
-    Logger.log('Actuals ' + ds + ':  Hi:' + hi + '  Lo:' + lo + '  (' + temps.length + ' obs)');
+    Logger.log('Actuals ' + ds + ':  Hi:' + hi + '  Lo:' + lo + '  (source: NWS KRDU fallback, ' + temps.length + ' obs)');
   }
 }
 
