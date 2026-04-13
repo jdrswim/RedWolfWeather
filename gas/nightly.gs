@@ -317,38 +317,67 @@ function nightlyLogMicroclimate_(ss) {
       Logger.log('MC WU fetch error: ' + e.message);
     }
 
-    // ── RDU Airport (KRDU) via NWS hourly observations ──────────
-    var tzOff2 = Utilities.formatDate(td, TZ, 'Z');
-    var tzIso2 = tzOff2.substring(0, 3) + ':' + tzOff2.substring(3);
-    var obsS = encodeURIComponent(ds + 'T00:00:00' + tzIso2);
-    var obsE = encodeURIComponent(ds + 'T23:59:59' + tzIso2);
-    var nwsUrl = 'https://api.weather.gov/stations/KRDU/observations?start=' + obsS + '&end=' + obsE + '&limit=200';
+    // ── RDU Airport via IEM (Iowa Environmental Mesonet) ────────
+    // IEM computes daily max/min from 1-minute ASOS data — matches NWS NOWData.
+    // NWS hourly METAR API misses temps that occur between hourly readings.
     var rduHigh = null, rduLow = null;
+    var iemYear  = Utilities.formatDate(td, TZ, 'yyyy');
+    var iemMonth = Utilities.formatDate(td, TZ, 'M');
+    var iemDay   = Utilities.formatDate(td, TZ, 'd');
+    var iemUrl = 'https://mesonet.agron.iastate.edu/api/1/daily.json?station=RDU&network=NC_ASOS' +
+                 '&year1=' + iemYear + '&month1=' + iemMonth + '&day1=' + iemDay +
+                 '&year2=' + iemYear + '&month2=' + iemMonth + '&day2=' + iemDay;
     try {
-      var nwsResp = UrlFetchApp.fetch(nwsUrl, opts);
-      if (nwsResp.getResponseCode() === 200) {
-        var features = JSON.parse(nwsResp.getContentText()).features || [];
-        var temps = features.reduce(function(a, f) {
-          var props = f.properties || {};
-          var t = props.temperature && props.temperature.value;
-          if (t != null) a.push(t * 9/5 + 32);
-          var mn6 = props.minTemperatureLast6Hours && props.minTemperatureLast6Hours.value;
-          var mx6 = props.maxTemperatureLast6Hours && props.maxTemperatureLast6Hours.value;
-          if (mn6 != null) a.push(mn6 * 9/5 + 32);
-          if (mx6 != null) a.push(mx6 * 9/5 + 32);
-          return a;
-        }, []);
-        if (temps.length) {
-          rduHigh = Math.round(Math.max.apply(null, temps));
-          rduLow  = Math.round(Math.min.apply(null, temps));
+      var iemResp = UrlFetchApp.fetch(iemUrl, opts);
+      if (iemResp.getResponseCode() === 200) {
+        var iemData = JSON.parse(iemResp.getContentText()).data || [];
+        if (iemData.length > 0) {
+          var row = iemData[0];
+          if (row.max_tmpf != null && row.max_tmpf !== '') rduHigh = Math.round(Number(row.max_tmpf));
+          if (row.min_tmpf != null && row.min_tmpf !== '') rduLow  = Math.round(Number(row.min_tmpf));
+          Logger.log('MC IEM RDU ' + ds + ':  Hi:' + rduHigh + '  Lo:' + rduLow);
         } else {
-          Logger.log('MC NWS: 0 temperature readings for ' + ds);
+          Logger.log('MC IEM: no data returned for ' + ds);
         }
       } else {
-        Logger.log('MC NWS fetch failed: HTTP ' + nwsResp.getResponseCode());
+        Logger.log('MC IEM fetch failed: HTTP ' + iemResp.getResponseCode());
       }
     } catch (e) {
-      Logger.log('MC NWS fetch error: ' + e.message);
+      Logger.log('MC IEM fetch error: ' + e.message);
+    }
+
+    // Fallback to NWS KRDU hourly if IEM had no data
+    if (rduHigh === null || rduLow === null) {
+      Logger.log('MC: IEM missing data for ' + ds + ' — falling back to NWS KRDU hourly');
+      var tzOff2 = Utilities.formatDate(td, TZ, 'Z');
+      var tzIso2 = tzOff2.substring(0, 3) + ':' + tzOff2.substring(3);
+      var obsS = encodeURIComponent(ds + 'T00:00:00' + tzIso2);
+      var obsE = encodeURIComponent(ds + 'T23:59:59' + tzIso2);
+      var nwsUrl = 'https://api.weather.gov/stations/KRDU/observations?start=' + obsS + '&end=' + obsE + '&limit=200';
+      try {
+        var nwsResp = UrlFetchApp.fetch(nwsUrl, opts);
+        if (nwsResp.getResponseCode() === 200) {
+          var features = JSON.parse(nwsResp.getContentText()).features || [];
+          var temps = features.reduce(function(a, f) {
+            var props = f.properties || {};
+            var t   = props.temperature && props.temperature.value;
+            if (t   != null) a.push(t   * 9/5 + 32);
+            var mn6 = props.minTemperatureLast6Hours && props.minTemperatureLast6Hours.value;
+            var mx6 = props.maxTemperatureLast6Hours && props.maxTemperatureLast6Hours.value;
+            if (mn6 != null) a.push(mn6 * 9/5 + 32);
+            if (mx6 != null) a.push(mx6 * 9/5 + 32);
+            return a;
+          }, []);
+          if (temps.length) {
+            rduHigh = rduHigh !== null ? rduHigh : Math.round(Math.max.apply(null, temps));
+            rduLow  = rduLow  !== null ? rduLow  : Math.round(Math.min.apply(null, temps));
+          } else {
+            Logger.log('MC NWS fallback: 0 temperature readings for ' + ds);
+          }
+        }
+      } catch (e) {
+        Logger.log('MC NWS fallback error: ' + e.message);
+      }
     }
 
     // ── Write to Microclimate sheet ──────────────────────────────
