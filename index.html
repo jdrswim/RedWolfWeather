@@ -2809,7 +2809,7 @@ function mcBuildHistory(rows){
       '</div>';
     }
     var n=acc.count;
-    var hiDiff=(acc.rwfHiSum-acc.rduHiSum)/n, loDiff=(acc.rwfLoSum-acc.rduLoSum)/n;
+    var hiDiff=(acc.rduHiSum-acc.rwfHiSum)/n, loDiff=(acc.rduLoSum-acc.rwfLoSum)/n;
     var avgDiff=(hiDiff+loDiff)/2;
     var valColor=diffColor(avgDiff);
     return'<div class="acc-score-card">'+
