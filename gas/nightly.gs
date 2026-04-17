@@ -324,7 +324,7 @@ function nightlyLogMicroclimate_(ss) {
     var iemYear  = Utilities.formatDate(td, TZ, 'yyyy');
     var iemMonth = Utilities.formatDate(td, TZ, 'M');
     var iemDay   = Utilities.formatDate(td, TZ, 'd');
-    var iemUrl = 'https://mesonet.agron.iastate.edu/api/1/daily.json?station=RDU&network=NC_ASOS' +
+    var iemUrl = 'https://mesonet.agron.iastate.edu/api/1/daily.json?station=KRDU&network=NC_ASOS' +
                  '&year1=' + iemYear + '&month1=' + iemMonth + '&day1=' + iemDay +
                  '&year2=' + iemYear + '&month2=' + iemMonth + '&day2=' + iemDay;
     try {

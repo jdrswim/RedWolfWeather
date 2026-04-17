@@ -2128,7 +2128,7 @@ function accLogActuals(){
     var yr=target.getFullYear();
     var mo=target.getMonth()+1;
     var dy=target.getDate();
-    fetch("https://mesonet.agron.iastate.edu/api/1/daily.json?station=RDU&network=NC_ASOS&year1="+yr+"&month1="+mo+"&day1="+dy+"&year2="+yr+"&month2="+mo+"&day2="+dy)
+    fetch("https://mesonet.agron.iastate.edu/api/1/daily.json?station=KRDU&network=NC_ASOS&year1="+yr+"&month1="+mo+"&day1="+dy+"&year2="+yr+"&month2="+mo+"&day2="+dy)
     .then(function(r){if(!r.ok)throw new Error("IEM HTTP "+r.status);return r.json();})
     .then(function(d){
       var rows=d.data||[];
