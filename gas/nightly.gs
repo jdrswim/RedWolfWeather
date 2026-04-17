@@ -317,38 +317,34 @@ function nightlyLogMicroclimate_(ss) {
       Logger.log('MC WU fetch error: ' + e.message);
     }
 
-    // ── RDU Airport via IEM (Iowa Environmental Mesonet) ────────
-    // IEM computes daily max/min from 1-minute ASOS data — matches NWS NOWData.
-    // NWS hourly METAR API misses temps that occur between hourly readings.
+    // ── RDU Airport via RCC-ACIS (NOAA ThreadEx — exact match to NOWData) ─
+    // ACIS serves the official NOAA daily climate record (ThreadEx), the same
+    // data shown in NOWData. No API key required.
     var rduHigh = null, rduLow = null;
-    var iemYear  = Utilities.formatDate(td, TZ, 'yyyy');
-    var iemMonth = Utilities.formatDate(td, TZ, 'M');
-    var iemDay   = Utilities.formatDate(td, TZ, 'd');
-    var iemUrl = 'https://mesonet.agron.iastate.edu/api/1/daily.json?station=KRDU&network=NC_ASOS' +
-                 '&year1=' + iemYear + '&month1=' + iemMonth + '&day1=' + iemDay +
-                 '&year2=' + iemYear + '&month2=' + iemMonth + '&day2=' + iemDay;
+    var acisUrl = 'https://data.rcc-acis.org/StnData?sid=KRDU&sdate=' + ds + '&edate=' + ds + '&elems=1,2&output=json';
     try {
-      var iemResp = UrlFetchApp.fetch(iemUrl, opts);
-      if (iemResp.getResponseCode() === 200) {
-        var iemData = JSON.parse(iemResp.getContentText()).data || [];
-        if (iemData.length > 0) {
-          var row = iemData[0];
-          if (row.max_tmpf != null && row.max_tmpf !== '') rduHigh = Math.round(Number(row.max_tmpf));
-          if (row.min_tmpf != null && row.min_tmpf !== '') rduLow  = Math.round(Number(row.min_tmpf));
-          Logger.log('MC IEM RDU ' + ds + ':  Hi:' + rduHigh + '  Lo:' + rduLow);
+      var acisResp = UrlFetchApp.fetch(acisUrl, opts);
+      if (acisResp.getResponseCode() === 200) {
+        var acisRows = JSON.parse(acisResp.getContentText()).data || [];
+        if (acisRows.length > 0) {
+          var hiVal = acisRows[0][1];
+          var loVal = acisRows[0][2];
+          if (hiVal !== 'M' && hiVal !== '' && hiVal != null) rduHigh = Math.round(Number(hiVal));
+          if (loVal !== 'M' && loVal !== '' && loVal != null) rduLow  = Math.round(Number(loVal));
+          Logger.log('MC ACIS RDU ' + ds + ':  Hi:' + rduHigh + '  Lo:' + rduLow);
         } else {
-          Logger.log('MC IEM: no data returned for ' + ds);
+          Logger.log('MC ACIS: no data returned for ' + ds);
         }
       } else {
-        Logger.log('MC IEM fetch failed: HTTP ' + iemResp.getResponseCode());
+        Logger.log('MC ACIS fetch failed: HTTP ' + acisResp.getResponseCode());
       }
     } catch (e) {
-      Logger.log('MC IEM fetch error: ' + e.message);
+      Logger.log('MC ACIS fetch error: ' + e.message);
     }
 
-    // Fallback to NWS KRDU hourly if IEM had no data
+    // Fallback to NWS KRDU hourly if ACIS had no data
     if (rduHigh === null || rduLow === null) {
-      Logger.log('MC: IEM missing data for ' + ds + ' — falling back to NWS KRDU hourly');
+      Logger.log('MC: ACIS missing data for ' + ds + ' — falling back to NWS KRDU hourly');
       var tzOff2 = Utilities.formatDate(td, TZ, 'Z');
       var tzIso2 = tzOff2.substring(0, 3) + ':' + tzOff2.substring(3);
       var obsS = encodeURIComponent(ds + 'T00:00:00' + tzIso2);

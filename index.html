@@ -2124,19 +2124,16 @@ function accLogActuals(){
         });
     }
 
-    // IEM (Iowa Environmental Mesonet) — 1-minute ASOS data, matches NWS NOWData exactly
-    var yr=target.getFullYear();
-    var mo=target.getMonth()+1;
-    var dy=target.getDate();
-    fetch("https://mesonet.agron.iastate.edu/api/1/daily.json?station=KRDU&network=NC_ASOS&year1="+yr+"&month1="+mo+"&day1="+dy+"&year2="+yr+"&month2="+mo+"&day2="+dy)
-    .then(function(r){if(!r.ok)throw new Error("IEM HTTP "+r.status);return r.json();})
+    // RCC-ACIS — NOAA ThreadEx official record, exact match to NOWData
+    fetch("https://data.rcc-acis.org/StnData?sid=KRDU&sdate="+dStr+"&edate="+dStr+"&elems=1,2&output=json")
+    .then(function(r){if(!r.ok)throw new Error("ACIS HTTP "+r.status);return r.json();})
     .then(function(d){
       var rows=d.data||[];
-      if(!rows.length||rows[0].max_tmpf==null||rows[0].min_tmpf==null)throw new Error("IEM no data for "+dStr);
-      return storeAndWrite(Math.round(Number(rows[0].max_tmpf)),Math.round(Number(rows[0].min_tmpf)),"IEM ASOS");
+      if(!rows.length||rows[0][1]==='M'||rows[0][2]==='M'||rows[0][1]===''||rows[0][2]==='')throw new Error("ACIS no data for "+dStr);
+      return storeAndWrite(Math.round(Number(rows[0][1])),Math.round(Number(rows[0][2])),"ACIS ThreadEx");
     })
     .catch(function(e){
-      console.log("ACC actuals IEM failed for "+dStr+": "+e.message+", trying NWS fallback");
+      console.log("ACC actuals ACIS failed for "+dStr+": "+e.message+", trying NWS fallback");
       var _tzOff=-target.getTimezoneOffset();
       var _tzSign=_tzOff>=0?'+':'-';
       var _tzAbs=Math.abs(_tzOff);
@@ -2729,7 +2726,7 @@ function fetchMicroclimate(){
         '</div>'+
       '</div>'+
       '<div id="mc-history-section"><div class="alm-ld"><div class="tsps-spinner"></div>Loading historical data...</div></div>'+
-      '<div class="mc-note2">Live data: KNCRALEI761 via Weather Underground · RDU via ASOS KRDU (Iowa State Mesonet)</div>'+
+      '<div class="mc-note2">Live data: KNCRALEI761 via Weather Underground · RDU via RDU via NOAA ThreadEx (RCC-ACIS)</div>'+
     '</div>';
     mcEl.innerHTML=html;
     // Load historical comparison
@@ -2903,7 +2900,7 @@ function mcBuildHistory(rows){
     html+='</div>';
   }
 
-  html+='<div class="mc-note2">'+parsed.length+' daily readings recorded at 8 PM ET · KNCRALEI761 via Weather Underground · RDU via ASOS KRDU (Iowa State Mesonet)</div>';
+  html+='<div class="mc-note2">'+parsed.length+' daily readings recorded at 8 PM ET · KNCRALEI761 via Weather Underground · RDU via RDU via NOAA ThreadEx (RCC-ACIS)</div>';
   return html;
 }
 
