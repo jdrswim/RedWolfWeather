@@ -2103,20 +2103,17 @@ function accLogActuals(){
   var now=new Date();
 
   [0,1,2,3,4,5,6].forEach(function(daysBack){
-    // Today's high isn't final until ~8 PM — skip today before then
     if(daysBack===0&&now.getHours()<20)return;
     var target=new Date(now.getFullYear(),now.getMonth(),now.getDate()-daysBack);
     var dStr=accDateStr(target);
-    var guardKey="acc_act_done2_"+dStr;
+    // Use a new guard key prefix so old NWS-written dates get reprocessed with IEM
+    var guardKey="acc_act_iem_v1_"+dStr;
     if(daysBack>=2){try{if(localStorage.getItem(guardKey))return;}catch(e){}}
 
-    // Cache locally first (survives sheet write failures) then write to sheet
     function storeAndWrite(hi,lo,src){
       try{localStorage.setItem("acc_actual_"+dStr,JSON.stringify({hi:hi,lo:lo}));}catch(e){}
       console.log("ACC actuals ("+src+"): "+dStr+" H:"+hi+" L:"+lo);
-      // Re-render immediately using cached rows + localStorage (no spinner, no sheet round-trip)
       if(daysBack===1)setTimeout(accQuickRender,100);
-      // Then persist to sheet
       return fetch(SHEET_URL+"?action=write&tab=Accuracy&date="+dStr+"&actual_high="+hi+"&actual_low="+lo)
         .then(function(r){if(!r.ok)throw new Error("Sheet HTTP "+r.status);return r.json();})
         .then(function(j){
@@ -2127,34 +2124,43 @@ function accLogActuals(){
         });
     }
 
-    // NWS KRDU hourly observations — official station, matches NOWData record
-    // Use explicit local-timezone ISO strings so the query always covers
-    // midnight-to-midnight in the browser's local time (ET), not UTC.
-    var _tzOff=-target.getTimezoneOffset(); // minutes ahead of UTC (negative for US)
-    var _tzSign=_tzOff>=0?'+':'-';
-    var _tzAbs=Math.abs(_tzOff);
-    var _tzIso=_tzSign+((_tzAbs/60|0)<10?'0':'')+(_tzAbs/60|0)+':'+((_tzAbs%60)<10?'0':'')+(_tzAbs%60);
-    var obsS=dStr+'T00:00:00'+_tzIso;
-    var obsE=dStr+'T23:59:59'+_tzIso;
-    fetch("https://api.weather.gov/stations/KRDU/observations?start="+encodeURIComponent(obsS)+"&end="+encodeURIComponent(obsE)+"&limit=200",
-      {headers:{"User-Agent":"WolfpackWeather/2.0"}})
-    .then(function(r){if(!r.ok)throw new Error("NWS HTTP "+r.status);return r.json();})
+    // IEM (Iowa Environmental Mesonet) — 1-minute ASOS data, matches NWS NOWData exactly
+    var yr=target.getFullYear();
+    var mo=target.getMonth()+1;
+    var dy=target.getDate();
+    fetch("https://mesonet.agron.iastate.edu/api/1/daily.json?station=RDU&network=NC_ASOS&year1="+yr+"&month1="+mo+"&day1="+dy+"&year2="+yr+"&month2="+mo+"&day2="+dy)
+    .then(function(r){if(!r.ok)throw new Error("IEM HTTP "+r.status);return r.json();})
     .then(function(d){
-      var temps=(d.features||[]).reduce(function(a,f){
-        var props=f.properties||{};
-        var t=props.temperature&&props.temperature.value;
-        if(t!=null)a.push(t*9/5+32);
-        var mn6=props.minTemperatureLast6Hours&&props.minTemperatureLast6Hours.value;
-        var mx6=props.maxTemperatureLast6Hours&&props.maxTemperatureLast6Hours.value;
-        if(mn6!=null)a.push(mn6*9/5+32);
-        if(mx6!=null)a.push(mx6*9/5+32);
-        return a;
-      },[]);
-      if(!temps.length)throw new Error("NWS KRDU returned no temperature readings for "+dStr);
-      return storeAndWrite(Math.round(Math.max.apply(null,temps)),Math.round(Math.min.apply(null,temps)),"NWS KRDU");
+      var rows=d.data||[];
+      if(!rows.length||rows[0].max_tmpf==null||rows[0].min_tmpf==null)throw new Error("IEM no data for "+dStr);
+      return storeAndWrite(Math.round(Number(rows[0].max_tmpf)),Math.round(Number(rows[0].min_tmpf)),"IEM ASOS");
     })
     .catch(function(e){
-      console.log("ACC actuals NWS KRDU failed for "+dStr+": "+e.message);
+      console.log("ACC actuals IEM failed for "+dStr+": "+e.message+", trying NWS fallback");
+      var _tzOff=-target.getTimezoneOffset();
+      var _tzSign=_tzOff>=0?'+':'-';
+      var _tzAbs=Math.abs(_tzOff);
+      var _tzIso=_tzSign+((_tzAbs/60|0)<10?'0':'')+(_tzAbs/60|0)+':'+((_tzAbs%60)<10?'0':'')+(_tzAbs%60);
+      var obsS=dStr+'T00:00:00'+_tzIso;
+      var obsE=dStr+'T23:59:59'+_tzIso;
+      fetch("https://api.weather.gov/stations/KRDU/observations?start="+encodeURIComponent(obsS)+"&end="+encodeURIComponent(obsE)+"&limit=200",
+        {headers:{"User-Agent":"WolfpackWeather/2.0"}})
+      .then(function(r){if(!r.ok)throw new Error("NWS HTTP "+r.status);return r.json();})
+      .then(function(d){
+        var temps=(d.features||[]).reduce(function(a,f){
+          var props=f.properties||{};
+          var t=props.temperature&&props.temperature.value;
+          if(t!=null)a.push(t*9/5+32);
+          var mn6=props.minTemperatureLast6Hours&&props.minTemperatureLast6Hours.value;
+          var mx6=props.maxTemperatureLast6Hours&&props.maxTemperatureLast6Hours.value;
+          if(mn6!=null)a.push(mn6*9/5+32);
+          if(mx6!=null)a.push(mx6*9/5+32);
+          return a;
+        },[]);
+        if(!temps.length)throw new Error("NWS returned no temps for "+dStr);
+        return storeAndWrite(Math.round(Math.max.apply(null,temps)),Math.round(Math.min.apply(null,temps)),"NWS KRDU fallback");
+      })
+      .catch(function(e2){console.log("ACC actuals NWS fallback also failed for "+dStr+": "+e2.message);});
     });
   });
 }
@@ -2550,7 +2556,7 @@ function accRender(el,rawRows){
     '<div class="acc-note">'+
       'Showing last 7 days ('+selectedLead+'-day-out forecast) · Click any row to see all lead-day forecasts · '+
       'Bust card = worst 1-day forecast in last 30 days · '+
-      'Predictions logged at 8 PM · Actuals: NWS KRDU · '+rows.length+' day'+(rows.length!==1?"s":"")+' total on record'+
+      'Predictions logged at 8 PM · Actuals: ASOS KRDU via Iowa State Mesonet · '+rows.length+' day'+(rows.length!==1?"s":"")+' total on record'+
     '</div>'+
   '</div>';
   el.innerHTML=html;
@@ -2723,7 +2729,7 @@ function fetchMicroclimate(){
         '</div>'+
       '</div>'+
       '<div id="mc-history-section"><div class="alm-ld"><div class="tsps-spinner"></div>Loading historical data...</div></div>'+
-      '<div class="mc-note2">Live data: KNCRALEI761 via Weather Underground · RDU via NWS METAR (KRDU)</div>'+
+      '<div class="mc-note2">Live data: KNCRALEI761 via Weather Underground · RDU via ASOS KRDU (Iowa State Mesonet)</div>'+
     '</div>';
     mcEl.innerHTML=html;
     // Load historical comparison
@@ -2897,7 +2903,7 @@ function mcBuildHistory(rows){
     html+='</div>';
   }
 
-  html+='<div class="mc-note2">'+parsed.length+' daily readings recorded at 8 PM ET · KNCRALEI761 via Weather Underground · RDU via NWS (KRDU)</div>';
+  html+='<div class="mc-note2">'+parsed.length+' daily readings recorded at 8 PM ET · KNCRALEI761 via Weather Underground · RDU via ASOS KRDU (Iowa State Mesonet)</div>';
   return html;
 }
 
