@@ -2039,9 +2039,6 @@ function accLogPrediction(){
   var guardKey="acc_pred_session_"+sessionDate;
   try{if(localStorage.getItem(guardKey))return;}catch(e){}
 
-  // Also log actuals for past days at 8 PM (same session as predictions)
-  accLogActuals();
-
   fetch("https://api.weather.gov/points/35.686,-78.614",{headers:{"User-Agent":"WolfpackWeather/2.0"}})
   .then(function(r){if(!r.ok)throw new Error("NWS points "+r.status);return r.json();})
   .then(function(d){
@@ -2090,77 +2087,6 @@ function accLogPrediction(){
   .catch(function(e){console.log("ACC pred error: "+e.message);});
 }
 
-// ── ACTUALS LOGGER ─────────────────────────────────────────
-// Fetches NWS KRDU hourly observations for each completed day.
-// GUARANTEE: A day is only considered "done" once it's in the past
-// AND it's past midnight (hour >= 1). This means:
-//   - Tonight (Mar 30) will NOT be locked by today's page loads.
-//   - At 12:01 AM tomorrow, the page (or interval) will fetch Mar 30
-//     actuals fresh and write them to the sheet.
-//   - The guard key is ONLY written after a successful sheet write
-//     AND only when the target date is strictly in the past.
-function accLogActuals(){
-  var now=new Date();
-
-  [0,1,2,3,4,5,6].forEach(function(daysBack){
-    if(daysBack===0&&now.getHours()<20)return;
-    var target=new Date(now.getFullYear(),now.getMonth(),now.getDate()-daysBack);
-    var dStr=accDateStr(target);
-    // Use a new guard key prefix so old NWS-written dates get reprocessed with IEM
-    var guardKey="acc_act_iem_v1_"+dStr;
-    if(daysBack>=2){try{if(localStorage.getItem(guardKey))return;}catch(e){}}
-
-    function storeAndWrite(hi,lo,src){
-      try{localStorage.setItem("acc_actual_"+dStr,JSON.stringify({hi:hi,lo:lo}));}catch(e){}
-      console.log("ACC actuals ("+src+"): "+dStr+" H:"+hi+" L:"+lo);
-      if(daysBack===1)setTimeout(accQuickRender,100);
-      return fetch(SHEET_URL+"?action=write&tab=Accuracy&date="+dStr+"&actual_high="+hi+"&actual_low="+lo)
-        .then(function(r){if(!r.ok)throw new Error("Sheet HTTP "+r.status);return r.json();})
-        .then(function(j){
-          if(j&&j.error)throw new Error("Sheet error: "+j.error);
-          console.log("ACC sheet write OK: "+dStr);
-          if(daysBack>=2){try{localStorage.setItem(guardKey,"1");}catch(e){}}
-          return{hi:hi,lo:lo,src:src};
-        });
-    }
-
-    // RCC-ACIS — NOAA ThreadEx official record, exact match to NOWData
-    fetch("https://data.rcc-acis.org/StnData?sid=KRDU&sdate="+dStr+"&edate="+dStr+"&elems=1,2&output=json")
-    .then(function(r){if(!r.ok)throw new Error("ACIS HTTP "+r.status);return r.json();})
-    .then(function(d){
-      var rows=d.data||[];
-      if(!rows.length||rows[0][1]==='M'||rows[0][2]==='M'||rows[0][1]===''||rows[0][2]==='')throw new Error("ACIS no data for "+dStr);
-      return storeAndWrite(Math.round(Number(rows[0][1])),Math.round(Number(rows[0][2])),"ACIS ThreadEx");
-    })
-    .catch(function(e){
-      console.log("ACC actuals ACIS failed for "+dStr+": "+e.message+", trying NWS fallback");
-      var _tzOff=-target.getTimezoneOffset();
-      var _tzSign=_tzOff>=0?'+':'-';
-      var _tzAbs=Math.abs(_tzOff);
-      var _tzIso=_tzSign+((_tzAbs/60|0)<10?'0':'')+(_tzAbs/60|0)+':'+((_tzAbs%60)<10?'0':'')+(_tzAbs%60);
-      var obsS=dStr+'T00:00:00'+_tzIso;
-      var obsE=dStr+'T23:59:59'+_tzIso;
-      fetch("https://api.weather.gov/stations/KRDU/observations?start="+encodeURIComponent(obsS)+"&end="+encodeURIComponent(obsE)+"&limit=200",
-        {headers:{"User-Agent":"WolfpackWeather/2.0"}})
-      .then(function(r){if(!r.ok)throw new Error("NWS HTTP "+r.status);return r.json();})
-      .then(function(d){
-        var temps=(d.features||[]).reduce(function(a,f){
-          var props=f.properties||{};
-          var t=props.temperature&&props.temperature.value;
-          if(t!=null)a.push(t*9/5+32);
-          var mn6=props.minTemperatureLast6Hours&&props.minTemperatureLast6Hours.value;
-          var mx6=props.maxTemperatureLast6Hours&&props.maxTemperatureLast6Hours.value;
-          if(mn6!=null)a.push(mn6*9/5+32);
-          if(mx6!=null)a.push(mx6*9/5+32);
-          return a;
-        },[]);
-        if(!temps.length)throw new Error("NWS returned no temps for "+dStr);
-        return storeAndWrite(Math.round(Math.max.apply(null,temps)),Math.round(Math.min.apply(null,temps)),"NWS KRDU fallback");
-      })
-      .catch(function(e2){console.log("ACC actuals NWS fallback also failed for "+dStr+": "+e2.message);});
-    });
-  });
-}
 
 var _accCachedRows=[];
 var ACC_CACHE_KEY='acc_rows_v1';
@@ -2270,6 +2196,7 @@ function accLogStatus(){
   }catch(e){}
   var hour=now.getHours();
   var nextRun=hour<20?"8:00 PM tonight":predDone?"Done for today":"Next interval (≤30 min)";
+  var actualsNote=hour<7?"Lo logs at 7 AM · Hi logs at 7 PM":hour<19?"Hi logs at 7 PM":"Hi logged at 7 PM · Lo logs at 7 AM tomorrow";
   var predColor=predDone?"#00d44a":"#FFD700";
   var predLbl=predDone?"✓ Logged tonight":"Pending — "+nextRun;
   var html='<div style="background:rgba(0,0,0,0.064);border:1px solid rgba(0,0,0,0.128);border-radius:4px;padding:10px 14px;margin-bottom:14px;font-size:11px;line-height:1.8">';
@@ -2278,7 +2205,7 @@ function accLogStatus(){
   if(actualsDone.length){
     html+='<span style="color:#00d44a;font-weight:700">'+actualsDone.length+' day'+(actualsDone.length>1?"s":"")+ ' cached</span></div>';
   } else {
-    html+='<span style="color:#FFD700;font-weight:700">None yet — logs at 8 PM</span></div>';
+    html+='<span style="color:#FFD700;font-weight:700">None yet — '+actualsNote+'</span></div>';
   }
   html+='</div>';
   return html;

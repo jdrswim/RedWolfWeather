@@ -117,22 +117,141 @@ function installNightlyTrigger() {
   Logger.log('✓ Nightly trigger installed — fires daily at 8 PM ET');
 }
 
-// Called automatically by the trigger every night at 8 PM ET
+function installEveningTrigger() {
+  ScriptApp.getProjectTriggers().forEach(function(t) {
+    if (t.getHandlerFunction() === 'eveningLog') ScriptApp.deleteTrigger(t);
+  });
+  ScriptApp.newTrigger('eveningLog')
+    .timeBased()
+    .atHour(19)
+    .everyDays(1)
+    .inTimezone(TZ)
+    .create();
+  Logger.log('✓ Evening trigger installed — fires daily at 7 PM ET');
+}
+
+function installMorningTrigger() {
+  ScriptApp.getProjectTriggers().forEach(function(t) {
+    if (t.getHandlerFunction() === 'morningLog') ScriptApp.deleteTrigger(t);
+  });
+  ScriptApp.newTrigger('morningLog')
+    .timeBased()
+    .atHour(7)
+    .everyDays(1)
+    .inTimezone(TZ)
+    .create();
+  Logger.log('✓ Morning trigger installed — fires daily at 7 AM ET');
+}
+
+// Run once after pasting this script to set up all three triggers
+function installAllTriggers() {
+  installNightlyTrigger();
+  installEveningTrigger();
+  installMorningTrigger();
+  Logger.log('✓ All triggers installed: 7 AM (morningLog)  7 PM (eveningLog)  8 PM (nightlyLog)');
+}
+
+// 8 PM — predictions + microclimate only (actuals handled by 7 PM / 7 AM triggers)
 function nightlyLog() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getSheetByName('Accuracy');
   if (!sheet) { Logger.log('ERROR: Accuracy sheet not found'); return; }
   Logger.log('=== nightlyLog START ' + Utilities.formatDate(new Date(), TZ, 'yyyy-MM-dd HH:mm z') + ' ===');
   nightlyLogPredictions_(sheet);
-  nightlyLogMicroclimate_(ss);   // must run before nightlyLogActuals_ so it can read from Microclimate
-  nightlyLogActuals_(sheet, ss);
+  nightlyLogMicroclimate_(ss);
   Logger.log('=== nightlyLog END ===');
 }
 
-// Run this manually from the editor anytime to test the full pipeline
-function testNightlyLog() {
-  Logger.log('--- MANUAL TEST RUN ---');
-  nightlyLog();
+// 7 PM — record today's daytime high (max observed 7 AM – 7 PM ET)
+function eveningLog() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('Accuracy');
+  if (!sheet) { Logger.log('ERROR: Accuracy sheet not found'); return; }
+  var now   = new Date();
+  var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  var ds    = Utilities.formatDate(today, TZ, 'yyyy-MM-dd');
+  Logger.log('=== eveningLog START ' + Utilities.formatDate(now, TZ, 'yyyy-MM-dd HH:mm z') + ' ===');
+  var result = fetchNWSWindow_(today, 7, today, 19);
+  if (!result || result.hi === null) {
+    Logger.log('Evening ' + ds + ': no high temp data returned from NWS');
+  } else {
+    nightlyWrite_(sheet, ds, 'actual_high', result.hi, 'actual_high', result.hi, true);
+    Logger.log('Evening ' + ds + ':  Hi:' + result.hi + '  (NWS KRDU 7a–7p, ' + result.count + ' obs)');
+  }
+  Logger.log('=== eveningLog END ===');
+}
+
+// 7 AM — record yesterday's overnight low (min observed 7 PM yesterday – 7 AM today)
+function morningLog() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('Accuracy');
+  if (!sheet) { Logger.log('ERROR: Accuracy sheet not found'); return; }
+  var now       = new Date();
+  var today     = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  var yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+  var ds        = Utilities.formatDate(yesterday, TZ, 'yyyy-MM-dd');
+  Logger.log('=== morningLog START ' + Utilities.formatDate(now, TZ, 'yyyy-MM-dd HH:mm z') + ' ===');
+  var result = fetchNWSWindow_(yesterday, 19, today, 7);
+  if (!result || result.lo === null) {
+    Logger.log('Morning (for ' + ds + '): no low temp data returned from NWS');
+  } else {
+    nightlyWrite_(sheet, ds, 'actual_low', result.lo, 'actual_low', result.lo, true);
+    Logger.log('Morning ' + Utilities.formatDate(today, TZ, 'yyyy-MM-dd') + ':  Lo:' + result.lo + ' for ' + ds + '  (NWS KRDU 7p–7a, ' + result.count + ' obs)');
+  }
+  Logger.log('=== morningLog END ===');
+}
+
+function testNightlyLog() { Logger.log('--- TEST nightlyLog ---'); nightlyLog(); }
+function testEveningLog()  { Logger.log('--- TEST eveningLog ---'); eveningLog(); }
+function testMorningLog()  { Logger.log('--- TEST morningLog ---');  morningLog(); }
+
+// ─────────────────────────────────────────────────────────────
+// NWS TIME-WINDOW HELPER
+// Fetches KRDU observations between startDate+startHour and endDate+endHour (ET).
+// Returns { hi: maxF, lo: minF, count: n } or null on failure.
+// ─────────────────────────────────────────────────────────────
+function fetchNWSWindow_(startDate, startHour, endDate, endHour) {
+  var opts = { headers: { 'User-Agent': 'WolfpackWeather/2.0' }, muteHttpExceptions: true };
+
+  var tzOffS = Utilities.formatDate(startDate, TZ, 'Z');
+  var tzIsoS = tzOffS.substring(0, 3) + ':' + tzOffS.substring(3);
+  var tzOffE = Utilities.formatDate(endDate, TZ, 'Z');
+  var tzIsoE = tzOffE.substring(0, 3) + ':' + tzOffE.substring(3);
+
+  var startDs = Utilities.formatDate(startDate, TZ, 'yyyy-MM-dd');
+  var endDs   = Utilities.formatDate(endDate,   TZ, 'yyyy-MM-dd');
+  var sH = (startHour < 10 ? '0' : '') + startHour;
+  var eH = (endHour   < 10 ? '0' : '') + endHour;
+
+  var url = 'https://api.weather.gov/stations/KRDU/observations' +
+            '?start=' + encodeURIComponent(startDs + 'T' + sH + ':00:00' + tzIsoS) +
+            '&end='   + encodeURIComponent(endDs   + 'T' + eH + ':00:00' + tzIsoE) +
+            '&limit=200';
+
+  var resp = UrlFetchApp.fetch(url, opts);
+  if (resp.getResponseCode() !== 200) {
+    Logger.log('fetchNWSWindow_: HTTP ' + resp.getResponseCode());
+    return null;
+  }
+
+  var features = JSON.parse(resp.getContentText()).features || [];
+  var hiVals = [], loVals = [];
+  features.forEach(function(f) {
+    var props = f.properties || {};
+    var t   = props.temperature && props.temperature.value;
+    var mx6 = props.maxTemperatureLast6Hours && props.maxTemperatureLast6Hours.value;
+    var mn6 = props.minTemperatureLast6Hours && props.minTemperatureLast6Hours.value;
+    if (t   != null) { hiVals.push(t   * 9/5 + 32); loVals.push(t   * 9/5 + 32); }
+    if (mx6 != null) hiVals.push(mx6 * 9/5 + 32);
+    if (mn6 != null) loVals.push(mn6 * 9/5 + 32);
+  });
+
+  if (!features.length) return null;
+  return {
+    hi:    hiVals.length ? Math.round(Math.max.apply(null, hiVals)) : null,
+    lo:    loVals.length ? Math.round(Math.min.apply(null, loVals)) : null,
+    count: features.length
+  };
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -188,10 +307,18 @@ function nightlyLogPredictions_(sheet) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// ACTUALS  (primary: Microclimate sheet rdu_high/rdu_low;
-//           fallback: NWS KRDU hourly observations)
+// BACKFILL ACTUALS  (manual tool — not called by any trigger)
+// Run backfillActuals() from the editor to re-populate actual_high/actual_low
+// for the past 7 days using calendar-day ACIS data (midnight–midnight).
+// Use this to recover after missed triggers or correct historical values.
 // ─────────────────────────────────────────────────────────────
-function nightlyLogActuals_(sheet, ss) {
+function backfillActuals() {
+  var ss    = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('Accuracy');
+  if (!sheet) { Logger.log('ERROR: Accuracy sheet not found'); return; }
+  backfillActuals_(sheet, ss);
+}
+function backfillActuals_(sheet, ss) {
   var now = new Date();
 
   // ── Load Microclimate sheet as source of truth for RDU temps ──
