@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<title>Red Wolf Weather</title>
+</head><body><script>
+// GitHub Pages SPA redirect: capture the path slug, store it, and go to root.
+// index.html reads sessionStorage on load and switches to the correct tab.
+var seg = window.location.pathname.replace(/^\//,'').replace(/\/$/,'');
+try { if (seg) sessionStorage.setItem('rwwRedirect', seg); } catch(e) {}
+window.location.replace('https://redwolfweather.com/');
+</script></body></html>

@@ -720,19 +720,21 @@ function switchTab(name,btn){
   document.querySelectorAll(".tab-btn").forEach(function(b){b.classList.remove("active");});
   $("tab-"+name).classList.add("active");
   btn.classList.add("active");
-  var hash=_TAB_HASH[name];
-  history.replaceState(null,'',hash?('#'+hash):window.location.pathname);
-  if(window.pendo){pendo.pageLoad({url:'/#'+(hash||name)});}
+  var slug=_TAB_HASH[name];
+  history.replaceState(null,'',slug?('/'+slug):'/');
+  if(window.pendo){pendo.pageLoad({url:'/'+(slug||name)});}
   if(name==="almanac"&&!window._almLoaded){fetchAlmanac();fetchSunData();accFetchAndRender();}
   else if(name==="almanac"){fetchSunData();accFetchAndRender();}
   if(name==="pws"){fetchPWS();}
   if(name==="aerospace"&&!window._rktLoaded){fetchRockets();}
 }
 
-// On load, honour the URL hash so direct links work
+// On load, route from 404.html sessionStorage redirect or pathname
 (function(){
-  var h=window.location.hash.replace('#','');
-  var tabName=_HASH_TAB[h];
+  var seg=null;
+  try{seg=sessionStorage.getItem('rwwRedirect');if(seg)sessionStorage.removeItem('rwwRedirect');}catch(e){}
+  if(!seg){var p=window.location.pathname.replace(/^\//,'').replace(/\/$/,'');if(p)seg=p;}
+  var tabName=_HASH_TAB[seg];
   if(tabName){
     var btnEl=document.getElementById(_TAB_BTN[tabName]);
     if(btnEl)switchTab(tabName,btnEl);
