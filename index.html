@@ -711,17 +711,33 @@ function openTip(id){$(id).classList.add("show");}
 function closeTip(id){$(id).classList.remove("show");}
 document.querySelectorAll(".tip-overlay").forEach(function(o){o.addEventListener("click",function(e){if(e.target===this)this.classList.remove("show");});});
 
+var _TAB_HASH={almanac:'almanac',pws:'microclimate',aerospace:'aerospace'};
+var _HASH_TAB={almanac:'almanac',microclimate:'pws',aerospace:'aerospace'};
+var _TAB_BTN={almanac:'tabBtnAlmanac',pws:'tabBtnPws',aerospace:'tabBtnAerospace'};
+
 function switchTab(name,btn){
   document.querySelectorAll(".tab-pane").forEach(function(p){p.classList.remove("active");});
   document.querySelectorAll(".tab-btn").forEach(function(b){b.classList.remove("active");});
   $("tab-"+name).classList.add("active");
   btn.classList.add("active");
-  if(window.pendo){pendo.pageLoad({url:'/#'+name});}
+  var hash=_TAB_HASH[name];
+  history.replaceState(null,'',hash?('#'+hash):window.location.pathname);
+  if(window.pendo){pendo.pageLoad({url:'/#'+(hash||name)});}
   if(name==="almanac"&&!window._almLoaded){fetchAlmanac();fetchSunData();accFetchAndRender();}
   else if(name==="almanac"){fetchSunData();accFetchAndRender();}
   if(name==="pws"){fetchPWS();}
   if(name==="aerospace"&&!window._rktLoaded){fetchRockets();}
 }
+
+// On load, honour the URL hash so direct links work
+(function(){
+  var h=window.location.hash.replace('#','');
+  var tabName=_HASH_TAB[h];
+  if(tabName){
+    var btnEl=document.getElementById(_TAB_BTN[tabName]);
+    if(btnEl)switchTab(tabName,btnEl);
+  }
+})();
 
 function switchAeroTab(name,btn){
   document.querySelectorAll('.aero-pane').forEach(function(p){p.classList.remove('active');});
@@ -2808,7 +2824,7 @@ function mcBuildHistory(rows){
       '<div class="acc-log-hdr"><div>DATE</div><div>RWF</div><div>RDU</div><div>DIFFERENTIAL</div></div>';
     recent.forEach(function(r){
       var hasRwf=r.rwfHi!==null&&r.rwfLo!==null;
-      var hiDiff=hasRwf?r.rwfHi-r.rduHi:null, loDiff=hasRwf?r.rwfLo-r.rduLo:null;
+      var hiDiff=hasRwf?r.rduHi-r.rwfHi:null, loDiff=hasRwf?r.rduLo-r.rwfLo:null;
       var dateLabel=r.ts.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric",year:"numeric"});
       var rwfStack=hasRwf?
         '<div class="acc-hilostack"><span><span class="acc-sublbl">HI</span>'+r.rwfHi+'°</span><span><span class="acc-sublbl">LO</span>'+r.rwfLo+'°</span></div>':
