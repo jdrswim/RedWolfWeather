@@ -151,7 +151,7 @@ function installAllTriggers() {
   Logger.log('✓ All triggers installed: 7 AM (morningLog)  7 PM (eveningLog)  8 PM (nightlyLog)');
 }
 
-// 8 PM — predictions + microclimate only (actuals handled by 7 PM / 7 AM triggers)
+// 8 PM — predictions, microclimate, then sync actuals from Microclimate sheet
 function nightlyLog() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getSheetByName('Accuracy');
@@ -159,7 +159,43 @@ function nightlyLog() {
   Logger.log('=== nightlyLog START ' + Utilities.formatDate(new Date(), TZ, 'yyyy-MM-dd HH:mm z') + ' ===');
   nightlyLogPredictions_(sheet);
   nightlyLogMicroclimate_(ss);
+  syncActualsFromMicroclimate_(sheet, ss);
   Logger.log('=== nightlyLog END ===');
+}
+
+// Copies rdu_high/rdu_low from Microclimate sheet → actual_high/actual_low in Accuracy.
+// This is the authoritative actuals source — ACIS ThreadEx data written by nightlyLogMicroclimate_.
+function syncActualsFromMicroclimate_(sheet, ss) {
+  var mcSheet = (ss || SpreadsheetApp.getActiveSpreadsheet()).getSheetByName('Microclimate');
+  if (!mcSheet) { Logger.log('syncActuals: Microclimate sheet not found'); return; }
+
+  var mcData    = mcSheet.getDataRange().getValues();
+  var mcHeaders = mcData[0].map(function(h) { return String(h).trim(); });
+  var mcDateCol  = mcHeaders.indexOf('date');
+  var mcRduHiCol = mcHeaders.indexOf('rdu_high');
+  var mcRduLoCol = mcHeaders.indexOf('rdu_low');
+  if (mcDateCol < 0 || mcRduHiCol < 0 || mcRduLoCol < 0) {
+    Logger.log('syncActuals: missing columns in Microclimate sheet');
+    return;
+  }
+
+  var synced = 0;
+  for (var i = 1; i < mcData.length; i++) {
+    var ds  = normDateStr_(mcData[i][mcDateCol]);
+    var hi  = mcData[i][mcRduHiCol];
+    var lo  = mcData[i][mcRduLoCol];
+    if (!ds || hi === '' || hi == null || lo === '' || lo == null) continue;
+    nightlyWrite_(sheet, ds, 'actual_high', Math.round(Number(hi)), 'actual_low', Math.round(Number(lo)), true);
+    synced++;
+  }
+  Logger.log('syncActuals: wrote ' + synced + ' dates from Microclimate → Accuracy');
+}
+
+function testSyncActuals() {
+  var ss    = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('Accuracy');
+  Logger.log('--- TEST syncActualsFromMicroclimate_ ---');
+  syncActualsFromMicroclimate_(sheet, ss);
 }
 
 // 7 PM — record today's daytime high (max observed 7 AM – 7 PM ET)
