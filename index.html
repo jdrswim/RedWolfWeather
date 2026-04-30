@@ -1415,18 +1415,21 @@ function tsps_buildHowlometer(score) {
   else if (lvIdx >= 2) wAnim = 'animation:hwolfBounce 1.4s ease-in-out infinite';
   else if (lvIdx >= 1) wAnim = 'animation:hwolfBounce 2.2s ease-in-out infinite';
 
-  // Wolves wake from grey → full color → glowing as severity rises
+  // Wolves wake from grey → full color as severity rises (no drop-shadow — rings handle the glow)
   var greyPct = [100, 70, 40, 10, 0, 0][lvIdx];
   var brtPct  = [70, 80, 95, 100, 105, 110][lvIdx];
-  var glowPx  = [0, 4, 8, 14, 22, 32][lvIdx];
-  var imgFilter = 'grayscale('+greyPct+'%) brightness('+brtPct+'%)'
-                + (glowPx > 0 ? ' drop-shadow(0 0 '+glowPx+'px rgba('+rgb+',0.85))' : '');
+  var imgFilter = 'grayscale('+greyPct+'%) brightness('+brtPct+'%)';
+
+  // Radial background glow behind the wolf (avoids rectangular box-shadow on image)
+  var stageBg = lvIdx > 0
+    ? 'background:radial-gradient(ellipse 80% 70% at 50% 50%, rgba('+rgb+','+(lvIdx*0.07)+') 0%, transparent 80%)'
+    : '';
 
   var taglines = ['Quiet skies — wolves at rest','Stirring — slight chance','Wolves are watching','Elevated threat — growling','High danger — full howl','EXTREME — all three wolves screaming!'];
 
   return '<div class="howl-wrap">'
     + '<div class="howl-lbl">🐺 Howl-o-meter</div>'
-    + '<div class="howl-stage">'
+    + '<div class="howl-stage" style="' + stageBg + '">'
       + '<svg class="howl-rings" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">' + rings + '</svg>'
       + '<div class="howl-wolf" style="' + (wAnim ? wAnim + ';' : '') + '">'
         + '<img src="' + imgSrc + '" alt="Wolfpack" style="filter:' + imgFilter + '">'
