@@ -1405,6 +1405,8 @@ function tsps_buildHowlometer(score) {
     }
   }
 
+  var imgSrc = lvIdx >= 2 ? 'images/wolfpack-howl.gif' : 'images/wolfpack.jpg';
+
   // Wolf animation intensity by level
   var wAnim = '';
   if      (lvIdx >= 5) wAnim = 'animation:hwolfFrenzy 0.45s ease-in-out infinite';
@@ -1427,7 +1429,7 @@ function tsps_buildHowlometer(score) {
     + '<div class="howl-stage">'
       + '<svg class="howl-rings" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">' + rings + '</svg>'
       + '<div class="howl-wolf" style="' + (wAnim ? wAnim + ';' : '') + '">'
-        + '<img src="images/wolfpack.jpg" alt="Wolfpack" style="filter:' + imgFilter + '">'
+        + '<img src="' + imgSrc + '" alt="Wolfpack" style="filter:' + imgFilter + '">'
       + '</div>'
     + '</div>'
     + '<div class="howl-score" style="color:' + c + '">' + score + '<span>/100</span></div>'
