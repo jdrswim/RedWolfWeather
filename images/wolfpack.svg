@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 400">
+  <!-- NC State Triple Wolf Head — stylized approximation -->
+
+  <!-- ── BACK WOLF (bottom-right, smallest) ── -->
+  <g transform="translate(290,165) scale(0.72)" opacity="0.82">
+    <!-- neck/mane -->
+    <path d="M-30,190 Q-10,130 20,110 Q50,90 80,95 Q110,100 130,115 L120,200 Z" fill="#111"/>
+    <!-- mane spikes -->
+    <path d="M-30,190 L-55,145 L-20,160 L-45,115 L-5,140 L-15,100 L25,130 L20,90 L55,120" fill="none" stroke="#111" stroke-width="14" stroke-linejoin="round" stroke-linecap="round"/>
+    <!-- head -->
+    <path d="M20,110 Q-10,60 10,20 Q30,-15 70,-10 Q115,-5 135,30 Q155,65 140,100 Q130,130 110,140 Q80,155 50,150 Q25,145 20,110Z" fill="#111"/>
+    <!-- ear left -->
+    <path d="M10,20 L-10,-25 L35,5Z" fill="#111"/>
+    <path d="M10,20 L-5,-15 L28,8Z" fill="#333"/>
+    <!-- ear right -->
+    <path d="M70,-10 L75,-40 L100,-5Z" fill="#111"/>
+    <path d="M72,-10 L76,-30 L97,-6Z" fill="#333"/>
+    <!-- snout -->
+    <path d="M140,50 Q170,45 195,60 Q210,75 205,95 Q195,115 175,120 Q150,125 135,105 Q125,85 140,65Z" fill="#222"/>
+    <!-- white snout highlight -->
+    <path d="M145,60 Q168,55 188,68 Q200,80 196,97 Q188,112 170,116 Q148,120 137,103 Q130,88 142,72Z" fill="#e8e8e8"/>
+    <!-- nose -->
+    <ellipse cx="192" cy="68" rx="12" ry="8" fill="#111"/>
+    <!-- open mouth / teeth -->
+    <path d="M140,105 Q160,130 200,125 Q220,120 225,108 L210,120 Q185,132 155,128 Q138,122 135,112Z" fill="#111"/>
+    <!-- teeth top -->
+    <path d="M150,118 L158,132 L167,117 L177,133 L187,116 L197,130 L207,115" fill="none" stroke="#fff" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"/>
+    <!-- teeth bottom -->
+    <path d="M148,120 L155,108 L165,120 L175,108 L185,120 L196,110 L207,120" fill="none" stroke="#fff" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+    <!-- red gum/tongue -->
+    <path d="M155,125 Q180,140 205,125 Q195,135 178,138 Q162,137 155,125Z" fill="#cc1f2e"/>
+    <!-- eye -->
+    <ellipse cx="60" cy="40" rx="12" ry="9" fill="#fff"/>
+    <ellipse cx="62" cy="40" rx="7" ry="6" fill="#111"/>
+    <ellipse cx="65" cy="37" rx="2.5" ry="2" fill="#fff"/>
+    <!-- white fur highlight on head -->
+    <path d="M50,10 Q80,5 105,20 Q120,35 115,60 Q105,80 85,85 Q65,88 50,75 Q35,60 40,38 Q44,20 50,10Z" fill="#d0d0d0" opacity="0.45"/>
+  </g>
+
+  <!-- ── MID WOLF (center) ── -->
+  <g transform="translate(155,90) scale(0.88)">
+    <!-- neck/mane -->
+    <path d="M-30,200 Q-8,135 25,112 Q58,88 92,93 Q125,98 148,118 L138,210 Z" fill="#111"/>
+    <!-- mane spikes -->
+    <path d="M-30,200 L-60,150 L-22,168 L-52,118 L-8,145 L-18,100 L28,132 L22,88 L62,122" fill="none" stroke="#111" stroke-width="16" stroke-linejoin="round" stroke-linecap="round"/>
+    <!-- head -->
+    <path d="M25,112 Q-8,58 14,14 Q36,-22 80,-16 Q128,-10 150,28 Q172,66 156,106 Q144,136 122,146 Q88,162 56,156 Q26,148 25,112Z" fill="#111"/>
+    <!-- ear left -->
+    <path d="M14,14 L-8,-35 L40,2Z" fill="#111"/>
+    <path d="M14,14 L-3,-22 L34,5Z" fill="#333"/>
+    <!-- ear right -->
+    <path d="M80,-16 L84,-50 L112,-10Z" fill="#111"/>
+    <path d="M81,-15 L85,-36 L109,-11Z" fill="#333"/>
+    <!-- snout -->
+    <path d="M155,48 Q188,42 215,60 Q232,78 226,100 Q215,122 192,128 Q165,133 150,110 Q138,88 155,68Z" fill="#222"/>
+    <!-- white snout highlight -->
+    <path d="M160,58 Q185,52 208,68 Q222,82 217,102 Q207,118 187,123 Q162,127 150,108 Q142,90 157,72Z" fill="#e8e8e8"/>
+    <!-- nose -->
+    <ellipse cx="212" cy="66" rx="13" ry="9" fill="#111"/>
+    <!-- open mouth -->
+    <path d="M150,110 Q172,138 216,132 Q238,126 243,113 L228,126 Q200,140 168,136 Q149,128 147,116Z" fill="#111"/>
+    <!-- teeth top -->
+    <path d="M163,125 L172,141 L183,124 L194,142 L206,123 L218,138 L228,123" fill="none" stroke="#fff" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+    <!-- teeth bottom -->
+    <path d="M161,128 L169,114 L181,128 L192,113 L204,128 L216,115 L228,128" fill="none" stroke="#fff" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <!-- red gum -->
+    <path d="M170,134 Q198,150 224,134 Q212,145 194,148 Q176,147 170,134Z" fill="#cc1f2e"/>
+    <!-- eye -->
+    <ellipse cx="68" cy="38" rx="13" ry="10" fill="#fff"/>
+    <ellipse cx="70" cy="38" rx="8" ry="7" fill="#111"/>
+    <ellipse cx="74" cy="34" rx="3" ry="2.5" fill="#fff"/>
+    <!-- white fur highlight -->
+    <path d="M55,5 Q90,-2 118,16 Q136,34 130,62 Q118,85 95,90 Q70,93 53,78 Q36,60 42,34 Q46,14 55,5Z" fill="#d0d0d0" opacity="0.4"/>
+  </g>
+
+  <!-- ── FRONT WOLF (top-left, largest) ── -->
+  <g transform="translate(20,10) scale(1.0)">
+    <!-- neck/mane -->
+    <path d="M-20,220 Q5,148 42,122 Q78,96 118,102 Q155,107 178,128 L165,228 Z" fill="#111"/>
+    <!-- mane spikes -->
+    <path d="M-20,220 L-55,162 L-14,183 L-50,128 L0,158 L-12,108 L38,142 L30,94 L78,132" fill="none" stroke="#111" stroke-width="18" stroke-linejoin="round" stroke-linecap="round"/>
+    <!-- head -->
+    <path d="M42,122 Q4,62 28,14 Q52,-28 102,-20 Q156,-12 182,30 Q208,72 190,116 Q176,148 150,160 Q112,178 76,170 Q42,160 42,122Z" fill="#111"/>
+    <!-- ear left -->
+    <path d="M28,14 L4,-42 L56,4Z" fill="#111"/>
+    <path d="M28,14 L8,-28 L48,6Z" fill="#333"/>
+    <!-- ear right -->
+    <path d="M102,-20 L108,-62 L142,-16Z" fill="#111"/>
+    <path d="M103,-19 L109,-46 L138,-17Z" fill="#333"/>
+    <!-- snout -->
+    <path d="M188,40 Q226,33 258,54 Q278,76 270,102 Q258,128 232,135 Q200,142 182,116 Q168,90 184,65Z" fill="#222"/>
+    <!-- white snout -->
+    <path d="M194,52 Q224,44 250,62 Q266,80 260,104 Q248,122 226,128 Q198,133 183,112 Q172,92 190,70Z" fill="#e8e8e8"/>
+    <!-- nose -->
+    <ellipse cx="254" cy="60" rx="15" ry="10" fill="#111"/>
+    <!-- open mouth -->
+    <path d="M182,116 Q208,148 258,142 Q284,135 290,120 L272,134 Q240,150 204,146 Q182,137 178,123Z" fill="#111"/>
+    <!-- teeth top -->
+    <path d="M196,138 L207,157 L220,137 L234,158 L248,136 L262,153 L275,136" fill="none" stroke="#fff" stroke-width="4.5" stroke-linejoin="round" stroke-linecap="round"/>
+    <!-- teeth bottom -->
+    <path d="M194,140 L204,124 L218,142 L232,124 L247,142 L261,125 L275,142" fill="none" stroke="#fff" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"/>
+    <!-- red gum / tongue -->
+    <path d="M205,148 Q238,167 270,148 Q256,160 234,164 Q212,163 205,148Z" fill="#cc1f2e"/>
+    <path d="M220,155 Q236,170 252,158 Q240,168 234,170 Q224,169 220,155Z" fill="#cc1f2e" opacity="0.7"/>
+    <!-- eye -->
+    <ellipse cx="84" cy="44" rx="15" ry="12" fill="#fff"/>
+    <ellipse cx="87" cy="44" rx="9" ry="8" fill="#111"/>
+    <ellipse cx="92" cy="39" rx="3.5" ry="3" fill="#fff"/>
+    <!-- white fur highlight -->
+    <path d="M66,4 Q108,-5 142,18 Q164,40 157,72 Q143,98 116,104 Q86,108 65,90 Q42,68 50,38 Q56,14 66,4Z" fill="#d0d0d0" opacity="0.38"/>
+  </g>
+</svg>
