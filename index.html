@@ -170,6 +170,20 @@ main{max-width:1100px;margin:0 auto;padding:18px;overflow-x:hidden}
 .tsps-ch-box{background:rgba(0,0,0,0.032);border-radius:10px;padding:14px;border:1px solid rgba(0,0,0,0.08)}
 .tsps-ch-box .tsps-ct{font-size:9px;font-weight:700;color:rgba(0,0,0,0.56);letter-spacing:1px;margin-bottom:10px}
 .tsps-ch-box canvas{width:100%!important;max-height:195px}
+/* HOWL-O-METER */
+.howl-wrap{text-align:center;padding:4px 8px}
+.howl-lbl{font-size:9px;font-weight:800;letter-spacing:2.5px;color:rgba(0,0,0,0.45);margin-bottom:10px;text-transform:uppercase}
+.howl-stage{position:relative;width:130px;height:130px;margin:0 auto}
+.howl-rings{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.howl-wolf{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:58px;line-height:1;transition:filter .5s}
+.howl-score{font-size:38px;font-weight:900;line-height:1;margin-top:8px;letter-spacing:-1px}
+.howl-score span{font-size:13px;font-weight:400;color:rgba(0,0,0,0.38);margin-left:1px}
+.howl-lvlabel{font-size:10px;font-weight:800;letter-spacing:2.5px;margin-top:4px;text-transform:uppercase}
+.howl-tagline{font-size:10px;color:rgba(0,0,0,0.45);margin-top:3px;font-style:italic}
+@keyframes hwavOut{0%{stroke-opacity:.7;transform:scale(1)}100%{stroke-opacity:0;transform:scale(1.6)}}
+@keyframes hwolfBounce{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-4px) scale(1.04)}}
+@keyframes hwolfShake{0%,100%{transform:translate(0,0) rotate(0)}20%{transform:translate(-3px,-2px) rotate(-2deg)}40%{transform:translate(3px,0) rotate(2deg)}60%{transform:translate(-2px,2px) rotate(-1deg)}80%{transform:translate(2px,-1px) rotate(1deg)}}
+@keyframes hwolfFrenzy{0%,100%{transform:translate(0,0) rotate(0) scale(1)}15%{transform:translate(-4px,-2px) rotate(-3deg) scale(1.05)}30%{transform:translate(4px,1px) rotate(3deg) scale(0.97)}45%{transform:translate(-3px,2px) rotate(-2deg) scale(1.04)}60%{transform:translate(3px,-3px) rotate(2deg) scale(0.98)}80%{transform:translate(-2px,2px) rotate(-1deg) scale(1.02)}}
 .tsps-det{background:rgba(0,0,0,0.032);border-radius:10px;padding:18px;border:1px solid rgba(0,0,0,0.08);margin-top:14px}
 .tsps-det-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px}
 .tsps-det-per{font-size:10px;font-weight:700;color:rgba(0,0,0,0.64);letter-spacing:1px}
@@ -1370,6 +1384,53 @@ function tsps_buildFingerprint(breakdown,score){
 
 function tsps_destroyCharts(){["tl","bar"].forEach(function(k){if(tspsState.charts[k]){tspsState.charts[k].destroy();tspsState.charts[k]=null;}});}
 
+function tsps_buildHowlometer(score) {
+  var lv = tsps_sevLevel(score);
+  var lvIdx = score < 10 ? 0 : score < 25 ? 1 : score < 50 ? 2 : score < 75 ? 3 : score < 90 ? 4 : 5;
+  var c = lv.color, rgb = tsps_hexToRgb(c);
+
+  // Sound-wave rings — more rings = louder howl, each cascades outward
+  var ringSpacing = [0, 14, 22, 30, 38, 46];
+  var rings = '';
+  var dur = [0, 2.4, 2.0, 1.6, 1.1, 0.75][lvIdx];
+  for (var i = 1; i <= 5; i++) {
+    var r = 42 + ringSpacing[Math.min(i, 5)];
+    if (i <= lvIdx) {
+      var delay = ((i - 1) * (dur / 5)).toFixed(2);
+      rings += '<circle cx="50" cy="50" r="'+r+'" fill="none" stroke="rgba('+rgb+',0.65)" stroke-width="1.8"'
+             + ' style="transform-origin:50% 50%;animation:hwavOut '+dur+'s ease-out '+delay+'s infinite"/>';
+    } else {
+      rings += '<circle cx="50" cy="50" r="'+r+'" fill="none" stroke="rgba('+rgb+',0.07)" stroke-width="1.2"/>';
+    }
+  }
+
+  // Wolf animation intensity by level
+  var wAnim = '';
+  if      (lvIdx >= 5) wAnim = 'animation:hwolfFrenzy 0.45s ease-in-out infinite';
+  else if (lvIdx >= 4) wAnim = 'animation:hwolfShake 0.65s ease-in-out infinite';
+  else if (lvIdx >= 3) wAnim = 'animation:hwolfShake 1.0s ease-in-out infinite';
+  else if (lvIdx >= 2) wAnim = 'animation:hwolfBounce 1.4s ease-in-out infinite';
+  else if (lvIdx >= 1) wAnim = 'animation:hwolfBounce 2.2s ease-in-out infinite';
+
+  var glowPx = [0, 6, 10, 16, 22, 30][lvIdx];
+  var glow = glowPx > 0 ? 'filter:drop-shadow(0 0 '+glowPx+'px rgba('+rgb+',0.9))' : '';
+
+  var taglines = ['Quiet skies — all clear','Slight chance — stay alert','Keep an eye out','Elevated threat — be ready','High danger — take action','EXTREME — seek shelter now!'];
+
+  return '<div class="howl-wrap">'
+    + '<div class="howl-lbl">🐺 Howl-o-meter</div>'
+    + '<div class="howl-stage">'
+      + '<svg class="howl-rings" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">' + rings + '</svg>'
+      + '<div class="howl-wolf" style="' + (wAnim ? wAnim + ';' : '') + glow + '">'
+        + (lvIdx === 0 ? '🐺' : lvIdx <= 2 ? '🐺' : '🐺')
+      + '</div>'
+    + '</div>'
+    + '<div class="howl-score" style="color:' + c + '">' + score + '<span>/100</span></div>'
+    + '<div class="howl-lvlabel" style="color:' + c + '">' + lv.label + '</div>'
+    + '<div class="howl-tagline">' + taglines[lvIdx] + '</div>'
+    + '</div>';
+}
+
 function tsps_renderMain(){
   var pk=tspsState.peakScore,pkL=tsps_sevLevel(pk),f=tspsState.forecasts,al=tspsState.alerts;
   var pw=f.length?f.reduce(function(a,b){return a.score>b.score?a:b;}).label:"--";
@@ -1383,7 +1444,7 @@ function tsps_renderMain(){
   var af=f[tspsState.activeIdx],afL=af?tsps_sevLevel(af.score):{color:"#888",label:"--"};
   var dH="";if(af){dH='<div class="tsps-det"><div class="tsps-det-hdr"><div><div class="tsps-det-per">ANALYSIS - '+af.label+'</div><div class="tsps-det-fc">'+(af.shortForecast||"--")+'</div></div><div style="text-align:right"><div class="tsps-det-sc" style="color:'+afL.color+'">'+af.score+'</div><div class="tsps-det-lv" style="color:'+afL.color+'">'+afL.label+'</div></div></div><div class="tsps-det-mg"><div class="tsps-dm"><div class="dm-l">TEMP</div><div class="dm-v">'+(af.temp!=null?af.temp+"F":"--")+'</div></div><div class="tsps-dm"><div class="dm-l">WIND</div><div class="dm-v">'+(af.wind||"--")+'</div></div><div class="tsps-dm"><div class="dm-l">PRECIP</div><div class="dm-v">'+(af.pop||0)+'%</div></div><div class="tsps-dm"><div class="dm-l">LIKELIHOOD</div><div class="dm-v">'+af.likelihood+'%</div></div></div>'+(af.detailedForecast?'<div class="tsps-det-nar" style="border-left-color:'+afL.color+'44"><b>NWS:</b> '+af.detailedForecast+'</div>':'')+'</div>';}
   var fpH='';if(af&&af.breakdown){fpH='<div class="tf-wrap"><div class="tf-title">THREAT FINGERPRINT</div><div class="tf-subtitle">6-COMPONENT SEVERITY BREAKDOWN</div>'+tsps_buildFingerprint(af.breakdown,af.score)+'</div>';}
-  cont.innerHTML='<div class="tsps-hdr"><div class="tsps-hdr-l"><div class="tsps-tag">PROPRIETARY MODEL</div><h2><span class="tsps-r">Tuffy\'s</span> Storm Prediction System <div class="tip-btn" onclick="openTip(\'tipTSPS\')" style="font-size:10px;width:18px;height:18px">?</div></h2><div class="tsps-loc">'+TSPS_CFG.name+' - NWS-powered intelligence</div></div><div class="tsps-hdr-r"><div class="tsps-ulbl">LAST UPDATE</div><div class="tsps-utime">'+(tspsState.lastUpdate?tspsState.lastUpdate.toLocaleTimeString():"--")+'</div><button class="tsps-rbtn" id="tspsRB">Refresh</button></div></div>'+aH+'<div class="tsps-top"><div class="tsps-gauge-w"><div class="tsps-gauge-lbl">PEAK SEVERE WEATHER INDEX</div>'+tsps_buildGauge(pk,gs)+'</div><div class="tsps-stats"><div class="tsps-sbox"><div class="tsps-slbl">PEAK WINDOW</div><div class="tsps-sval" style="color:'+pkL.color+'">'+pw+'</div></div><div class="tsps-sbox"><div class="tsps-slbl">ACTIVE ALERTS</div><div class="tsps-sval" style="color:'+(al.length>0?"#ef4444":"#22c55e")+'">'+(al.length>0?al.length+" ACTIVE":"ALL CLEAR")+'</div></div><div class="tsps-sbox"><div class="tsps-slbl">MAX LIKELIHOOD</div><div class="tsps-sval" style="color:rgba(0,0,0,0.85)">'+ml+'%</div></div></div></div><div class="tsps-sec-lbl">FORECAST PERIODS</div><div class="tsps-cards">'+cH+'</div>'+fpH+'<div class="tsps-tl-box"><div class="tsps-ct">SEVERITY TIMELINE</div><canvas id="tsTL"></canvas></div><div class="tsps-ch-row"><div class="tsps-ch-box"><div class="tsps-ct">COMPONENT BREAKDOWN</div><canvas id="tsBA"></canvas></div></div>'+dH+'<div class="tsps-foot"><span>TSPS v2.0 - Proprietary Index - NWS API</span><span>Auto-refresh 5 min</span></div>';
+  cont.innerHTML='<div class="tsps-hdr"><div class="tsps-hdr-l"><div class="tsps-tag">PROPRIETARY MODEL</div><h2><span class="tsps-r">Tuffy\'s</span> Storm Prediction System <div class="tip-btn" onclick="openTip(\'tipTSPS\')" style="font-size:10px;width:18px;height:18px">?</div></h2><div class="tsps-loc">'+TSPS_CFG.name+' - NWS-powered intelligence</div></div><div class="tsps-hdr-r"><div class="tsps-ulbl">LAST UPDATE</div><div class="tsps-utime">'+(tspsState.lastUpdate?tspsState.lastUpdate.toLocaleTimeString():"--")+'</div><button class="tsps-rbtn" id="tspsRB">Refresh</button></div></div>'+aH+'<div class="tsps-top">'+tsps_buildHowlometer(pk)+'<div class="tsps-stats"><div class="tsps-sbox"><div class="tsps-slbl">PEAK WINDOW</div><div class="tsps-sval" style="color:'+pkL.color+'">'+pw+'</div></div><div class="tsps-sbox"><div class="tsps-slbl">ACTIVE ALERTS</div><div class="tsps-sval" style="color:'+(al.length>0?"#ef4444":"#22c55e")+'">'+(al.length>0?al.length+" ACTIVE":"ALL CLEAR")+'</div></div><div class="tsps-sbox"><div class="tsps-slbl">MAX LIKELIHOOD</div><div class="tsps-sval" style="color:rgba(0,0,0,0.85)">'+ml+'%</div></div></div></div><div class="tsps-sec-lbl">FORECAST PERIODS</div><div class="tsps-cards">'+cH+'</div>'+fpH+'<div class="tsps-tl-box"><div class="tsps-ct">SEVERITY TIMELINE</div><canvas id="tsTL"></canvas></div><div class="tsps-ch-row"><div class="tsps-ch-box"><div class="tsps-ct">COMPONENT BREAKDOWN</div><canvas id="tsBA"></canvas></div></div>'+dH+'<div class="tsps-foot"><span>TSPS v2.0 - Proprietary Index - NWS API</span><span>Auto-refresh 5 min</span></div>';
   $("tspsRB").addEventListener("click",function(){tsps_refresh();});
   document.querySelectorAll(".tsps-fc").forEach(function(c){c.addEventListener("click",function(){tspsState.activeIdx=parseInt(this.getAttribute("data-idx"));tsps_renderMain();tsps_buildCharts();});});
   tsps_buildCharts();
