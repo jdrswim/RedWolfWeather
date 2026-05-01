@@ -213,11 +213,12 @@ main{max-width:1100px;margin:0 auto;padding:18px;overflow-x:hidden}
 .hr-v{font-size:17px;font-weight:200;color:var(--white)}
 .hr-p{font-size:10px;color:#2255cc;margin-top:3px}
 .hr-wind{font-size:10px;color:var(--mu);margin-top:2px}
+.hr-rain{font-size:10px;color:#2255cc;margin-top:2px}
 
 /* ============================================================
    7-DAY FORECAST — FIX: wider wmoDescMap, better NWS source
    ============================================================ */
-.ext-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
+.ext-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
 .ext-day{background:var(--p2);border:1px solid var(--bd);border-radius:3px;padding:14px 10px;text-align:center;overflow:hidden}
 .ext-day.today{border-color:var(--red);background:#fff0f0}
 .ext-dow{font-size:13px;font-weight:900;color:var(--white);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px}
@@ -433,11 +434,11 @@ footer strong{color:var(--red)}
 /* RESPONSIVE */
 @media(max-width:960px){
   .media-row{grid-template-columns:1fr 1fr}
-  .ext-grid{grid-template-columns:repeat(4,1fr)}
+  .ext-grid{grid-template-columns:repeat(5,1fr)}
   .alm-grid{grid-template-columns:1fr}
 }
 @media(max-width:760px){
-  .ext-grid{grid-template-columns:repeat(3,1fr)}
+  .ext-grid{grid-template-columns:repeat(4,1fr)}
   .sgrid{grid-template-columns:repeat(3,1fr)}
   .alm-mo-grid{grid-template-columns:repeat(3,1fr)}
   .media-row{grid-template-columns:1fr}
@@ -1070,7 +1071,7 @@ function fetchConditions(){
     // Custom location — use Open-Meteo directly (WU PWS is station-specific)
     var om='https://api.open-meteo.com/v1/forecast?latitude='+custLoc.lat+'&longitude='+custLoc.lon+
       '&current=temperature_2m,apparent_temperature,relative_humidity_2m,dew_point_2m,wind_speed_10m,wind_gusts_10m,wind_direction_10m,surface_pressure,precipitation,weather_code,uv_index'+
-      '&hourly=temperature_2m,weather_code,precipitation_probability,wind_speed_10m'+
+      '&hourly=temperature_2m,weather_code,precipitation_probability,wind_speed_10m,wind_direction_10m,precipitation'+
       '&daily=temperature_2m_max,temperature_2m_min'+
       '&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=auto&forecast_days=2';
     fetch(om).then(function(r){return r.json();})
@@ -1092,7 +1093,7 @@ function fetchConditions(){
   Promise.all([
     wuFetch(_WU+"observations/current?stationId=KNCRALEI761&format=json&units=e&apiKey="+_K),
     wuFetch(_WU+"observations/current?stationId=KNCRALEI1276&format=json&units=e&apiKey="+_K),
-    fetch("https://api.open-meteo.com/v1/forecast?latitude="+_sl.lat+"&longitude="+_sl.lon+"&current=weather_code&hourly=temperature_2m,weather_code,precipitation_probability,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,sunrise&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=America%2FNew_York&forecast_days=2").then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
+    fetch("https://api.open-meteo.com/v1/forecast?latitude="+_sl.lat+"&longitude="+_sl.lon+"&current=weather_code&hourly=temperature_2m,weather_code,precipitation_probability,wind_speed_10m,wind_direction_10m,precipitation&daily=temperature_2m_max,temperature_2m_min,sunrise&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=America%2FNew_York&forecast_days=2").then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
   ]).then(function(res){
     var dCur=res[0],dCur1276=res[1],dOm=res[2];
     if(dOm&&dOm.daily&&dOm.daily.sunrise){var _sr=new Date(dOm.daily.sunrise[0]);window._pastSunrise=new Date()>_sr;window._tomorrowFcstLo=dOm.daily.temperature_2m_min&&dOm.daily.temperature_2m_min[1]!=null?Math.round(dOm.daily.temperature_2m_min[1]):null;}
@@ -1124,7 +1125,7 @@ function fetchConditions(){
     window._todayObsLo=lo;
     applyConditions(temp,feels,dew,humid,wspd,wdir,gust,pres,prec,uvi,hi,lo,code,dOm&&dOm.hourly||null);
   }).catch(function(){
-    fetch("https://api.open-meteo.com/v1/forecast?latitude=35.686&longitude=-78.614&current=temperature_2m,apparent_temperature,relative_humidity_2m,dew_point_2m,wind_speed_10m,wind_gusts_10m,wind_direction_10m,surface_pressure,precipitation,weather_code,uv_index&hourly=temperature_2m,weather_code,precipitation_probability,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,sunrise&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=America%2FNew_York&forecast_days=2")
+    fetch("https://api.open-meteo.com/v1/forecast?latitude=35.686&longitude=-78.614&current=temperature_2m,apparent_temperature,relative_humidity_2m,dew_point_2m,wind_speed_10m,wind_gusts_10m,wind_direction_10m,surface_pressure,precipitation,weather_code,uv_index&hourly=temperature_2m,weather_code,precipitation_probability,wind_speed_10m,wind_direction_10m,precipitation&daily=temperature_2m_max,temperature_2m_min,sunrise&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=America%2FNew_York&forecast_days=2")
     .then(function(r){return r.json();})
     .then(function(d){
       var c=d.current,dl=d.daily;
@@ -1140,6 +1141,8 @@ function fetchConditions(){
 // ============================================================
 // 12-HOUR FORECAST
 // ============================================================
+function degToCard(d){var dirs=['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];return dirs[Math.round(d/22.5)%16];}
+
 function buildHourly(h){
   var row=$("hr-row");row.innerHTML="";
   var n=new Date();var cnt=0;
@@ -1150,7 +1153,11 @@ function buildHourly(h){
     var lbl=t.toLocaleTimeString("en-US",{hour:"numeric",hour12:true});
     var pp=(h.precipitation_probability||[])[i]||0;
     var ws=Math.round((h.wind_speed_10m||[])[i]||0);
-    b.innerHTML='<div class="hr-t">'+lbl+'</div><div class="hr-i">'+wmoIcon(h.weather_code[i])+'</div><div class="hr-v">'+Math.round(h.temperature_2m[i])+'</div><div class="hr-p">'+pp+'%</div><div class="hr-wind">💨 '+ws+' mph</div>';
+    var wd=(h.wind_direction_10m||[])[i];
+    var rain=(h.precipitation||[])[i]||0;
+    var wdStr=wd!=null?degToCard(wd)+' ':'';
+    var rainHtml=rain>=0.01?'<div class="hr-rain">💧 '+rain.toFixed(2)+'"</div>':'';
+    b.innerHTML='<div class="hr-t">'+lbl+'</div><div class="hr-i">'+wmoIcon(h.weather_code[i])+'</div><div class="hr-v">'+Math.round(h.temperature_2m[i])+'</div>'+(pp>0?'<div class="hr-p">'+pp+'%</div>':'')+rainHtml+'<div class="hr-wind">'+wdStr+ws+' mph</div>';
     row.appendChild(b);cnt++;
   }
 }
@@ -1162,7 +1169,7 @@ function buildHourly(h){
 function seedExtended(){
   var grid=$("ext-grid");if(!grid)return;
   var h="";
-  for(var i=0;i<7;i++){
+  for(var i=0;i<10;i++){
     var dt=new Date();dt.setDate(dt.getDate()+i);
     var dow=i===0?"Today":dt.toLocaleDateString("en-US",{weekday:"short"});
     var date=dt.toLocaleDateString("en-US",{month:"short",day:"numeric"});
@@ -1212,7 +1219,7 @@ function fetchExtended(){
     if(!periods||periods.length<2)throw new Error("No NWS periods");
     // NWS gives day/night pairs. Build 7-day from daytime periods + pair nights
     var days=[];
-    for(var i=0;i<periods.length&&days.length<7;i++){
+    for(var i=0;i<periods.length&&days.length<10;i++){
       if(periods[i].isDaytime){
         var day={
           name:periods[i].name,
@@ -1222,6 +1229,7 @@ function fetchExtended(){
           shortForecast:periods[i].shortForecast,
           pop:(periods[i].probabilityOfPrecipitation&&periods[i].probabilityOfPrecipitation.value)||0,
           windSpeed:periods[i].windSpeed,
+          windDir:periods[i].windDirection||"",
           lo:null,
           nightForecast:""
         };
@@ -1278,9 +1286,9 @@ function fetchExtended(){
         '<div class="ext-icon">'+icon+'</div>'+
         '<div class="ext-desc">'+day.shortForecast+'</div>'+
         '<div class="ext-temps"><span class="ext-hi">'+day.hi+'</span><span class="ext-lo">'+loStr+'</span></div>'+
-        (day.pop>10?'<div class="ext-pop">'+day.pop+'%</div>':'')+
+        (day.pop>10?'<div class="ext-pop">'+day.pop+'% Chance</div>':'')+
         bar+
-        '<div class="ext-wind">'+day.windSpeed+'</div>'+
+        '<div class="ext-wind">'+(day.windDir?day.windDir+' · ':'')+day.windSpeed+'</div>'+
         '</div>';
     });
     grid.innerHTML=h;
@@ -1289,7 +1297,7 @@ function fetchExtended(){
     console.log("NWS forecast failed ("+e.message+"), using Open-Meteo fallback");
     // Fallback: Open-Meteo
     var _fl=siteGetLoc();
-    fetch("https://api.open-meteo.com/v1/forecast?latitude="+_fl.lat+"&longitude="+_fl.lon+"&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max,wind_speed_10m_max&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=7")
+    fetch("https://api.open-meteo.com/v1/forecast?latitude="+_fl.lat+"&longitude="+_fl.lon+"&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max,wind_speed_10m_max,wind_direction_10m_dominant&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=10")
     .then(function(r){return r.json();})
     .then(function(d){
       var dl=d.daily;
@@ -1302,7 +1310,8 @@ function fetchExtended(){
         var date=dt.toLocaleDateString("en-US",{month:"short",day:"numeric"});
         var hi=Math.round(dl.temperature_2m_max[i]),lo=Math.round(dl.temperature_2m_min[i]);
         var pop=dl.precipitation_probability_max[i]||0;
-        h+='<div class="ext-day'+(i===0?' today':'')+'"><div class="ext-dow">'+dow+'</div><div class="ext-date">'+date+'</div><div class="ext-icon">'+wmoIcon(dl.weather_code[i])+'</div><div class="ext-desc">'+wmoDesc(dl.weather_code[i])+'</div><div class="ext-temps"><span class="ext-hi">'+hi+'</span><span class="ext-lo">'+lo+'</span></div>'+(pop>10?'<div class="ext-pop">'+pop+'%</div>':'')+buildRangeBar(hi,lo,mn,mx)+'<div class="ext-wind">'+Math.round(dl.wind_speed_10m_max[i])+' mph</div></div>';
+        var wdDom=dl.wind_direction_10m_dominant&&dl.wind_direction_10m_dominant[i]!=null?degToCard(dl.wind_direction_10m_dominant[i])+' · ':'';
+        h+='<div class="ext-day'+(i===0?' today':'')+'"><div class="ext-dow">'+dow+'</div><div class="ext-date">'+date+'</div><div class="ext-icon">'+wmoIcon(dl.weather_code[i])+'</div><div class="ext-desc">'+wmoDesc(dl.weather_code[i])+'</div><div class="ext-temps"><span class="ext-hi">'+hi+'</span><span class="ext-lo">'+lo+'</span></div>'+(pop>10?'<div class="ext-pop">'+pop+'% Chance</div>':'')+buildRangeBar(hi,lo,mn,mx)+'<div class="ext-wind">'+wdDom+Math.round(dl.wind_speed_10m_max[i])+' mph</div></div>';
       });
       grid.innerHTML=h;
     })
