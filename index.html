@@ -592,7 +592,7 @@ footer strong{color:var(--red)}
 
 <!-- TOOLTIPS -->
 <div class="tip-overlay" id="tipTSPS"><div class="tip-panel"><button class="tip-close" onclick="closeTip('tipTSPS')">&times;</button><div class="tip-title">About Tuffy's Storm Prediction System</div><div class="tip-body"><div class="tip-label">What Is This?</div>A <strong>proprietary severe weather intelligence engine</strong> generating a <strong>Severe Weather Index (0-100)</strong> and occurrence likelihood for +3, +6, +9, +12, and +24 hour windows.<div class="tip-divider"></div><div class="tip-label">Data Sources</div>All data from the <strong>National Weather Service (NWS) API</strong>: hourly forecast and active alerts.<div class="tip-divider"></div><div class="tip-label">6-Component Algorithm</div><strong>Wind</strong> (0-20), <strong>Gusts</strong> (0-18), <strong>Precip</strong> (0-14), <strong>Instability</strong> (0-16), <strong>Forecast Text</strong> (0-22), <strong>Alerts</strong> (0-10).<div class="tip-divider"></div><div class="tip-label">Threat Levels</div><div class="tip-color-row"><div class="tip-swatch" style="background:#1a6b3a"></div><strong>0-9 NONE</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#22c55e"></div><strong>10-24 LOW</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#eab308"></div><strong>25-49 GUARDED</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#f97316"></div><strong>50-74 ELEVATED</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#ef4444"></div><strong>75-89 HIGH</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#dc2626"></div><strong>90-100 EXTREME</strong></div></div></div></div>
-<div class="tip-overlay" id="tipForecast"><div class="tip-panel"><button class="tip-close" onclick="closeTip('tipForecast')">&times;</button><div class="tip-title">Reading the 7-Day Forecast</div><div class="tip-body"><div class="tip-label">Temperature Range Bar</div>Each bar spans <strong style="color:#2255cc">Low</strong> to <strong style="color:#b05800">High</strong>, positioned relative to the full week.<div class="tip-divider"></div><div class="tip-color-row"><div class="tip-swatch" style="background:#ff6600"></div><strong>Orange</strong> 80F+</div><div class="tip-color-row"><div class="tip-swatch" style="background:#ffcc00"></div><strong>Yellow</strong> 60-79F</div><div class="tip-color-row"><div class="tip-swatch" style="background:#4488ff"></div><strong>Blue</strong> Below 60F</div></div></div></div>
+<div class="tip-overlay" id="tipForecast"><div class="tip-panel"><button class="tip-close" onclick="closeTip('tipForecast')">&times;</button><div class="tip-title">Reading the 10-Day Forecast</div><div class="tip-body"><div class="tip-label">Temperature Range Bar</div>Each bar spans <strong style="color:#2255cc">Low</strong> to <strong style="color:#b05800">High</strong>, positioned relative to the full week.<div class="tip-divider"></div><div class="tip-color-row"><div class="tip-swatch" style="background:#ff6600"></div><strong>Orange</strong> 80F+</div><div class="tip-color-row"><div class="tip-swatch" style="background:#ffcc00"></div><strong>Yellow</strong> 60-79F</div><div class="tip-color-row"><div class="tip-swatch" style="background:#4488ff"></div><strong>Blue</strong> Below 60F</div></div></div></div>
 <div class="tip-overlay" id="tipAccuracy"><div class="tip-panel"><button class="tip-close" onclick="closeTip('tipAccuracy')">&times;</button><div class="tip-title">Gainey's Forecast Accountability</div><div class="tip-body"><div class="tip-color-row"><div class="tip-swatch" style="background:#00d44a"></div><strong>HIT</strong> — Hi &amp; Lo both within 1° of actual</div><div class="tip-color-row"><div class="tip-swatch" style="background:#FFD700"></div><strong>CLOSE</strong> — Average error 2–4°</div><div class="tip-color-row"><div class="tip-swatch" style="background:#ef4444"></div><strong>MISS</strong> — Average error 5°+</div><div class="tip-divider"></div><div class="tip-label">Lead-Time Cards</div>Each card shows NWS accuracy for forecasts made <strong>N days before</strong> the target date. 1-Day Out = next-day forecast; 5-Day Out = five days ahead. Accuracy naturally decreases with lead time.<div class="tip-divider"></div><div class="tip-label">Methodology</div>At <strong>8 PM</strong> each evening, forecasts are recorded for all 5 upcoming days from NWS Raleigh. Actuals are the observed <strong>high &amp; low from NWS KRDU</strong> station data.</div></div></div>
 <div class="tip-overlay" id="tipAlmanac"><div class="tip-panel"><button class="tip-close" onclick="closeTip('tipAlmanac')">&times;</button><div class="tip-title">Raleigh Wx Almanac</div><div class="tip-body"><strong>Year-to-date climate stats</strong> vs 30-year normals (1991-2020). Data from <strong>Open-Meteo Archive</strong> (ERA5). Reference: RDU Airport.<div class="tip-divider"></div><div class="tip-color-row"><div class="tip-swatch" style="background:#ff8844"></div><strong>Orange</strong> Above normal</div><div class="tip-color-row"><div class="tip-swatch" style="background:#77aaff"></div><strong>Blue</strong> Below normal</div><div class="tip-color-row"><div class="tip-swatch" style="background:#00d44a"></div><strong>Green</strong> Near normal</div></div></div></div>
 
@@ -667,7 +667,7 @@ footer strong{color:var(--red)}
   </div>
 
   <div style="margin-top:18px">
-    <div class="sec">7-Day Extended Forecast <div class="tip-btn" onclick="openTip('tipForecast')">?</div></div>
+    <div class="sec">10-Day Extended Forecast <div class="tip-btn" onclick="openTip('tipForecast')">?</div></div>
     <div class="card" style="padding:18px"><div class="ext-grid" id="ext-grid"></div></div>
   </div>
 
@@ -1231,7 +1231,7 @@ function fetchExtended(){
   .then(function(d){
     var periods=d.properties&&d.properties.periods;
     if(!periods||periods.length<2)throw new Error("No NWS periods");
-    // NWS gives day/night pairs. Build 7-day from daytime periods + pair nights
+    // NWS gives day/night pairs. Build 10-day from daytime periods + pair nights
     var days=[];
     for(var i=0;i<periods.length&&days.length<10;i++){
       if(periods[i].isDaytime){
@@ -3143,9 +3143,28 @@ function rktLikelihood(netStr,padLat,padLon,statusAbbrev,orbit){
   var dScore=avgDist<200?100:avgDist<400?80:avgDist<600?55:avgDist<800?35:15;
   // ── Status score (10%) ────────────────────────────────────────
   var sScore=statusAbbrev==='Go'?100:statusAbbrev==='Hold'?20:50;
-  // ── Base score × trajectory multiplier ───────────────────────
+  // ── Sky conditions — average cloud cover at viewer cities ─────
+  var skyMult=1.0,skyDesc='',skyColor='var(--mu)';
+  if(netStr&&window._rktClouds){
+    var tMs=new Date(netStr).getTime();
+    var cloudVals=[];
+    RKT_CITIES.forEach(function(c){
+      var cv=issGetCloud(window._rktClouds[c.name]||null,tMs);
+      if(cv!=null)cloudVals.push(cv);
+    });
+    if(cloudVals.length){
+      var avgCloud=cloudVals.reduce(function(a,b){return a+b;},0)/cloudVals.length;
+      var cp=Math.round(avgCloud)+'%';
+      if(avgCloud<20){skyMult=1.0;skyDesc='Clear skies ('+cp+')';skyColor='#00d44a';}
+      else if(avgCloud<40){skyMult=0.85;skyDesc='Mostly clear ('+cp+')';skyColor='#66ee44';}
+      else if(avgCloud<60){skyMult=0.65;skyDesc='Partly cloudy ('+cp+')';skyColor='#ffcc00';}
+      else if(avgCloud<80){skyMult=0.4;skyDesc='Mostly cloudy ('+cp+')';skyColor='#ff8800';}
+      else{skyMult=0.15;skyDesc='Overcast ('+cp+')';skyColor='#ff4444';}
+    }
+  }
+  // ── Base score × trajectory × sky multipliers ────────────────
   var base=Math.round(tScore*0.6+dScore*0.3+sScore*0.1);
-  var score=Math.round(base*traj.factor);
+  var score=Math.round(base*traj.factor*skyMult);
 
   var tier,color,filled;
   if(score>=75){tier='EXCELLENT';color='#00d44a';filled=5;}
@@ -3158,14 +3177,14 @@ function rktLikelihood(netStr,padLat,padLon,statusAbbrev,orbit){
   for(var i=1;i<=5;i++){
     bars+='<div class="rkt-lik-seg" style="background:'+(i<=filled?color:'rgba(0,0,0,0.16)')+'"></div>';
   }
-  // Trajectory label color: red if southbound, yellow if uncertain, green if NE
   var trajColor=traj.factor>=0.8?'#00d44a':traj.factor>=0.4?'#ffcc00':'#ff4444';
   return{
     html:'<div class="rkt-lik">'+
       '<div style="flex:1;min-width:0">'+
         '<div class="rkt-lik-lbl">Visibility Likelihood</div>'+
         '<div class="rkt-lik-sub">'+tDesc+(tDesc!=='Unknown'?' &middot; ':'')+Math.round(avgDist)+' mi avg</div>'+
-        '<div style="font-size:9px;margin-top:3px;font-style:italic" class="rkt-lik-sub"><span style="color:'+trajColor+'">&#9654;</span> '+escH(traj.label)+'</div>'+
+        (skyDesc?'<div style="font-size:9px;margin-top:2px" class="rkt-lik-sub"><span style="color:'+skyColor+'">☁</span> '+escH(skyDesc)+'</div>':'')+
+        '<div style="font-size:9px;margin-top:2px;font-style:italic" class="rkt-lik-sub"><span style="color:'+trajColor+'">&#9654;</span> '+escH(traj.label)+'</div>'+
       '</div>'+
       '<div class="rkt-lik-right">'+
         '<div class="rkt-lik-bar">'+bars+'</div>'+
@@ -3256,22 +3275,29 @@ function fetchRockets(){
   var el=document.getElementById('rkt-content');
   el.innerHTML='<div class="alm-ld"><div class="tsps-spinner"></div>Loading launches...</div>';
 
-  // Check localStorage cache first
+  // Always fetch fresh cloud cover for viewer cities (weather changes hourly)
+  var cloudPromise=Promise.all(RKT_CITIES.map(function(c){return issCloudFetch(c.lat,c.lon);}))
+    .then(function(maps){
+      window._rktClouds={};
+      RKT_CITIES.forEach(function(c,i){window._rktClouds[c.name]=maps[i];});
+    }).catch(function(){window._rktClouds=window._rktClouds||{};});
+
+  // Check localStorage cache for launch data
   try{
     var cached=localStorage.getItem(RKT_CACHE_KEY);
     if(cached){
       var obj=JSON.parse(cached);
       if(obj&&obj.ts&&(Date.now()-obj.ts)<RKT_CACHE_TTL&&obj.data){
-        rktRender(el,obj.data);
+        cloudPromise.then(function(){rktRender(el,obj.data);});
         return;
       }
     }
   }catch(e){}
 
-  rktTryUrls(RKT_URLS,0)
-    .then(function(data){
-      try{localStorage.setItem(RKT_CACHE_KEY,JSON.stringify({ts:Date.now(),data:data}));}catch(e){}
-      rktRender(el,data);
+  Promise.all([rktTryUrls(RKT_URLS,0),cloudPromise])
+    .then(function(results){
+      try{localStorage.setItem(RKT_CACHE_KEY,JSON.stringify({ts:Date.now(),data:results[0]}));}catch(e){}
+      rktRender(el,results[0]);
     })
     .catch(function(){
       _rktLoaded=false;
