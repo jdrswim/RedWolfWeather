@@ -541,6 +541,20 @@ footer strong{color:var(--red)}
 .rkt-vis-city-dir{font-size:9px;color:var(--mu);margin-top:2px}
 .rkt-empty{text-align:center;padding:32px 20px;color:var(--mu);font-size:13px}
 .rkt-note{font-size:9px;color:rgba(0,0,0,0.32);text-align:center;padding:12px 0 2px;letter-spacing:.3px;line-height:1.7}
+.rkt-section-lbl{font-size:9px;font-weight:800;letter-spacing:2px;color:var(--cyan);text-transform:uppercase;margin:10px 0 5px}
+.rkt-desc{font-size:11px;color:var(--mu);line-height:1.6;margin-bottom:4px}
+.rkt-map-wrap{height:165px;border-radius:3px;overflow:hidden;position:relative;background:#1a1a2e}
+.rkt-map-wrap .leaflet-container{background:#1a1a2e}
+.rkt-traj-label{position:absolute;top:8px;left:8px;background:rgba(130,60,200,.85);color:#fff;font-size:9px;font-weight:800;letter-spacing:1.5px;padding:3px 8px;border-radius:3px;z-index:900;pointer-events:none;text-transform:uppercase}
+.rkt-traj-badge{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.92);border-radius:6px;padding:8px 12px;z-index:900;pointer-events:none;text-align:center;color:#1a1a1a;box-shadow:0 1px 6px rgba(0,0,0,.25)}
+.rkt-traj-badge-lbl{font-size:8px;color:#666;letter-spacing:.5px}
+.rkt-traj-badge-dir{font-size:14px;font-weight:900}
+.rkt-traj-badge-icon{font-size:18px;margin-bottom:2px}
+.rkt-specs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:2px}
+.rkt-spec{background:rgba(0,0,0,.18);border-radius:3px;padding:7px 8px}
+.rkt-spec-lbl{font-size:8px;color:var(--mu);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:3px}
+.rkt-spec-val{font-size:12px;color:var(--white);font-weight:600}
+.rkt-booster{background:rgba(0,204,255,.06);border:1px solid rgba(0,204,255,.12);border-radius:3px;padding:9px 12px;font-size:11px;color:var(--tx)}
 .rkt-lik{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:10px;padding-bottom:9px;border-bottom:1px solid rgba(0,204,255,.1)}
 .rkt-lik-lbl{font-size:9px;font-weight:800;letter-spacing:2px;color:var(--cyan);text-transform:uppercase}
 .rkt-lik-right{display:flex;align-items:center;gap:7px}
@@ -742,7 +756,7 @@ function switchTab(name,btn){
   if(name==="almanac"&&!window._almLoaded){fetchAlmanac();fetchSunData();accFetchAndRender();}
   else if(name==="almanac"){fetchSunData();accFetchAndRender();}
   if(name==="pws"){fetchPWS();}
-  if(name==="aerospace"&&!window._rktLoaded){fetchRockets();}
+  if(name==="aerospace"&&!window._rktLoaded){rktLoadLeaflet();fetchRockets();}
 }
 
 // On load, route from 404.html sessionStorage redirect or pathname
@@ -3166,6 +3180,62 @@ var RKT_CACHE_TTL=7200000; // 2 hours
 var RKT_URLS=['https://ll2.thespacedevs.com/2.2.0/launch/upcoming/?limit=50&format=json',
               'https://lldev.thespacedevs.com/2.2.0/launch/upcoming/?limit=50&format=json'];
 
+// ── Trajectory map helpers ─────────────────────────────────
+function rktDirToAz(dir){var m={N:0,NNE:22.5,NE:45,ENE:67.5,E:90,ESE:112.5,SE:135,SSE:157.5,S:180,SSW:202.5,SW:225,WSW:247.5,W:270,WNW:292.5,NW:315,NNW:337.5};return m[dir]!=null?m[dir]:90;}
+function rktConePoints(lat,lon,azDeg,distKm,spreadDeg){
+  var R=6371,pts=[[lat,lon]];
+  for(var a=azDeg-spreadDeg;a<=azDeg+spreadDeg;a+=4){
+    var b=a*Math.PI/180,d=distKm/R,la=lat*Math.PI/180;
+    var la2=Math.asin(Math.sin(la)*Math.cos(d)+Math.cos(la)*Math.sin(d)*Math.cos(b));
+    var lo2=(lon*Math.PI/180)+Math.atan2(Math.sin(b)*Math.sin(d)*Math.cos(la),Math.cos(d)-Math.sin(la)*Math.sin(la2));
+    pts.push([la2*180/Math.PI,lo2*180/Math.PI]);
+  }
+  pts.push([lat,lon]);return pts;
+}
+var _leafletLoaded=false,_leafletLoading=null;
+function rktLoadLeaflet(){
+  if(window.L&&_leafletLoaded)return Promise.resolve();
+  if(_leafletLoading)return _leafletLoading;
+  _leafletLoading=new Promise(function(res){
+    var css=document.createElement('link');css.rel='stylesheet';
+    css.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+    document.head.appendChild(css);
+    var scr=document.createElement('script');
+    scr.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+    scr.onload=function(){_leafletLoaded=true;res();};
+    document.head.appendChild(scr);
+  });
+  return _leafletLoading;
+}
+function rktInitMaps(list){
+  rktLoadLeaflet().then(function(){
+    (list||[]).forEach(function(l){
+      if(!l.pad||!l.pad.latitude)return;
+      var padLat=parseFloat(l.pad.latitude),padLon=parseFloat(l.pad.longitude);
+      var mapId='rkt-map-'+l.id;
+      var el=document.getElementById(mapId);
+      if(!el||el._leaflet_id)return;
+      el.innerHTML='';
+      var orbit=(l.mission&&l.mission.orbit&&l.mission.orbit.abbrev)||'';
+      var traj=rktTrajFactor(orbit,padLat);
+      var azDeg=rktDirToAz(traj.dir);
+      // Center map slightly ahead of pad in trajectory direction
+      var offLat=padLat+(traj.dir.indexOf('N')>=0?3:(traj.dir.indexOf('S')>=0?-2:1));
+      var offLon=padLon+(traj.dir.indexOf('E')>=0?4:(traj.dir.indexOf('W')>=0?-4:2));
+      var map=L.map(mapId,{center:[offLat,offLon],zoom:5,zoomControl:false,attributionControl:false,dragging:false,scrollWheelZoom:false,keyboard:false,doubleClickZoom:false,touchZoom:false});
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:14}).addTo(map);
+      // Trajectory cone
+      if(traj.dir!=='?'&&traj.dir!=='varies'){
+        var cc=traj.factor>=0.8?'#9955ee':traj.factor>=0.4?'#ee8800':'#ee3333';
+        L.polygon(rktConePoints(padLat,padLon,azDeg,750,18),{color:cc,fillColor:cc,fillOpacity:0.28,weight:1}).addTo(map);
+      }
+      // Pad marker
+      var icon=L.divIcon({html:'<div style="width:13px;height:13px;background:#00dd44;border:2px solid #fff;border-radius:50%;box-shadow:0 1px 5px rgba(0,0,0,.6)"></div>',iconSize:[13,13],iconAnchor:[6,6],className:''});
+      L.marker([padLat,padLon],{icon:icon}).addTo(map);
+    });
+  });
+}
+
 function rktFetchWithTimeout(url,ms){
   var ctrl=typeof AbortController!=='undefined'?new AbortController():null;
   var timer=ctrl?setTimeout(function(){ctrl.abort();},ms):null;
@@ -3219,40 +3289,102 @@ function rktRender(el,data){
   var list=(data.results||[]).filter(function(l){
     if(!l.pad||!l.pad.latitude||!l.pad.longitude)return false;
     var lat=parseFloat(l.pad.latitude),lon=parseFloat(l.pad.longitude);
-    // East coast US: lon -84 to -71, lat 25-42 (covers KSC/CCAFS/Wallops)
     if(!l.pad.location||l.pad.location.country_code!=='USA')return false;
     if(lon<-84||lon>-71||lat<25||lat>42)return false;
-    // Only include launches within the next 90 days
     var netStr=l.net||l.window_start||'';
     if(!netStr)return false;
     var t=new Date(netStr).getTime();
     return !isNaN(t)&&t>nowMs&&t<nowMs+windowMs;
   });
-  // Sort by date, cap at 10
   list.sort(function(a,b){return new Date(a.net||a.window_start)-new Date(b.net||b.window_start);});
   list=list.slice(0,10);
   if(!list.length){el.innerHTML='<div class="rkt-empty">No upcoming east coast launches in the next window.<br><span style="font-size:10px;color:var(--mu)">Check back soon — data refreshes every 2 hours.</span></div>';return;}
   var html='';
   list.forEach(function(l){
     var provider=(l.launch_service_provider&&l.launch_service_provider.name)||'Unknown';
-    var rktName=(l.rocket&&l.rocket.configuration&&(l.rocket.configuration.full_name||l.rocket.configuration.name))||'Unknown';
+    var cfg=l.rocket&&l.rocket.configuration;
+    var rktName=(cfg&&(cfg.full_name||cfg.name))||'Unknown';
     var mission=(l.mission&&l.mission.name)||l.name||'Unknown Mission';
+    var missionDesc=(l.mission&&l.mission.description)||'';
+    var orbitAbbrev=(l.mission&&l.mission.orbit&&l.mission.orbit.abbrev)||'';
+    var orbitName=(l.mission&&l.mission.orbit&&l.mission.orbit.name)||orbitAbbrev;
     var padName=(l.pad&&l.pad.name)||'Unknown';
     var locName=(l.pad&&l.pad.location&&l.pad.location.name)||'Unknown';
-    var orbit=(l.mission&&l.mission.orbit&&l.mission.orbit.abbrev)||'';
     var statusName=(l.status&&l.status.name)||'TBD';
     var statusAbbrev=(l.status&&l.status.abbrev)||'TBD';
     var netStr=l.net||l.window_start||'';
     var statusClass=statusAbbrev==='Go'?'go':statusAbbrev==='Hold'?'hold':'tbd';
+    var padLat=parseFloat(l.pad.latitude),padLon=parseFloat(l.pad.longitude);
+    var traj=rktTrajFactor(orbitAbbrev,padLat);
+    var dirLabel=traj.dir==='?'||traj.dir==='varies'?'—':traj.dir;
+
+    // ── Trajectory map ──────────────────────────────────────
+    var mapId='rkt-map-'+l.id.replace(/[^a-z0-9]/gi,'-');
+    var mapHtml=
+      '<div class="rkt-map-wrap" id="'+mapId+'">'+
+        '<div class="rkt-traj-label">● General Trajectory</div>'+
+        '<div class="rkt-traj-badge">'+
+          '<div class="rkt-traj-badge-icon">🧭</div>'+
+          '<div class="rkt-traj-badge-lbl">Launching</div>'+
+          '<div class="rkt-traj-badge-dir">'+dirLabel+'</div>'+
+        '</div>'+
+      '</div>';
+
+    // ── Booster / vehicle info ───────────────────────────────
+    var boosterHtml='';
+    var stages=l.rocket&&l.rocket.launcher_stage;
+    if(stages&&stages.length){
+      var core=stages[0];
+      var lnch=core.launcher;
+      var serial=lnch&&lnch.serial_number;
+      var flights=lnch&&lnch.flights!=null?lnch.flights:null;
+      var tat=core.turn_around_time_days;
+      var landing=core.landing;
+      var landType=landing&&landing.landing_type&&landing.landing_type.abbrev;
+      var landLoc=landing&&landing.landing_location&&landing.landing_location.abbrev;
+      if(serial||flights!=null){
+        boosterHtml=
+          '<div class="rkt-section-lbl">Vehicle</div>'+
+          '<div class="rkt-booster">'+
+            (serial?'<span style="font-weight:800;color:var(--white)">'+escH(serial)+'</span>':'')+
+            (flights!=null?' · Flight #'+flights:'')+
+            (tat?' · '+tat+'-day turnaround':'')+
+            (landing&&landing.attempt?
+              '<br><span style="font-size:9px;color:var(--mu)">Recovery: '+(landType?escH(landType):'')+(landLoc?' → '+escH(landLoc):'')+'</span>':'')+
+          '</div>';
+      }
+    }
+
+    // ── Rocket specs ─────────────────────────────────────────
+    var specsHtml='';
+    if(cfg){
+      var specs=[];
+      if(cfg.max_stage!=null)specs.push({l:'Stages',v:cfg.max_stage});
+      if(cfg.length)specs.push({l:'Height',v:cfg.length+'m'});
+      if(cfg.diameter)specs.push({l:'Diameter',v:cfg.diameter+'m'});
+      if(cfg.to_thrust)specs.push({l:'Liftoff Thrust',v:(cfg.to_thrust).toLocaleString()+' kN'});
+      if(cfg.leo_capacity)specs.push({l:'LEO Payload',v:(cfg.leo_capacity/1000).toFixed(0)+'t'});
+      if(cfg.gto_capacity)specs.push({l:'GTO Payload',v:(cfg.gto_capacity/1000).toFixed(0)+'t'});
+      if(specs.length>=2){
+        specsHtml=
+          '<div class="rkt-section-lbl">Rocket</div>'+
+          '<div class="rkt-specs-grid">'+
+            specs.slice(0,6).map(function(s){
+              return '<div class="rkt-spec"><div class="rkt-spec-lbl">'+s.l+'</div><div class="rkt-spec-val">'+s.v+'</div></div>';
+            }).join('')+
+          '</div>';
+      }
+    }
+
+    // ── Visibility ───────────────────────────────────────────
     var launchTimeStr='NET TBD';
     var visHtml='';
     if(netStr){
       var net=new Date(netStr);
       if(!isNaN(net.getTime())){
         launchTimeStr=net.toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit',timeZone:'America/New_York',timeZoneName:'short'});
-        var padLat=parseFloat(l.pad.latitude),padLon=parseFloat(l.pad.longitude);
         var vis=rktVisCalc(padLat,padLon,netStr);
-        var lik=rktLikelihood(netStr,padLat,padLon,statusAbbrev,orbit);
+        var lik=rktLikelihood(netStr,padLat,padLon,statusAbbrev,orbitAbbrev);
         visHtml='<div class="rkt-vis">'+lik.html+'<div class="rkt-vis-title">Estimated Look Times</div><div class="rkt-vis-grid">'+
           vis.map(function(v){
             return '<div class="rkt-vis-city">'+
@@ -3265,25 +3397,37 @@ function rktRender(el,data){
         '</div></div>';
       }
     }
-    html+='<div class="rkt-launch">'+
-      '<div class="rkt-launch-top">'+
-        '<div>'+
-          '<div class="rkt-launch-name">'+escH(mission)+'</div>'+
-          '<div class="rkt-launch-provider">'+escH(provider)+' &middot; '+escH(rktName)+'</div>'+
+
+    html+=
+      '<div class="rkt-launch">'+
+        // ── Header ──
+        '<div class="rkt-launch-top">'+
+          '<div>'+
+            '<div class="rkt-launch-name">'+escH(mission)+'</div>'+
+            '<div class="rkt-launch-provider">'+escH(provider)+' · '+escH(rktName)+
+              (orbitName?' · <span style="color:var(--cyan)">'+escH(orbitName)+'</span>':'')+
+            '</div>'+
+          '</div>'+
+          '<span class="rkt-status '+statusClass+'">'+escH(statusName)+'</span>'+
         '</div>'+
-        '<span class="rkt-status '+statusClass+'">'+escH(statusName)+'</span>'+
-      '</div>'+
-      '<div class="rkt-meta">'+
-        '<div class="rkt-meta-item"><div class="rkt-meta-lbl">Launch Time</div><div class="rkt-meta-val">'+launchTimeStr+'</div></div>'+
-        '<div class="rkt-meta-item"><div class="rkt-meta-lbl">Pad</div><div class="rkt-meta-val">'+escH(padName)+'</div></div>'+
-        '<div class="rkt-meta-item"><div class="rkt-meta-lbl">Location</div><div class="rkt-meta-val">'+escH(locName)+'</div></div>'+
-        (orbit?'<div class="rkt-meta-item"><div class="rkt-meta-lbl">Orbit</div><div class="rkt-meta-val">'+escH(orbit)+'</div></div>':'')+
-      '</div>'+
-      visHtml+
-    '</div>';
+        // ── Description ──
+        (missionDesc?'<div class="rkt-desc">'+escH(missionDesc)+'</div>':'')+
+        // ── Launch site ──
+        '<div class="rkt-section-lbl">Launch Site</div>'+
+        mapHtml+
+        '<div class="rkt-meta" style="margin-top:8px">'+
+          '<div class="rkt-meta-item"><div class="rkt-meta-lbl">Time</div><div class="rkt-meta-val">'+launchTimeStr+'</div></div>'+
+          '<div class="rkt-meta-item"><div class="rkt-meta-lbl">Pad</div><div class="rkt-meta-val">'+escH(padName)+'</div></div>'+
+          '<div class="rkt-meta-item"><div class="rkt-meta-lbl">Location</div><div class="rkt-meta-val">'+escH(locName)+'</div></div>'+
+        '</div>'+
+        boosterHtml+
+        specsHtml+
+        visHtml+
+      '</div>';
   });
-  html+='<div class="rkt-note">Visibility estimates assume dark or twilight conditions — daytime launches are rarely visible.<br>T+ offsets are approximate based on distance to the pad. Look in the listed compass direction.<br>Data: Launch Library 2 (thespacedevs.com) &middot; Cached 2 hrs</div>';
+  html+='<div class="rkt-note">Visibility estimates assume dark or twilight conditions — daytime launches are rarely visible.<br>T+ offsets are approximate based on distance to the pad. Look in the listed compass direction.<br>Map: © OpenStreetMap contributors, © CARTO · Launch data: Launch Library 2 (thespacedevs.com) · Cached 2 hrs</div>';
   el.innerHTML=html;
+  rktInitMaps(list);
 }
 
 // ============================================================
