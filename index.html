@@ -219,7 +219,7 @@ main{max-width:1100px;margin:0 auto;padding:18px;overflow-x:hidden}
    7-DAY FORECAST — FIX: wider wmoDescMap, better NWS source
    ============================================================ */
 .ext-grid{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
-.ext-day{flex:1 1 155px;max-width:calc(20% - 8px);background:var(--p2);border:1px solid var(--bd);border-radius:3px;padding:14px 10px;text-align:center;overflow:hidden;box-sizing:border-box}
+.ext-day{flex:0 0 calc(20% - 8px);background:var(--p2);border:1px solid var(--bd);border-radius:3px;padding:14px 10px;text-align:center;overflow:hidden;box-sizing:border-box}
 .ext-day.today{border-color:var(--red);background:#fff0f0}
 .ext-dow{font-size:13px;font-weight:900;color:var(--white);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px}
 .ext-date{font-size:11px;color:var(--mu);margin-bottom:9px}
@@ -434,11 +434,11 @@ footer strong{color:var(--red)}
 /* RESPONSIVE */
 @media(max-width:960px){
   .media-row{grid-template-columns:1fr 1fr}
-  .ext-day{max-width:calc(25% - 8px)}
+  .ext-day{flex:0 0 calc(25% - 8px)}
   .alm-grid{grid-template-columns:1fr}
 }
 @media(max-width:760px){
-  .ext-day{max-width:calc(33.33% - 7px)}
+  .ext-day{flex:0 0 calc(33.33% - 7px)}
   .sgrid{grid-template-columns:repeat(3,1fr)}
   .alm-mo-grid{grid-template-columns:repeat(3,1fr)}
   .media-row{grid-template-columns:1fr}
@@ -485,7 +485,7 @@ footer strong{color:var(--red)}
   .hr{min-width:64px;padding:8px 10px}
   .hr-v{font-size:15px}
   .ext-grid{gap:8px}
-  .ext-day{flex:1 1 130px;max-width:calc(50% - 4px);padding:12px 8px}
+  .ext-day{flex:0 0 calc(50% - 4px);padding:12px 8px}
   .ext-hi{font-size:18px}
   .ext-lo{font-size:13px}
   .media-frame{height:180px}
