@@ -579,7 +579,7 @@ footer strong{color:var(--red)}
 <!-- TOOLTIPS -->
 <div class="tip-overlay" id="tipTSPS"><div class="tip-panel"><button class="tip-close" onclick="closeTip('tipTSPS')">&times;</button><div class="tip-title">About Tuffy's Storm Prediction System</div><div class="tip-body"><div class="tip-label">What Is This?</div>A <strong>proprietary severe weather intelligence engine</strong> generating a <strong>Severe Weather Index (0-100)</strong> and occurrence likelihood for +3, +6, +9, +12, and +24 hour windows.<div class="tip-divider"></div><div class="tip-label">Data Sources</div>All data from the <strong>National Weather Service (NWS) API</strong>: hourly forecast and active alerts.<div class="tip-divider"></div><div class="tip-label">6-Component Algorithm</div><strong>Wind</strong> (0-20), <strong>Gusts</strong> (0-18), <strong>Precip</strong> (0-14), <strong>Instability</strong> (0-16), <strong>Forecast Text</strong> (0-22), <strong>Alerts</strong> (0-10).<div class="tip-divider"></div><div class="tip-label">Threat Levels</div><div class="tip-color-row"><div class="tip-swatch" style="background:#1a6b3a"></div><strong>0-9 NONE</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#22c55e"></div><strong>10-24 LOW</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#eab308"></div><strong>25-49 GUARDED</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#f97316"></div><strong>50-74 ELEVATED</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#ef4444"></div><strong>75-89 HIGH</strong></div><div class="tip-color-row"><div class="tip-swatch" style="background:#dc2626"></div><strong>90-100 EXTREME</strong></div></div></div></div>
 <div class="tip-overlay" id="tipForecast"><div class="tip-panel"><button class="tip-close" onclick="closeTip('tipForecast')">&times;</button><div class="tip-title">Reading the 7-Day Forecast</div><div class="tip-body"><div class="tip-label">Temperature Range Bar</div>Each bar spans <strong style="color:#2255cc">Low</strong> to <strong style="color:#b05800">High</strong>, positioned relative to the full week.<div class="tip-divider"></div><div class="tip-color-row"><div class="tip-swatch" style="background:#ff6600"></div><strong>Orange</strong> 80F+</div><div class="tip-color-row"><div class="tip-swatch" style="background:#ffcc00"></div><strong>Yellow</strong> 60-79F</div><div class="tip-color-row"><div class="tip-swatch" style="background:#4488ff"></div><strong>Blue</strong> Below 60F</div></div></div></div>
-<div class="tip-overlay" id="tipAccuracy"><div class="tip-panel"><button class="tip-close" onclick="closeTip('tipAccuracy')">&times;</button><div class="tip-title">Justin Gainey's Forecast %</div><div class="tip-body"><div class="tip-color-row"><div class="tip-swatch" style="background:#00d44a"></div><strong>HIT</strong> — Hi &amp; Lo both within 1° of actual</div><div class="tip-color-row"><div class="tip-swatch" style="background:#FFD700"></div><strong>CLOSE</strong> — Average error 2–4°</div><div class="tip-color-row"><div class="tip-swatch" style="background:#ef4444"></div><strong>MISS</strong> — Average error 5°+</div><div class="tip-divider"></div><div class="tip-label">Lead-Time Cards</div>Each card shows NWS accuracy for forecasts made <strong>N days before</strong> the target date. 1-Day Out = next-day forecast; 5-Day Out = five days ahead. Accuracy naturally decreases with lead time.<div class="tip-divider"></div><div class="tip-label">Methodology</div>At <strong>8 PM</strong> each evening, forecasts are recorded for all 5 upcoming days from NWS Raleigh. Actuals are the observed <strong>high &amp; low from NWS KRDU</strong> station data.</div></div></div>
+<div class="tip-overlay" id="tipAccuracy"><div class="tip-panel"><button class="tip-close" onclick="closeTip('tipAccuracy')">&times;</button><div class="tip-title">Gainey's Forecast Accountability</div><div class="tip-body"><div class="tip-color-row"><div class="tip-swatch" style="background:#00d44a"></div><strong>HIT</strong> — Hi &amp; Lo both within 1° of actual</div><div class="tip-color-row"><div class="tip-swatch" style="background:#FFD700"></div><strong>CLOSE</strong> — Average error 2–4°</div><div class="tip-color-row"><div class="tip-swatch" style="background:#ef4444"></div><strong>MISS</strong> — Average error 5°+</div><div class="tip-divider"></div><div class="tip-label">Lead-Time Cards</div>Each card shows NWS accuracy for forecasts made <strong>N days before</strong> the target date. 1-Day Out = next-day forecast; 5-Day Out = five days ahead. Accuracy naturally decreases with lead time.<div class="tip-divider"></div><div class="tip-label">Methodology</div>At <strong>8 PM</strong> each evening, forecasts are recorded for all 5 upcoming days from NWS Raleigh. Actuals are the observed <strong>high &amp; low from NWS KRDU</strong> station data.</div></div></div>
 <div class="tip-overlay" id="tipAlmanac"><div class="tip-panel"><button class="tip-close" onclick="closeTip('tipAlmanac')">&times;</button><div class="tip-title">Raleigh Wx Almanac</div><div class="tip-body"><strong>Year-to-date climate stats</strong> vs 30-year normals (1991-2020). Data from <strong>Open-Meteo Archive</strong> (ERA5). Reference: RDU Airport.<div class="tip-divider"></div><div class="tip-color-row"><div class="tip-swatch" style="background:#ff8844"></div><strong>Orange</strong> Above normal</div><div class="tip-color-row"><div class="tip-swatch" style="background:#77aaff"></div><strong>Blue</strong> Below normal</div><div class="tip-color-row"><div class="tip-swatch" style="background:#00d44a"></div><strong>Green</strong> Near normal</div></div></div></div>
 
 <span id="oatemp" style="display:none"></span>
@@ -2211,7 +2211,7 @@ function accFetchAndRender(){
     _accCachedRows=cached;
     accRender(el,_accCachedRows);
   } else {
-    el.innerHTML='<div class="acc-wrap"><div class="acc-hdr">Justin Gainey\'s Forecast % <em>- Loading...</em></div><div class="alm-ld"><div class="tsps-spinner"></div></div></div>';
+    el.innerHTML='<div class="acc-wrap"><div class="acc-hdr">Gainey\'s Forecast Accountability <em>- Loading...</em></div><div class="alm-ld"><div class="tsps-spinner"></div></div></div>';
   }
   // Always fetch fresh data in the background
   fetch(SHEET_URL+"?tab=Accuracy")
@@ -2310,12 +2310,18 @@ function accLogStatus(){
 }
 
 window._accSelectedLead=window._accSelectedLead||1;
+window._accDayLimit=window._accDayLimit||10;
 window._accExpandedDay=window._accExpandedDay||null;
 window._accLastEl=null;
 window._accLastRaw=null;
 
 function accSelectLead(lead){
   window._accSelectedLead=lead;
+  if(window._accLastEl&&window._accLastRaw)accRender(window._accLastEl,window._accLastRaw);
+}
+
+function accSelectDays(n){
+  window._accDayLimit=n;
   if(window._accLastEl&&window._accLastRaw)accRender(window._accLastEl,window._accLastRaw);
 }
 
@@ -2328,6 +2334,7 @@ function accRender(el,rawRows){
   window._accLastEl=el;
   window._accLastRaw=rawRows;
   var selectedLead=window._accSelectedLead||1;
+  var dayLimit=window._accDayLimit||10;
   var expandedDay=window._accExpandedDay||null;
   // Deduplicate first
   var rows=accDedupeRows(rawRows);
@@ -2335,7 +2342,7 @@ function accRender(el,rawRows){
   if(!rows.length){
     el.innerHTML=
       '<div class="acc-wrap">'+
-        '<div class="acc-hdr">Justin Gainey\'s Forecast % <em>- Forecast vs Actual Temperature</em> <div class="tip-btn" onclick="openTip(\'tipAccuracy\')" style="display:inline-flex;vertical-align:middle;margin-left:6px">?</div></div>'+
+        '<div class="acc-hdr">Gainey\'s Forecast Accountability <em>- Forecast vs Actual Temperature</em> <div class="tip-btn" onclick="openTip(\'tipAccuracy\')" style="display:inline-flex;vertical-align:middle;margin-left:6px">?</div></div>'+
         accLogStatus()+
         '<div style="background:var(--p2);border:1px solid var(--bd);border-radius:4px;padding:28px;text-align:center">'+
           '<div style="font-size:36px;margin-bottom:14px">📊</div>'+
@@ -2400,7 +2407,13 @@ function accRender(el,rawRows){
 
   var html=
     '<div class="acc-wrap">'+
-      '<div class="acc-hdr">Justin Gainey\'s Forecast % <em>- Forecast vs Actual Temperature</em> <div class="tip-btn" onclick="openTip(\'tipAccuracy\')" style="display:inline-flex;vertical-align:middle;margin-left:6px">?</div></div>'+
+      '<div class="acc-hdr">Gainey\'s Forecast Accountability <em>- Forecast vs Actual Temperature</em> <div class="tip-btn" onclick="openTip(\'tipAccuracy\')" style="display:inline-flex;vertical-align:middle;margin-left:6px">?</div>'+
+      '<select onchange="accSelectDays(+this.value)" style="margin-left:auto;font-size:10px;background:var(--p2);color:var(--white);border:1px solid var(--bd);border-radius:3px;padding:3px 8px;cursor:pointer;letter-spacing:.5px">'+
+        '<option value="10"'+(dayLimit===10?' selected':'')+'>Last 10 Days</option>'+
+        '<option value="15"'+(dayLimit===15?' selected':'')+'>Last 15 Days</option>'+
+        '<option value="30"'+(dayLimit===30?' selected':'')+'>Last 30 Days</option>'+
+      '</select>'+
+      '</div>'+
       accLogStatus()+
       (function(){
         var accs=[1,2,3,4,5].map(function(l){return{l:l,a:calcAccuracyForLead(rows,l)};});
@@ -2476,13 +2489,13 @@ function accRender(el,rawRows){
           '<div>Result</div>'+
         '</div>';
 
-  // Sort descending by date — show last 7 days only
-  var cutoff7=new Date();cutoff7.setDate(cutoff7.getDate()-7);
+  // Sort descending by date — show last N days per user selection
+  var cutoffN=new Date();cutoffN.setDate(cutoffN.getDate()-dayLimit);
   var sortedRows=rows.slice().sort(function(a,b){return accParseDate(b.date)-accParseDate(a.date);});
   var shown=0;
   sortedRows.forEach(function(r){
     var dp=accParseDate(r.date);
-    if(isNaN(dp.getTime())||dp<cutoff7)return;
+    if(isNaN(dp.getTime())||dp<cutoffN)return;
     var ds=(r.date||"").substring(0,10);
     var hiKey=selectedLead===1?'pred_high':'pred_hi_d'+selectedLead;
     var loKey=selectedLead===1?'pred_low':'pred_lo_d'+selectedLead;
@@ -2576,7 +2589,7 @@ function accRender(el,rawRows){
   html+=
     '</div>'+
     '<div class="acc-note">'+
-      'Showing last 7 days ('+selectedLead+'-day-out forecast) · Click any row to see all lead-day forecasts · '+
+      'Showing last '+dayLimit+' days ('+selectedLead+'-day-out forecast) · Click any row to see all lead-day forecasts · '+
       'Bust card = worst 1-day forecast in last 30 days · '+
       'Predictions logged at 8 PM · Actuals: ASOS KRDU via Iowa State Mesonet · '+rows.length+' day'+(rows.length!==1?"s":"")+' total on record'+
     '</div>'+
