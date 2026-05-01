@@ -1218,79 +1218,82 @@ function nwsIcon(iconUrl,isDaytime){
 
 function fetchExtended(){
   var grid=$("ext-grid");if(!grid)return;
-  // Primary: NWS 7-day forecast (real text descriptions, accurate conditions)
   var _el=siteGetLoc();
-  fetch("https://api.weather.gov/points/"+_el.lat+","+_el.lon,{headers:{"User-Agent":"WolfpackWeather/2.0 (wolfpackweather.com)"}})
-  .then(function(r){if(!r.ok)throw new Error("NWS points "+r.status);return r.json();})
-  .then(function(d){
-    var furl=d.properties&&d.properties.forecast;
-    if(!furl)throw new Error("No forecast URL");
-    return fetch(furl,{headers:{"User-Agent":"WolfpackWeather/2.0"}});
-  })
-  .then(function(r){if(!r.ok)throw new Error("NWS forecast "+r.status);return r.json();})
-  .then(function(d){
-    var periods=d.properties&&d.properties.periods;
-    if(!periods||periods.length<2)throw new Error("No NWS periods");
-    // NWS gives day/night pairs. Build 10-day from daytime periods + pair nights
-    var days=[];
-    for(var i=0;i<periods.length&&days.length<10;i++){
-      if(periods[i].isDaytime){
-        var day={
-          name:periods[i].name,
-          startTime:periods[i].startTime,
-          hi:periods[i].temperature,
-          icon:periods[i].icon,
-          shortForecast:periods[i].shortForecast,
-          pop:(periods[i].probabilityOfPrecipitation&&periods[i].probabilityOfPrecipitation.value)||0,
-          windSpeed:periods[i].windSpeed,
-          windDir:periods[i].windDirection||"",
-          lo:null,
-          nightForecast:""
-        };
-        // Previous night period leads into this morning — use it for lo
-        if(i>0&&!periods[i-1].isDaytime){
-          day.lo=periods[i-1].temperature;
-        } else if(i+1<periods.length&&!periods[i+1].isDaytime){
-          day.lo=periods[i+1].temperature;  // tonight's forecast (used for future days only)
-        }
-        // nightForecast describes the coming night (always forward-looking)
-        if(i+1<periods.length&&!periods[i+1].isDaytime){
-          day.nightForecast=periods[i+1].shortForecast;
-        }
+
+  // ── NWS forecast (best quality, up to ~7 days) ───────────────
+  var nwsP=fetch("https://api.weather.gov/points/"+_el.lat+","+_el.lon,{headers:{"User-Agent":"WolfpackWeather/2.0 (wolfpackweather.com)"}})
+    .then(function(r){if(!r.ok)throw 0;return r.json();})
+    .then(function(d){var furl=d.properties&&d.properties.forecast;if(!furl)throw 0;return fetch(furl,{headers:{"User-Agent":"WolfpackWeather/2.0"}});})
+    .then(function(r){if(!r.ok)throw 0;return r.json();})
+    .then(function(d){
+      var periods=d.properties&&d.properties.periods;
+      if(!periods||periods.length<2)throw 0;
+      var days=[];
+      for(var i=0;i<periods.length&&days.length<10;i++){
+        if(!periods[i].isDaytime)continue;
+        var p=periods[i];
+        var day={startTime:p.startTime,hi:p.temperature,lo:null,icon:p.icon,wmoCode:null,
+          shortForecast:p.shortForecast,pop:(p.probabilityOfPrecipitation&&p.probabilityOfPrecipitation.value)||0,
+          windSpeed:p.windSpeed,windDir:p.windDirection||""};
+        if(i>0&&!periods[i-1].isDaytime)day.lo=periods[i-1].temperature;
+        else if(i+1<periods.length&&!periods[i+1].isDaytime)day.lo=periods[i+1].temperature;
         days.push(day);
       }
+      return days;
+    })
+    .catch(function(){return null;});
+
+  // ── Open-Meteo 10-day (fills gaps + full fallback) ────────────
+  var omUrl="https://api.open-meteo.com/v1/forecast?latitude="+_el.lat+"&longitude="+_el.lon+
+    "&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max,wind_speed_10m_max,wind_direction_10m_dominant"+
+    "&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=10";
+  var omP=fetch(omUrl).then(function(r){return r.json();}).catch(function(){return null;});
+
+  // ── Observed hourly (for today's real low) ────────────────────
+  var omHrUrl="https://api.open-meteo.com/v1/forecast?latitude="+_el.lat+"&longitude="+_el.lon+
+    "&hourly=temperature_2m&temperature_unit=fahrenheit&timezone=America%2FNew_York&forecast_days=1";
+  var omHrP=fetch(omHrUrl).then(function(r){return r.json();}).catch(function(){return null;});
+
+  Promise.all([nwsP,omP,omHrP]).then(function(results){
+    var nwsDays=results[0],omData=results[1],omHr=results[2];
+    if(!nwsDays&&(!omData||!omData.daily)){
+      grid.innerHTML='<div style="color:var(--mu);padding:16px">Forecast unavailable</div>';return;
     }
-    var allHi=days.map(function(x){return x.hi;}),allLo=days.filter(function(x){return x.lo!==null;}).map(function(x){return x.lo;});
-    var allT=allHi.concat(allLo);
-    var mn=allT.length?Math.min.apply(null,allT):32,mx=allT.length?Math.max.apply(null,allT):90;
-    // Fetch today's actual observed hourly temps NOW, in the same promise chain,
-    // so there is zero race condition — the grid never renders without the observed lo.
-    var _el2=siteGetLoc();
-    var omHrUrl="https://api.open-meteo.com/v1/forecast?latitude="+_el2.lat+"&longitude="+_el2.lon+
-      "&hourly=temperature_2m&temperature_unit=fahrenheit&timezone=America%2FNew_York&forecast_days=1";
-    return Promise.all([
-      Promise.resolve({days:days,mn:mn,mx:mx}),
-      fetch(omHrUrl).then(function(r){return r.json();}).catch(function(){return null;})
-    ]);
-  })
-  .then(function(results){
-    var nws=results[0],omData=results[1];
-    var days=nws.days,mn=nws.mn,mx=nws.mx;
-    // Compute observed low from hourly temps up to NOW (not tonight's forecast)
-    var obsLo=todayObsLow(omData&&omData.hourly,null);
+
+    var obsLo=todayObsLow(omHr&&omHr.hourly,null);
     if(obsLo!=="--")window._todayObsLo=obsLo;
     var now=new Date();
     var todayDateStr=now.toLocaleDateString("en-US",{month:"short",day:"numeric"});
+
+    // Start with NWS days, track which calendar dates are covered
+    var days=nwsDays||[];
+    var covered={};
+    days.forEach(function(d){var dt=new Date(d.startTime);covered[dt.toISOString().substring(0,10)]=true;});
+
+    // Append Open-Meteo days for dates not yet covered, up to 10 total
+    if(omData&&omData.daily){
+      var dl=omData.daily;
+      for(var i=0;i<dl.time.length&&days.length<10;i++){
+        if(covered[dl.time[i]])continue;
+        var wd=dl.wind_direction_10m_dominant&&dl.wind_direction_10m_dominant[i]!=null
+          ?degToCard(dl.wind_direction_10m_dominant[i]):'';
+        days.push({startTime:dl.time[i]+"T12:00:00",hi:Math.round(dl.temperature_2m_max[i]),
+          lo:Math.round(dl.temperature_2m_min[i]),icon:null,wmoCode:dl.weather_code[i],
+          shortForecast:wmoDesc(dl.weather_code[i]),pop:dl.precipitation_probability_max[i]||0,
+          windSpeed:Math.round(dl.wind_speed_10m_max[i])+' mph',windDir:wd});
+      }
+    }
+
+    var allT=days.map(function(x){return x.hi;}).concat(
+      days.filter(function(x){return x.lo!==null;}).map(function(x){return x.lo;}));
+    var mn=allT.length?Math.min.apply(null,allT):32,mx=allT.length?Math.max.apply(null,allT):90;
     var h="";
     days.forEach(function(day,i){
-      // Use period's actual startTime for correct date — avoids off-by-one when
-      // NWS omits the current day's daytime period (evening hours).
       var dt=day.startTime?new Date(day.startTime):new Date(now.getTime()+i*86400000);
       var date=dt.toLocaleDateString("en-US",{month:"short",day:"numeric"});
       var isToday=date===todayDateStr;
       var dow=isToday?"Today":dt.toLocaleDateString("en-US",{weekday:"short"});
-      var icon=nwsIcon(day.icon,true);
-      // For "Today": use the observed low (already happened this morning), not tonight's forecast low
+      var icon=day.icon?nwsIcon(day.icon,true):wmoIcon(day.wmoCode);
       var loVal=isToday?(obsLo!=="--"?obsLo:day.lo):day.lo;
       var loStr=loVal!==null?loVal+"":"--";
       var bar=loVal!==null?buildRangeBar(day.hi,loVal,mn,mx):"";
@@ -1306,30 +1309,6 @@ function fetchExtended(){
         '</div>';
     });
     grid.innerHTML=h;
-  })
-  .catch(function(e){
-    console.log("NWS forecast failed ("+e.message+"), using Open-Meteo fallback");
-    // Fallback: Open-Meteo
-    var _fl=siteGetLoc();
-    fetch("https://api.open-meteo.com/v1/forecast?latitude="+_fl.lat+"&longitude="+_fl.lon+"&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max,wind_speed_10m_max,wind_direction_10m_dominant&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=10")
-    .then(function(r){return r.json();})
-    .then(function(d){
-      var dl=d.daily;
-      var allT=dl.temperature_2m_max.concat(dl.temperature_2m_min);
-      var mn=Math.min.apply(null,allT),mx=Math.max.apply(null,allT);
-      var h="";
-      dl.time.forEach(function(t,i){
-        var dt=new Date(t+"T12:00:00");
-        var dow=i===0?"Today":dt.toLocaleDateString("en-US",{weekday:"short"});
-        var date=dt.toLocaleDateString("en-US",{month:"short",day:"numeric"});
-        var hi=Math.round(dl.temperature_2m_max[i]),lo=Math.round(dl.temperature_2m_min[i]);
-        var pop=dl.precipitation_probability_max[i]||0;
-        var wdDom=dl.wind_direction_10m_dominant&&dl.wind_direction_10m_dominant[i]!=null?degToCard(dl.wind_direction_10m_dominant[i])+' · ':'';
-        h+='<div class="ext-day'+(i===0?' today':'')+'"><div class="ext-dow">'+dow+'</div><div class="ext-date">'+date+'</div><div class="ext-icon">'+wmoIcon(dl.weather_code[i])+'</div><div class="ext-desc">'+wmoDesc(dl.weather_code[i])+'</div><div class="ext-temps"><span class="ext-hi">'+hi+'</span><span class="ext-lo">'+lo+'</span></div>'+(pop>10?'<div class="ext-pop">'+pop+'% Chance</div>':'')+buildRangeBar(hi,lo,mn,mx)+'<div class="ext-wind">'+wdDom+Math.round(dl.wind_speed_10m_max[i])+' mph</div></div>';
-      });
-      grid.innerHTML=h;
-    })
-    .catch(function(){grid.innerHTML='<div style="color:var(--mu);padding:16px;grid-column:1/-1">Forecast unavailable</div>';});
   });
 }
 
