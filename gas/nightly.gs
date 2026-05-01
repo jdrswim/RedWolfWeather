@@ -117,14 +117,114 @@ function installNightlyTrigger() {
   Logger.log('✓ Nightly trigger installed — fires daily at 8 PM ET');
 }
 
-// Called automatically by the trigger every night at 8 PM ET
+function installEveningTrigger() {
+  ScriptApp.getProjectTriggers().forEach(function(t) {
+    if (t.getHandlerFunction() === 'eveningLog') ScriptApp.deleteTrigger(t);
+  });
+  ScriptApp.newTrigger('eveningLog')
+    .timeBased()
+    .atHour(19)
+    .everyDays(1)
+    .inTimezone(TZ)
+    .create();
+  Logger.log('✓ Evening trigger installed — fires daily at 7 PM ET');
+}
+
+function installMorningTrigger() {
+  ScriptApp.getProjectTriggers().forEach(function(t) {
+    if (t.getHandlerFunction() === 'morningLog') ScriptApp.deleteTrigger(t);
+  });
+  ScriptApp.newTrigger('morningLog')
+    .timeBased()
+    .atHour(7)
+    .everyDays(1)
+    .inTimezone(TZ)
+    .create();
+  Logger.log('✓ Morning trigger installed — fires daily at 7 AM ET');
+}
+
+// Run once to set up all three triggers (7 AM, 7 PM, 8 PM).
+function installAllTriggers() {
+  installMorningTrigger();
+  installEveningTrigger();
+  installNightlyTrigger();
+  Logger.log('✓ All triggers installed: 7 AM (morningLog), 7 PM (eveningLog), 8 PM (nightlyLog)');
+}
+
+// ─────────────────────────────────────────────────────────────
+// EVENING LOG  (7 PM ET — records today's actual high)
+// High = max temp observed 7 AM – 7 PM local time (aligns with NWS daytime forecast)
+// ─────────────────────────────────────────────────────────────
+function eveningLog() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('Accuracy');
+  if (!sheet) { Logger.log('ERROR: Accuracy sheet not found'); return; }
+
+  var now = new Date();
+  var ds  = Utilities.formatDate(now, TZ, 'yyyy-MM-dd');
+  var tzOff = Utilities.formatDate(now, TZ, 'Z');
+  var tzIso = tzOff.substring(0, 3) + ':' + tzOff.substring(3);
+
+  var startIso = ds + 'T07:00:00' + tzIso;
+  var endIso   = ds + 'T19:00:00' + tzIso;
+
+  var result = fetchNWSWindow_(startIso, endIso);
+  if (!result) { Logger.log('Evening ' + ds + ': NWS fetch failed — no actual_high written'); return; }
+
+  var col = sheet.getDataRange().getValues()[0].map(function(h) { return String(h).trim(); }).indexOf('actual_high');
+  if (col < 0) { Logger.log('Evening ' + ds + ': column actual_high not found'); return; }
+
+  nightlyWrite_(sheet, ds, 'actual_high', result.hi, 'actual_high', result.hi, true);
+  Logger.log('Evening ' + ds + ': Hi:' + result.hi + ' (source: NWS KRDU 7a-7p)');
+}
+
+function testEveningLog() {
+  Logger.log('--- MANUAL TEST: eveningLog ---');
+  eveningLog();
+}
+
+// ─────────────────────────────────────────────────────────────
+// MORNING LOG  (7 AM ET — records yesterday's actual low)
+// Low = min temp observed 7 PM yesterday – 7 AM today (aligns with NWS overnight forecast)
+// ─────────────────────────────────────────────────────────────
+function morningLog() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('Accuracy');
+  if (!sheet) { Logger.log('ERROR: Accuracy sheet not found'); return; }
+
+  var now = new Date();
+  var today = Utilities.formatDate(now, TZ, 'yyyy-MM-dd');
+  var tzOff = Utilities.formatDate(now, TZ, 'Z');
+  var tzIso = tzOff.substring(0, 3) + ':' + tzOff.substring(3);
+
+  // Yesterday's date string
+  var yd = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+  var yesterday = Utilities.formatDate(yd, TZ, 'yyyy-MM-dd');
+  var tzOffYd = Utilities.formatDate(yd, TZ, 'Z');
+  var tzIsoYd = tzOffYd.substring(0, 3) + ':' + tzOffYd.substring(3);
+
+  var startIso = yesterday + 'T19:00:00' + tzIsoYd;
+  var endIso   = today    + 'T07:00:00' + tzIso;
+
+  var result = fetchNWSWindow_(startIso, endIso);
+  if (!result) { Logger.log('Morning ' + today + ': NWS fetch failed — no actual_low written for ' + yesterday); return; }
+
+  nightlyWrite_(sheet, yesterday, 'actual_low', result.lo, 'actual_low', result.lo, true);
+  Logger.log('Morning ' + today + ': Lo:' + result.lo + ' for ' + yesterday + ' (source: NWS KRDU 7p-7a)');
+}
+
+function testMorningLog() {
+  Logger.log('--- MANUAL TEST: morningLog ---');
+  morningLog();
+}
+
+// Called automatically by the trigger every night at 8 PM ET (predictions + microclimate only)
 function nightlyLog() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getSheetByName('Accuracy');
   if (!sheet) { Logger.log('ERROR: Accuracy sheet not found'); return; }
   Logger.log('=== nightlyLog START ' + Utilities.formatDate(new Date(), TZ, 'yyyy-MM-dd HH:mm z') + ' ===');
   nightlyLogPredictions_(sheet);
-  nightlyLogActuals_(sheet);
   nightlyLogMicroclimate_(ss);
   Logger.log('=== nightlyLog END ===');
 }
@@ -188,9 +288,49 @@ function nightlyLogPredictions_(sheet) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// ACTUALS  (NWS KRDU hourly observations, last 5 days)
+// NWS OBSERVATION WINDOW HELPER
+// Fetches KRDU observations between two ISO timestamps.
+// Returns { hi: fahrenheit, lo: fahrenheit } or null on failure.
+// Considers temperature.value, maxTemperatureLast6Hours, minTemperatureLast6Hours.
 // ─────────────────────────────────────────────────────────────
-function nightlyLogActuals_(sheet) {
+function fetchNWSWindow_(startIso, endIso) {
+  var opts = { headers: { 'User-Agent': 'WolfpackWeather/2.0' }, muteHttpExceptions: true };
+  var url  = 'https://api.weather.gov/stations/KRDU/observations?start=' +
+             encodeURIComponent(startIso) + '&end=' + encodeURIComponent(endIso) + '&limit=200';
+  var resp = UrlFetchApp.fetch(url, opts);
+  if (resp.getResponseCode() !== 200) {
+    Logger.log('fetchNWSWindow_ HTTP ' + resp.getResponseCode() + ' for ' + startIso + ' → ' + endIso);
+    return null;
+  }
+  var features = JSON.parse(resp.getContentText()).features || [];
+  var hiVals = [], loVals = [];
+  features.forEach(function(f) {
+    var p = f.properties || {};
+    var t  = p.temperature && p.temperature.value != null ? p.temperature.value * 9/5 + 32 : null;
+    var mx = p.maxTemperatureLast6Hours && p.maxTemperatureLast6Hours.value != null
+             ? p.maxTemperatureLast6Hours.value * 9/5 + 32 : null;
+    var mn = p.minTemperatureLast6Hours && p.minTemperatureLast6Hours.value != null
+             ? p.minTemperatureLast6Hours.value * 9/5 + 32 : null;
+    if (t  != null) { hiVals.push(t);  loVals.push(t);  }
+    if (mx != null)   hiVals.push(mx);
+    if (mn != null)   loVals.push(mn);
+  });
+  if (!hiVals.length && !loVals.length) {
+    Logger.log('fetchNWSWindow_: 0 temperature readings in window ' + startIso + ' → ' + endIso);
+    return null;
+  }
+  return {
+    hi: Math.round(Math.max.apply(null, hiVals)),
+    lo: Math.round(Math.min.apply(null, loVals))
+  };
+}
+
+// ─────────────────────────────────────────────────────────────
+// BACKFILL ACTUALS  (manual historical correction only)
+// Uses calendar-day midnight-to-midnight window.
+// NOT called automatically — run by hand when needed.
+// ─────────────────────────────────────────────────────────────
+function backfillActuals_(sheet) {
   var opts = { headers: { 'User-Agent': 'WolfpackWeather/2.0' }, muteHttpExceptions: true };
   var now  = new Date();
 
@@ -200,37 +340,16 @@ function nightlyLogActuals_(sheet) {
     var td = new Date(now.getFullYear(), now.getMonth(), now.getDate() - daysBack);
     var ds = Utilities.formatDate(td, TZ, 'yyyy-MM-dd');
 
-    // Build explicit ET-timezone ISO timestamps so the NWS query always covers
-    // midnight-to-midnight Eastern Time, regardless of GAS runtime timezone (UTC).
-    var tzOff = Utilities.formatDate(td, TZ, 'Z');            // e.g. "-0400" (EDT) or "-0500" (EST)
-    var tzIso = tzOff.substring(0, 3) + ':' + tzOff.substring(3); // "-04:00"
-    var obsS = encodeURIComponent(ds + 'T00:00:00' + tzIso);
-    var obsE = encodeURIComponent(ds + 'T23:59:59' + tzIso);
+    var tzOff = Utilities.formatDate(td, TZ, 'Z');
+    var tzIso = tzOff.substring(0, 3) + ':' + tzOff.substring(3);
+    var startIso = ds + 'T00:00:00' + tzIso;
+    var endIso   = ds + 'T23:59:59' + tzIso;
 
-    var url  = 'https://api.weather.gov/stations/KRDU/observations?start=' + obsS + '&end=' + obsE + '&limit=200';
-    var resp = UrlFetchApp.fetch(url, opts);
+    var result = fetchNWSWindow_(startIso, endIso);
+    if (!result) { Logger.log('Backfill ' + ds + ': no data'); continue; }
 
-    if (resp.getResponseCode() !== 200) {
-      Logger.log('NWS obs FAILED ' + ds + ' (HTTP ' + resp.getResponseCode() + ')');
-      continue;
-    }
-
-    var features = JSON.parse(resp.getContentText()).features || [];
-    var temps = features.reduce(function(a, f) {
-      var t = f.properties && f.properties.temperature && f.properties.temperature.value;
-      if (t != null) a.push(t * 9/5 + 32);
-      return a;
-    }, []);
-
-    if (!temps.length) {
-      Logger.log('Actuals ' + ds + ': 0 temperature readings returned');
-      continue;
-    }
-
-    var hi = Math.round(Math.max.apply(null, temps));
-    var lo = Math.round(Math.min.apply(null, temps));
-    nightlyWrite_(sheet, ds, 'actual_high', hi, 'actual_low', lo, true);
-    Logger.log('Actuals ' + ds + ':  Hi:' + hi + '  Lo:' + lo + '  (' + temps.length + ' obs)');
+    nightlyWrite_(sheet, ds, 'actual_high', result.hi, 'actual_low', result.lo, true);
+    Logger.log('Backfill ' + ds + ':  Hi:' + result.hi + '  Lo:' + result.lo);
   }
 }
 

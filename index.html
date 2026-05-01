@@ -2033,9 +2033,6 @@ function accLogPrediction(){
   var guardKey="acc_pred_session_"+sessionDate;
   try{if(localStorage.getItem(guardKey))return;}catch(e){}
 
-  // Also log actuals for past days at 8 PM (same session as predictions)
-  accLogActuals();
-
   fetch("https://api.weather.gov/points/35.686,-78.614",{headers:{"User-Agent":"WolfpackWeather/2.0"}})
   .then(function(r){if(!r.ok)throw new Error("NWS points "+r.status);return r.json();})
   .then(function(d){
@@ -2087,66 +2084,6 @@ function accLogPrediction(){
 // ── ACTUALS LOGGER ─────────────────────────────────────────
 // Fetches NWS KRDU hourly observations for each completed day.
 // GUARANTEE: A day is only considered "done" once it's in the past
-// AND it's past midnight (hour >= 1). This means:
-//   - Tonight (Mar 30) will NOT be locked by today's page loads.
-//   - At 12:01 AM tomorrow, the page (or interval) will fetch Mar 30
-//     actuals fresh and write them to the sheet.
-//   - The guard key is ONLY written after a successful sheet write
-//     AND only when the target date is strictly in the past.
-function accLogActuals(){
-  var now=new Date();
-
-  [0,1,2,3,4,5,6].forEach(function(daysBack){
-    // Today's high isn't final until ~8 PM — skip today before then
-    if(daysBack===0&&now.getHours()<20)return;
-    var target=new Date(now.getFullYear(),now.getMonth(),now.getDate()-daysBack);
-    var dStr=accDateStr(target);
-    var guardKey="acc_act_done2_"+dStr;
-    if(daysBack>=2){try{if(localStorage.getItem(guardKey))return;}catch(e){}}
-
-    // Cache locally first (survives sheet write failures) then write to sheet
-    function storeAndWrite(hi,lo,src){
-      try{localStorage.setItem("acc_actual_"+dStr,JSON.stringify({hi:hi,lo:lo}));}catch(e){}
-      console.log("ACC actuals ("+src+"): "+dStr+" H:"+hi+" L:"+lo);
-      // Re-render immediately using cached rows + localStorage (no spinner, no sheet round-trip)
-      if(daysBack===1)setTimeout(accQuickRender,100);
-      // Then persist to sheet
-      return fetch(SHEET_URL+"?action=write&tab=Accuracy&date="+dStr+"&actual_high="+hi+"&actual_low="+lo)
-        .then(function(r){if(!r.ok)throw new Error("Sheet HTTP "+r.status);return r.json();})
-        .then(function(j){
-          if(j&&j.error)throw new Error("Sheet error: "+j.error);
-          console.log("ACC sheet write OK: "+dStr);
-          if(daysBack>=2){try{localStorage.setItem(guardKey,"1");}catch(e){}}
-          return{hi:hi,lo:lo,src:src};
-        });
-    }
-
-    // NWS KRDU hourly observations — official station, matches NOWData record
-    // Use explicit local-timezone ISO strings so the query always covers
-    // midnight-to-midnight in the browser's local time (ET), not UTC.
-    var _tzOff=-target.getTimezoneOffset(); // minutes ahead of UTC (negative for US)
-    var _tzSign=_tzOff>=0?'+':'-';
-    var _tzAbs=Math.abs(_tzOff);
-    var _tzIso=_tzSign+((_tzAbs/60|0)<10?'0':'')+(_tzAbs/60|0)+':'+((_tzAbs%60)<10?'0':'')+(_tzAbs%60);
-    var obsS=dStr+'T00:00:00'+_tzIso;
-    var obsE=dStr+'T23:59:59'+_tzIso;
-    fetch("https://api.weather.gov/stations/KRDU/observations?start="+encodeURIComponent(obsS)+"&end="+encodeURIComponent(obsE)+"&limit=200",
-      {headers:{"User-Agent":"WolfpackWeather/2.0"}})
-    .then(function(r){if(!r.ok)throw new Error("NWS HTTP "+r.status);return r.json();})
-    .then(function(d){
-      var temps=(d.features||[]).reduce(function(a,f){
-        var t=f.properties&&f.properties.temperature&&f.properties.temperature.value;
-        if(t!=null)a.push(t*9/5+32);return a;
-      },[]);
-      if(!temps.length)throw new Error("NWS KRDU returned no temperature readings for "+dStr);
-      return storeAndWrite(Math.round(Math.max.apply(null,temps)),Math.round(Math.min.apply(null,temps)),"NWS KRDU");
-    })
-    .catch(function(e){
-      console.log("ACC actuals NWS KRDU failed for "+dStr+": "+e.message);
-    });
-  });
-}
-
 var _accCachedRows=[];
 var ACC_CACHE_KEY='acc_rows_v1';
 var ACC_CACHE_MAX_MS=15*60*1000; // 15 minutes
@@ -2263,7 +2200,7 @@ function accLogStatus(){
   if(actualsDone.length){
     html+='<span style="color:#00d44a;font-weight:700">'+actualsDone.length+' day'+(actualsDone.length>1?"s":"")+ ' cached</span></div>';
   } else {
-    html+='<span style="color:#FFD700;font-weight:700">None yet — logs at 8 PM</span></div>';
+    html+='<span style="color:#FFD700;font-weight:700">Highs logged at 7 PM · Lows logged at 7 AM</span></div>';
   }
   html+='</div>';
   return html;
@@ -2509,10 +2446,7 @@ function accRender(el,rawRows){
 })();
 // Pre-fetch accuracy sheet data so Almanac tab renders instantly on first click
 setTimeout(accPrefetch,3000);
-// Actuals: run on every page load (guard keys prevent duplicate sheet writes)
-// This ensures past-day actuals are captured even if 8 PM session was missed
-setTimeout(accLogActuals,6000);
-// Predictions + actuals: every 30 min, only acts after 8 PM
+// Predictions: every 30 min, only acts after 8 PM
 setTimeout(accLogPrediction,8000);
 setInterval(accLogPrediction,1800000);
 
