@@ -3084,14 +3084,24 @@ function rktTrajFactor(orbit,padLat){
     return{factor:0.65,label:'Trajectory unknown — check mission details',dir:'?'};
   }
 
-  // ── Wallops Island / Mid-Atlantic (lat > 36) ─────────────────
+  // ── Wallops Island / Mid-Atlantic (lat > 36, east coast) ──────
   // Wallops missions are much closer and nearly all go NE over the Atlantic
-  if(padLat>36){
+  if(padLat>36&&padLon>-85){
     if(o==='SSO'||o==='POLAR'||o==='PO')
       return{factor:0.75,label:'NE trajectory (SSO) — flies over/near NC coast',dir:'NE'};
     if(o==='ISS'||o==='LEO'||o==='VLEO')
       return{factor:1.0,label:'NNE trajectory — flies directly over NC',dir:'NNE'};
     return{factor:0.9,label:'NE trajectory — flies toward NC coast',dir:'NE'};
+  }
+
+  // ── Vandenberg / west coast (lon < -100) ─────────────────────
+  // Nearly all west coast launches go south or polar over the Pacific
+  if(padLon<-100){
+    if(o==='SSO'||o==='POLAR'||o==='PO')
+      return{factor:0.02,label:'South polar (Vandenberg) — flies away from east coast',dir:'S'};
+    if(o==='LEO'||o==='VLEO')
+      return{factor:0.05,label:'West coast launch — not visible from east coast',dir:'W'};
+    return{factor:0.03,label:'West coast launch — not visible from east coast',dir:'W'};
   }
 
   return{factor:0.6,label:'Trajectory unknown — check mission details',dir:'?'};
@@ -3172,7 +3182,7 @@ function rktLikelihood(netStr,padLat,padLon,statusAbbrev,orbit){
     '</div>'
   };
 }
-var RKT_CACHE_KEY='rkt_v4_cache'; // bumped: production API first
+var RKT_CACHE_KEY='rkt_v4_cache'; // bumped: all US launches, not east-coast-only
 var RKT_CACHE_TTL=7200000; // 2 hours
 // Production server first; dev server as fallback
 var RKT_URLS=['https://ll2.thespacedevs.com/2.2.0/launch/upcoming/?limit=50&format=json',
@@ -3293,9 +3303,7 @@ function rktRender(el,data){
   var windowMs=90*24*3600*1000; // 90-day window
   var list=(data.results||[]).filter(function(l){
     if(!l.pad||!l.pad.latitude||!l.pad.longitude)return false;
-    var lat=parseFloat(l.pad.latitude),lon=parseFloat(l.pad.longitude);
     if(!l.pad.location||l.pad.location.country_code!=='USA')return false;
-    if(lon<-84||lon>-71||lat<25||lat>42)return false;
     var netStr=l.net||l.window_start||'';
     if(!netStr)return false;
     var t=new Date(netStr).getTime();
@@ -3303,7 +3311,7 @@ function rktRender(el,data){
   });
   list.sort(function(a,b){return new Date(a.net||a.window_start)-new Date(b.net||b.window_start);});
   list=list.slice(0,10);
-  if(!list.length){el.innerHTML='<div class="rkt-empty">No upcoming east coast launches in the next window.<br><span style="font-size:10px;color:var(--mu)">Check back soon — data refreshes every 2 hours.</span></div>';return;}
+  if(!list.length){el.innerHTML='<div class="rkt-empty">No upcoming US launches in the next 90 days.<br><span style="font-size:10px;color:var(--mu)">Check back soon — data refreshes every 2 hours.</span></div>';return;}
   var html='';
   list.forEach(function(l){
     var provider=(l.launch_service_provider&&l.launch_service_provider.name)||'Unknown';
