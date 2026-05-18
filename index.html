@@ -3050,7 +3050,7 @@ function rktVisCalc(padLat,padLon,launchTimeStr){
 }
 function escH(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
-function rktTrajFactor(orbit,padLat){
+function rktTrajFactor(orbit,padLat,padLon){
   // Returns {factor:0-1, label, dir} based on orbit type + pad latitude.
   // Trajectory direction is the dominant visibility factor — a south-bound
   // lunar mission from KSC flies AWAY from the NC/SC coast regardless of
@@ -3109,7 +3109,7 @@ function rktTrajFactor(orbit,padLat){
 
 function rktLikelihood(netStr,padLat,padLon,statusAbbrev,orbit){
   // ── Trajectory multiplier (applied last — overrides everything) ──
-  var traj=rktTrajFactor(orbit,padLat);
+  var traj=rktTrajFactor(orbit,padLat,padLon);
 
   // ── Time-of-day score (60%) ───────────────────────────────────
   var etHour=null;
@@ -3225,7 +3225,7 @@ function rktInitMaps(list){
       if(!el||el._leaflet_id)return;
       el.innerHTML='';
       var orbit=(l.mission&&l.mission.orbit&&l.mission.orbit.abbrev)||'';
-      var traj=rktTrajFactor(orbit,padLat);
+      var traj=rktTrajFactor(orbit,padLat,padLon);
       var azDeg=rktDirToAz(traj.dir);
       // Center map slightly ahead of pad in trajectory direction
       var offLat=padLat+(traj.dir.indexOf('N')>=0?3:(traj.dir.indexOf('S')>=0?-2:1));
@@ -3328,7 +3328,7 @@ function rktRender(el,data){
     var netStr=l.net||l.window_start||'';
     var statusClass=statusAbbrev==='Go'?'go':statusAbbrev==='Hold'?'hold':'tbd';
     var padLat=parseFloat(l.pad.latitude),padLon=parseFloat(l.pad.longitude);
-    var traj=rktTrajFactor(orbitAbbrev,padLat);
+    var traj=rktTrajFactor(orbitAbbrev,padLat,padLon);
     var dirLabel=traj.dir==='?'||traj.dir==='varies'?'—':traj.dir;
 
     // ── Trajectory map ──────────────────────────────────────
