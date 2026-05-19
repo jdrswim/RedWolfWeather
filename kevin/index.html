@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kevin's HOA Management</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+tailwind.config = {
+  theme: { extend: { colors: { primary: { 600:'#2563eb', 700:'#1d4ed8', 800:'#1e40af', 900:'#1e3a8a' } } } }
+}
+</script>
+<style>
+  .hidden { display: none !important; }
+  .sidebar-link.active { background: rgba(255,255,255,0.2); color: white; }
+  .sidebar-link { color: rgba(255,255,255,0.75); }
+  .sidebar-link:hover { background: rgba(255,255,255,0.1); color: white; }
+  .badge-paid    { background:#dcfce7; color:#15803d; }
+  .badge-pending { background:#fef9c3; color:#854d0e; }
+  .badge-partial { background:#dbeafe; color:#1d4ed8; }
+  .badge-overdue { background:#fee2e2; color:#b91c1c; }
+  .badge-waived  { background:#f3f4f6; color:#6b7280; }
+  .badge-completed { background:#dcfce7; color:#15803d; }
+  .badge-failed  { background:#fee2e2; color:#b91c1c; }
+  .fade { animation: fadeIn .2s ease; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
+</style>
+</head>
+<body class="bg-gray-50 text-gray-900 font-sans">
+
+<!-- ===================== SETUP VIEW ===================== -->
+<div id="view-setup" class="hidden min-h-screen bg-gradient-to-br from-blue-900 to-blue-700 flex items-center justify-center p-6">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-8">
+    <div class="text-center mb-8">
+      <div class="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      </div>
+      <h1 class="text-2xl font-bold text-gray-900">Kevin's HOA</h1>
+      <p class="text-gray-500 text-sm mt-1">Connect your Supabase project to get started</p>
+    </div>
+    <div id="setup-error" class="hidden mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm"></div>
+    <div class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Supabase Project URL</label>
+        <input id="cfg-url" type="url" placeholder="https://xxxx.supabase.co"
+          class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
+        <p class="text-xs text-gray-400 mt-1">Project Settings → API → Project URL</p>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Supabase Anon Key</label>
+        <input id="cfg-key" type="text" placeholder="eyJhbGci..."
+          class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm font-mono" />
+        <p class="text-xs text-gray-400 mt-1">Project Settings → API → anon/public key</p>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Stripe Payment Link <span class="text-gray-400 font-normal">(optional)</span></label>
+        <input id="cfg-stripe" type="url" placeholder="https://buy.stripe.com/..."
+          class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
+        <p class="text-xs text-gray-400 mt-1">Create in Stripe Dashboard → Payment Links</p>
+      </div>
+      <button onclick="saveSetup()" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors text-sm">
+        Connect &amp; Continue
+      </button>
+    </div>
+    <p class="text-center text-xs text-gray-400 mt-5">Keys are stored locally in your browser only.</p>
+  </div>
+</div>
+
+<!-- ===================== AUTH VIEWS ===================== -->
+<div id="view-auth" class="hidden min-h-screen bg-gradient-to-br from-blue-900 to-blue-700 flex flex-col">
+  <div class="flex items-center p-6">
+    <div class="flex items-center gap-2 text-white/80">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      <span class="font-semibold">Kevin's HOA</span>
+    </div>
+    <button onclick="showView('setup')" class="ml-auto text-white/50 hover:text-white/80 text-xs">⚙ Reconfigure</button>
+  </div>
+  <div class="flex-1 flex items-center justify-center p-6">
+    <!-- LOGIN -->
+    <div id="auth-login" class="w-full max-w-md">
+      <div class="bg-white rounded-2xl shadow-2xl p-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-1 text-center">Welcome back</h2>
+        <p class="text-gray-500 text-sm text-center mb-8">Sign in to your HOA portal</p>
+        <div id="login-error" class="hidden mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm"></div>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <input id="login-email" type="email" placeholder="you@example.com"
+              class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <input id="login-password" type="password" placeholder="••••••••"
+              class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              onkeydown="if(event.key==='Enter')doLogin()" />
+          </div>
+          <button onclick="doLogin()" id="login-btn" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors text-sm">
+            Sign in
+          </button>
+        </div>
+        <p class="text-center text-sm text-gray-500 mt-6">
+          No account? <button onclick="switchAuth('signup')" class="text-blue-600 hover:text-blue-700 font-medium">Sign up</button>
+        </p>
+      </div>
+    </div>
+    <!-- SIGNUP -->
+    <div id="auth-signup" class="hidden w-full max-w-md">
+      <div class="bg-white rounded-2xl shadow-2xl p-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-1 text-center">Create account</h2>
+        <p class="text-gray-500 text-sm text-center mb-8">Join your HOA portal as a homeowner</p>
+        <div id="signup-error" class="hidden mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm"></div>
+        <div class="space-y-4">
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+              <input id="signup-name" type="text" placeholder="Jane Smith"
+                class="w-full px-3 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Unit #</label>
+              <input id="signup-unit" type="text" placeholder="101"
+                class="w-full px-3 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <input id="signup-email" type="email" placeholder="you@example.com"
+              class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <input id="signup-password" type="password" placeholder="Min 6 characters"
+              class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
+          </div>
+          <button onclick="doSignup()" id="signup-btn" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors text-sm">
+            Create account
+          </button>
+        </div>
+        <p class="text-center text-sm text-gray-500 mt-6">
+          Have an account? <button onclick="switchAuth('login')" class="text-blue-600 hover:text-blue-700 font-medium">Sign in</button>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== DASHBOARD ===================== -->
+<div id="view-dashboard" class="hidden flex min-h-screen">
+  <!-- Sidebar -->
+  <aside id="sidebar" class="w-60 flex-shrink-0 bg-gradient-to-b from-blue-900 to-blue-800 flex flex-col min-h-screen fixed lg:static z-40">
+    <div class="px-5 py-5 border-b border-blue-700">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        </div>
+        <div>
+          <div class="font-bold text-white text-sm">Kevin's HOA</div>
+          <div id="sidebar-role-label" class="text-blue-200 text-xs"></div>
+        </div>
+      </div>
+    </div>
+    <div class="px-5 py-4 border-b border-blue-700">
+      <div class="flex items-center gap-2">
+        <div id="sidebar-avatar" class="w-8 h-8 bg-blue-400 rounded-full flex items-center justify-center text-white font-bold text-xs"></div>
+        <div class="min-w-0">
+          <div id="sidebar-name" class="text-white font-medium text-sm truncate"></div>
+          <div id="sidebar-unit" class="text-blue-300 text-xs"></div>
+        </div>
+      </div>
+    </div>
+    <nav id="sidebar-nav" class="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto"></nav>
+    <div class="px-3 py-4 border-t border-blue-700">
+      <button onclick="doSignout()" class="sidebar-link w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        Sign out
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <main class="flex-1 min-w-0 overflow-auto p-6 lg:p-8">
+    <div id="main-content" class="max-w-5xl mx-auto fade"></div>
+  </main>
+</div>
+
+<!-- ===================== TOAST ===================== -->
+<div id="toast" class="hidden fixed bottom-6 right-6 z-50 px-5 py-3 rounded-xl text-white text-sm font-medium shadow-lg transition-all"></div>
+
+<script>
+// ─────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────
+let sb = null;
+let user = null;
+let profile = null;
+
+// ─────────────────────────────────────────────
+// CONFIG / SETUP
+// ─────────────────────────────────────────────
+function getCfg() {
+  return {
+    url: localStorage.getItem('hoa_url') || '',
+    key: localStorage.getItem('hoa_key') || '',
+    stripe: localStorage.getItem('hoa_stripe') || '',
+  };
+}
+
+function saveSetup() {
+  const url = document.getElementById('cfg-url').value.trim();
+  const key = document.getElementById('cfg-key').value.trim();
+  const stripe = document.getElementById('cfg-stripe').value.trim();
+  const err = document.getElementById('setup-error');
+  if (!url || !key) { showEl(err, 'Please enter your Supabase URL and Anon Key.'); return; }
+  localStorage.setItem('hoa_url', url);
+  localStorage.setItem('hoa_key', key);
+  localStorage.setItem('hoa_stripe', stripe);
+  hideEl(err);
+  initApp();
+}
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+async function initApp() {
+  const cfg = getCfg();
+  if (!cfg.url || !cfg.key) { showView('setup'); return; }
+
+  sb = window.supabase.createClient(cfg.url, cfg.key);
+
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { showView('auth'); return; }
+
+  user = session.user;
+  const { data: p } = await sb.from('profiles').select('*').eq('id', user.id).single();
+  profile = p;
+  enterDashboard();
+}
+
+// ─────────────────────────────────────────────
+// AUTH
+// ─────────────────────────────────────────────
+function showView(v) {
+  ['setup','auth','dashboard'].forEach(id => {
+    const el = document.getElementById('view-' + id);
+    if (el) el.classList.add('hidden');
+  });
+  const target = document.getElementById('view-' + v);
+  if (target) target.classList.remove('hidden');
+}
+
+function switchAuth(which) {
+  document.getElementById('auth-login').classList.toggle('hidden', which !== 'login');
+  document.getElementById('auth-signup').classList.toggle('hidden', which !== 'signup');
+}
+
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pwd = document.getElementById('login-password').value;
+  const btn = document.getElementById('login-btn');
+  const err = document.getElementById('login-error');
+  hideEl(err); btn.textContent = 'Signing in…'; btn.disabled = true;
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pwd });
+  btn.textContent = 'Sign in'; btn.disabled = false;
+  if (error) { showEl(err, error.message); return; }
+  user = data.user;
+  const { data: p } = await sb.from('profiles').select('*').eq('id', user.id).single();
+  profile = p;
+  enterDashboard();
+}
+
+async function doSignup() {
+  const name  = document.getElementById('signup-name').value.trim();
+  const email = document.getElementById('signup-email').value.trim();
+  const pwd   = document.getElementById('signup-password').value;
+  const unit  = document.getElementById('signup-unit').value.trim();
+  const btn   = document.getElementById('signup-btn');
+  const err   = document.getElementById('signup-error');
+  hideEl(err); btn.textContent = 'Creating…'; btn.disabled = true;
+  const { data, error } = await sb.auth.signUp({ email, password: pwd, options: { data: { name, role: 'owner' } } });
+  btn.textContent = 'Create account'; btn.disabled = false;
+  if (error) { showEl(err, error.message); return; }
+  user = data.user;
+  if (unit) await sb.from('profiles').update({ unit_number: unit }).eq('id', user.id);
+  const { data: p } = await sb.from('profiles').select('*').eq('id', user.id).single();
+  profile = p;
+  enterDashboard();
+}
+
+async function doSignout() {
+  await sb.auth.signOut();
+  user = null; profile = null;
+  showView('auth');
+}
+
+// ─────────────────────────────────────────────
+// DASHBOARD SHELL
+// ─────────────────────────────────────────────
+const ADMIN_NAV = [
+  { id:'home',      label:'Dashboard',  icon:'grid' },
+  { id:'owners',    label:'Owners',     icon:'users' },
+  { id:'dues',      label:'Dues',       icon:'dollar' },
+  { id:'payments',  label:'Payments',   icon:'card' },
+  { id:'expenses',  label:'Expenses',   icon:'receipt' },
+  { id:'messages',  label:'Messages',   icon:'chat' },
+  { id:'documents', label:'Documents',  icon:'file' },
+  { id:'settings',  label:'Settings',   icon:'cog' },
+];
+const OWNER_NAV = [
+  { id:'home',      label:'Dashboard',  icon:'grid' },
+  { id:'dues',      label:'My Dues',    icon:'dollar' },
+  { id:'payments',  label:'Payments',   icon:'card' },
+  { id:'messages',  label:'Messages',   icon:'chat' },
+  { id:'documents', label:'Documents',  icon:'file' },
+];
+
+const ICONS = {
+  grid:    `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>`,
+  users:   `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>`,
+  dollar:  `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>`,
+  card:    `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>`,
+  receipt: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>`,
+  chat:    `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>`,
+  file:    `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>`,
+  cog:     `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>`,
+};
+
+function svgIcon(name) {
+  return `<svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">${ICONS[name]||''}</svg>`;
+}
+
+let currentSection = 'home';
+
+function enterDashboard() {
+  showView('dashboard');
+  const role = profile?.role || 'owner';
+  document.getElementById('sidebar-role-label').textContent = role === 'admin' ? 'Admin Portal' : 'Owner Portal';
+  const nm = profile?.name || user?.email || '?';
+  document.getElementById('sidebar-name').textContent = nm;
+  document.getElementById('sidebar-avatar').textContent = nm.charAt(0).toUpperCase();
+  const unit = profile?.unit_number;
+  const unitEl = document.getElementById('sidebar-unit');
+  unitEl.textContent = unit ? 'Unit ' + unit : '';
+
+  const nav = document.getElementById('sidebar-nav');
+  const links = role === 'admin' ? ADMIN_NAV : OWNER_NAV;
+  nav.innerHTML = links.map(l => `
+    <button onclick="loadSection('${l.id}')"
+      class="sidebar-link w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors mb-0.5"
+      data-section="${l.id}">
+      ${svgIcon(l.icon)} ${l.label}
+    </button>`).join('');
+
+  loadSection('home');
+}
+
+function loadSection(section) {
+  currentSection = section;
+  document.querySelectorAll('[data-section]').forEach(el => {
+    el.classList.toggle('active', el.dataset.section === section);
+  });
+  const content = document.getElementById('main-content');
+  content.innerHTML = '<div class="flex justify-center py-12"><div class="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div></div>';
+  const role = profile?.role || 'owner';
+  if (role === 'admin') renderAdmin(section);
+  else renderOwner(section);
+}
+
+// ─────────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────────
+function showEl(el, msg) { el.textContent = msg; el.classList.remove('hidden'); }
+function hideEl(el) { el.classList.add('hidden'); }
+function fmtMoney(n) { return '$' + (Number(n)||0).toFixed(2); }
+function fmtDate(d) {
+  if (!d) return '—';
+  return new Date(d).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+}
+function badge(status) {
+  return `<span class="px-2.5 py-0.5 rounded-full text-xs font-medium badge-${status||'pending'}">${status||''}</span>`;
+}
+function statCard(label, value, color='blue') {
+  const bg = { blue:'bg-blue-50', green:'bg-green-50', yellow:'bg-yellow-50', red:'bg-red-50', purple:'bg-purple-50' }[color] || 'bg-blue-50';
+  const txt = { blue:'text-blue-700', green:'text-green-700', yellow:'text-yellow-700', red:'text-red-600', purple:'text-purple-700' }[color] || 'text-blue-700';
+  return `<div class="${bg} rounded-2xl p-6 shadow-sm border border-gray-100">
+    <p class="text-sm text-gray-500 mb-1">${label}</p>
+    <p class="text-3xl font-bold ${txt}">${value}</p>
+  </div>`;
+}
+function emptyState(msg) {
+  return `<div class="text-center py-16 text-gray-400"><p class="font-medium">${msg}</p></div>`;
+}
+function toast(msg, ok=true) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `fixed bottom-6 right-6 z-50 px-5 py-3 rounded-xl text-white text-sm font-medium shadow-lg ${ok?'bg-green-600':'bg-red-600'}`;
+  t.classList.remove('hidden');
+  setTimeout(() => t.classList.add('hidden'), 3000);
+}
+
+// ─────────────────────────────────────────────
+// ADMIN SECTIONS
+// ─────────────────────────────────────────────
+async function renderAdmin(section) {
+  const fns = {
+    home:      adminHome,
+    owners:    adminOwners,
+    dues:      adminDues,
+    payments:  adminPayments,
+    expenses:  adminExpenses,
+    messages:  adminMessages,
+    documents: adminDocuments,
+    settings:  adminSettings,
+  };
+  (fns[section] || adminHome)();
+}
+
+async function adminHome() {
+  const [
+    { data: owners },
+    { data: dues },
+    { data: payments },
+    { data: expenses },
+    { data: checklist },
+    { data: settings },
+  ] = await Promise.all([
+    sb.from('profiles').select('id').eq('role','owner'),
+    sb.from('dues').select('balance_remaining,status'),
+    sb.from('payments').select('amount,status,created_at').order('created_at',{ascending:false}).limit(8),
+    sb.from('expenses').select('amount,date'),
+    sb.from('setup_checklist').select('*').order('sort_order'),
+    sb.from('hoa_settings').select('hoa_name').eq('id','00000000-0000-0000-0000-000000000001').single(),
+  ]);
+
+  const totalDue = (dues||[]).reduce((s,d)=>s+(d.balance_remaining||0),0);
+  const collected = (payments||[]).filter(p=>p.status==='completed').reduce((s,p)=>s+(p.amount||0),0);
+  const now = new Date();
+  const monthExp = (expenses||[]).filter(e=>{const d=new Date(e.date);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();}).reduce((s,e)=>s+(e.amount||0),0);
+  const checklist_ = checklist||[];
+  const done = checklist_.filter(c=>c.completed).length;
+  const total = checklist_.length;
+
+  let checklistHtml = '';
+  if (done < total) {
+    checklistHtml = `<div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="px-6 py-5 border-b border-gray-100">
+        <div class="flex justify-between items-center mb-3">
+          <h2 class="font-semibold text-gray-900">Setup Checklist</h2>
+          <span class="text-sm text-gray-500">${done}/${total}</span>
+        </div>
+        <div class="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+          <div class="h-full bg-blue-600 rounded-full" style="width:${Math.round(done/total*100)}%"></div>
+        </div>
+      </div>
+      <ul class="divide-y divide-gray-50">
+        ${checklist_.map(c=>`<li class="flex items-center gap-3 px-6 py-3 hover:bg-gray-50 cursor-pointer" onclick="loadSection('settings')">
+          <span class="${c.completed?'text-green-500':'text-gray-300'}">${c.completed?'✓':'○'}</span>
+          <span class="text-sm ${c.completed?'text-gray-400 line-through':'text-gray-700'}">${c.step_label}</span>
+        </li>`).join('')}
+      </ul>
+    </div>`;
+  }
+
+  const overdue = (dues||[]).filter(d=>d.status==='overdue');
+  const recentPay = (payments||[]).slice(0,5);
+
+  document.getElementById('main-content').innerHTML = `
+    <div class="space-y-6 fade">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
+        <p class="text-gray-500 text-sm mt-1">${settings?.hoa_name||"Kevin's HOA"}</p>
+      </div>
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        ${statCard('Owners', owners?.length||0, 'blue')}
+        ${statCard('Balance Due', fmtMoney(totalDue), totalDue>0?'yellow':'green')}
+        ${statCard('Total Collected', fmtMoney(collected), 'green')}
+        ${statCard('Month Expenses', fmtMoney(monthExp), 'purple')}
+      </div>
+      ${checklistHtml}
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <h2 class="font-semibold text-gray-900 mb-4">Recent Payments</h2>
+        ${recentPay.length===0 ? emptyState('No payments yet') : `
+        <table class="w-full text-sm">
+          <thead><tr class="text-left text-gray-400 border-b border-gray-100">
+            <th class="pb-3 font-medium">Date</th><th class="pb-3 font-medium">Amount</th><th class="pb-3 font-medium">Status</th>
+          </tr></thead>
+          <tbody class="divide-y divide-gray-50">
+            ${recentPay.map(p=>`<tr>
+              <td class="py-3 text-gray-500">${fmtDate(p.created_at)}</td>
+              <td class="py-3 font-semibold">${fmtMoney(p.amount)}</td>
+              <td class="py-3">${badge(p.status)}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>`}
+      </div>
+    </div>`;
+}
+
+async function adminOwners() {
+  const { data: owners } = await sb.from('profiles').select('id,name,email,unit_number,is_active,created_at').eq('role','owner').order('name');
+  const { data: allDues } = await sb.from('dues').select('owner_id,balance_remaining');
+  const balanceMap = {};
+  (allDues||[]).forEach(d => { balanceMap[d.owner_id] = (balanceMap[d.owner_id]||0)+(d.balance_remaining||0); });
+
+  document.getElementById('main-content').innerHTML = `
+    <div class="space-y-6 fade">
+      <div class="flex items-center justify-between">
+        <h1 class="text-2xl font-bold text-gray-900">Owners</h1>
+        <button onclick="showAddOwnerForm()" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl transition-colors">+ Add Owner</button>
+      </div>
+      <div id="add-owner-form" class="hidden bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <h2 class="font-semibold text-gray-900 mb-4">Invite New Owner</h2>
+        <div class="p-4 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800 mb-4">
+          <strong>Note:</strong> For security, owners create their own accounts via the signup page.
+          Share this link: <code class="bg-amber-100 px-1 rounded">${location.origin}/kevin</code>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <input id="ao-name" placeholder="Full Name" class="px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <input id="ao-email" type="email" placeholder="Email" class="px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <input id="ao-unit" placeholder="Unit #" class="px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+        <p class="text-xs text-gray-400 mt-3">This creates a placeholder profile. The owner must sign up with the same email to activate their account.</p>
+        <button onclick="createOwnerProfile()" class="mt-4 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl">Save Profile</button>
+      </div>
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        ${!owners||owners.length===0 ? emptyState('No owners yet') : `
+        <table class="w-full text-sm">
+          <thead class="bg-gray-50 border-b border-gray-100">
+            <tr>
+              <th class="text-left px-6 py-4 font-medium text-gray-500">Owner</th>
+              <th class="text-left px-6 py-4 font-medium text-gray-500">Unit</th>
+              <th class="text-left px-6 py-4 font-medium text-gray-500">Balance</th>
+              <th class="text-left px-6 py-4 font-medium text-gray-500">Joined</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-50">
+            ${(owners||[]).map(o=>`<tr class="hover:bg-gray-50">
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-700 font-bold text-xs">${(o.name||'?').charAt(0).toUpperCase()}</div>
+                  <div><p class="font-medium text-gray-900">${o.name||'Unknown'}</p><p class="text-xs text-gray-400">${o.email}</p></div>
+                </div>
+              </td>
+              <td class="px-6 py-4 text-gray-600">${o.unit_number||'—'}</td>
+              <td class="px-6 py-4"><span class="${(balanceMap[o.id]||0)>0?'text-red-600':'text-green-600'} font-semibold">${fmtMoney(balanceMap[o.id]||0)}</span></td>
+              <td class="px-6 py-4 text-gray-500">${fmtDate(o.created_at)}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>`}
+      </div>
+    </div>`;
+}
+
+function showAddOwnerForm() {
+  const f = document.getElementById('add-owner-form');
+  f.classList.toggle('hidden');
+}
+
+async function createOwnerProfile() {
+  const name = document.getElementById('ao-name').value.trim();
+  const email = document.getElementById('ao-email').value.trim();
+  const unit = document.getElementById('ao-unit').value.trim();
+  if (!name || !email) { toast('Name and email required', false); return; }
+  // Insert a profile record — the trigger will link it when they sign up
+  // We can't create auth users client-side without service key, so we create profile manually
+  // The trigger handles this on real signup, so this is just a display record
+  toast('Share the signup link with this owner so they can register.', true);
+  document.getElementById('add-owner-form').classList.add('hidden');
+}
+
+async function adminDues() {
+  const [{ data: dues }, { data: owners }] = await Promise.all([
+    sb.from('dues').select('*,profiles(name,unit_number)').order('due_date',{ascending:false}),
+    sb.from('profiles').select('id,name,unit_number').eq('role','owner').order('name'),
+  ]);
+
+  document.getElementById('main-content').innerHTML = `
+    <div class="space-y-6 fade">
+      <h1 class="text-2xl font-bold text-gray-900">Dues Management</h1>
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-semibold text-gray-900">Assign New Dues</h2>
+          <button onclick="toggleForm('assign-dues-form')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl">+ Assign</button>
+        </div>
+        <div id="assign-dues-form" class="hidden grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+          <select id="dues-owner" class="px-3 py-2.5 border border-gray-300 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">Select owner…</option>
+            ${(owners||[]).map(o=>`<option value="${o.id}">${o.name}${o.unit_number?' (Unit '+o.unit_number+')':''}</option>`).join('')}
+          </select>
+          <input id="dues-amount" type="number" step="0.01" placeholder="Amount ($)" class="px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <input id="dues-date" type="date" class="px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <div class="sm:col-span-3">
+            <button onclick="assignDues()" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl">Assign Dues</button>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        ${!dues||dues.length===0 ? emptyState('No dues assigned yet') : `
+        <table class="w-full text-sm">
+          <thead class="bg-gray-50 border-b border-gray-100">
+            <tr>
+              <th class="text-left px-6 py-4 font-medium text-gray-500">Owner</th>
+              <th class="text-left px-6 py-4 font-medium text-gray-500">Amount</th>
+              <th class="text-left px-6 py-4 font-medium text-gray-500">Balance</th>
+              <th class="text-left px-6 py-4 font-medium text-gray-500">Due Date</th>
+              <th class="text-left px-6 py-4 font-medium text-gray-500">Status</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-50">
+            ${(dues||[]).map(d=>`<tr class="hover:bg-gray-50">
+              <td class="px-6 py-4">
+                <p class="font-medium text-gray-900">${d.profiles?.name||'Unknown'}</p>
+                <p class="text-xs text-gray-400">Unit ${d.profiles?.unit_number||'—'}</p>
+              </td>
+              <td class="px-6 py-4 font-semibold">${fmtMoney(d.amount_due)}</td>
+              <td class="px-6 py-4"><span class="${(d.balance_remaining||0)>0?'text-red-600':'text-green-600'} font-semibold">${fmtMoney(d.balance_remaining)}</span></td>
+              <td class="px-6 py-4 text-gray-600">${fmtDate(d.due_date)}</td>
+              <td class="px-6 py-4">${badge(d.status)}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>`}
+      </div>
+    </div>`;
+}
+
+async function assignDues() {
+  const owner_id = document.getElementById('dues-owner').value;
+  const amount = parseFloat(document.getElementById('dues-amount').value);
+  const due_date = document.getElementById('dues-date').value;
+  if (!owner_id || !amount || !due_date) { toast('All fields required', false); return; }
+  const { error } = await sb.from('dues').insert({ owner_id, amount_due: amount, balance_remaining: amount, due_date, status:'pending' });
+  if (error) { toast(error.message, false); return; }
+  toast('Dues assigned!');
+  loadSection('dues');
+}
+
+async function adminPayments() {
+  const { data: payments } = await sb.from('payments').select('*,profiles(name,unit_number)').order('created_at',{ascending:false});
+  const collected = (payments||[]).filter(p=>p.status==='completed').reduce((s,p)=>s+(p.amount||0),0);
+  const pending = (payments||[]).filter(p=>p.status==='pending').reduce((s,p)=>s+(p.amount||0),0);
+
+  document.getElementById('main-content').innerHTML = `
+    <div class="space-y-6 fade">
+      <h1 class="text-2xl font-bold text-gray-900">Payments</h1>
+      <div class="grid grid-cols-2 gap-4">
+        ${statCard('Total Collected', fmtMoney(collected), 'green')}
+        ${statCard('Pending', fmtMoney(pending), 'yellow')}
+      </div>
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        ${!payments||payments.length===0 ? emptyState('No payments yet') : `
+        <table class="w-full text-sm">
+          <thead class="bg-gray-50 border-b border-gray-100">
+            <tr>
+              <th class="text-left px-6 py-4 font-medium text-gray-500">Date</th>
+              <th class="text-left px-6 py-4 font-medium text-gray-500">Owner</th>
+              <th class="text-left px-6 py-4 font-medium text-gray-500">Amount</th>
+              <th class="text-left px-6 py-4 font-medium text-gray-500">Status</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-50">
+            ${(payments||[]).map(p=>`<tr class="hover:bg-gray-50">
+              <td class="px-6 py-4 text-gray-500">${fmtDate(p.created_at)}</td>
+              <td class="px-6 py-4"><p class="font-medium">${p.profiles?.name||'—'}</p><p class="text-xs text-gray-400">Unit ${p.profiles?.unit_number||'—'}</p></td>
+              <td class="px-6 py-4 font-semibold">${fmtMoney(p.amount)}</td>
+              <td class="px-6 py-4">${badge(p.status)}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>`}
+      </div>
+    </div>`;
+}
+
+const EXPENSE_CATS = ['Insurance','Utilities','Landscaping','Repairs','Management','Legal','Accounting','Other'];
+
+async function adminExpenses() {
+  const { data: expenses } = await sb.from('expenses').select('*').order('date',{ascending:false});
+  const total = (expenses||[]).reduce((s,e)=>s+(e.amount||0),0);
+  const now = new Date();
+  const month = (expenses||[]).filter(e=>{const d=new Date(e.date);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();}).reduce((s,e)=>s+(e.amount||0),0);
+
+  document.getElementById('main-content').innerHTML = `
+    <div class="space-y-6 fade">
+      <h1 class="text-2xl font-bold text-gray-900">Expenses</h1>
+      <div class="grid grid-cols-2 gap-4">
+        ${statCard('Total Expenses', fmtMoney(total), 'purple')}
+        ${statCard('This Month', fmtMoney(month), 'blue')}
+      </div>
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-semibold text-gray-900">Add Expense</h2>
+          <button onclick="toggleForm('add-expense-form')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl">+ Add</button>
+        </div>
+        <div id="add-expense-form" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+          <input id="exp-vendor" placeholder="Vendor Name" class="px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <select id="exp-cat" class="px-3 py-2.5 border border-gray-300 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+            ${EXPENSE_CATS.map(c=>`<option>${c}</option>`).join('')}
+          </select>
+          <input id="exp-amount" type="number" step="0.01" placeholder="Amount ($)" class="px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <input id="exp-date" type="date" value="${new Date().toISOString().split('T')[0]}" class="px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <input id="exp-notes" placeholder="Notes (optional)" class="sm:col-span-2 px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <div class="sm:col-span-2">
+            <button onclick="addExpense()" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl">Save Expense</button>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        ${!expenses||expenses.length===0 ? emptyState('No expenses recorded') : `
+        <table class="w-full text-sm">
+          <thead class="bg-gray-50 border-b border-gray-100">
+            <tr>
+              <th class="text-left px-6 py-4 font-medium text-gray-500">Date</th>
+              <th class="text-left px-6 py-4 font-medium text-gray-500">Vendor</th>
+              <th class="text-left px-6 py-4 font-medium text-gray-500">Category</th>
+              <th class="text-left px-6 py-4 font-medium text-gray-500">Amount</th>
+              <th class="text-left px-6 py-4 font-medium text-gray-500">Notes</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-50">
+            ${(expenses||[]).map(e=>`<tr class="hover:bg-gray-50">
+              <td class="px-6 py-4 text-gray-500">${fmtDate(e.date)}</td>
+              <td class="px-6 py-4 font-medium text-gray-900">${e.vendor_name}</td>
+              <td class="px-6 py-4"><span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">${e.category}</span></td>
+              <td class="px-6 py-4 font-semibold">${fmtMoney(e.amount)}</td>
+              <td class="px-6 py-4 text-gray-400 max-w-xs truncate">${e.notes||'—'}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>`}
+      </div>
+    </div>`;
+}
+
+async function addExpense() {
+  const vendor = document.getElementById('exp-vendor').value.trim();
+  const category = document.getElementById('exp-cat').value;
+  const amount = parseFloat(document.getElementById('exp-amount').value);
+  const date = document.getElementById('exp-date').value;
+  const notes = document.getElementById('exp-notes').value.trim();
+  if (!vendor || !amount || !date) { toast('Vendor, amount, and date required', false); return; }
+  const { error } = await sb.from('expenses').insert({ vendor_name:vendor, category, amount, date, notes, created_by: user.id });
+  if (error) { toast(error.message, false); return; }
+  toast('Expense saved!');
+  loadSection('expenses');
+}
+
+async function adminMessages() {
+  const [{ data: msgs }, { data: owners }] = await Promise.all([
+    sb.from('messages').select('*,sender:profiles!sender_id(name)').order('created_at',{ascending:false}).limit(60),
+    sb.from('profiles').select('id,name').eq('role','owner').order('name'),
+  ]);
+  renderMessaging(msgs||[], owners||[], 'admin');
+}
+
+async function adminDocuments() {
+  const { data: docs } = await sb.from('documents').select('*').order('created_at',{ascending:false});
+  document.getElementById('main-content').innerHTML = `
+    <div class="space-y-6 fade">
+      <h1 class="text-2xl font-bold text-gray-900">Documents</h1>
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <h2 class="font-semibold text-gray-900 mb-4">Upload Document</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <input id="doc-title" placeholder="Document Title" class="px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <input id="doc-file" type="file" accept=".pdf,.doc,.docx,.txt" class="px-3 py-2 border border-gray-300 rounded-xl text-sm file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:bg-blue-50 file:text-blue-600 file:text-xs" />
+          <button onclick="uploadDoc()" id="doc-btn" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl">Upload</button>
+        </div>
+        <div id="doc-error" class="hidden mt-3 p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm"></div>
+        <div id="doc-success" class="hidden mt-3 p-3 bg-green-50 border border-green-200 rounded-xl text-green-700 text-sm"></div>
+      </div>
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100"><h2 class="font-semibold text-gray-900">All Documents (${docs?.length||0})</h2></div>
+        ${!docs||docs.length===0 ? emptyState('No documents uploaded') : `
+        <ul class="divide-y divide-gray-50">
+          ${(docs||[]).map(d=>`<li class="flex items-center gap-4 px-6 py-4 hover:bg-gray-50">
+            <div class="p-2.5 bg-blue-50 rounded-xl">📄</div>
+            <div class="flex-1 min-w-0">
+              <p class="font-medium text-gray-900 truncate">${d.title}</p>
+              <p class="text-xs text-gray-400">${fmtDate(d.created_at)}</p>
+            </div>
+            <a href="${d.file_url}" target="_blank" class="text-blue-600 hover:text-blue-700 text-sm font-medium">Download</a>
+          </li>`).join('')}
+        </ul>`}
+      </div>
+    </div>`;
+}
+
+async function uploadDoc() {
+  const title = document.getElementById('doc-title').value.trim();
+  const fileInput = document.getElementById('doc-file');
+  const file = fileInput.files?.[0];
+  const errEl = document.getElementById('doc-error');
+  const sucEl = document.getElementById('doc-success');
+  hideEl(errEl); hideEl(sucEl);
+  if (!title || !file) { showEl(errEl,'Title and file required'); return; }
+  const btn = document.getElementById('doc-btn');
+  btn.textContent = 'Uploading…'; btn.disabled = true;
+  const path = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g,'_')}`;
+  const { error: upErr } = await sb.storage.from('hoa-documents').upload(path, file);
+  if (upErr) { showEl(errEl, upErr.message); btn.textContent='Upload'; btn.disabled=false; return; }
+  const { data: { publicUrl } } = sb.storage.from('hoa-documents').getPublicUrl(path);
+  const { error: dbErr } = await sb.from('documents').insert({ title, file_url: publicUrl, file_name: file.name, file_size: file.size, uploaded_by: user.id, is_public: true });
+  if (dbErr) { showEl(errEl, dbErr.message); btn.textContent='Upload'; btn.disabled=false; return; }
+  showEl(sucEl,'Uploaded successfully!');
+  btn.textContent='Upload'; btn.disabled=false;
+  document.getElementById('doc-title').value='';
+  fileInput.value='';
+  setTimeout(()=>loadSection('documents'),1200);
+}
+
+async function adminSettings() {
+  const [{ data: settings }, { data: checklist }] = await Promise.all([
+    sb.from('hoa_settings').select('*').eq('id','00000000-0000-0000-0000-000000000001').single(),
+    sb.from('setup_checklist').select('*').order('sort_order'),
+  ]);
+  const cfg = getCfg();
+  const s = settings || {};
+
+  document.getElementById('main-content').innerHTML = `
+    <div class="space-y-6 fade">
+      <h1 class="text-2xl font-bold text-gray-900">Settings</h1>
+
+      <!-- HOA Info -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <h2 class="font-semibold text-gray-900 mb-5">HOA Organization</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div><label class="block text-sm font-medium text-gray-700 mb-1">HOA Name</label>
+            <input id="s-name" value="${s.hoa_name||''}" placeholder="Sunset Hills HOA" class="w-full px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" /></div>
+          <div><label class="block text-sm font-medium text-gray-700 mb-1">Number of Units</label>
+            <input id="s-units" type="number" value="${s.num_units||''}" placeholder="24" class="w-full px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" /></div>
+          <div class="sm:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+            <input id="s-addr" value="${s.address||''}" placeholder="123 Main St, City, State 12345" class="w-full px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" /></div>
+          <div><label class="block text-sm font-medium text-gray-700 mb-1">Default Monthly Dues ($)</label>
+            <input id="s-dues" type="number" step="0.01" value="${s.default_monthly_dues||''}" placeholder="250.00" class="w-full px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" /></div>
+          <div><label class="block text-sm font-medium text-gray-700 mb-1">Default Due Day</label>
+            <input id="s-dueday" type="number" min="1" max="28" value="${s.default_due_day||1}" class="w-full px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" /></div>
+        </div>
+        <button onclick="saveHoaSettings()" class="mt-4 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl">Save HOA Settings</button>
+      </div>
+
+      <!-- Stripe / Payment -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <h2 class="font-semibold text-gray-900 mb-4">Stripe Payment Link</h2>
+        <div class="p-4 bg-amber-50 border border-amber-100 rounded-xl text-sm text-amber-800 mb-4">
+          Create a Payment Link in your <a href="https://dashboard.stripe.com/payment-links" target="_blank" class="underline font-medium">Stripe Dashboard</a> and paste it here. Owners will be redirected to it to pay dues.
+        </div>
+        <div class="flex gap-3">
+          <input id="s-stripe" value="${cfg.stripe||''}" placeholder="https://buy.stripe.com/…" class="flex-1 px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <button onclick="saveStripeLink()" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl">Save</button>
+        </div>
+      </div>
+
+      <!-- Setup Checklist -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="px-6 py-5 border-b border-gray-100">
+          <div class="flex justify-between items-center mb-3">
+            <h2 class="font-semibold text-gray-900">Setup Checklist</h2>
+            <span class="text-sm text-gray-500">${(checklist||[]).filter(c=>c.completed).length}/${(checklist||[]).length}</span>
+          </div>
+          <div class="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-full bg-blue-600 rounded-full" style="width:${Math.round((checklist||[]).filter(c=>c.completed).length/((checklist||[]).length||1)*100)}%"></div>
+          </div>
+        </div>
+        <ul class="divide-y divide-gray-50">
+          ${(checklist||[]).map(c=>`<li class="flex items-center justify-between px-6 py-4">
+            <div class="flex items-center gap-3">
+              <span class="${c.completed?'text-green-500':'text-gray-300'} text-lg">${c.completed?'✓':'○'}</span>
+              <span class="text-sm ${c.completed?'text-gray-400 line-through':'text-gray-700'}">${c.step_label}</span>
+            </div>
+            ${!c.completed?`<button onclick="markChecklistDone('${c.step_key}')" class="text-xs text-blue-600 hover:text-blue-700 font-medium">Mark done</button>`:''}
+          </li>`).join('')}
+        </ul>
+      </div>
+    </div>`;
+}
+
+async function saveHoaSettings() {
+  const { error } = await sb.from('hoa_settings').update({
+    hoa_name: document.getElementById('s-name').value.trim(),
+    num_units: parseInt(document.getElementById('s-units').value)||0,
+    address: document.getElementById('s-addr').value.trim(),
+    default_monthly_dues: parseFloat(document.getElementById('s-dues').value)||0,
+    default_due_day: parseInt(document.getElementById('s-dueday').value)||1,
+  }).eq('id','00000000-0000-0000-0000-000000000001');
+  if (error) { toast(error.message, false); return; }
+  await sb.from('setup_checklist').update({completed:true,completed_at:new Date().toISOString()}).eq('step_key','hoa_info');
+  toast('HOA settings saved!');
+}
+
+function saveStripeLink() {
+  const link = document.getElementById('s-stripe').value.trim();
+  localStorage.setItem('hoa_stripe', link);
+  toast('Stripe link saved!');
+}
+
+async function markChecklistDone(key) {
+  await sb.from('setup_checklist').update({completed:true,completed_at:new Date().toISOString()}).eq('step_key',key);
+  toast('Step marked complete!');
+  loadSection('settings');
+}
+
+function toggleForm(id) {
+  document.getElementById(id).classList.toggle('hidden');
+}
+
+// ─────────────────────────────────────────────
+// OWNER SECTIONS
+// ─────────────────────────────────────────────
+async function renderOwner(section) {
+  const fns = { home:ownerHome, dues:ownerDues, payments:ownerPayments, messages:ownerMessages, documents:ownerDocuments };
+  (fns[section]||ownerHome)();
+}
+
+async function ownerHome() {
+  const [
+    { data: dues },
+    { data: payments },
+    { data: msgs },
+    { data: settings },
+  ] = await Promise.all([
+    sb.from('dues').select('*').eq('owner_id',user.id).order('due_date',{ascending:false}),
+    sb.from('payments').select('*').eq('owner_id',user.id).order('created_at',{ascending:false}).limit(5),
+    sb.from('messages').select('id').or(`recipient_id.eq.${user.id},is_broadcast.eq.true`).eq('read_status',false),
+    sb.from('hoa_settings').select('hoa_name').eq('id','00000000-0000-0000-0000-000000000001').single(),
+  ]);
+
+  const balance = (dues||[]).reduce((s,d)=>s+(d.balance_remaining||0),0);
+  const paid = (payments||[]).filter(p=>p.status==='completed').length;
+  const unread = msgs?.length||0;
+  const pending = (dues||[]).find(d=>d.status==='pending'||d.status==='overdue');
+
+  document.getElementById('main-content').innerHTML = `
+    <div class="space-y-6 fade">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">Welcome, ${profile?.name||'Homeowner'}</h1>
+        <p class="text-gray-500 text-sm mt-1">${settings?.hoa_name||"Kevin's HOA"} • Unit ${profile?.unit_number||'—'}</p>
+      </div>
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        ${statCard('Balance Due', fmtMoney(balance), balance>0?'red':'green')}
+        ${statCard('Payments Made', paid, 'blue')}
+        ${statCard('Unread Messages', unread, unread>0?'yellow':'blue')}
+        ${statCard('My Dues', (dues||[]).length, 'purple')}
+      </div>
+      ${pending ? `
+      <div class="bg-white rounded-2xl shadow-sm border-2 ${pending.status==='overdue'?'border-red-200':'border-yellow-200'} p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="font-semibold text-gray-900 text-lg">Payment Due</p>
+            <p class="text-sm text-gray-500 mt-1">Due ${fmtDate(pending.due_date)} • ${badge(pending.status)}</p>
+          </div>
+          <div class="text-right">
+            <p class="text-3xl font-bold ${pending.status==='overdue'?'text-red-600':'text-gray-900'}">${fmtMoney(pending.balance_remaining)}</p>
+            <button onclick="payDues('${pending.id}',${pending.balance_remaining})" class="mt-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl">Pay Now</button>
+          </div>
+        </div>
+      </div>` : `
+      <div class="bg-green-50 border border-green-100 rounded-2xl p-6 flex items-center gap-4">
+        <span class="text-3xl">✅</span>
+        <div><p class="font-semibold text-green-800">All dues paid!</p><p class="text-green-600 text-sm">You're all caught up.</p></div>
+      </div>`}
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="font-semibold text-gray-900">Recent Payments</h2>
+          <button onclick="loadSection('payments')" class="text-sm text-blue-600 hover:text-blue-700 font-medium">View all</button>
+        </div>
+        ${!payments||payments.length===0 ? emptyState('No payments yet') : `
+        <div class="space-y-3">
+          ${(payments||[]).map(p=>`<div class="flex justify-between items-center py-2 border-b border-gray-50 last:border-0">
+            <div><p class="font-medium text-sm">${fmtMoney(p.amount)}</p><p class="text-xs text-gray-400">${fmtDate(p.created_at)}</p></div>
+            ${badge(p.status)}
+          </div>`).join('')}
+        </div>`}
+      </div>
+    </div>`;
+}
+
+async function ownerDues() {
+  const { data: dues } = await sb.from('dues').select('*').eq('owner_id',user.id).order('due_date',{ascending:false});
+  const balance = (dues||[]).reduce((s,d)=>s+(d.balance_remaining||0),0);
+
+  document.getElementById('main-content').innerHTML = `
+    <div class="space-y-6 fade">
+      <h1 class="text-2xl font-bold text-gray-900">My Dues</h1>
+      <div class="${balance>0?'bg-red-50 border-red-100':'bg-green-50 border-green-100'} border rounded-2xl p-6 flex items-center justify-between">
+        <div>
+          <p class="text-sm text-gray-500 mb-1">Total Balance Due</p>
+          <p class="text-4xl font-bold ${balance>0?'text-red-600':'text-green-600'}">${fmtMoney(balance)}</p>
+          ${balance===0?'<p class="text-green-600 text-sm font-medium mt-1">All dues paid!</p>':''}
+        </div>
+        <span class="text-5xl">${balance>0?'💳':'✅'}</span>
+      </div>
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100"><h2 class="font-semibold text-gray-900">Dues History</h2></div>
+        ${!dues||dues.length===0 ? emptyState('No dues assigned yet') : `
+        <ul class="divide-y divide-gray-50">
+          ${(dues||[]).map(d=>`<li class="flex items-center gap-4 px-6 py-5">
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-1">
+                <p class="font-medium text-gray-900">Due ${fmtDate(d.due_date)}</p>
+                ${badge(d.status)}
+              </div>
+              <p class="text-sm text-gray-500">${fmtMoney(d.amount_due)} total${d.balance_remaining<d.amount_due&&d.balance_remaining>0?' • '+fmtMoney(d.balance_remaining)+' remaining':''}</p>
+            </div>
+            ${d.status!=='paid'&&d.status!=='waived'&&(d.balance_remaining||0)>0
+              ? `<button onclick="payDues('${d.id}',${d.balance_remaining})" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl">Pay ${fmtMoney(d.balance_remaining)}</button>`
+              : `<span class="text-sm font-semibold text-green-600">${d.status==='paid'?'Paid':d.status==='waived'?'Waived':''}</span>`}
+          </li>`).join('')}
+        </ul>`}
+      </div>
+    </div>`;
+}
+
+function payDues(duesId, amount) {
+  const stripeLink = getCfg().stripe;
+  if (!stripeLink) {
+    toast('Payment link not configured. Contact your HOA admin.', false);
+    return;
+  }
+  // Record a pending payment before redirecting
+  sb.from('payments').insert({ owner_id: user.id, dues_id: duesId, amount, status:'pending' });
+  window.open(stripeLink, '_blank');
+  toast('Redirecting to payment portal…');
+}
+
+async function ownerPayments() {
+  const { data: payments } = await sb.from('payments').select('*').eq('owner_id',user.id).order('created_at',{ascending:false});
+  const total = (payments||[]).filter(p=>p.status==='completed').reduce((s,p)=>s+(p.amount||0),0);
+
+  document.getElementById('main-content').innerHTML = `
+    <div class="space-y-6 fade">
+      <h1 class="text-2xl font-bold text-gray-900">Payment History</h1>
+      ${statCard('Total Paid', fmtMoney(total), 'blue')}
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        ${!payments||payments.length===0 ? emptyState('No payments yet') : `
+        <table class="w-full text-sm">
+          <thead class="bg-gray-50 border-b border-gray-100">
+            <tr>
+              <th class="text-left px-6 py-4 font-medium text-gray-500">Date</th>
+              <th class="text-left px-6 py-4 font-medium text-gray-500">Amount</th>
+              <th class="text-left px-6 py-4 font-medium text-gray-500">Status</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-50">
+            ${(payments||[]).map(p=>`<tr class="hover:bg-gray-50">
+              <td class="px-6 py-4 text-gray-500">${fmtDate(p.created_at)}</td>
+              <td class="px-6 py-4 font-semibold">${fmtMoney(p.amount)}</td>
+              <td class="px-6 py-4">${badge(p.status)}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>`}
+      </div>
+    </div>`;
+}
+
+async function ownerMessages() {
+  const [{ data: msgs }, { data: admins }] = await Promise.all([
+    sb.from('messages').select('*,sender:profiles!sender_id(name)').or(`sender_id.eq.${user.id},recipient_id.eq.${user.id},is_broadcast.eq.true`).order('created_at',{ascending:false}).limit(60),
+    sb.from('profiles').select('id,name').eq('role','admin'),
+  ]);
+  renderMessaging(msgs||[], admins||[], 'owner');
+}
+
+async function ownerDocuments() {
+  const { data: docs } = await sb.from('documents').select('*').eq('is_public',true).order('created_at',{ascending:false});
+  document.getElementById('main-content').innerHTML = `
+    <div class="space-y-6 fade">
+      <h1 class="text-2xl font-bold text-gray-900">HOA Documents</h1>
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        ${!docs||docs.length===0 ? emptyState('No documents available yet') : `
+        <ul class="divide-y divide-gray-50">
+          ${(docs||[]).map(d=>`<li class="flex items-center gap-4 px-6 py-4 hover:bg-gray-50">
+            <div class="p-2.5 bg-blue-50 rounded-xl text-xl">📄</div>
+            <div class="flex-1 min-w-0">
+              <p class="font-medium text-gray-900 truncate">${d.title}</p>
+              <p class="text-xs text-gray-400">${d.file_name||''} • Added ${fmtDate(d.created_at)}</p>
+            </div>
+            <a href="${d.file_url}" target="_blank" class="flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-700">⬇ Download</a>
+          </li>`).join('')}
+        </ul>`}
+      </div>
+    </div>`;
+}
+
+// ─────────────────────────────────────────────
+// MESSAGING (shared admin+owner)
+// ─────────────────────────────────────────────
+let realtimeChannel = null;
+
+function renderMessaging(msgs, recipients, role) {
+  const isAdmin = role === 'admin';
+  const filtered = msgs.filter(m => m.is_broadcast || m.sender_id === user.id || m.recipient_id === user.id);
+  const reversed = [...filtered].reverse();
+
+  document.getElementById('main-content').innerHTML = `
+    <div class="space-y-6 fade">
+      <h1 class="text-2xl font-bold text-gray-900">Messages</h1>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col" style="height:60vh">
+          <div class="px-6 py-4 border-b border-gray-100"><h2 class="font-semibold text-gray-900">Conversation</h2></div>
+          <div id="msg-thread" class="flex-1 overflow-y-auto p-4 space-y-3">
+            ${reversed.length===0 ? '<div class="flex items-center justify-center h-full text-gray-400 text-sm">No messages yet</div>' :
+              reversed.map(m => {
+                const own = m.sender_id === user.id;
+                const senderName = m.is_broadcast ? 'Broadcast' : (m.sender?.name || 'Unknown');
+                return `<div class="flex ${own?'justify-end':'justify-start'}">
+                  <div class="max-w-xs lg:max-w-sm px-4 py-3 rounded-2xl ${own?'bg-blue-600 text-white rounded-br-sm':m.is_broadcast?'bg-amber-50 border border-amber-200 text-gray-800 rounded-bl-sm':'bg-gray-100 text-gray-800 rounded-bl-sm'}">
+                    <p class="text-xs font-medium mb-1 ${own?'text-blue-200':m.is_broadcast?'text-amber-600':'text-gray-400'}">${senderName}</p>
+                    <p class="text-sm leading-relaxed">${escHtml(m.content)}</p>
+                    <p class="text-xs mt-1 ${own?'text-blue-200':'text-gray-400'}">${fmtDate(m.created_at)}</p>
+                  </div>
+                </div>`;
+              }).join('')}
+          </div>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
+          <h2 class="font-semibold text-gray-900">Compose</h2>
+          ${isAdmin ? `<label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" id="msg-broadcast" class="w-4 h-4 text-blue-600 rounded" onchange="toggleBroadcast()" />
+            <span class="text-sm font-medium text-gray-700">Broadcast to all owners</span>
+          </label>` : ''}
+          <div id="recipient-wrap">
+            <label class="block text-sm font-medium text-gray-700 mb-1">${isAdmin?'Send to Owner':'Send to Admin'}</label>
+            <select id="msg-recipient" class="w-full px-3 py-2.5 border border-gray-300 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="">${isAdmin?'Select owner…':'Select admin…'}</option>
+              ${recipients.map(r=>`<option value="${r.id}">${r.name}</option>`).join('')}
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Message</label>
+            <textarea id="msg-content" rows="4" placeholder="Type your message…"
+              class="w-full px-3 py-2.5 border border-gray-300 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+          </div>
+          <button onclick="sendMsg(${isAdmin})" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl">Send Message</button>
+        </div>
+      </div>
+    </div>`;
+
+  // scroll to bottom
+  const t = document.getElementById('msg-thread');
+  if (t) t.scrollTop = t.scrollHeight;
+
+  // realtime
+  if (realtimeChannel) sb.removeChannel(realtimeChannel);
+  realtimeChannel = sb.channel('msgs-'+Date.now())
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'},() => loadSection('messages'))
+    .subscribe();
+}
+
+function toggleBroadcast() {
+  const bc = document.getElementById('msg-broadcast')?.checked;
+  const rw = document.getElementById('recipient-wrap');
+  if (rw) rw.classList.toggle('hidden', !!bc);
+}
+
+async function sendMsg(isAdmin) {
+  const content = document.getElementById('msg-content')?.value.trim();
+  const bc = document.getElementById('msg-broadcast')?.checked || false;
+  const recipientId = document.getElementById('msg-recipient')?.value || null;
+  if (!content) { toast('Write a message first', false); return; }
+  if (!bc && !recipientId) { toast('Select a recipient', false); return; }
+  const { error } = await sb.from('messages').insert({
+    sender_id: user.id,
+    recipient_id: bc ? null : recipientId,
+    content,
+    is_broadcast: bc,
+  });
+  if (error) { toast(error.message, false); return; }
+  document.getElementById('msg-content').value = '';
+  toast('Message sent!');
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ─────────────────────────────────────────────
+// BOOT
+// ─────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  // Pre-fill setup form if saved
+  const cfg = getCfg();
+  if (cfg.url) document.getElementById('cfg-url').value = cfg.url;
+  if (cfg.key) document.getElementById('cfg-key').value = cfg.key;
+  if (cfg.stripe) document.getElementById('cfg-stripe').value = cfg.stripe;
+  initApp();
+});
+</script>
+</body>
+</html>
