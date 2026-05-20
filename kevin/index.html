@@ -62,6 +62,14 @@ tailwind.config = {
       <button onclick="saveSetup()" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors text-sm">
         Connect &amp; Continue
       </button>
+      <div class="relative flex items-center gap-3 py-1">
+        <div class="flex-1 h-px bg-gray-200"></div>
+        <span class="text-xs text-gray-400">or</span>
+        <div class="flex-1 h-px bg-gray-200"></div>
+      </div>
+      <button onclick="startDemo()" class="w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl transition-colors text-sm">
+        👀 Preview with Demo Data
+      </button>
     </div>
     <p class="text-center text-xs text-gray-400 mt-5">Keys are stored locally in your browser only.</p>
   </div>
@@ -179,13 +187,19 @@ tailwind.config = {
   </aside>
 
   <!-- Main content -->
-  <main class="flex-1 min-w-0 overflow-auto p-6 lg:p-8">
+  <main id="main-wrap" class="flex-1 min-w-0 overflow-auto p-6 lg:p-8">
     <div id="main-content" class="max-w-5xl mx-auto fade"></div>
   </main>
 </div>
 
 <!-- ===================== TOAST ===================== -->
 <div id="toast" class="hidden fixed bottom-6 right-6 z-50 px-5 py-3 rounded-xl text-white text-sm font-medium shadow-lg transition-all"></div>
+
+<!-- ===================== DEMO BANNER ===================== -->
+<div id="demo-banner" class="hidden fixed top-0 left-0 right-0 z-50 bg-amber-400 text-amber-900 text-sm font-semibold text-center py-2 flex items-center justify-center gap-3">
+  <span>👀 DEMO MODE — data is not saved</span>
+  <button onclick="exitDemo()" class="px-3 py-0.5 bg-amber-900/20 hover:bg-amber-900/30 rounded-lg text-xs transition-colors">Exit Demo</button>
+</div>
 
 <script>
 // ─────────────────────────────────────────────
@@ -1201,6 +1215,118 @@ async function sendMsg(isAdmin) {
 
 function escHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ─────────────────────────────────────────────
+// DEMO MODE
+// ─────────────────────────────────────────────
+let demoMode = false;
+
+const DEMO_PROFILE_ADMIN = { id:'demo-admin', name:'Kevin Admin', email:'kevin@hoa.com', role:'admin', unit_number:null };
+const DEMO_PROFILE_OWNER = { id:'demo-owner', name:'Jane Smith', email:'jane@example.com', role:'owner', unit_number:'101' };
+
+const DEMO_DATA = {
+  owners: [
+    { id:'o1', name:'Jane Smith',   email:'jane@example.com',   unit_number:'101', is_active:true, created_at:'2024-01-15', dues:[{balance_remaining:0}] },
+    { id:'o2', name:'Bob Johnson',  email:'bob@example.com',    unit_number:'102', is_active:true, created_at:'2024-02-01', dues:[{balance_remaining:250}] },
+    { id:'o3', name:'Maria Garcia', email:'maria@example.com',  unit_number:'103', is_active:true, created_at:'2024-01-20', dues:[{balance_remaining:500}] },
+    { id:'o4', name:'Tom Williams', email:'tom@example.com',    unit_number:'104', is_active:false,created_at:'2023-11-10', dues:[{balance_remaining:0}] },
+  ],
+  dues: [
+    { id:'d1', owner_id:'o1', amount_due:250, balance_remaining:0,   due_date:'2025-05-01', status:'paid',    profiles:{name:'Jane Smith',   unit_number:'101'} },
+    { id:'d2', owner_id:'o2', amount_due:250, balance_remaining:250, due_date:'2025-05-01', status:'overdue', profiles:{name:'Bob Johnson',  unit_number:'102'} },
+    { id:'d3', owner_id:'o3', amount_due:250, balance_remaining:250, due_date:'2025-05-01', status:'pending', profiles:{name:'Maria Garcia', unit_number:'103'} },
+    { id:'d4', owner_id:'o4', amount_due:250, balance_remaining:0,   due_date:'2025-04-01', status:'paid',    profiles:{name:'Tom Williams', unit_number:'104'} },
+    { id:'d5', owner_id:'o1', amount_due:250, balance_remaining:125, due_date:'2025-04-01', status:'partial', profiles:{name:'Jane Smith',   unit_number:'101'} },
+  ],
+  payments: [
+    { id:'p1', owner_id:'o1', amount:250, status:'completed', created_at:'2025-05-02', payment_method:'card', profiles:{name:'Jane Smith',   unit_number:'101'} },
+    { id:'p2', owner_id:'o4', amount:250, status:'completed', created_at:'2025-05-01', payment_method:'card', profiles:{name:'Tom Williams', unit_number:'104'} },
+    { id:'p3', owner_id:'o1', amount:125, status:'completed', created_at:'2025-04-15', payment_method:'card', profiles:{name:'Jane Smith',   unit_number:'101'} },
+    { id:'p4', owner_id:'o2', amount:250, status:'failed',    created_at:'2025-04-10', payment_method:'card', profiles:{name:'Bob Johnson',  unit_number:'102'} },
+  ],
+  expenses: [
+    { id:'e1', vendor_name:'Green Thumb Landscaping', category:'Landscaping', amount:800,  date:'2025-05-10', notes:'Monthly lawn service' },
+    { id:'e2', vendor_name:'State Farm',              category:'Insurance',   amount:1200, date:'2025-05-01', notes:'Annual HOA policy' },
+    { id:'e3', vendor_name:'City Utilities',          category:'Utilities',   amount:340,  date:'2025-05-01', notes:'Water & electric common areas' },
+    { id:'e4', vendor_name:'ABC Repairs',             category:'Repairs',     amount:650,  date:'2025-04-22', notes:'Parking lot crack seal' },
+  ],
+  messages: [
+    { id:'m1', sender_id:'demo-admin', recipient_id:null, content:'Reminder: May dues are due by the 5th. Please pay via the portal.', is_broadcast:true,  read_status:false, created_at:'2025-05-01', sender:{name:'Kevin Admin'} },
+    { id:'m2', sender_id:'demo-owner', recipient_id:'demo-admin', content:'Hi, when is the next HOA meeting?', is_broadcast:false, read_status:true,  created_at:'2025-05-03', sender:{name:'Jane Smith'} },
+    { id:'m3', sender_id:'demo-admin', recipient_id:'demo-owner', content:'Next meeting is May 20th at 7pm in the clubhouse.', is_broadcast:false, read_status:false, created_at:'2025-05-03', sender:{name:'Kevin Admin'} },
+  ],
+  documents: [
+    { id:'doc1', title:'HOA Bylaws 2024',        file_url:'#', file_name:'bylaws-2024.pdf',     created_at:'2024-01-01', uploader:{name:'Kevin Admin'} },
+    { id:'doc2', title:'Rules & Regulations',    file_url:'#', file_name:'rules-regs.pdf',      created_at:'2024-01-01', uploader:{name:'Kevin Admin'} },
+    { id:'doc3', title:'Meeting Minutes Apr 2025',file_url:'#',file_name:'minutes-apr-2025.pdf',created_at:'2025-04-21', uploader:{name:'Kevin Admin'} },
+  ],
+  settings: { hoa_name:"Sunset Hills HOA", address:"123 Main Street, Raleigh, NC 27601", num_units:4, default_monthly_dues:250, default_due_day:1 },
+  checklist: [
+    { step_key:'hoa_info',       step_label:'HOA Organization Settings', completed:true,  sort_order:1 },
+    { step_key:'admin_identity', step_label:'Admin Identity Setup',       completed:true,  sort_order:2 },
+    { step_key:'financial_setup',step_label:'Financial Setup',            completed:false, sort_order:3 },
+    { step_key:'payment_config', step_label:'Payment Configuration',      completed:false, sort_order:4 },
+    { step_key:'documents_upload',step_label:'Initial Documents Upload',  completed:true,  sort_order:5 },
+  ],
+};
+
+function createDemoSupabase() {
+  const TABLES = {
+    profiles:        DEMO_DATA.owners,
+    dues:            DEMO_DATA.dues,
+    payments:        DEMO_DATA.payments,
+    expenses:        DEMO_DATA.expenses,
+    messages:        DEMO_DATA.messages,
+    documents:       DEMO_DATA.documents,
+    setup_checklist: DEMO_DATA.checklist,
+    hoa_settings:    [DEMO_DATA.settings],
+  };
+
+  class Q {
+    constructor(rows) { this._rows = [...(rows||[])]; }
+    select()      { return this; }
+    or()          { return this; }
+    order()       { return this; }
+    limit(n)      { return new Q(this._rows.slice(0,n)); }
+    eq(col, val)  {
+      if (col==='id' && val==='00000000-0000-0000-0000-000000000001') return new Q([DEMO_DATA.settings]);
+      if (col==='role' && val==='owner') return new Q(DEMO_DATA.owners);
+      if (col==='role' && val==='admin') return new Q([{id:'demo-admin',name:'Kevin Admin',role:'admin'}]);
+      if (col==='is_public') return new Q(this._rows.filter(r=>r[col]!==false));
+      return new Q(this._rows.filter(r => String(r[col])===String(val)));
+    }
+    single()  { return Promise.resolve({ data: this._rows[0]||null, error:null }); }
+    insert()  { return Promise.resolve({ error:null }); }
+    update()  { return { eq: ()=>Promise.resolve({error:null}), then:(r)=>r({error:null}) }; }
+    then(resolve) { resolve({ data: this._rows, error:null }); }
+  }
+
+  return {
+    from: (table) => new Q(TABLES[table]||[]),
+    auth: { getSession: async ()=>({data:{session:null},error:null}), signOut: async ()=>({}) },
+    channel: ()=>({ on: ()=>({ subscribe: ()=>({}) }) }),
+    removeChannel: ()=>{},
+    storage: { from: ()=>({ upload: async ()=>({error:null}), getPublicUrl: ()=>({data:{publicUrl:'#'}}) }) },
+  };
+}
+
+function startDemo() {
+  demoMode = true;
+  sb      = createDemoSupabase();
+  user    = { id: 'demo-admin' };
+  profile = DEMO_PROFILE_ADMIN;
+  document.getElementById('demo-banner').classList.remove('hidden');
+  document.getElementById('main-wrap')?.style.setProperty('padding-top','3.5rem');
+  enterDashboard();
+}
+
+function exitDemo() {
+  demoMode = false;
+  sb = null; user = null; profile = null;
+  document.getElementById('demo-banner').classList.add('hidden');
+  document.getElementById('main-wrap')?.style.removeProperty('padding-top');
+  showView('setup');
 }
 
 // ─────────────────────────────────────────────
