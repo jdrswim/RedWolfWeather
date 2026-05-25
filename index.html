@@ -2010,6 +2010,9 @@ function almRender(byDay,el,now,yr,curMo,curDay,src){
   var prevMo=curMo===0?11:curMo-1;
   var depLMAvg=moTemp[prevMo]!=null?moTemp[prevMo]:null,depLM=depLMAvg!=null?depLMAvg-RDU_NTEMP[prevMo]:null;
   var depTMAvg=moTemp[curMo]!=null?moTemp[curMo]:null,depTM=depTMAvg!=null?depTMAvg-RDU_NTEMP[curMo]:null;
+  var rainYd=byDay[ydStr]&&byDay[ydStr].precip!=null?byDay[ydStr].precip:null;
+  var rain7sum=0,rain7ok=false;
+  for(var ri=1;ri<=7;ri++){var riDate=new Date(now);riDate.setDate(riDate.getDate()-ri);var riStr=riDate.toLocaleDateString('en-CA');if(byDay[riStr]&&byDay[riStr].precip!=null){rain7sum+=byDay[riStr].precip;rain7ok=true;}}
   function depCard(title,sub,avg,norm,dep){if(dep===null)return'<div class="alm-big"><div class="alm-big-lbl">'+title+'</div><div class="alm-big-val">--</div><div class="alm-big-sub">No data yet</div></div>';return'<div class="alm-big"><div class="alm-big-lbl">'+title+'</div><div class="alm-big-val">'+avg.toFixed(1)+'°F</div><div class="alm-big-sub">Normal: '+norm.toFixed(1)+'°F · '+sub+'</div>'+dLbl(dep,'°F',0.5)+'</div>';}
   var tMo='',pMo='';
   for(var m3=0;m3<12;m3++){
@@ -2026,6 +2029,8 @@ function almRender(byDay,el,now,yr,curMo,curDay,src){
     '<div class="alm-summary" style="grid-template-columns:repeat(2,1fr);max-width:720px;margin:0 auto 16px">'+
       '<div class="alm-big"><div class="alm-big-lbl">YTD Rainfall</div><div class="alm-big-val">'+ytdP.toFixed(2)+'"</div><div class="alm-big-sub">Normal: '+nP.toFixed(2)+'"</div>'+dLbl(pDiff,'"',0.25)+'</div>'+
       '<div class="alm-big"><div class="alm-big-lbl">YTD Avg Temp</div><div class="alm-big-val">'+ytdAT.toFixed(1)+'F</div><div class="alm-big-sub">Normal: '+nAT.toFixed(1)+'F</div>'+dLbl(tDiff,'F',0.5)+'</div>'+
+      '<div class="alm-big"><div class="alm-big-lbl">Rain Yesterday</div><div class="alm-big-val">'+(rainYd!=null?rainYd.toFixed(2)+'"':'--')+'</div><div class="alm-big-sub">'+ydStr+'</div></div>'+
+      '<div class="alm-big"><div class="alm-big-lbl">Rain Last 7 Days</div><div class="alm-big-val">'+(rain7ok?rain7sum.toFixed(2)+'"':'--')+'</div><div class="alm-big-sub">rolling 7-day total</div></div>'+
     '</div>'+
     '<div class="alm-card" style="margin-top:18px"><h3><span>🌡</span> Temperature Departure from Normal</h3>'+
       '<div class="alm-summary" style="grid-template-columns:repeat(2,1fr)">'+
@@ -2613,7 +2618,6 @@ var PWS_STATIONS=[
   {id:"KNCRALEI761",name:"Red Wolf Farm",loc:"S. Wake County / Garner",own:true},
   {id:"KNCRALEI828",name:"G. Bragg",loc:"Raleigh",own:false},
   {id:"KNCRALEI1276",name:"Vorbeck Residence",loc:"Juniper",own:false},
-  {id:"KNCRALEI1175",name:"Grayson Merrill",loc:"Raleigh",own:false},
   {id:"KNCRALEI668",name:"Jon Wall - near RDU",loc:"Northwest Raleigh",own:false}
 ];
 
@@ -2621,12 +2625,30 @@ function fetchPWS(){
   var el=$("pws-content");
   el.innerHTML='<div class="alm-ld"><div class="tsps-spinner"></div>Loading PWS data...</div>';
   var promises=PWS_STATIONS.map(function(st){
-    return fetch("https://api.weather.com/v2/pws/observations/current?stationId="+st.id+"&format=json&units=e&apiKey="+WU_COMMUNITY_KEY)
-    .then(function(r){if(!r.ok)throw new Error(r.status);return r.json();})
-    .then(function(d){
+    var curFetch=fetch("https://api.weather.com/v2/pws/observations/current?stationId="+st.id+"&format=json&units=e&apiKey="+WU_COMMUNITY_KEY)
+      .then(function(r){if(!r.ok)throw new Error(r.status);return r.json();});
+    var histFetch=fetch("https://api.weather.com/v2/pws/dailysummary/7day?stationId="+st.id+"&format=json&units=e&apiKey="+WU_COMMUNITY_KEY)
+      .then(function(r){if(!r.ok)throw new Error(r.status);return r.json();})
+      .catch(function(){return null;});
+    return Promise.all([curFetch,histFetch])
+    .then(function(res){
+      var d=res[0],hist=res[1];
       var obs=d.observations&&d.observations[0];
       if(!obs)throw new Error("No data");
-      return{id:st.id,name:st.name,loc:st.loc,own:st.own,obs:obs,ok:true};
+      var rain1d=null,rain7d=null;
+      if(hist&&hist.summaries&&hist.summaries.length){
+        var sums=hist.summaries.slice().sort(function(a,b){return a.obsTimeLocal<b.obsTimeLocal?-1:1;});
+        var yd=new Date();yd.setDate(yd.getDate()-1);
+        var ydStr=yd.toLocaleDateString('en-CA');
+        var tot7=0;
+        sums.forEach(function(s){
+          var p=(s.imperial&&s.imperial.precipTotal!=null&&s.imperial.precipTotal>-900)?s.imperial.precipTotal:0;
+          tot7+=p;
+          if(s.obsTimeLocal&&s.obsTimeLocal.startsWith(ydStr))rain1d=p;
+        });
+        rain7d=tot7;
+      }
+      return{id:st.id,name:st.name,loc:st.loc,own:st.own,obs:obs,rain1d:rain1d,rain7d:rain7d,ok:true};
     })
     .catch(function(){return{id:st.id,name:st.name,loc:st.loc,own:st.own,ok:false};});
   });
@@ -2662,6 +2684,8 @@ function fetchPWS(){
       var uvi=o.uv!=null?o.uv:"--";
       var solar=o.solarRadiation!=null?Math.round(o.solarRadiation):"--";
       var obsTime=o.obsTimeLocal?new Date(o.obsTimeLocal).toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit"}):"--";
+      var r1d=st.rain1d!=null?Number(st.rain1d).toFixed(2):"--";
+      var r7d=st.rain7d!=null?Number(st.rain7d).toFixed(2):"--";
       html+='<div class="pws-station'+(isOwn?" own":"")+'">'+
         '<div class="pws-top">'+
           '<div>'+
@@ -2680,7 +2704,9 @@ function fetchPWS(){
           '<div class="pws-stat"><div class="pws-stat-lbl">Wind</div><div class="pws-stat-val">'+wspd+'</div><div class="pws-stat-unit">'+wdir+' mph</div></div>'+
           '<div class="pws-stat"><div class="pws-stat-lbl">Gusts</div><div class="pws-stat-val">'+wgust+'</div><div class="pws-stat-unit">mph</div></div>'+
           '<div class="pws-stat"><div class="pws-stat-lbl">Pressure</div><div class="pws-stat-val">'+pres+'</div><div class="pws-stat-unit">inHg</div></div>'+
-          '<div class="pws-stat"><div class="pws-stat-lbl">Precip</div><div class="pws-stat-val">'+precip+'"</div><div class="pws-stat-unit">today</div></div>'+
+          '<div class="pws-stat"><div class="pws-stat-lbl">Precip Today</div><div class="pws-stat-val">'+precip+'"</div></div>'+
+          '<div class="pws-stat"><div class="pws-stat-lbl">Rain Yesterday</div><div class="pws-stat-val">'+r1d+'"</div></div>'+
+          '<div class="pws-stat"><div class="pws-stat-lbl">Rain 7 Days</div><div class="pws-stat-val">'+r7d+'"</div></div>'+
           '<div class="pws-stat"><div class="pws-stat-lbl">UV Index</div><div class="pws-stat-val">'+uvi+'</div></div>'+
           '<div class="pws-stat"><div class="pws-stat-lbl">Solar Rad</div><div class="pws-stat-val">'+solar+'</div><div class="pws-stat-unit">W/m²</div></div>'+
           '<div class="pws-stat"><div class="pws-stat-lbl">Temp</div><div class="pws-stat-val">'+temp+'F</div></div>'+
