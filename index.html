@@ -2627,11 +2627,29 @@ function fetchPWS(){
   var promises=PWS_STATIONS.map(function(st){
     var curFetch=fetch("https://api.weather.com/v2/pws/observations/current?stationId="+st.id+"&format=json&units=e&apiKey="+WU_COMMUNITY_KEY)
       .then(function(r){if(!r.ok)throw new Error(r.status);return r.json();});
-    return curFetch
-    .then(function(d){
+    var histFetch=st.own?Promise.resolve(null):
+      fetch("https://api.weather.com/v2/pws/dailysummary/7day?stationId="+st.id+"&format=json&units=e&apiKey="+WU_COMMUNITY_KEY)
+        .then(function(r){if(!r.ok)throw new Error(r.status);return r.json();})
+        .catch(function(){return null;});
+    return Promise.all([curFetch,histFetch])
+    .then(function(res){
+      var d=res[0],hist=res[1];
       var obs=d.observations&&d.observations[0];
       if(!obs)throw new Error("No data");
-      return{id:st.id,name:st.name,loc:st.loc,own:st.own,obs:obs,ok:true};
+      var rain1d=null,rain7d=null;
+      if(hist&&hist.summaries&&hist.summaries.length){
+        var sums=hist.summaries.slice().sort(function(a,b){return a.obsTimeLocal<b.obsTimeLocal?-1:1;});
+        var yd=new Date();yd.setDate(yd.getDate()-1);
+        var ydStr=yd.toLocaleDateString('en-CA');
+        var tot7=0;
+        sums.forEach(function(s){
+          var p=(s.imperial&&s.imperial.precipTotal!=null&&s.imperial.precipTotal>-900)?s.imperial.precipTotal:0;
+          tot7+=p;
+          if(s.obsTimeLocal&&s.obsTimeLocal.startsWith(ydStr))rain1d=p;
+        });
+        rain7d=tot7;
+      }
+      return{id:st.id,name:st.name,loc:st.loc,own:st.own,obs:obs,rain1d:rain1d,rain7d:rain7d,ok:true};
     })
     .catch(function(){return{id:st.id,name:st.name,loc:st.loc,own:st.own,ok:false};});
   });
@@ -2666,6 +2684,8 @@ function fetchPWS(){
       var uvi=o.uv!=null?o.uv:"--";
       var solar=o.solarRadiation!=null?Math.round(o.solarRadiation):"--";
       var obsTime=o.obsTimeLocal?new Date(o.obsTimeLocal).toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit"}):"--";
+      var r1d=!isOwn&&st.rain1d!=null?Number(st.rain1d).toFixed(2):"--";
+      var r7d=!isOwn&&st.rain7d!=null?Number(st.rain7d).toFixed(2):"--";
       html+='<div class="pws-station'+(isOwn?" own":"")+'">'+
         '<div class="pws-top">'+
           '<div>'+
@@ -2684,6 +2704,9 @@ function fetchPWS(){
           '<div class="pws-stat"><div class="pws-stat-lbl">Wind</div><div class="pws-stat-val">'+wspd+'</div><div class="pws-stat-unit">'+wdir+' mph</div></div>'+
           '<div class="pws-stat"><div class="pws-stat-lbl">Gusts</div><div class="pws-stat-val">'+wgust+'</div><div class="pws-stat-unit">mph</div></div>'+
           '<div class="pws-stat"><div class="pws-stat-lbl">Pressure</div><div class="pws-stat-val">'+pres+'</div><div class="pws-stat-unit">inHg</div></div>'+
+          (!isOwn?'<div class="pws-stat"><div class="pws-stat-lbl">Precip Today</div><div class="pws-stat-val">'+(imp.precipTotal!=null?Number(imp.precipTotal).toFixed(2)+'"':'--')+'</div></div>':'')+
+          (!isOwn?'<div class="pws-stat"><div class="pws-stat-lbl">Rain Yesterday</div><div class="pws-stat-val">'+r1d+'"</div></div>':'')+
+          (!isOwn?'<div class="pws-stat"><div class="pws-stat-lbl">Rain 7 Days</div><div class="pws-stat-val">'+r7d+'"</div></div>':'')+
           '<div class="pws-stat"><div class="pws-stat-lbl">UV Index</div><div class="pws-stat-val">'+uvi+'</div></div>'+
           '<div class="pws-stat"><div class="pws-stat-lbl">Solar Rad</div><div class="pws-stat-val">'+solar+'</div><div class="pws-stat-unit">W/m²</div></div>'+
           '<div class="pws-stat"><div class="pws-stat-lbl">Temp</div><div class="pws-stat-val">'+temp+'F</div></div>'+
