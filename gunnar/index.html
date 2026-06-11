@@ -308,8 +308,7 @@ table.swims .delta.up{color:var(--red2)}
   <div class="identity">
     <div class="eyebrow">Season Logbook · 2025–26</div>
     <div class="name-line">
-      <h1 class="athlete" id="athleteName" contenteditable="true" spellcheck="false" aria-label="Swimmer name, tap to edit"></h1>
-      <span class="edit-hint">tap name to edit</span>
+      <h1 class="athlete" id="athleteName">Gunnar Roney</h1>
     </div>
     <div class="sub" id="heroSub">
       <span>Raleigh, North Carolina</span><span class="dot"></span>
@@ -351,8 +350,7 @@ table.swims .delta.up{color:var(--red2)}
     <div class="prompts" id="prompts"></div>
     <textarea class="note" id="journal" placeholder="Start typing… your goals, your wins, your why."></textarea>
     <div class="saverow">
-      <button class="btn btn-red" id="saveJournal">Save notes</button>
-      <span class="saved" id="journalSaved">Saved</span>
+      <span class="saved" id="journalSaved">✓ Saved</span>
     </div>
     <p class="quote">"You don't have to be the best in the pool. You have to be better than you were yesterday."</p>
   </div>
@@ -362,7 +360,7 @@ table.swims .delta.up{color:var(--red2)}
   <div class="fbrand">RSA Wahoos · Est. 1960</div>
   <div style="margin-top:8px">Personal swim logbook for a <b>Raleigh Swimming Association</b> athlete.</div>
   <div style="margin-top:4px">Standards: USA Swimming 2024–2028 Motivational Times · 11-12 Boys · SCY &amp; LCM.</div>
-  <div style="margin-top:4px;color:#3c5468">Goals and notes save on this device.</div>
+  <div style="margin-top:4px;color:#3c5468">All changes save automatically.</div>
 </footer>
 
 <!-- ===== MODAL ===== -->
@@ -513,10 +511,7 @@ function renderHero(){
   document.getElementById("evCount").textContent = EVENTS.length;
 
   // name
-  const nameEl=document.getElementById("athleteName");
-  nameEl.textContent = Store.get("rsa.name") || "";
-  nameEl.addEventListener("blur",()=>{ Store.set("rsa.name", nameEl.textContent.trim()); refreshFooterName(); });
-  nameEl.addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); nameEl.blur(); }});
+  // Name is permanent — no editing needed
 
   // stats
   const totalDrop = EVENTS.reduce((s,ev)=>s+dropSec(ev),0);
@@ -767,8 +762,7 @@ function openModal(id){
         <h4>${icon("note")} Notes for this event</h4>
         <textarea class="note" id="evNote" placeholder="Splits, technique cues, how the race felt, what to fix next time…">${esc(Store.get(noteKey)||"")}</textarea>
         <div class="saverow">
-          <button class="btn btn-red" id="saveEvNote">Save note</button>
-          <span class="saved" id="evNoteSaved">Saved</span>
+          <span class="saved" id="evNoteSaved">✓ Saved</span>
         </div>
       </div>
     </div>`;
@@ -795,8 +789,7 @@ function openModal(id){
   // event note
   const en=modal.querySelector("#evNote");
   const enSaved=modal.querySelector("#evNoteSaved");
-  modal.querySelector("#saveEvNote").addEventListener("click",()=>{ Store.set(noteKey, en.value); flash(enSaved); });
-  en.addEventListener("input",()=>{ Store.set(noteKey, en.value); });
+  en.addEventListener("input",()=>{ Store.set(noteKey, en.value); flash(enSaved); });
 
   modal.querySelector("#closeX").addEventListener("click",closeModal);
   const scrim=document.getElementById("scrim");
@@ -845,8 +838,7 @@ function renderJournal(){
   const ta=document.getElementById("journal");
   ta.value=Store.get("rsa.journal")||"";
   const saved=document.getElementById("journalSaved");
-  document.getElementById("saveJournal").addEventListener("click",()=>{ Store.set("rsa.journal", ta.value); flash(saved); });
-  ta.addEventListener("input",()=>{ Store.set("rsa.journal", ta.value); });
+  ta.addEventListener("input",()=>{ Store.set("rsa.journal", ta.value); flash(saved); });
   const prompts=["My goal for this summer","What went well at my last meet","One thing to fix in practice","A swimmer I look up to","My pre-race routine"];
   document.getElementById("prompts").innerHTML=prompts.map(p=>`<button class="prompt" type="button">${esc(p)}</button>`).join("");
   document.querySelectorAll(".prompt").forEach(btn=>btn.addEventListener("click",()=>{
