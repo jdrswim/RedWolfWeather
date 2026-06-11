@@ -1568,10 +1568,17 @@ const GHSync = (function(){
       const r2=await fetch(`${API}/repos/${REPO}/contents/${FILE}`,{
         method:"PUT",headers:{"Authorization":"token "+token,"Content-Type":"application/json"},body:JSON.stringify(body)
       });
-      if(!r2.ok) throw new Error("HTTP "+r2.status+" (after SHA retry)");
+      if(!r2.ok){ const t=await r2.text().catch(()=>""); throw new Error("HTTP "+r2.status+(t?": "+JSON.parse(t).message:"")+" (after SHA retry)"); }
       const j2=await r2.json(); _sha=j2.content.sha;
     } else {
-      if(!r.ok) throw new Error("HTTP "+r.status);
+      if(!r.ok){
+        const t=await r.text().catch(()=>"");
+        let msg="HTTP "+r.status;
+        try{ msg+=" — "+JSON.parse(t).message; }catch(e){}
+        if(r.status===403) msg+=" (token needs full 'repo' scope — not just 'public_repo')";
+        if(r.status===401) msg+=" (token invalid or expired)";
+        throw new Error(msg);
+      }
       const j=await r.json(); _sha=j.content.sha;
     }
   }
@@ -1585,7 +1592,7 @@ const GHSync = (function(){
       setLocalTs(ts);
       setBtn("ok","Saved ✓");
       setTimeout(()=>setBtn("connected","☁ Synced"),2000);
-    }catch(e){ console.error("GHSync push:",e); setBtn("err","Sync error"); }
+    }catch(e){ console.error("GHSync push:",e); setBtn("err","⚠ "+e.message.slice(0,40)); }
   }
 
   function schedulePush(){
@@ -1636,8 +1643,8 @@ const GHSync = (function(){
           <div style="font-family:var(--display);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mist2);margin-bottom:10px">One-time setup (do this once)</div>
           <ol style="color:var(--mist);font-size:13px;line-height:2;padding-left:20px;margin:0">
             <li>Go to <b style="color:var(--foam)">github.com</b> → Settings → Developer settings</li>
-            <li>Personal access tokens → Tokens (classic) → <b style="color:var(--foam)">Generate new token</b></li>
-            <li>Give it a name (e.g. "Swim Tracker"), check the <b style="color:var(--aqua)">repo</b> scope</li>
+            <li>Personal access tokens → Tokens (classic) → <b style="color:var(--foam)">Generate new token (classic)</b></li>
+            <li>Give it a name (e.g. "Swim Tracker"), check <b style="color:var(--aqua)">repo</b> (the top-level checkbox — <em>not</em> just public_repo)</li>
             <li>Click Generate, then copy the <code style="background:var(--panel2);padding:1px 5px;border-radius:4px">ghp_...</code> token</li>
             <li>Paste it below and click <b style="color:var(--foam)">Connect</b></li>
           </ol>
