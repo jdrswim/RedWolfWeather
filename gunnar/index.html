@@ -449,6 +449,11 @@ textarea.paste{min-height:120px;font-family:ui-monospace,Menlo,Consolas,monospac
 </div>
 
 
+<!-- ===== EDIT SWIMMER MODAL ===== -->
+<div class="scrim" id="editSwimmerScrim" role="dialog" aria-modal="true">
+  <div class="modal" id="editSwimmerModal" style="max-width:520px"></div>
+</div>
+
 <!-- ===== NEW SWIMMER MODAL ===== -->
 <div class="scrim" id="newSwimmerScrim" role="dialog" aria-modal="true">
   <div class="modal" id="newSwimmerModal" style="max-width:520px"></div>
@@ -565,9 +570,11 @@ function toast(msg){ const t=document.getElementById("toast"); t.innerHTML=msg; 
 
 let scrimFocus=null;
 function openScrim(id){ scrimFocus=document.activeElement; const s=document.getElementById(id); s.classList.add("open"); document.body.style.overflow="hidden"; s.scrollTop=0; }
-function closeScrim(id){ const s=document.getElementById(id); s.classList.remove("open"); const others=["scrim","newSwimmerScrim","addScrim"].filter(i=>i!==id); if(!others.some(i=>document.getElementById(i).classList.contains("open"))) document.body.style.overflow=""; if(scrimFocus&&scrimFocus.focus) scrimFocus.focus(); }
+function closeScrim(id){ const s=document.getElementById(id); s.classList.remove("open"); const others=["scrim","editSwimmerScrim","newSwimmerScrim","addScrim"].filter(i=>i!==id); if(!others.some(i=>document.getElementById(i).classList.contains("open"))) document.body.style.overflow=""; if(scrimFocus&&scrimFocus.focus) scrimFocus.focus(); }
 function wireNewScrims(){
-  ["newSwimmerScrim","addScrim"].forEach(id=>{ const s=document.getElementById(id); if(!s) return; s.addEventListener("click",e=>{ if(e.target===s||(e.target.closest&&e.target.closest("[data-close]"))) closeScrim(id); }); });
+  const NEW_SCRIMS=["editSwimmerScrim","newSwimmerScrim","addScrim"];
+  NEW_SCRIMS.forEach(id=>{ const s=document.getElementById(id); if(!s) return; s.addEventListener("click",e=>{ if(e.target===s||(e.target.closest&&e.target.closest("[data-close]"))) closeScrim(id); }); });
+  document.addEventListener("keydown",e=>{ if(e.key!=="Escape") return; for(const id of ["addScrim","editSwimmerScrim","newSwimmerScrim"]){ const s=document.getElementById(id); if(s&&s.classList.contains("open")){ closeScrim(id); return; } } });
 }
 
 /* swimmer bar */
@@ -583,6 +590,9 @@ function renderSwimmerBar(){
     if(r.photo) out+=`<img src="${r.photo}" alt=""> `;
     out+=esc(r.name||"Swimmer")+"</button>";
   });
+  if(ACTIVE!=="gunnar"){
+    out+=`<button class="mini-btn" id="manageSwimmerBtn" style="padding:6px 12px;gap:5px"><svg viewBox="0 0 24 24" fill="none" width="14" height="14"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor" stroke-width="1.8"/></svg>Manage</button>`;
+  }
   out+=`<button class="sw-add" id="addSwimmerBtn">+ New Swimmer</button>`;
   bar.innerHTML=out;
   bar.querySelectorAll(".sw-chip").forEach(btn=>btn.addEventListener("click",()=>{
@@ -590,6 +600,7 @@ function renderSwimmerBar(){
     if(id===ACTIVE) return;
     ACTIVE=id; renderSwimmerBar(); renderHero(); renderGrid(); renderJournal();
   }));
+  if(ACTIVE!=="gunnar"){ const mb=document.getElementById("manageSwimmerBtn"); if(mb) mb.addEventListener("click",openEditSwimmer); }
   document.getElementById("addSwimmerBtn").addEventListener("click",openNewSwimmer);
 }
 
@@ -661,8 +672,95 @@ function _updateNsPv(){
 }
 document.getElementById("nsPhotoInput").addEventListener("change",e=>{
   const f=e.target.files&&e.target.files[0]; e.target.value=""; if(!f) return;
-  const r=new FileReader(); r.onload=()=>{ nsPhoto=String(r.result||""); _updateNsPv(); }; r.readAsDataURL(f);
+  const r=new FileReader(); r.onload=()=>{ nsPhoto=String(r.result||""); _updateNsPv(); _updateEsPv(); }; r.readAsDataURL(f);
 });
+
+/* edit / manage swimmer modal */
+function openEditSwimmer(){ buildEditSwimmerModal(); openScrim("editSwimmerScrim"); setTimeout(()=>{ const n=document.getElementById("esName"); if(n) n.focus(); },60); }
+function buildEditSwimmerModal(){
+  const id=ACTIVE; const prof=getSProfile(id);
+  nsPhoto=prof.photo||""; nsSex=prof.sex||null;
+  const m=document.getElementById("editSwimmerModal");
+  m.innerHTML=`
+    <div class="m-head">
+      <div class="titles"><div class="m-evt" style="font-size:clamp(22px,3.5vw,32px)">Edit Profile</div>
+        <div class="m-tags"><span class="m-tag">${esc(prof.name||"Swimmer")}</span></div></div>
+      <button class="x" data-close aria-label="Close">&times;</button>
+    </div>
+    <div class="m-body">
+      <div class="setup-photo">
+        <div class="pv" id="esPv">${nsPhoto?`<img src="${nsPhoto}" alt="">`:_photoIcon()}</div>
+        <div>
+          <div class="pa">
+            <button class="mini-btn" type="button" id="esPhotoBtn">${_camIcon()}Upload photo</button>
+            <button class="mini-btn" type="button" id="esPhotoRemove" style="display:${nsPhoto?"inline-flex":"none"}">Remove</button>
+          </div>
+          <div style="font-size:12px;color:var(--mist2)">Saved on this device only.</div>
+        </div>
+      </div>
+      <div class="field"><label for="esName">Swimmer name</label>
+        <input class="input" id="esName" type="text" placeholder="e.g. Olivia Roney" value="${esc(prof.name||"")}" autocomplete="off"></div>
+      <div class="two">
+        <div class="field"><label for="esDob">Birthdate <span style="text-transform:none;letter-spacing:0;color:var(--mist2)">(for standards)</span></label>
+          <input class="input" id="esDob" type="date" max="${todayISO()}" value="${esc(prof.dob||"")}"></div>
+        <div class="field"><label>Competes as</label>
+          <div class="seg" id="esSeg" role="group">
+            <button type="button" data-sex="F" aria-pressed="${prof.sex==="F"?"true":"false"}">Girls</button>
+            <button type="button" data-sex="M" aria-pressed="${prof.sex==="M"?"true":"false"}">Boys</button>
+          </div></div>
+      </div>
+      <div class="saverow" style="justify-content:flex-start;margin-top:4px">
+        <button class="btn btn-red" id="esSave">Save changes</button>
+        <button class="mini-btn" type="button" data-close>Cancel</button>
+      </div>
+      <hr style="border:0;border-top:1px solid var(--line);margin:26px 0 18px">
+      <div style="font-family:var(--display);text-transform:uppercase;letter-spacing:.12em;font-size:11px;color:var(--mist2);margin-bottom:12px">Data</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="mini-btn" type="button" id="esClearSwims" style="color:var(--gold);border-color:color-mix(in srgb,var(--gold) 40%,var(--line2))">Clear all swims</button>
+        <button class="mini-btn" type="button" id="esRemove" style="color:var(--red2);border-color:color-mix(in srgb,var(--red2) 40%,var(--line2))">Remove swimmer</button>
+      </div>
+    </div>`;
+  m.querySelector("#esPhotoBtn").addEventListener("click",()=>document.getElementById("nsPhotoInput").click());
+  m.querySelector("#esPhotoRemove").addEventListener("click",()=>{ nsPhoto=""; _updateEsPv(); });
+  m.querySelectorAll("#esSeg button").forEach(btn=>btn.addEventListener("click",()=>{
+    nsSex=btn.dataset.sex;
+    m.querySelectorAll("#esSeg button").forEach(b=>b.setAttribute("aria-pressed",b===btn?"true":"false"));
+  }));
+  m.querySelector("#esSave").addEventListener("click",()=>{
+    const name=m.querySelector("#esName").value.trim();
+    if(!name){ m.querySelector("#esName").focus(); toast("Enter a name"); return; }
+    const dob=m.querySelector("#esDob").value;
+    const sex=nsSex||prof.sex||"M";
+    const updated={name,dob,sex,photo:nsPhoto};
+    saveSProfile(id,updated);
+    const roster=getRoster(); const ri=roster.findIndex(r=>r.id===id);
+    if(ri>=0){ roster[ri]={id,...updated}; saveRoster(roster); }
+    closeScrim("editSwimmerScrim");
+    renderSwimmerBar(); renderHero(); toast("<b>"+esc(name)+"</b>'s profile updated");
+  });
+  m.querySelector("#esClearSwims").addEventListener("click",()=>{
+    const p=getSProfile(id);
+    if(!confirm("Clear all logged swims for "+(p.name||"this swimmer")+"? This cannot be undone.")) return;
+    saveDSwims(id,[]); Store.set("rsa."+id+".seq","0");
+    closeScrim("editSwimmerScrim");
+    renderGrid(); renderHero(); toast("All swims cleared");
+  });
+  m.querySelector("#esRemove").addEventListener("click",()=>{
+    const p=getSProfile(id);
+    if(!confirm("Remove "+(p.name||"this swimmer")+" and all their data? This cannot be undone.")) return;
+    Store.keys().filter(k=>k&&k.startsWith("rsa."+id+".")).forEach(k=>Store.remove(k));
+    const newRoster=getRoster().filter(r=>r.id!==id); saveRoster(newRoster);
+    ACTIVE="gunnar";
+    closeScrim("editSwimmerScrim");
+    renderSwimmerBar(); renderHero(); renderGrid(); renderJournal();
+    toast("Swimmer removed");
+  });
+}
+function _updateEsPv(){
+  const pv=document.getElementById("esPv"); if(!pv) return;
+  pv.innerHTML=nsPhoto?`<img src="${nsPhoto}" alt="">`:_photoIcon();
+  const rm=document.getElementById("esPhotoRemove"); if(rm) rm.style.display=nsPhoto?"inline-flex":"none";
+}
 
 /* add-times modal */
 function openAddTimes(){ if(ACTIVE==="gunnar") return; buildAddTimesModal(); openScrim("addScrim"); setTimeout(()=>{ const s=document.getElementById("qaEvent"); if(s) s.focus(); },60); }
