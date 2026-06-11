@@ -284,57 +284,69 @@ table.swims .delta.up{color:var(--red2)}
   .card{transition:border-color .2s}
 }
 
-/* ================= SWIMMER BAR ================= */
-.swimmer-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:12px 0 2px}
-.sw-chip{font-family:var(--display);font-weight:600;font-size:13px;letter-spacing:.08em;text-transform:uppercase;
-  color:var(--mist);background:var(--panel);border:1.5px solid var(--line);border-radius:30px;
-  padding:7px 18px;cursor:pointer;transition:.18s;display:inline-flex;align-items:center;gap:8px}
-.sw-chip:hover{color:var(--foam);border-color:var(--line2)}
-.sw-chip.active{background:var(--red);color:#fff;border-color:var(--red)}
-.sw-chip img{width:22px;height:22px;border-radius:50%;object-fit:cover;flex-shrink:0}
-.sw-add{font-family:var(--display);font-weight:600;font-size:13px;letter-spacing:.08em;text-transform:uppercase;
-  color:var(--aqua);background:transparent;border:1.5px dashed var(--aqua-deep);border-radius:30px;
-  padding:7px 18px;cursor:pointer;transition:.18s}
-.sw-add:hover{background:rgba(58,215,222,.10);border-color:var(--aqua)}
-.sw-chip:focus-visible,.sw-add:focus-visible{outline:2px solid var(--aqua);outline-offset:2px}
-/* ================= FORM ELEMENTS ================= */
+/* ================= TEMPLATE ADDITIONS ================= */
+/* ---- photo upload / porthole ---- */
+.porthole .ring{cursor:pointer;transition:transform .2s}
+.porthole .ring:hover{transform:scale(1.02)}
+.porthole .ring:focus-visible{outline:2px solid var(--aqua);outline-offset:4px}
+.porthole .ring.empty{background:conic-gradient(from 200deg,var(--line2),var(--line),var(--line2))}
+.ph-empty{position:relative;width:100%;height:100%;border-radius:50%;overflow:hidden;background:var(--panel);display:grid;place-items:center;color:var(--mist2)}
+.ph-empty svg{width:52%;height:52%;opacity:.55}
+.porthole .cam{position:absolute;right:2px;top:4px;width:32px;height:32px;border-radius:50%;background:var(--red);
+  display:grid;place-items:center;color:#fff;box-shadow:0 5px 14px -5px rgba(191,30,45,.9);pointer-events:none}
+.porthole .cam svg{width:16px;height:16px}
 .hidden-file{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;clip:rect(0 0 0 0)}
+
+.hero-actions{display:flex;gap:10px;align-items:center;margin-top:16px;flex-wrap:wrap}
 .mini-btn{font-family:var(--display);font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:12px;
-  background:var(--panel2);border:1.5px solid var(--line2);border-radius:8px;color:var(--mist);padding:7px 14px;
-  cursor:pointer;transition:.18s;display:inline-flex;align-items:center;gap:6px}
+  background:var(--panel);border:1px solid var(--line2);color:var(--foam);border-radius:30px;padding:9px 16px;cursor:pointer;
+  display:inline-flex;align-items:center;gap:8px;transition:.18s}
 .mini-btn:hover{border-color:var(--aqua);color:#fff}
 .mini-btn svg{width:15px;height:15px}
+.mini-btn.solid{background:var(--red);border-color:var(--red)}
+.mini-btn.solid:hover{background:var(--red2);border-color:var(--red2)}
+.mini-btn:focus-visible{outline:2px solid var(--aqua);outline-offset:2px}
+
+/* ---- forms ---- */
 .field{margin-bottom:16px}
 .field>label{display:block;font-family:var(--display);text-transform:uppercase;letter-spacing:.1em;font-size:11.5px;
-  color:var(--mist2);margin-bottom:7px;font-weight:500}
+  color:var(--mist);margin-bottom:7px;font-weight:500}
 .input{width:100%;background:var(--deep);border:1px solid var(--line2);border-radius:12px;color:var(--foam);
-  font-family:var(--body);font-size:15px;padding:11px 14px}
+  font-family:var(--body);font-size:15px;padding:12px 14px}
 .input:focus{outline:none;border-color:var(--aqua);box-shadow:0 0 0 3px rgba(58,215,222,.16)}
 .input::placeholder{color:var(--mist2)}
-select.input{appearance:none;-webkit-appearance:none;cursor:pointer}
+select.input{appearance:none;-webkit-appearance:none;cursor:pointer;padding-right:38px;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none'><path d='M4 6l4 4 4-4' stroke='%2393B2C6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  background-repeat:no-repeat;background-position:right 13px center}
 input[type=date].input{color-scheme:dark}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 @media(max-width:520px){.two{grid-template-columns:1fr}}
 .seg{display:inline-flex;background:var(--deep);border:1px solid var(--line2);border-radius:12px;padding:4px;gap:4px}
 .seg button{font-family:var(--display);font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:13px;
-  border:0;border-radius:9px;padding:8px 18px;color:var(--mist);background:none;cursor:pointer;transition:.18s}
+  border:0;background:transparent;color:var(--mist);padding:9px 20px;border-radius:9px;cursor:pointer;transition:.16s}
 .seg button[aria-pressed="true"]{background:var(--red);color:#fff}
 .seg button:focus-visible{outline:2px solid var(--aqua);outline-offset:2px}
+
+/* ---- setup photo block ---- */
 .setup-photo{display:flex;align-items:center;gap:16px;margin-bottom:20px}
 .setup-photo .pv{width:88px;height:88px;border-radius:50%;flex:0 0 auto;background:var(--panel);border:1px solid var(--line2);
-  display:grid;place-items:center;overflow:hidden}
-.setup-photo .pv img{width:100%;height:100%;object-fit:cover}
+  object-fit:cover;display:grid;place-items:center;color:var(--mist2);overflow:hidden}
+.setup-photo .pv img{width:100%;height:100%;object-fit:cover;object-position:center 28%}
 .setup-photo .pv svg{width:46%;height:46%;opacity:.5}
 .setup-photo .pa{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+
+/* ---- tabs ---- */
 .tabs{display:flex;gap:0;border-bottom:1px solid var(--line);margin-bottom:20px}
 .tab{font-family:var(--display);font-weight:600;letter-spacing:.05em;text-transform:uppercase;font-size:13px;
-  background:none;border:0;border-bottom:2px solid transparent;padding:10px 20px;color:var(--mist);cursor:pointer;transition:.18s;margin-bottom:-1px}
+  background:none;border:0;color:var(--mist);padding:11px 2px;margin-right:22px;cursor:pointer;border-bottom:2px solid transparent;transition:.16s}
 .tab[aria-selected="true"]{color:var(--foam);border-bottom-color:var(--red)}
 .tab:focus-visible{outline:2px solid var(--aqua);outline-offset:2px}
 .tabpane{display:none}
 .tabpane.active{display:block}
+
+/* ---- dropzone / paste ---- */
 .dropzone{border:1.5px dashed var(--line2);border-radius:14px;padding:26px 18px;text-align:center;color:var(--mist);
-  cursor:pointer;transition:.18s;display:flex;flex-direction:column;align-items:center;gap:10px}
+  background:var(--deep);transition:.16s;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px}
 .dropzone:hover,.dropzone.drag{border-color:var(--aqua);color:var(--foam);background:rgba(58,215,222,.05)}
 .dropzone b{color:var(--aqua)}
 .dropzone svg{width:34px;height:34px;color:var(--aqua);opacity:.85}
@@ -342,29 +354,131 @@ input[type=date].input{color-scheme:dark}
 .csv-help code{background:var(--deep);border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:var(--foam);font-size:12px}
 .linkbtn{background:none;border:0;color:var(--aqua);cursor:pointer;text-decoration:underline;font-size:12.5px;font-family:var(--body);padding:0}
 .linkbtn:hover{color:#fff}
-.qa-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.qa-grid .full{grid-column:1/-1}
-@media(max-width:520px){.qa-grid{grid-template-columns:1fr}}
 textarea.paste{min-height:120px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;line-height:1.6;resize:vertical}
-.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:var(--panel2);
-  border:1px solid var(--line2);border-radius:30px;padding:10px 22px;font-size:14px;font-weight:600;
-  opacity:0;pointer-events:none;z-index:200;transition:.24s;white-space:nowrap;color:var(--foam)}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.toast b{color:var(--green)}
-.empty-state{border:1.5px dashed var(--line2);border-radius:20px;padding:44px 26px;text-align:center}
+
+/* ---- empty state ---- */
+.empty-state{border:1.5px dashed var(--line2);border-radius:20px;padding:44px 26px;text-align:center;
+  background:linear-gradient(180deg,var(--panel),var(--deep2))}
 .empty-state .eico{width:56px;height:56px;margin:0 auto 16px;color:var(--aqua);opacity:.9}
 .empty-state h3{font-family:var(--display);font-weight:600;text-transform:uppercase;letter-spacing:.04em;font-size:23px;margin-bottom:8px}
 .empty-state p{color:var(--mist);font-size:14.5px;max-width:50ch;margin:0 auto 20px}
 .empty-state .row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+
+/* ---- history delete ---- */
+table.swims td.act{text-align:right;width:36px;padding-right:4px}
+.del{background:none;border:0;color:var(--mist2);cursor:pointer;padding:5px;border-radius:7px;transition:.16s;line-height:0}
+.del:hover{color:var(--red2);background:rgba(226,58,72,.12)}
+.del svg{width:15px;height:15px;display:block}
+
+/* ---- data manage ---- */
+.datamanage{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;font-size:12px;margin-top:22px}
+.datamanage button{background:none;border:0;color:var(--mist);cursor:pointer;font-size:12.5px;font-family:var(--body);
+  display:inline-flex;align-items:center;gap:6px;transition:.16s}
+.datamanage button:hover{color:var(--aqua)}
+.datamanage button.danger:hover{color:var(--red2)}
+.datamanage svg{width:14px;height:14px}
+
+/* ---- no-standard note ---- */
+.nostd{background:var(--deep);border:1px dashed var(--line2);border-radius:14px;padding:20px;color:var(--mist);font-size:13.5px;text-align:center;margin-top:18px}
+.nostd b{color:var(--foam)}
+.nostd .mini-btn{margin-top:12px}
+
+/* ---- toast ---- */
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:var(--panel2);
+  border:1px solid var(--line2);color:var(--foam);padding:12px 22px;border-radius:30px;font-size:13.5px;font-weight:500;
+  box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:.25s;z-index:80;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast b{color:var(--green)}
+
+/* quick-add grid */
+.qa-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.qa-grid .full{grid-column:1/-1}
+@media(max-width:520px){.qa-grid{grid-template-columns:1fr}}
+
+/* empty-name placeholder for the editable H1 */
+.athlete:empty:before{content:attr(data-empty);color:var(--mist2);font-weight:600}
+.athlete:focus{outline:none}
+
+/* ================= MULTI-SWIMMER ================= */
+.swbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding-top:24px;margin-bottom:-8px}
+.swpill{display:inline-flex;align-items:center;gap:9px;border-radius:30px;padding:6px 16px 6px 7px;cursor:pointer;
+  font-family:var(--display);font-weight:600;letter-spacing:.05em;text-transform:uppercase;font-size:13px;
+  background:var(--panel);border:1px solid var(--line2);color:var(--foam);transition:.16s;line-height:1}
+.swpill .swav{width:28px;height:28px;border-radius:50%;overflow:hidden;background:var(--deep);display:grid;place-items:center;flex:0 0 auto;color:var(--mist2)}
+.swpill .swav img{width:100%;height:100%;object-fit:cover;object-position:center 28%}
+.swpill .swav svg{width:60%;height:60%;opacity:.6}
+.swpill .swav .ini{font-size:11px;font-weight:700;color:var(--mist);letter-spacing:0}
+.swpill .swname{max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.swpill:hover{border-color:var(--aqua);color:#fff}
+.swpill:focus-visible{outline:2px solid var(--aqua);outline-offset:2px}
+.swpill.active{background:var(--red);border-color:var(--red);color:#fff}
+.swpill.active .swav{background:rgba(0,0,0,.28);color:#fff}
+.swpill.active .swav .ini{color:#fff}
+.swpill.new{border-style:dashed;border-color:var(--line2);color:var(--aqua);padding:8px 17px}
+.swpill.new:hover{background:rgba(58,215,222,.06);border-color:var(--aqua)}
+.swpill.new svg{width:15px;height:15px}
+@media(max-width:520px){ .swpill .swname{max-width:110px} }
+
+/* manage footer inside Edit Profile modal */
+.manage-foot{margin-top:22px;padding-top:18px;border-top:1px solid var(--line)}
+.manage-foot-label{display:block;font-family:var(--display);text-transform:uppercase;letter-spacing:.12em;font-size:11px;color:var(--mist2);margin-bottom:11px}
+.manage-foot-row{display:flex;gap:10px;flex-wrap:wrap}
+.mini-btn.danger-btn{border-color:rgba(226,58,72,.5);color:#f2a4ab}
+.mini-btn.danger-btn:hover{background:rgba(226,58,72,.12);border-color:var(--red2);color:#fff}
+
+/* ================= MOBILE POLISH ================= */
+@media(max-width:600px){
+  .wrap{padding:0 15px}
+  /* swimmer bar becomes a tidy swipeable row */
+  .swbar{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-top:16px;gap:8px}
+  .swbar::-webkit-scrollbar{display:none}
+  .swpill{flex:0 0 auto}
+  .hero{padding:16px 0 6px}
+  .hero-top{flex-direction:column;align-items:stretch;gap:16px}
+  .brand{gap:12px}
+  .brand img{height:58px}
+  .porthole{align-self:center;margin-top:2px}
+  .porthole .ring{width:96px;height:96px}
+  .porthole .badge{font-size:10px;padding:3px 11px;bottom:-11px;letter-spacing:.07em}
+  .porthole .cam{width:28px;height:28px;top:2px;right:0}
+  .porthole .cam svg{width:14px;height:14px}
+  .identity{margin:18px 0 4px}
+  .athlete{font-size:clamp(36px,12.5vw,60px)}
+  .eyebrow{letter-spacing:.2em;font-size:11px}
+  .sub{font-size:13.5px;gap:8px;margin-top:8px}
+  .hero-actions{margin-top:14px;gap:8px}
+  .hero-actions .btn{flex:1 1 auto;justify-content:center;min-height:44px}
+  .stats{gap:10px;margin-top:18px}
+  .stat{padding:13px 13px 11px;border-radius:13px}
+  .stat .num{font-size:clamp(22px,7vw,30px)}
+  .stat .lab{font-size:10.5px;letter-spacing:.07em}
+  .spotlight{padding:13px 15px;gap:9px;border-radius:14px}
+  .spotlight .big{font-size:clamp(17px,5vw,22px)}
+  .section{padding:24px 0 4px}
+  .section-head{margin-bottom:14px}
+  .grid{grid-template-columns:1fr;gap:12px}
+  .chip{padding:7px 13px;font-size:12px}
+  .datamanage{gap:14px 16px;margin-top:18px}
+  .datamanage button{min-height:34px}
+  /* 16px inputs so iOS doesn't zoom when focusing a field */
+  .input,.paste,select.input,textarea.input{font-size:16px}
+  .mini-btn{min-height:40px}
+}
+@media(max-width:380px){
+  .athlete{font-size:33px}
+  .stat .num{font-size:21px}
+  .brand img{height:54px}
+  .porthole .ring{width:78px;height:78px}
+}
+
 </style>
 </head>
 <body>
 <div class="water-bg"></div>
 <div class="caustics" aria-hidden="true"></div>
 
-
-<!-- ===== SWIMMER BAR ===== -->
-<nav class="swimmer-bar wrap" id="swimmerBar" aria-label="Switch swimmer"></nav>
+<!-- ===== SWIMMER SWITCHER ===== -->
+<nav class="swbar wrap" id="swimmerBar" aria-label="Switch swimmer"></nav>
 
 <!-- ===== HERO ===== -->
 <header class="hero wrap">
@@ -377,26 +491,35 @@ textarea.paste{min-height:120px;font-family:ui-monospace,Menlo,Consolas,monospac
       </div>
     </div>
     <div class="porthole">
-      <div class="ring"><img id="portholeImg" src="gunnar.webp" alt="Portrait of the swimmer"></div>
-      <span class="badge" id="ageBadge">11 · 11-12 Boys</span>
+      <div class="ring empty" id="portholeRing" role="button" tabindex="0" aria-label="Add or change your photo">
+        <div class="ph-empty" id="phInner">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.7"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        </div>
+        <div class="cam"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 8.5A1.5 1.5 0 014.5 7h2L8 5h8l1.5 2h2A1.5 1.5 0 0121 8.5v9A1.5 1.5 0 0119.5 19h-15A1.5 1.5 0 013 17.5z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="12.5" r="3" stroke="currentColor" stroke-width="1.7"/></svg></div>
+      </div>
+      <span class="badge" id="ageBadge">Add birthdate</span>
     </div>
   </div>
 
   <div class="identity">
     <div class="eyebrow">Season Logbook · 2025–26</div>
     <div class="name-line">
-      <h1 class="athlete" id="athleteName">Gunnar Roney</h1>
+      <h1 class="athlete" id="athleteName" contenteditable="true" spellcheck="false" aria-label="Swimmer name, tap to edit" data-empty="Your Name"></h1>
     </div>
     <div class="sub" id="heroSub">
       <span>Raleigh, North Carolina</span><span class="dot"></span>
       <span><b id="evCount">0</b> events tracked</span><span class="dot"></span>
-      <span>Short course &amp; long course</span>
+      <span id="courseSub">Short course &amp; long course</span>
+    </div>
+    <div class="hero-actions">
+      <button class="mini-btn" id="btnSetup" type="button"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span id="btnSetupLabel">Set up profile</span></button>
+      <button class="mini-btn solid" id="btnAddTop" type="button"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>Add times</button>
     </div>
   </div>
 
   <div class="stats" id="statStrip"></div>
 
-  <div class="spotlight" id="spotlight"></div>
+  <div class="spotlight" id="spotlight" style="display:none"></div>
 </header>
 
 <hr class="rope wrap" style="margin-top:30px">
@@ -408,16 +531,34 @@ textarea.paste{min-height:120px;font-family:ui-monospace,Menlo,Consolas,monospac
       <h2 class="section-title">Events <span class="n">tap to dive in</span></h2>
       <p class="section-sub">Every personal best, race-by-race progression, your goal, and the USA Swimming cuts you're chasing.</p>
     </div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-      <div class="filters" id="filters" role="group" aria-label="Filter events by course">
-        <button class="chip" data-f="all" aria-pressed="true">All</button>
-        <button class="chip" data-f="SCY" aria-pressed="false">Yards (SCY)</button>
-        <button class="chip" data-f="LCM" aria-pressed="false">Meters (LCM)</button>
-      </div>
-      <button class="sw-add" id="addTimesBtn" style="display:none" onclick="openAddTimes()">+ Add Times</button>
+    <div class="filters" id="filters" role="group" aria-label="Filter events by course">
+      <button class="chip" data-f="all" aria-pressed="true">All</button>
+      <button class="chip" data-f="SCY" aria-pressed="false">Yards (SCY)</button>
+      <button class="chip" data-f="LCM" aria-pressed="false">Meters (LCM)</button>
     </div>
   </div>
   <div class="grid" id="eventGrid"></div>
+
+  <!-- empty state -->
+  <div class="empty-state" id="emptyState">
+    <div class="eico"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 12c2.5-3 4.5-3 7 0s4.5 3 7 0M3 17c2.5-3 4.5-3 7 0s4.5 3 7 0M3 7c2.5-3 4.5-3 7 0s4.5 3 7 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+    <h3>Let's build your logbook</h3>
+    <p>Add your best times event by event, or paste a whole season at once. Set your birthdate and gender first so we can show the right USA Swimming standards for your age group.</p>
+    <div class="row">
+      <button class="mini-btn" id="emptySetup" type="button"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Set up profile</button>
+      <button class="mini-btn solid" id="emptyAdd" type="button"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>Add your times</button>
+      <button class="mini-btn" id="emptyLoad" type="button"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 13V4m0 0L8.5 7.5M12 4l3.5 3.5M5 16v2a2 2 0 002 2h10a2 2 0 002-2v-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Load a saved file</button>
+    </div>
+  </div>
+
+  <div class="datamanage" id="dataManage" style="display:none">
+    <button id="manageAdd" type="button"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Add more times</button>
+    <button id="manageProfile" type="button"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8" r="3.4" stroke="currentColor" stroke-width="1.8"/><path d="M5 20c0-3.6 3-6 7-6s7 2.4 7 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Edit profile</button>
+    <button id="manageSave" type="button"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 4v9m0 0l-3.5-3.5M12 13l3.5-3.5M5 16v2a2 2 0 002 2h10a2 2 0 002-2v-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Save profile &amp; times</button>
+    <button id="manageLoad" type="button"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 13V4m0 0L8.5 7.5M12 4l3.5 3.5M5 16v2a2 2 0 002 2h10a2 2 0 002-2v-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Load saved file</button>
+    <button id="manageExport" type="button"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 4h11l3 3v13H5zM8 4v5h7" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>Export CSV</button>
+    <button id="manageClear" type="button" class="danger"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 7h14M9 7V5h6v2M7 7l1 13h8l1-13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Remove this swimmer</button>
+  </div>
 </main>
 
 <hr class="rope wrap" style="margin:36px auto 0">
@@ -430,7 +571,8 @@ textarea.paste{min-height:120px;font-family:ui-monospace,Menlo,Consolas,monospac
     <div class="prompts" id="prompts"></div>
     <textarea class="note" id="journal" placeholder="Start typing… your goals, your wins, your why."></textarea>
     <div class="saverow">
-      <span class="saved" id="journalSaved">✓ Saved</span>
+      <button class="btn btn-red" id="saveJournal">Save notes</button>
+      <span class="saved" id="journalSaved">Saved</span>
     </div>
     <p class="quote">"You don't have to be the best in the pool. You have to be better than you were yesterday."</p>
   </div>
@@ -439,33 +581,27 @@ textarea.paste{min-height:120px;font-family:ui-monospace,Menlo,Consolas,monospac
 <footer>
   <div class="fbrand">RSA Wahoos · Est. 1960</div>
   <div style="margin-top:8px">Personal swim logbook for a <b>Raleigh Swimming Association</b> athlete.</div>
-  <div style="margin-top:4px">Standards: USA Swimming 2024–2028 Motivational Times · 11-12 Boys · SCY &amp; LCM.</div>
-  <div style="margin-top:4px;color:#3c5468">All changes save automatically.</div>
+  <div style="margin-top:4px">Standards: USA Swimming 2024–2028 Motivational Times · shown for your age group &amp; gender · SCY &amp; LCM.</div>
+  <div style="margin-top:4px;color:#3c5468">Your photo, times and notes save on this device only.</div>
 </footer>
 
-<!-- ===== MODAL ===== -->
+<!-- ===== EVENT MODAL ===== -->
 <div class="scrim" id="scrim" role="dialog" aria-modal="true" aria-labelledby="m-evt">
   <div class="modal" id="modal"></div>
 </div>
 
-
-<!-- ===== EDIT SWIMMER MODAL ===== -->
-<div class="scrim" id="editSwimmerScrim" role="dialog" aria-modal="true">
-  <div class="modal" id="editSwimmerModal" style="max-width:520px"></div>
-</div>
-
-<!-- ===== NEW SWIMMER MODAL ===== -->
-<div class="scrim" id="newSwimmerScrim" role="dialog" aria-modal="true">
-  <div class="modal" id="newSwimmerModal" style="max-width:520px"></div>
+<!-- ===== SETUP MODAL ===== -->
+<div class="scrim" id="setupScrim" role="dialog" aria-modal="true" aria-labelledby="setupTitle">
+  <div class="modal" id="setupModal" style="max-width:560px"></div>
 </div>
 
 <!-- ===== ADD TIMES MODAL ===== -->
-<div class="scrim" id="addScrim" role="dialog" aria-modal="true">
+<div class="scrim" id="addScrim" role="dialog" aria-modal="true" aria-labelledby="addTitle">
   <div class="modal" id="addModal" style="max-width:640px"></div>
 </div>
 
-<input type="file" id="nsPhotoInput" class="hidden-file" accept="image/*" aria-hidden="true">
-<input type="file" id="csvFileInput" class="hidden-file" accept=".csv,.txt,text/csv,text/plain" aria-hidden="true">
+<input type="file" id="photoInput" class="hidden-file" accept="image/*" aria-hidden="true">
+<input type="file" id="backupFile" class="hidden-file" accept=".json,application/json" aria-hidden="true">
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -484,63 +620,472 @@ const Store = (function(){
   };
 })();
 
-/* ---------------- athlete ---------------- */
-const ATHLETE = { dob:"2014-11-05" };
-
-let ACTIVE = (function(){
-  const a=Store.get("rsa.active")||"gunnar";
-  if(a==="gunnar") return "gunnar";
-  try{ const r=JSON.parse(Store.get("rsa.roster")||"[]"); return r.some(x=>x.id===a)?a:"gunnar"; }catch(e){ return "gunnar"; }
-})();
-function activeKey(sub){ return ACTIVE==="gunnar" ? "rsa."+sub : "rsa."+ACTIVE+"."+sub; }
-function getActiveProfile(){
-  if(ACTIVE==="gunnar") return {name:"Gunnar Roney",dob:"2014-11-05",sex:"M",photo:"gunnar.webp"};
-  return getSProfile(ACTIVE)||{};
-}
-function getActiveEvents(){ return ACTIVE==="gunnar" ? EVENTS : buildDynamicEvents(ACTIVE); }
-
+/* ---------------- USA Swimming standards (adaptive by sex + age group) ---------------- */
 const STD = {"M":{"10U":{"50fr-scy":{"AAAA":"27.49","AAA":"28.69","AA":"29.89","A":"31.09","BB":"34.59","B":"38.19"},"100fr-scy":{"AAAA":"1:00.69","AAA":"1:03.79","AA":"1:06.79","A":"1:09.79","BB":"1:18.89","B":"1:27.99"},"200fr-scy":{"AAAA":"2:12.69","AAA":"2:18.99","AA":"2:25.29","A":"2:31.59","BB":"2:50.59","B":"3:09.49"},"500fr-scy":{"AAAA":"5:52.99","AAA":"6:09.79","AA":"6:26.59","A":"6:43.39","BB":"7:33.79","B":"8:24.29"},"50bk-scy":{"AAAA":"32.19","AAA":"33.99","AA":"35.79","A":"37.59","BB":"42.89","B":"48.29"},"100bk-scy":{"AAAA":"1:08.99","AAA":"1:12.49","AA":"1:16.09","A":"1:19.59","BB":"1:30.09","B":"1:40.69"},"50br-scy":{"AAAA":"36.39","AAA":"38.29","AA":"40.19","A":"42.09","BB":"47.69","B":"53.39"},"100br-scy":{"AAAA":"1:18.79","AAA":"1:22.69","AA":"1:26.59","A":"1:30.59","BB":"1:42.29","B":"1:54.09"},"50fl-scy":{"AAAA":"30.79","AAA":"32.59","AA":"34.29","A":"35.99","BB":"41.29","B":"46.49"},"100fl-scy":{"AAAA":"1:09.79","AAA":"1:14.59","AA":"1:19.49","A":"1:24.39","BB":"1:38.99","B":"1:53.49"},"100im-scy":{"AAAA":"1:09.79","AAA":"1:13.09","AA":"1:16.39","A":"1:19.69","BB":"1:29.69","B":"1:39.69"},"200im-scy":{"AAAA":"2:30.89","AAA":"2:38.39","AA":"2:45.89","A":"2:53.49","BB":"3:15.99","B":"3:38.59"},"50fr-lcm":{"AAAA":"31.59","AAA":"32.99","AA":"34.39","A":"35.69","BB":"39.79","B":"43.89"},"100fr-lcm":{"AAAA":"1:09.79","AAA":"1:13.19","AA":"1:16.69","A":"1:20.19","BB":"1:30.59","B":"1:40.99"},"200fr-lcm":{"AAAA":"2:31.69","AAA":"2:38.89","AA":"2:46.09","A":"2:53.39","BB":"3:14.99","B":"3:36.69"},"400fr-lcm":{"AAAA":"5:20.79","AAA":"5:36.09","AA":"5:51.39","A":"6:06.59","BB":"6:52.49","B":"7:38.29"},"50bk-lcm":{"AAAA":"36.99","AAA":"38.99","AA":"41.09","A":"43.09","BB":"49.29","B":"55.39"},"100bk-lcm":{"AAAA":"1:19.99","AAA":"1:24.09","AA":"1:28.19","A":"1:32.29","BB":"1:44.49","B":"1:56.69"},"50br-lcm":{"AAAA":"41.49","AAA":"43.59","AA":"45.79","A":"47.89","BB":"54.39","B":"1:00.89"},"100br-lcm":{"AAAA":"1:31.69","AAA":"1:36.29","AA":"1:40.89","A":"1:45.49","BB":"1:59.19","B":"2:12.89"},"50fl-lcm":{"AAAA":"34.69","AAA":"36.59","AA":"38.59","A":"40.59","BB":"46.39","B":"52.29"},"100fl-lcm":{"AAAA":"1:19.59","AAA":"1:25.09","AA":"1:30.69","A":"1:36.19","BB":"1:52.89","B":"2:09.49"},"200im-lcm":{"AAAA":"2:52.19","AAA":"3:00.79","AA":"3:09.39","A":"3:17.89","BB":"3:43.69","B":"4:09.49"}},"11-12":{"50fr-scy":{"AAAA":"24.59","AAA":"25.79","AA":"26.99","A":"28.09","BB":"30.49","B":"32.79"},"100fr-scy":{"AAAA":"53.59","AAA":"56.19","AA":"58.69","A":"1:01.29","BB":"1:06.39","B":"1:11.49"},"200fr-scy":{"AAAA":"1:56.99","AAA":"2:02.59","AA":"2:08.19","A":"2:13.69","BB":"2:24.89","B":"2:35.99"},"500fr-scy":{"AAAA":"5:14.99","AAA":"5:29.99","AA":"5:44.99","A":"5:59.99","BB":"6:29.99","B":"6:59.89"},"50bk-scy":{"AAAA":"28.19","AAA":"29.69","AA":"31.19","A":"32.69","BB":"35.59","B":"38.49"},"100bk-scy":{"AAAA":"59.49","AAA":"1:02.79","AA":"1:05.99","A":"1:09.29","BB":"1:15.69","B":"1:22.19"},"200bk-scy":{"AAAA":"2:09.69","AAA":"2:15.89","AA":"2:21.99","A":"2:28.19","BB":"2:40.49","B":"2:52.89"},"50br-scy":{"AAAA":"31.49","AAA":"33.29","AA":"34.99","A":"36.69","BB":"40.09","B":"43.49"},"100br-scy":{"AAAA":"1:07.79","AAA":"1:11.39","AA":"1:14.89","A":"1:18.39","BB":"1:25.49","B":"1:32.59"},"200br-scy":{"AAAA":"2:27.29","AAA":"2:34.39","AA":"2:41.39","A":"2:48.39","BB":"3:02.39","B":"3:16.39"},"50fl-scy":{"AAAA":"26.69","AAA":"28.19","AA":"29.69","A":"31.19","BB":"34.19","B":"37.09"},"100fl-scy":{"AAAA":"59.09","AAA":"1:02.49","AA":"1:05.89","A":"1:09.29","BB":"1:16.09","B":"1:22.89"},"200fl-scy":{"AAAA":"2:12.39","AAA":"2:18.69","AA":"2:24.99","A":"2:31.39","BB":"2:43.99","B":"2:56.59"},"100im-scy":{"AAAA":"1:01.09","AAA":"1:03.99","AA":"1:06.99","A":"1:09.99","BB":"1:15.89","B":"1:21.89"},"200im-scy":{"AAAA":"2:12.09","AAA":"2:18.79","AA":"2:25.59","A":"2:32.29","BB":"2:45.79","B":"2:59.29"},"400im-scy":{"AAAA":"4:42.79","AAA":"4:56.29","AA":"5:09.79","A":"5:23.19","BB":"5:50.09","B":"6:17.09"},"50fr-lcm":{"AAAA":"28.09","AAA":"29.39","AA":"30.69","A":"32.09","BB":"34.79","B":"37.39"},"100fr-lcm":{"AAAA":"1:01.59","AAA":"1:04.49","AA":"1:07.49","A":"1:10.39","BB":"1:16.19","B":"1:22.09"},"200fr-lcm":{"AAAA":"2:14.39","AAA":"2:20.79","AA":"2:27.19","A":"2:33.59","BB":"2:46.39","B":"2:59.19"},"400fr-lcm":{"AAAA":"4:45.89","AAA":"4:59.49","AA":"5:13.09","A":"5:26.69","BB":"5:53.89","B":"6:21.09"},"50bk-lcm":{"AAAA":"32.59","AAA":"34.29","AA":"35.99","A":"37.69","BB":"41.09","B":"44.49"},"100bk-lcm":{"AAAA":"1:10.39","AAA":"1:14.29","AA":"1:18.09","A":"1:21.89","BB":"1:29.59","B":"1:37.19"},"200bk-lcm":{"AAAA":"2:32.19","AAA":"2:39.49","AA":"2:46.69","A":"2:53.99","BB":"3:08.49","B":"3:22.99"},"50br-lcm":{"AAAA":"36.09","AAA":"38.09","AA":"39.99","A":"41.99","BB":"45.89","B":"49.79"},"100br-lcm":{"AAAA":"1:18.99","AAA":"1:23.09","AA":"1:27.19","A":"1:31.29","BB":"1:39.59","B":"1:47.79"},"200br-lcm":{"AAAA":"2:50.99","AAA":"2:59.09","AA":"3:07.19","A":"3:15.39","BB":"3:31.59","B":"3:47.89"},"50fl-lcm":{"AAAA":"30.29","AAA":"31.99","AA":"33.59","A":"35.29","BB":"38.69","B":"41.99"},"100fl-lcm":{"AAAA":"1:07.79","AAA":"1:11.69","AA":"1:15.59","A":"1:19.49","BB":"1:27.29","B":"1:35.09"},"200fl-lcm":{"AAAA":"2:33.59","AAA":"2:40.89","AA":"2:48.29","A":"2:55.59","BB":"3:10.19","B":"3:24.79"},"200im-lcm":{"AAAA":"2:30.59","AAA":"2:38.29","AA":"2:45.99","A":"2:53.69","BB":"3:08.99","B":"3:24.39"},"400im-lcm":{"AAAA":"5:28.39","AAA":"5:44.09","AA":"5:59.69","A":"6:15.39","BB":"6:46.59","B":"7:17.89"}},"13-14":{"50fr-scy":{"AAAA":"22.39","AAA":"23.49","AA":"24.59","A":"25.59","BB":"27.69","B":"29.89"},"100fr-scy":{"AAAA":"48.69","AAA":"51.09","AA":"53.39","A":"55.69","BB":"1:00.29","B":"1:04.99"},"200fr-scy":{"AAAA":"1:46.89","AAA":"1:51.99","AA":"1:57.09","A":"2:02.19","BB":"2:12.29","B":"2:22.49"},"500fr-scy":{"AAAA":"4:49.29","AAA":"5:03.09","AA":"5:16.89","A":"5:30.59","BB":"5:58.19","B":"6:25.69"},"1000fr-scy":{"AAAA":"9:58.49","AAA":"10:26.99","AA":"10:55.49","A":"11:23.99","BB":"12:20.99","B":"13:17.99"},"50bk-scy":{"AAAA":"25.29","AAA":"26.49","AA":"27.69","A":"28.89","BB":"31.29","B":"33.69"},"100bk-scy":{"AAAA":"53.49","AAA":"55.99","AA":"58.59","A":"1:01.09","BB":"1:06.19","B":"1:11.29"},"200bk-scy":{"AAAA":"1:55.99","AAA":"2:01.59","AA":"2:07.09","A":"2:12.59","BB":"2:23.69","B":"2:34.69"},"50br-scy":{"AAAA":"28.89","AAA":"30.29","AA":"31.69","A":"33.09","BB":"35.79","B":"38.59"},"100br-scy":{"AAAA":"1:00.39","AAA":"1:03.29","AA":"1:06.19","A":"1:08.99","BB":"1:14.79","B":"1:20.49"},"200br-scy":{"AAAA":"2:11.19","AAA":"2:17.39","AA":"2:23.59","A":"2:29.89","BB":"2:42.39","B":"2:54.89"},"50fl-scy":{"AAAA":"24.89","AAA":"26.09","AA":"27.19","A":"28.39","BB":"30.79","B":"33.19"},"100fl-scy":{"AAAA":"52.89","AAA":"55.39","AA":"57.89","A":"1:00.39","BB":"1:05.49","B":"1:10.49"},"200fl-scy":{"AAAA":"1:57.59","AAA":"2:03.19","AA":"2:08.79","A":"2:14.39","BB":"2:25.59","B":"2:36.79"},"200im-scy":{"AAAA":"1:58.49","AAA":"2:04.09","AA":"2:09.79","A":"2:15.39","BB":"2:26.69","B":"2:37.99"},"400im-scy":{"AAAA":"4:13.29","AAA":"4:25.39","AA":"4:37.39","A":"4:49.49","BB":"5:13.59","B":"5:37.69"},"50fr-lcm":{"AAAA":"25.69","AAA":"26.89","AA":"28.19","A":"29.39","BB":"31.79","B":"34.29"},"100fr-lcm":{"AAAA":"56.39","AAA":"58.99","AA":"1:01.69","A":"1:04.39","BB":"1:09.79","B":"1:15.09"},"200fr-lcm":{"AAAA":"2:02.99","AAA":"2:08.89","AA":"2:14.69","A":"2:20.59","BB":"2:32.29","B":"2:43.99"},"400fr-lcm":{"AAAA":"4:21.29","AAA":"4:33.79","AA":"4:46.19","A":"4:58.69","BB":"5:23.49","B":"5:48.39"},"800fr-lcm":{"AAAA":"9:00.49","AAA":"9:26.19","AA":"9:51.99","A":"10:17.69","BB":"11:09.19","B":"12:00.59"},"50bk-lcm":{"AAAA":"29.69","AAA":"31.09","AA":"32.49","A":"33.89","BB":"36.69","B":"39.49"},"100bk-lcm":{"AAAA":"1:02.79","AAA":"1:05.79","AA":"1:08.69","A":"1:11.69","BB":"1:17.69","B":"1:23.69"},"200bk-lcm":{"AAAA":"2:16.29","AAA":"2:22.79","AA":"2:29.29","A":"2:35.79","BB":"2:48.79","B":"3:01.79"},"50br-lcm":{"AAAA":"32.99","AAA":"34.59","AA":"36.19","A":"37.69","BB":"40.89","B":"43.99"},"100br-lcm":{"AAAA":"1:10.29","AAA":"1:13.69","AA":"1:16.99","A":"1:20.39","BB":"1:27.09","B":"1:33.79"},"200br-lcm":{"AAAA":"2:32.09","AAA":"2:39.39","AA":"2:46.59","A":"2:53.79","BB":"3:08.29","B":"3:22.79"},"50fl-lcm":{"AAAA":"27.99","AAA":"29.29","AA":"30.59","A":"31.89","BB":"34.59","B":"37.29"},"100fl-lcm":{"AAAA":"1:00.29","AAA":"1:03.09","AA":"1:05.99","A":"1:08.89","BB":"1:14.59","B":"1:20.29"},"200fl-lcm":{"AAAA":"2:14.79","AAA":"2:21.19","AA":"2:27.59","A":"2:33.99","BB":"2:46.79","B":"2:59.69"},"200im-lcm":{"AAAA":"2:17.19","AAA":"2:23.69","AA":"2:30.19","A":"2:36.69","BB":"2:49.79","B":"3:02.89"},"400im-lcm":{"AAAA":"4:52.99","AAA":"5:06.99","AA":"5:20.89","A":"5:34.89","BB":"6:02.79","B":"6:30.69"}},"15-16":{"50fr-scy":{"AAAA":"21.19","AAA":"22.19","AA":"23.19","A":"24.19","BB":"26.29","B":"28.29"},"100fr-scy":{"AAAA":"46.49","AAA":"48.79","AA":"50.99","A":"53.19","BB":"57.59","B":"1:01.99"},"200fr-scy":{"AAAA":"1:41.99","AAA":"1:46.89","AA":"1:51.79","A":"1:56.59","BB":"2:06.29","B":"2:15.99"},"500fr-scy":{"AAAA":"4:36.29","AAA":"4:49.49","AA":"5:02.69","A":"5:15.79","BB":"5:42.09","B":"6:08.39"},"1000fr-scy":{"AAAA":"9:38.89","AAA":"10:06.39","AA":"10:33.99","A":"11:01.59","BB":"11:56.69","B":"12:51.79"},"50bk-scy":{"AAAA":"23.79","AAA":"24.99","AA":"26.09","A":"27.19","BB":"29.49","B":"31.79"},"100bk-scy":{"AAAA":"50.69","AAA":"53.09","AA":"55.49","A":"57.89","BB":"1:02.69","B":"1:07.49"},"200bk-scy":{"AAAA":"1:50.69","AAA":"1:55.99","AA":"2:01.29","A":"2:06.59","BB":"2:17.09","B":"2:27.59"},"50br-scy":{"AAAA":"27.49","AAA":"28.79","AA":"30.09","A":"31.39","BB":"34.09","B":"36.69"},"100br-scy":{"AAAA":"57.69","AAA":"1:00.39","AA":"1:03.19","A":"1:05.89","BB":"1:11.39","B":"1:16.89"},"200br-scy":{"AAAA":"2:05.29","AAA":"2:11.29","AA":"2:17.29","A":"2:23.19","BB":"2:35.19","B":"2:47.09"},"50fl-scy":{"AAAA":"23.69","AAA":"24.79","AA":"25.89","A":"27.09","BB":"29.29","B":"31.59"},"100fl-scy":{"AAAA":"50.39","AAA":"52.79","AA":"55.19","A":"57.59","BB":"1:02.39","B":"1:07.19"},"200fl-scy":{"AAAA":"1:52.69","AAA":"1:58.09","AA":"2:03.39","A":"2:08.79","BB":"2:19.49","B":"2:30.19"},"200im-scy":{"AAAA":"1:53.19","AAA":"1:58.59","AA":"2:03.99","A":"2:09.39","BB":"2:20.19","B":"2:30.89"},"400im-scy":{"AAAA":"4:01.59","AAA":"4:13.19","AA":"4:24.69","A":"4:36.19","BB":"4:59.19","B":"5:22.19"},"50fr-lcm":{"AAAA":"24.69","AAA":"25.89","AA":"26.99","A":"28.19","BB":"30.59","B":"32.89"},"100fr-lcm":{"AAAA":"53.79","AAA":"56.39","AA":"58.99","A":"1:01.49","BB":"1:06.69","B":"1:11.79"},"200fr-lcm":{"AAAA":"1:57.49","AAA":"2:03.09","AA":"2:08.69","A":"2:14.29","BB":"2:25.39","B":"2:36.59"},"400fr-lcm":{"AAAA":"4:10.59","AAA":"4:22.49","AA":"4:34.39","A":"4:46.39","BB":"5:10.19","B":"5:34.09"},"800fr-lcm":{"AAAA":"8:40.49","AAA":"9:05.29","AA":"9:29.99","A":"9:54.79","BB":"10:44.39","B":"11:33.99"},"50bk-lcm":{"AAAA":"28.39","AAA":"29.69","AA":"31.09","A":"32.39","BB":"35.09","B":"37.79"},"100bk-lcm":{"AAAA":"59.49","AAA":"1:02.39","AA":"1:05.19","A":"1:07.99","BB":"1:13.69","B":"1:19.39"},"200bk-lcm":{"AAAA":"2:09.19","AAA":"2:15.39","AA":"2:21.49","A":"2:27.69","BB":"2:39.99","B":"2:52.29"},"50br-lcm":{"AAAA":"31.29","AAA":"32.79","AA":"34.29","A":"35.79","BB":"38.79","B":"41.79"},"100br-lcm":{"AAAA":"1:07.09","AAA":"1:10.29","AA":"1:13.49","A":"1:16.69","BB":"1:23.09","B":"1:29.49"},"200br-lcm":{"AAAA":"2:25.89","AAA":"2:32.79","AA":"2:39.79","A":"2:46.69","BB":"3:00.59","B":"3:14.49"},"50fl-lcm":{"AAAA":"26.79","AAA":"27.99","AA":"29.29","A":"30.59","BB":"33.09","B":"35.69"},"100fl-lcm":{"AAAA":"57.59","AAA":"1:00.29","AA":"1:03.09","A":"1:05.79","BB":"1:11.29","B":"1:16.79"},"200fl-lcm":{"AAAA":"2:08.79","AAA":"2:14.89","AA":"2:21.09","A":"2:27.19","BB":"2:39.49","B":"2:51.69"},"200im-lcm":{"AAAA":"2:12.09","AAA":"2:18.39","AA":"2:24.69","A":"2:30.99","BB":"2:43.59","B":"2:56.19"},"400im-lcm":{"AAAA":"4:41.09","AAA":"4:54.39","AA":"5:07.79","A":"5:21.19","BB":"5:47.99","B":"6:14.69"}},"17-18":{"50fr-scy":{"AAAA":"20.69","AAA":"21.69","AA":"22.59","A":"23.59","BB":"25.59","B":"27.59"},"100fr-scy":{"AAAA":"45.29","AAA":"47.39","AA":"49.59","A":"51.69","BB":"55.99","B":"1:00.29"},"200fr-scy":{"AAAA":"1:40.19","AAA":"1:44.99","AA":"1:49.69","A":"1:54.49","BB":"2:03.99","B":"2:13.59"},"500fr-scy":{"AAAA":"4:32.39","AAA":"4:45.39","AA":"4:58.39","A":"5:11.39","BB":"5:37.29","B":"6:03.19"},"1000fr-scy":{"AAAA":"9:30.19","AAA":"9:57.29","AA":"10:24.49","A":"10:51.59","BB":"11:45.89","B":"12:40.19"},"50bk-scy":{"AAAA":"23.09","AAA":"24.19","AA":"25.29","A":"26.39","BB":"28.59","B":"30.79"},"100bk-scy":{"AAAA":"48.89","AAA":"51.29","AA":"53.59","A":"55.89","BB":"1:00.59","B":"1:05.19"},"200bk-scy":{"AAAA":"1:47.89","AAA":"1:53.09","AA":"1:58.19","A":"2:03.29","BB":"2:13.59","B":"2:23.89"},"50br-scy":{"AAAA":"26.59","AAA":"27.89","AA":"29.09","A":"30.39","BB":"32.89","B":"35.39"},"100br-scy":{"AAAA":"55.99","AAA":"58.69","AA":"1:01.39","A":"1:03.99","BB":"1:09.39","B":"1:14.69"},"200br-scy":{"AAAA":"2:01.69","AAA":"2:07.49","AA":"2:13.29","A":"2:19.09","BB":"2:30.69","B":"2:42.29"},"50fl-scy":{"AAAA":"22.99","AAA":"23.99","AA":"25.09","A":"26.19","BB":"28.39","B":"30.59"},"100fl-scy":{"AAAA":"49.09","AAA":"51.39","AA":"53.69","A":"56.09","BB":"1:00.79","B":"1:05.39"},"200fl-scy":{"AAAA":"1:49.79","AAA":"1:55.09","AA":"2:00.29","A":"2:05.49","BB":"2:15.99","B":"2:26.39"},"200im-scy":{"AAAA":"1:50.59","AAA":"1:55.89","AA":"2:01.09","A":"2:06.39","BB":"2:16.89","B":"2:27.39"},"400im-scy":{"AAAA":"3:57.99","AAA":"4:09.39","AA":"4:20.69","A":"4:31.99","BB":"4:54.69","B":"5:17.39"},"50fr-lcm":{"AAAA":"23.99","AAA":"25.09","AA":"26.19","A":"27.39","BB":"29.59","B":"31.89"},"100fr-lcm":{"AAAA":"52.39","AAA":"54.89","AA":"57.39","A":"59.89","BB":"1:04.89","B":"1:09.89"},"200fr-lcm":{"AAAA":"1:54.69","AAA":"2:00.09","AA":"2:05.59","A":"2:11.09","BB":"2:21.99","B":"2:32.89"},"400fr-lcm":{"AAAA":"4:04.89","AAA":"4:16.49","AA":"4:28.19","A":"4:39.79","BB":"5:03.09","B":"5:26.49"},"800fr-lcm":{"AAAA":"8:28.49","AAA":"8:52.69","AA":"9:16.89","A":"9:41.09","BB":"10:29.49","B":"11:17.89"},"50bk-lcm":{"AAAA":"27.59","AAA":"28.99","AA":"30.29","A":"31.59","BB":"34.19","B":"36.79"},"100bk-lcm":{"AAAA":"58.19","AAA":"1:00.89","AA":"1:03.69","A":"1:06.49","BB":"1:11.99","B":"1:17.49"},"200bk-lcm":{"AAAA":"2:06.89","AAA":"2:12.89","AA":"2:18.99","A":"2:24.99","BB":"2:37.09","B":"2:49.19"},"50br-lcm":{"AAAA":"30.29","AAA":"31.69","AA":"33.09","A":"34.59","BB":"37.49","B":"40.29"},"100br-lcm":{"AAAA":"1:05.09","AAA":"1:08.19","AA":"1:11.29","A":"1:14.39","BB":"1:20.59","B":"1:26.69"},"200br-lcm":{"AAAA":"2:21.89","AAA":"2:28.59","AA":"2:35.39","A":"2:42.19","BB":"2:55.69","B":"3:09.19"},"50fl-lcm":{"AAAA":"25.99","AAA":"27.19","AA":"28.39","A":"29.69","BB":"32.09","B":"34.59"},"100fl-lcm":{"AAAA":"55.99","AAA":"58.69","AA":"1:01.29","A":"1:03.99","BB":"1:09.29","B":"1:14.59"},"200fl-lcm":{"AAAA":"2:05.29","AAA":"2:11.29","AA":"2:17.19","A":"2:23.19","BB":"2:35.09","B":"2:46.99"},"200im-lcm":{"AAAA":"2:08.99","AAA":"2:15.09","AA":"2:21.19","A":"2:27.39","BB":"2:39.59","B":"2:51.89"},"400im-lcm":{"AAAA":"4:35.69","AAA":"4:48.79","AA":"5:01.89","A":"5:15.09","BB":"5:41.29","B":"6:07.59"}}},"F":{"10U":{"50fr-scy":{"B":"39.79","BB":"35.99","A":"32.09","AA":"30.89","AAA":"29.59","AAAA":"28.29"},"100fr-scy":{"B":"1:30.79","BB":"1:21.09","A":"1:11.49","AA":"1:08.29","AAA":"1:04.99","AAAA":"1:01.79"},"200fr-scy":{"B":"3:22.79","BB":"3:00.59","A":"2:38.39","AA":"2:30.99","AAA":"2:23.59","AAAA":"2:16.19"},"500fr-scy":{"B":"8:36.69","BB":"7:45.09","A":"6:53.39","AA":"6:36.19","AAA":"6:18.99","AAAA":"6:01.69"},"50bk-scy":{"B":"48.59","BB":"43.29","A":"37.99","AA":"36.19","AAA":"34.39","AAAA":"32.59"},"100bk-scy":{"B":"1:45.79","BB":"1:33.99","A":"1:22.29","AA":"1:18.39","AAA":"1:14.49","AAAA":"1:10.59"},"50br-scy":{"B":"54.59","BB":"48.69","A":"42.79","AA":"40.89","AAA":"38.89","AAAA":"36.89"},"100br-scy":{"B":"2:00.29","BB":"1:46.89","A":"1:33.59","AA":"1:29.09","AAA":"1:24.69","AAAA":"1:20.19"},"50fl-scy":{"B":"48.39","BB":"42.69","A":"36.99","AA":"35.09","AAA":"33.19","AAAA":"31.29"},"100fl-scy":{"B":"1:56.69","BB":"1:41.39","A":"1:26.09","AA":"1:20.99","AAA":"1:15.99","AAAA":"1:10.89"},"100im-scy":{"B":"1:44.29","BB":"1:33.19","A":"1:22.09","AA":"1:18.39","AAA":"1:14.69","AAAA":"1:10.99"},"200im-scy":{"B":"3:42.09","BB":"3:18.79","A":"2:55.49","AA":"2:47.69","AAA":"2:39.99","AAAA":"2:32.19"},"50fr-lcm":{"B":"45.29","BB":"40.89","A":"36.59","AA":"35.09","AAA":"33.69","AAAA":"32.19"},"100fr-lcm":{"B":"1:44.09","BB":"1:32.99","A":"1:21.89","AA":"1:18.19","AAA":"1:14.49","AAAA":"1:10.79"},"200fr-lcm":{"B":"3:50.99","BB":"3:25.69","A":"3:00.39","AA":"2:51.99","AAA":"2:43.49","AAAA":"2:35.09"},"400fr-lcm":{"B":"7:48.59","BB":"7:01.69","A":"6:14.89","AA":"5:59.29","AAA":"5:43.69","AAAA":"5:27.99"},"50bk-lcm":{"B":"55.79","BB":"49.69","A":"43.59","AA":"41.59","AAA":"39.49","AAAA":"37.49"},"100bk-lcm":{"B":"2:01.59","BB":"1:48.09","A":"1:34.59","AA":"1:30.09","AAA":"1:25.59","AAAA":"1:21.09"},"50br-lcm":{"B":"1:02.19","BB":"55.49","A":"48.79","AA":"46.49","AAA":"44.29","AAAA":"42.09"},"100br-lcm":{"B":"2:19.39","BB":"2:03.89","A":"1:48.39","AA":"1:43.29","AAA":"1:38.09","AAAA":"1:32.99"},"50fl-lcm":{"B":"54.49","BB":"48.09","A":"41.59","AA":"39.49","AAA":"37.29","AAAA":"35.19"},"100fl-lcm":{"B":"2:12.79","BB":"1:55.39","A":"1:37.99","AA":"1:32.19","AAA":"1:26.39","AAAA":"1:20.59"},"200im-lcm":{"B":"4:15.69","BB":"3:48.89","A":"3:22.09","AA":"3:13.09","AAA":"3:04.19","AAAA":"2:55.29"}},"11-12":{"50fr-scy":{"B":"33.99","BB":"31.69","A":"29.29","AA":"28.09","AAA":"26.99","AAAA":"25.79"},"100fr-scy":{"B":"1:14.69","BB":"1:09.39","A":"1:03.99","AA":"1:01.39","AAA":"58.69","AAAA":"55.99"},"200fr-scy":{"B":"2:42.59","BB":"2:30.89","A":"2:19.29","AA":"2:13.49","AAA":"2:07.69","AAAA":"2:01.89"},"500fr-scy":{"B":"7:16.89","BB":"6:45.69","A":"6:14.49","AA":"5:58.89","AAA":"5:43.29","AAAA":"5:27.69"},"50bk-scy":{"B":"38.79","BB":"35.99","A":"33.19","AA":"31.79","AAA":"30.49","AAAA":"29.09"},"100bk-scy":{"B":"1:26.59","BB":"1:19.79","A":"1:12.99","AA":"1:09.59","AAA":"1:06.19","AAAA":"1:02.69"},"200bk-scy":{"B":"2:59.49","BB":"2:46.69","A":"2:33.89","AA":"2:27.49","AAA":"2:20.99","AAAA":"2:14.59"},"50br-scy":{"B":"43.99","BB":"40.89","A":"37.69","AA":"36.19","AAA":"34.59","AAAA":"32.99"},"100br-scy":{"B":"1:36.49","BB":"1:29.29","A":"1:22.19","AA":"1:18.59","AAA":"1:15.09","AAAA":"1:11.49"},"200br-scy":{"B":"3:25.69","BB":"3:10.99","A":"2:56.29","AA":"2:48.99","AAA":"2:41.69","AAAA":"2:34.29"},"50fl-scy":{"B":"36.89","BB":"34.29","A":"31.59","AA":"30.29","AAA":"28.99","AAAA":"27.69"},"100fl-scy":{"B":"1:25.79","BB":"1:18.89","A":"1:12.09","AA":"1:08.59","AAA":"1:05.19","AAAA":"1:01.79"},"200fl-scy":{"B":"3:03.39","BB":"2:50.29","A":"2:37.19","AA":"2:30.59","AAA":"2:24.09","AAAA":"2:17.59"},"100im-scy":{"B":"1:25.19","BB":"1:19.09","A":"1:13.09","AA":"1:09.99","AAA":"1:06.99","AAAA":"1:03.89"},"200im-scy":{"B":"3:03.89","BB":"2:50.69","A":"2:37.59","AA":"2:30.99","AAA":"2:24.49","AAAA":"2:17.89"},"400im-scy":{"B":"6:31.69","BB":"6:03.69","A":"5:35.79","AA":"5:21.79","AAA":"5:07.79","AAAA":"4:53.79"},"50fr-lcm":{"B":"38.49","BB":"35.89","A":"33.19","AA":"31.89","AAA":"30.49","AAAA":"29.19"},"100fr-lcm":{"B":"1:25.59","BB":"1:19.49","A":"1:13.39","AA":"1:10.29","AAA":"1:07.19","AAAA":"1:04.19"},"200fr-lcm":{"B":"3:06.39","BB":"2:53.09","A":"2:39.79","AA":"2:33.09","AAA":"2:26.49","AAAA":"2:19.79"},"400fr-lcm":{"B":"6:32.89","BB":"6:04.79","A":"5:36.79","AA":"5:22.79","AAA":"5:08.69","AAAA":"4:54.69"},"50bk-lcm":{"B":"44.79","BB":"41.59","A":"38.39","AA":"36.79","AAA":"35.19","AAAA":"33.59"},"100bk-lcm":{"B":"1:40.59","BB":"1:32.69","A":"1:24.79","AA":"1:20.79","AAA":"1:16.89","AAAA":"1:12.89"},"200bk-lcm":{"B":"3:28.09","BB":"3:13.29","A":"2:58.39","AA":"2:50.99","AAA":"2:43.49","AAAA":"2:36.09"},"50br-lcm":{"B":"49.79","BB":"46.19","A":"42.69","AA":"40.89","AAA":"39.09","AAAA":"37.39"},"100br-lcm":{"B":"1:50.39","BB":"1:42.19","A":"1:33.99","AA":"1:29.99","AAA":"1:25.89","AAAA":"1:21.79"},"200br-lcm":{"B":"3:56.79","BB":"3:39.89","A":"3:22.99","AA":"3:14.49","AAA":"3:06.09","AAAA":"2:57.59"},"50fl-lcm":{"B":"41.79","BB":"38.79","A":"35.79","AA":"34.29","AAA":"32.89","AAAA":"31.39"},"100fl-lcm":{"B":"1:38.29","BB":"1:30.49","A":"1:22.59","AA":"1:18.69","AAA":"1:14.79","AAAA":"1:10.79"},"200fl-lcm":{"B":"3:31.09","BB":"3:15.99","A":"3:00.89","AA":"2:53.39","AAA":"2:45.89","AAAA":"2:38.29"},"200im-lcm":{"B":"3:30.59","BB":"3:15.59","A":"3:00.59","AA":"2:52.99","AAA":"2:45.49","AAAA":"2:37.99"},"400im-lcm":{"B":"7:28.89","BB":"6:56.79","A":"6:24.79","AA":"6:08.69","AAA":"5:52.69","AAAA":"5:36.69"}},"13-14":{"50fr-scy":{"B":"32.49","BB":"30.19","A":"27.89","AA":"26.69","AAA":"25.59","AAAA":"24.39"},"100fr-scy":{"B":"1:10.99","BB":"1:05.89","A":"1:00.89","AA":"58.29","AAA":"55.79","AAAA":"53.29"},"200fr-scy":{"B":"2:33.59","BB":"2:22.69","A":"2:11.69","AA":"2:06.19","AAA":"2:00.69","AAAA":"1:55.29"},"500fr-scy":{"B":"6:52.19","BB":"6:22.79","A":"5:53.39","AA":"5:38.59","AAA":"5:23.89","AAAA":"5:09.19"},"1000fr-scy":{"B":"14:11.09","BB":"13:10.29","A":"12:09.49","AA":"11:39.09","AAA":"11:08.69","AAAA":"10:38.29"},"50bk-scy":{"B":"36.19","BB":"33.69","A":"31.09","AA":"29.79","AAA":"28.49","AAAA":"27.19"},"100bk-scy":{"B":"1:16.89","BB":"1:11.39","A":"1:05.89","AA":"1:03.19","AAA":"1:00.49","AAAA":"57.69"},"200bk-scy":{"B":"2:46.39","BB":"2:34.49","A":"2:22.59","AA":"2:16.69","AAA":"2:10.69","AAAA":"2:04.79"},"50br-scy":{"B":"42.09","BB":"39.09","A":"36.09","AA":"34.59","AAA":"33.09","AAAA":"31.59"},"100br-scy":{"B":"1:28.69","BB":"1:22.29","A":"1:15.99","AA":"1:12.89","AAA":"1:09.69","AAAA":"1:06.49"},"200br-scy":{"B":"3:10.99","BB":"2:57.39","A":"2:43.79","AA":"2:36.89","AAA":"2:30.09","AAAA":"2:23.29"},"50fl-scy":{"B":"35.79","BB":"33.29","A":"30.69","AA":"29.39","AAA":"28.19","AAAA":"26.89"},"100fl-scy":{"B":"1:16.79","BB":"1:11.29","A":"1:05.89","AA":"1:03.09","AAA":"1:00.39","AAAA":"57.59"},"200fl-scy":{"B":"2:51.19","BB":"2:38.99","A":"2:26.69","AA":"2:20.59","AAA":"2:14.49","AAAA":"2:08.39"},"200im-scy":{"B":"2:51.79","BB":"2:39.49","A":"2:27.19","AA":"2:21.09","AAA":"2:14.99","AAAA":"2:08.79"},"400im-scy":{"B":"6:05.79","BB":"5:39.69","A":"5:13.49","AA":"5:00.49","AAA":"4:47.39","AAAA":"4:34.29"},"50fr-lcm":{"B":"37.19","BB":"34.59","A":"31.89","AA":"30.59","AAA":"29.29","AAAA":"27.89"},"100fr-lcm":{"B":"1:21.19","BB":"1:15.39","A":"1:09.59","AA":"1:06.69","AAA":"1:03.79","AAAA":"1:00.89"},"200fr-lcm":{"B":"2:55.29","BB":"2:42.79","A":"2:30.29","AA":"2:23.99","AAA":"2:17.79","AAAA":"2:11.49"},"400fr-lcm":{"B":"6:08.09","BB":"5:41.79","A":"5:15.49","AA":"5:02.39","AAA":"4:49.19","AAAA":"4:36.09"},"800fr-lcm":{"B":"12:45.49","BB":"11:50.79","A":"10:56.09","AA":"10:28.79","AAA":"10:01.49","AAAA":"9:34.09"},"50bk-lcm":{"B":"42.59","BB":"39.49","A":"36.49","AA":"34.99","AAA":"33.49","AAAA":"31.89"},"100bk-lcm":{"B":"1:29.69","BB":"1:23.29","A":"1:16.89","AA":"1:13.69","AAA":"1:10.49","AAAA":"1:07.29"},"200bk-lcm":{"B":"3:13.29","BB":"2:59.49","A":"2:45.69","AA":"2:38.79","AAA":"2:31.89","AAAA":"2:24.99"},"50br-lcm":{"B":"47.79","BB":"44.39","A":"40.99","AA":"39.29","AAA":"37.59","AAAA":"35.89"},"100br-lcm":{"B":"1:42.39","BB":"1:34.99","A":"1:27.69","AA":"1:24.09","AAA":"1:20.39","AAAA":"1:16.79"},"200br-lcm":{"B":"3:40.29","BB":"3:24.59","A":"3:08.89","AA":"3:00.99","AAA":"2:53.09","AAAA":"2:45.29"},"50fl-lcm":{"B":"39.99","BB":"37.09","A":"34.29","AA":"32.79","AAA":"31.39","AAAA":"29.99"},"100fl-lcm":{"B":"1:27.19","BB":"1:20.99","A":"1:14.79","AA":"1:11.69","AAA":"1:08.59","AAAA":"1:05.39"},"200fl-lcm":{"B":"3:15.69","BB":"3:01.69","A":"2:47.79","AA":"2:40.79","AAA":"2:33.79","AAAA":"2:26.79"},"200im-lcm":{"B":"3:17.19","BB":"3:03.09","A":"2:48.99","AA":"2:41.99","AAA":"2:34.89","AAAA":"2:27.89"},"400im-lcm":{"B":"6:57.99","BB":"6:28.19","A":"5:58.29","AA":"5:43.39","AAA":"5:28.39","AAAA":"5:13.49"}},"15-16":{"50fr-scy":{"B":"31.79","BB":"29.49","A":"27.29","AA":"26.09","AAA":"24.99","AAAA":"23.89"},"100fr-scy":{"B":"1:08.79","BB":"1:03.79","A":"58.89","AA":"56.49","AAA":"53.99","AAAA":"51.59"},"200fr-scy":{"B":"2:28.99","BB":"2:18.39","A":"2:07.69","AA":"2:02.39","AAA":"1:57.09","AAAA":"1:51.79"},"500fr-scy":{"B":"6:40.99","BB":"6:12.39","A":"5:43.69","AA":"5:29.39","AAA":"5:15.09","AAAA":"5:00.79"},"1000fr-scy":{"B":"13:52.89","BB":"12:53.49","A":"11:53.99","AA":"11:24.19","AAA":"10:54.49","AAAA":"10:24.69"},"50bk-scy":{"B":"35.29","BB":"32.69","A":"30.19","AA":"28.99","AAA":"27.69","AAAA":"26.49"},"100bk-scy":{"B":"1:14.69","BB":"1:09.39","A":"1:04.09","AA":"1:01.39","AAA":"58.69","AAAA":"56.09"},"200bk-scy":{"B":"2:42.19","BB":"2:30.59","A":"2:19.09","AA":"2:13.29","AAA":"2:07.49","AAAA":"2:01.69"},"50br-scy":{"B":"41.09","BB":"38.19","A":"35.19","AA":"33.79","AAA":"32.29","AAAA":"30.79"},"100br-scy":{"B":"1:25.89","BB":"1:19.79","A":"1:13.69","AA":"1:10.59","AAA":"1:07.49","AAAA":"1:04.49"},"200br-scy":{"B":"3:05.99","BB":"2:52.69","A":"2:39.39","AA":"2:32.79","AAA":"2:26.19","AAAA":"2:19.49"},"50fl-scy":{"B":"34.69","BB":"32.29","A":"29.79","AA":"28.59","AAA":"27.29","AAAA":"26.09"},"100fl-scy":{"B":"1:14.39","BB":"1:09.09","A":"1:03.79","AA":"1:01.09","AAA":"58.39","AAAA":"55.79"},"200fl-scy":{"B":"2:45.79","BB":"2:33.99","A":"2:22.09","AA":"2:16.19","AAA":"2:10.29","AAAA":"2:04.39"},"200im-scy":{"B":"2:46.19","BB":"2:34.29","A":"2:22.39","AA":"2:16.49","AAA":"2:10.59","AAAA":"2:04.59"},"400im-scy":{"B":"5:54.99","BB":"5:29.69","A":"5:04.29","AA":"4:51.59","AAA":"4:38.99","AAAA":"4:26.29"},"50fr-lcm":{"B":"36.09","BB":"33.49","A":"30.89","AA":"29.59","AAA":"28.29","AAAA":"27.09"},"100fr-lcm":{"B":"1:18.39","BB":"1:12.79","A":"1:07.19","AA":"1:04.39","AAA":"1:01.59","AAAA":"58.79"},"200fr-lcm":{"B":"2:49.19","BB":"2:37.09","A":"2:25.09","AA":"2:18.99","AAA":"2:12.99","AAAA":"2:06.89"},"400fr-lcm":{"B":"5:55.19","BB":"5:29.89","A":"5:04.49","AA":"4:51.79","AAA":"4:39.09","AAAA":"4:26.39"},"800fr-lcm":{"B":"12:17.79","BB":"11:25.09","A":"10:32.39","AA":"10:05.99","AAA":"9:39.69","AAAA":"9:13.29"},"50bk-lcm":{"B":"41.19","BB":"38.29","A":"35.29","AA":"33.89","AAA":"32.39","AAAA":"30.89"},"100bk-lcm":{"B":"1:26.89","BB":"1:20.69","A":"1:14.49","AA":"1:11.39","AAA":"1:08.29","AAAA":"1:05.19"},"200bk-lcm":{"B":"3:06.79","BB":"2:53.39","A":"2:40.09","AA":"2:33.39","AAA":"2:26.79","AAAA":"2:20.09"},"50br-lcm":{"B":"46.19","BB":"42.89","A":"39.59","AA":"37.89","AAA":"36.29","AAAA":"34.59"},"100br-lcm":{"B":"1:38.59","BB":"1:31.59","A":"1:24.49","AA":"1:20.99","AAA":"1:17.49","AAAA":"1:13.99"},"200br-lcm":{"B":"3:32.49","BB":"3:17.29","A":"3:02.09","AA":"2:54.49","AAA":"2:46.99","AAAA":"2:39.39"},"50fl-lcm":{"B":"38.99","BB":"36.19","A":"33.49","AA":"32.09","AAA":"30.69","AAAA":"29.29"},"100fl-lcm":{"B":"1:24.29","BB":"1:18.29","A":"1:12.29","AA":"1:09.29","AAA":"1:06.29","AAAA":"1:03.29"},"200fl-lcm":{"B":"3:07.79","BB":"2:54.39","A":"2:40.99","AA":"2:34.29","AAA":"2:27.59","AAAA":"2:20.89"},"200im-lcm":{"B":"3:11.19","BB":"2:57.49","A":"2:43.89","AA":"2:36.99","AAA":"2:30.19","AAAA":"2:23.39"},"400im-lcm":{"B":"6:44.69","BB":"6:15.79","A":"5:46.89","AA":"5:32.49","AAA":"5:17.99","AAAA":"5:03.59"}},"17-18":{"50fr-scy":{"B":"31.39","BB":"29.09","A":"26.89","AA":"25.79","AAA":"24.69","AAAA":"23.49"},"100fr-scy":{"B":"1:08.09","BB":"1:03.19","A":"58.39","AA":"55.89","AAA":"53.49","AAAA":"51.09"},"200fr-scy":{"B":"2:27.19","BB":"2:16.69","A":"2:06.19","AA":"2:00.89","AAA":"1:55.69","AAAA":"1:50.39"},"500fr-scy":{"B":"6:36.49","BB":"6:08.19","A":"5:39.89","AA":"5:25.69","AAA":"5:11.59","AAAA":"4:57.39"},"1000fr-scy":{"B":"13:46.09","BB":"12:47.09","A":"11:48.09","AA":"11:18.59","AAA":"10:49.09","AAAA":"10:19.59"},"50bk-scy":{"B":"34.59","BB":"32.19","A":"29.69","AA":"28.39","AAA":"27.19","AAAA":"25.99"},"100bk-scy":{"B":"1:13.39","BB":"1:08.09","A":"1:02.89","AA":"1:00.29","AAA":"57.69","AAAA":"54.99"},"200bk-scy":{"B":"2:38.79","BB":"2:27.39","A":"2:16.09","AA":"2:10.39","AAA":"2:04.79","AAAA":"1:59.09"},"50br-scy":{"B":"40.39","BB":"37.49","A":"34.59","AA":"33.19","AAA":"31.69","AAAA":"30.29"},"100br-scy":{"B":"1:24.79","BB":"1:18.79","A":"1:12.69","AA":"1:09.69","AAA":"1:06.69","AAAA":"1:03.59"},"200br-scy":{"B":"3:04.69","BB":"2:51.49","A":"2:38.29","AA":"2:31.69","AAA":"2:25.09","AAAA":"2:18.49"},"50fl-scy":{"B":"34.49","BB":"31.99","A":"29.59","AA":"28.29","AAA":"27.09","AAAA":"25.89"},"100fl-scy":{"B":"1:13.59","BB":"1:08.29","A":"1:03.09","AA":"1:00.39","AAA":"57.79","AAAA":"55.19"},"200fl-scy":{"B":"2:42.79","BB":"2:31.19","A":"2:19.49","AA":"2:13.69","AAA":"2:07.89","AAAA":"2:02.09"},"200im-scy":{"B":"2:43.59","BB":"2:31.89","A":"2:20.19","AA":"2:14.39","AAA":"2:08.49","AAAA":"2:02.69"},"400im-scy":{"B":"5:50.69","BB":"5:25.59","A":"5:00.59","AA":"4:47.99","AAA":"4:35.49","AAAA":"4:22.99"},"50fr-lcm":{"B":"35.89","BB":"33.29","A":"30.69","AA":"29.49","AAA":"28.19","AAAA":"26.89"},"100fr-lcm":{"B":"1:17.69","BB":"1:12.19","A":"1:06.59","AA":"1:03.89","AAA":"1:01.09","AAAA":"58.29"},"200fr-lcm":{"B":"2:47.69","BB":"2:35.69","A":"2:23.69","AA":"2:17.69","AAA":"2:11.69","AAAA":"2:05.79"},"400fr-lcm":{"B":"5:53.39","BB":"5:28.19","A":"5:02.99","AA":"4:50.29","AAA":"4:37.69","AAAA":"4:25.09"},"800fr-lcm":{"B":"12:10.29","BB":"11:18.19","A":"10:25.99","AA":"9:59.89","AAA":"9:33.79","AAAA":"9:07.79"},"50bk-lcm":{"B":"40.99","BB":"38.09","A":"35.09","AA":"33.69","AAA":"32.19","AAAA":"30.79"},"100bk-lcm":{"B":"1:25.89","BB":"1:19.79","A":"1:13.69","AA":"1:10.59","AAA":"1:07.49","AAAA":"1:04.49"},"200bk-lcm":{"B":"3:05.79","BB":"2:52.49","A":"2:39.19","AA":"2:32.59","AAA":"2:25.99","AAAA":"2:19.29"},"50br-lcm":{"B":"45.59","BB":"42.29","A":"39.09","AA":"37.49","AAA":"35.79","AAAA":"34.19"},"100br-lcm":{"B":"1:37.49","BB":"1:30.49","A":"1:23.59","AA":"1:20.09","AAA":"1:16.59","AAAA":"1:13.09"},"200br-lcm":{"B":"3:29.89","BB":"3:14.99","A":"2:59.99","AA":"2:52.49","AAA":"2:44.99","AAAA":"2:37.49"},"50fl-lcm":{"B":"38.39","BB":"35.59","A":"32.89","AA":"31.49","AAA":"30.19","AAAA":"28.79"},"100fl-lcm":{"B":"1:23.59","BB":"1:17.69","A":"1:11.69","AA":"1:08.69","AAA":"1:05.69","AAAA":"1:02.69"},"200fl-lcm":{"B":"3:04.49","BB":"2:51.39","A":"2:38.19","AA":"2:31.59","AAA":"2:24.99","AAAA":"2:18.39"},"200im-lcm":{"B":"3:09.29","BB":"2:55.79","A":"2:42.29","AA":"2:35.49","AAA":"2:28.79","AAAA":"2:21.99"},"400im-lcm":{"B":"6:40.29","BB":"6:11.69","A":"5:43.09","AA":"5:28.79","AAA":"5:14.49","AAAA":"5:00.29"}}}};
-const CATALOG=(function(){
-  const defs=[["SCY","fr","free",[50,100,200,500]],["SCY","bk","back",[50,100,200]],["SCY","br","breast",[50,100,200]],["SCY","fl","fly",[50,100,200]],["SCY","im","im",[100,200,400]],["LCM","fr","free",[50,100,200,400]],["LCM","bk","back",[50,100,200]],["LCM","br","breast",[50,100,200]],["LCM","fl","fly",[50,100,200]],["LCM","im","im",[200,400]]];
+
+const STROKES = {
+  free:{label:"Freestyle", c:"#3AD7DE"},
+  back:{label:"Backstroke", c:"#6FB7E8"},
+  breast:{label:"Breaststroke", c:"#4FD0A6"},
+  fly:{label:"Butterfly", c:"#F4C152"},
+  im:{label:"Individual Medley", c:"#E23A48"}
+};
+const CUTS = ["AAAA","AAA","AA","A","BB","B"]; // fast -> slow
+
+/* ---------------- event catalog (the swimmable events you can log) ---------------- */
+const CATALOG = (function(){
+  const defs = [
+    ["SCY","fr","free",[50,100,200,500]],
+    ["SCY","bk","back",[50,100,200]],
+    ["SCY","br","breast",[50,100,200]],
+    ["SCY","fl","fly",[50,100,200]],
+    ["SCY","im","im",[100,200,400]],
+    ["LCM","fr","free",[50,100,200,400]],
+    ["LCM","bk","back",[50,100,200]],
+    ["LCM","br","breast",[50,100,200]],
+    ["LCM","fl","fly",[50,100,200]],
+    ["LCM","im","im",[200,400]]
+  ];
   const nm={fr:"Free",bk:"Back",br:"Breast",fl:"Fly",im:"IM"};
   const out=[];
-  defs.forEach(([course,code,stroke,dists])=>{ dists.forEach(d=>out.push({id:`${d}${code}-${course.toLowerCase()}`,name:`${d} ${nm[code]}`,stroke,course,dist:d,code})); });
+  defs.forEach(([course,code,stroke,dists])=>{
+    dists.forEach(d=> out.push({ id:`${d}${code}-${course.toLowerCase()}`, name:`${d} ${nm[code]}`, stroke, course, dist:d, code }));
+  });
   return out;
 })();
-const CAT_BY_ID=(function(){ const m={}; CATALOG.forEach(c=>m[c.id]=c); return m; })();
+const CAT_BY_ID = (function(){ const m={}; CATALOG.forEach(c=>m[c.id]=c); return m; })();
 function catalogById(id){ return CAT_BY_ID[id]||null; }
 
-/* roster */
-function getRoster(){ try{ return JSON.parse(Store.get("rsa.roster")||"[]"); }catch(e){ return []; } }
-function saveRoster(r){ Store.set("rsa.roster",JSON.stringify(r)); }
-function getSProfile(id){ try{ return JSON.parse(Store.get("rsa."+id+".profile")||"{}"); }catch(e){ return {}; } }
-function saveSProfile(id,p){ Store.set("rsa."+id+".profile",JSON.stringify(p)); }
-function getDSwims(id){ try{ const a=JSON.parse(Store.get("rsa."+id+".swims")||"[]"); return Array.isArray(a)?a:[]; }catch(e){ return []; } }
-function saveDSwims(id,a){ Store.set("rsa."+id+".swims",JSON.stringify(a)); }
-function nextDSeq(id){ const k="rsa."+id+".seq"; const n=(parseInt(Store.get(k)||"0",10)||0)+1; Store.set(k,String(n)); return n; }
-function addDSwims(id,list){ if(!list||!list.length) return; const a=getDSwims(id); list.forEach(r=>{ const seq=nextDSeq(id); a.push({sid:"s"+seq,eid:r.eid,t:r.t,d:r.d||"",meet:r.meet||"",seq}); }); saveDSwims(id,a); }
+/* ---------------- multi-swimmer roster + per-swimmer persistence ---------------- */
+let activeId = null;   // current swimmer id
+let SEQ = 0;           // per-swimmer swim counter (loaded on switch)
 
-/* build events for dynamic swimmer */
-function stdForDynamic(eid,prof){
-  if(!prof||!prof.dob||!prof.sex) return null;
-  const ag=ageGroup(ageFrom(prof.dob)); if(!ag) return null;
-  const bucket=STD[prof.sex]&&STD[prof.sex][ag];
-  return (bucket&&bucket[eid])?bucket[eid]:null;
-}
-function buildDynamicEvents(id){
-  const prof=getSProfile(id); const byId={};
-  getDSwims(id).forEach(s=>{ if(!catalogById(s.eid)) return; (byId[s.eid]=byId[s.eid]||[]).push(s); });
-  return Object.keys(byId).map(eid=>{ const cat=catalogById(eid); return {id:eid,name:cat.name,stroke:cat.stroke,course:cat.course,swims:byId[eid].map(s=>({d:s.d||"",t:s.t,meet:s.meet||"",seq:s.seq||0,sid:s.sid})),std:stdForDynamic(eid,prof)}; });
+function getRoster(){ try{ const a=JSON.parse(Store.get("tpl.roster")||"[]"); return Array.isArray(a)?a:[]; }catch(e){ return []; } }
+function saveRoster(a){ Store.set("tpl.roster", JSON.stringify(a)); }
+function K(suffix){ return "tpl.s."+activeId+"."+suffix; }            // active swimmer key
+function profileOf(id){ try{ return JSON.parse(Store.get("tpl.s."+id+".profile")||"{}"); }catch(e){ return {}; } }
+function newId(){ return "sw"+Date.now().toString(36)+Math.floor(Math.random()*1e6).toString(36); }
+function createSwimmer(){ const id=newId(); const r=getRoster(); r.push(id); saveRoster(r); return id; }
+function setActive(id){ activeId=id; Store.set("tpl.active", id); SEQ = parseInt(Store.get(K("seq"))||"0",10) || 0; }
+
+function getProfile(){ try{ return JSON.parse(Store.get(K("profile"))||"{}"); }catch(e){ return {}; } }
+function saveProfile(p){ Store.set(K("profile"), JSON.stringify(p)); renderSwimmerBar(); }
+function getSwims(){ try{ const a=JSON.parse(Store.get(K("swims"))||"[]"); return Array.isArray(a)?a:[]; }catch(e){ return []; } }
+function saveSwims(a){ Store.set(K("swims"), JSON.stringify(a)); }
+function nextSeq(){ SEQ++; Store.set(K("seq"), String(SEQ)); return SEQ; }
+
+/* one-time migration: fold any old single-swimmer data into the roster model */
+function migrateIfNeeded(){
+  if(Store.get("tpl.roster")!==null) return;                 // already multi-swimmer
+  const old = Store.keys().filter(k=> k && k.indexOf("tpl.")===0 && k.indexOf("tpl.s.")!==0 && k!=="tpl.roster" && k!=="tpl.active");
+  const id = createSwimmer();
+  old.forEach(k=>{ Store.set("tpl.s."+id+"."+k.slice(4), Store.get(k)); Store.remove(k); });
+  Store.set("tpl.active", id);
 }
 
-/* helpers */
-function ageFrom(dob){ if(!dob) return null; const d=new Date(dob+"T00:00:00"); if(isNaN(d)) return null; const now=new Date(); let a=now.getFullYear()-d.getFullYear(); const md=now.getMonth()-d.getMonth(); if(md<0||(md===0&&now.getDate()<d.getDate())) a--; return a; }
+/* ---------------- age + standards lookup ---------------- */
+function ageFrom(dob){ if(!dob) return null; const d=new Date(dob+"T00:00:00"); if(isNaN(d)) return null; const now=new Date();
+  let a=now.getFullYear()-d.getFullYear(); const md=now.getMonth()-d.getMonth();
+  if(md<0||(md===0&&now.getDate()<d.getDate())) a--; return a; }
 function ageGroup(age){ if(age==null) return null; if(age<=10) return "10U"; if(age<=12) return "11-12"; if(age<=14) return "13-14"; if(age<=16) return "15-16"; return "17-18"; }
-function ageGroupLabel(ag){ return ag==="10U"?"10 & Under":(ag||""); }
-function sexWord(s){ return s==="F"?"Girls":s==="M"?"Boys":""; }
+function ageGroupLabel(ag){ return ag==="10U" ? "10 & Under" : (ag||""); }
+function sexWord(s){ return s==="F" ? "Girls" : s==="M" ? "Boys" : ""; }
+function stdFor(eid){
+  const p=getProfile(); if(!p.dob||!p.sex) return null;
+  const ag=ageGroup(ageFrom(p.dob)); if(!ag) return null;
+  const bucket = STD[p.sex] && STD[p.sex][ag];
+  return (bucket && bucket[eid]) ? bucket[eid] : null;
+}
+
+/* ---------------- build event objects from logged swims ---------------- */
+function buildEvents(){
+  const byId={};
+  getSwims().forEach(s=>{ if(!catalogById(s.eid)) return; (byId[s.eid]=byId[s.eid]||[]).push(s); });
+  const evs=[];
+  Object.keys(byId).forEach(eid=>{
+    const cat=catalogById(eid);
+    evs.push({ id:eid, name:cat.name, stroke:cat.stroke, course:cat.course,
+      swims: byId[eid].map(s=>({ d:s.d||"", t:s.t, meet:s.meet||"", seq:s.seq||0, sid:s.sid })),
+      std: stdFor(eid) });
+  });
+  return evs;
+}
+
+/* ---------------- helpers ---------------- */
+function toSec(t){ const s=String(t).trim(); if(!s) return NaN; const p=s.split(":"); return p.length===2 ? (+p[0])*60 + parseFloat(p[1]) : parseFloat(p[0]); }
+function fmt(sec){ if(!isFinite(sec)) return "—"; sec=Math.max(0,sec); const m=Math.floor(sec/60); const s=sec-m*60; return m>0 ? m+":"+s.toFixed(2).padStart(5,"0") : s.toFixed(2); }
+function sortAsc(swims){
+  const dated=swims.filter(s=>s.d).sort((a,b)=> a.d<b.d?-1:a.d>b.d?1:0);
+  const undated=swims.filter(s=>!s.d).sort((a,b)=> (a.seq||0)-(b.seq||0));
+  return [...dated, ...undated];
+}
+function bestSwim(ev){ return [...ev.swims].sort((a,b)=> toSec(a.t)-toSec(b.t))[0]; }
+function firstSwim(ev){ return sortAsc(ev.swims)[0]; }
+function dropSec(ev){ if(ev.swims.length<2) return 0; const d = toSec(firstSwim(ev).t) - toSec(bestSwim(ev).t); return d>0?d:0; }
+function gapToB(ev){ if(!ev.std) return null; return toSec(bestSwim(ev).t) - toSec(ev.std.B); }
+function shortDate(d){ if(!d) return "—"; const [y,m,day]=d.split("-"); return (+m)+"/"+(+day); }
+function longDate(d){ if(!d) return "Undated"; const [y,m,day]=d.split("-"); const mo=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][(+m)-1]; return `${mo} ${(+day)}, ${y}`; }
+function nextCut(ev){ if(!ev.std) return null; const best=toSec(bestSwim(ev).t); const slowToFast=[...CUTS].reverse(); for(const c of slowToFast){ if(toSec(ev.std[c])<best) return c; } return null; }
+function esc(s){ return String(s).replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m])); }
 function todayISO(){ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
 function pad2(x){ return String(parseInt(x,10)).padStart(2,"0"); }
-function normTime(str){ if(str==null) return null; const s=String(str).trim(); if(!s) return null; const sec=toSec(s); return (isFinite(sec)&&sec>0)?s:null; }
+
+/* ---------------- icons ---------------- */
+function icon(name){
+  const p={
+    lanes:'<path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+    medal:'<circle cx="12" cy="15" r="5" stroke="currentColor" stroke-width="2"/><path d="M9 3l2 6M15 3l-2 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+    stop:'<circle cx="12" cy="13" r="7" stroke="currentColor" stroke-width="2"/><path d="M12 13V9M10 3h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+    flag:'<path d="M5 21V4m0 0l11 2-2 4 2 4-11 1" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>',
+    target:'<circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3.2" stroke="currentColor" stroke-width="2"/>',
+    chart:'<path d="M4 19V5M4 19h16M8 15l3-4 3 2 4-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+    ladder:'<path d="M8 3v18M16 3v18M8 7h8M8 12h8M8 17h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+    note:'<path d="M5 4h11l3 3v13H5zM15 4v4h4" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>'
+  }[name]||"";
+  return `<svg class="ic" viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true">${p}</svg>`;
+}
+function arrowSvg(){ return `<svg viewBox="0 0 24 24" width="20" height="20" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`; }
+function photoIcon(){ return '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.7"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>'; }
+function camIcon(){ return '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 8.5A1.5 1.5 0 014.5 7h2L8 5h8l1.5 2h2A1.5 1.5 0 0121 8.5v9A1.5 1.5 0 0119.5 19h-15A1.5 1.5 0 013 17.5z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="12.5" r="3" stroke="currentColor" stroke-width="1.7"/></svg>'; }
+
+/* ---------------- hero pieces ---------------- */
+function renderBadge(){
+  const p=getProfile(); const el=document.getElementById("ageBadge");
+  if(p.dob){
+    const age=ageFrom(p.dob);
+    el.textContent = p.sex ? `${age} · ${ageGroupLabel(ageGroup(age))} ${sexWord(p.sex)}` : `${age} · add gender`;
+  } else { el.textContent="Add birthdate"; }
+}
+function renderHeroStats(evs){
+  const swims=getSwims();
+  const totalDrop=evs.reduce((s,ev)=>s+dropSec(ev),0);
+  const meets=new Set(); swims.forEach(s=>{ if(s.meet) meets.add(s.meet); });
+  const stats=[
+    {ic:icon("lanes"), num:evs.length, lab:"Events Raced", c:"var(--aqua)"},
+    {ic:icon("medal"), num:evs.length, lab:"Personal Bests", c:"var(--gold)"},
+    {ic:icon("stop"), num:totalDrop.toFixed(1)+"s", lab:"Time Dropped", c:"var(--green)"},
+    {ic:icon("flag"), num:meets.size, lab:"Meets", c:"var(--red2)"}
+  ];
+  document.getElementById("statStrip").innerHTML = stats.map(s=>
+    `<div class="stat" style="--accent:${s.c}">${s.ic}<div class="num">${s.num}</div><div class="lab">${s.lab}</div></div>`).join("");
+}
+function renderSpotlight(evs){
+  const sp=document.getElementById("spotlight");
+  if(!evs.length){ sp.style.display="none"; return; }
+  const withStd=evs.filter(e=>e.std);
+  sp.style.display="";
+  if(!withStd.length){
+    sp.innerHTML = `<div class="tag">${icon("target")} Unlock your targets</div>
+      <div class="big">Add your <em>birthdate</em> and <em>gender</em> to see the USA Swimming cuts you're chasing in every event.</div>`;
+    return;
+  }
+  const closest=[...withStd].sort((a,b)=>gapToB(a)-gapToB(b))[0];
+  const g=gapToB(closest);
+  if(g>0){
+    sp.innerHTML = `<div class="tag">${icon("target")} Closest to a cut</div>
+      <div class="big">Just <b>${g.toFixed(2)}s</b> from your first <em>B</em> standard in the <em>${esc(closest.name)} ${closest.course}</em>. That's the next one to chase.</div>`;
+  } else {
+    sp.innerHTML = `<div class="tag">${icon("target")} On the board</div>
+      <div class="big">You've already cracked a <em>B</em> standard. Time to climb the ladder.</div>`;
+  }
+}
+
+/* ---------------- photo / porthole ---------------- */
+function paintPorthole(){
+  const p=getProfile(); const ring=document.getElementById("portholeRing"); const inner=document.getElementById("phInner");
+  if(p.photo){ ring.classList.remove("empty"); inner.innerHTML=`<img src="${p.photo}" alt="Portrait of the swimmer" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 28%">`; }
+  else { ring.classList.add("empty"); inner.innerHTML=photoIcon(); }
+}
+function readPhoto(file, cb){
+  const reader=new FileReader();
+  reader.onload=()=>{
+    const img=new Image();
+    img.onload=()=>{
+      const max=512; let w=img.width, h=img.height;
+      const scale=Math.min(1, max/Math.max(w,h)); w=Math.round(w*scale); h=Math.round(h*scale);
+      const cv=document.createElement("canvas"); cv.width=w; cv.height=h;
+      const ctx=cv.getContext("2d"); ctx.drawImage(img,0,0,w,h);
+      try{ cb(cv.toDataURL("image/jpeg",0.85)); }catch(e){ cb(null); }
+    };
+    img.onerror=()=>cb(null); img.src=reader.result;
+  };
+  reader.onerror=()=>cb(null); reader.readAsDataURL(file);
+}
+
+/* ---------------- event cards ---------------- */
+function sparkline(ev, color){
+  const sw=sortAsc(ev.swims); const secs=sw.map(s=>toSec(s.t));
+  const w=220,h=34,pad=4;
+  if(secs.length<2){ return `<svg class="spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><circle cx="${w/2}" cy="${h/2}" r="3.5" fill="${color}"/></svg>`; }
+  const min=Math.min(...secs),max=Math.max(...secs),rng=(max-min)||1;
+  const X=i=> pad + i*(w-2*pad)/(secs.length-1);
+  const Y=v=> pad + (v-min)/rng*(h-2*pad);
+  const pts=secs.map((v,i)=>`${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(" ");
+  const bi=secs.indexOf(min);
+  return `<svg class="spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+    <polyline points="${pts}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>
+    <circle cx="${X(bi).toFixed(1)}" cy="${Y(min).toFixed(1)}" r="3.5" fill="${color}"/>
+  </svg>`;
+}
+let currentFilter="all";
+function renderGrid(evs){
+  const grid=document.getElementById("eventGrid");
+  const order=["free","back","breast","fly","im"];
+  const list=evs.filter(ev=> currentFilter==="all" || ev.course===currentFilter);
+  let html="";
+  order.forEach(stk=>{
+    const group=list.filter(e=>e.stroke===stk).sort((a,b)=> (a.course>b.course?1:a.course<b.course?-1:0) || (toSec(bestSwim(a).t)-toSec(bestSwim(b).t)));
+    if(!group.length) return;
+    const col=STROKES[stk].c;
+    html+=`<div class="grouplabel" style="--accent:${col}"><span class="swatch"></span>${STROKES[stk].label}</div>`;
+    group.forEach(ev=>{
+      const best=bestSwim(ev);
+      let footTxt;
+      if(ev.std){ const g=gapToB(ev); footTxt = g>0 ? `<b>${g.toFixed(2)}s</b> to first B` : `B cut achieved`; }
+      else { footTxt = `${ev.swims.length} ${ev.swims.length===1?"swim":"swims"} logged`; }
+      html+=`<button class="card" style="--accent:${col}" data-id="${ev.id}" aria-label="${esc(ev.name)} ${ev.course}, best ${fmt(toSec(best.t))}. Open details.">
+        <span class="stripe"></span>
+        <div class="ev-top"><span class="ev-name">${esc(ev.name)}</span><span class="course">${ev.course}</span></div>
+        <div class="pb"><span class="pbtag">PERSONAL BEST</span>${fmt(toSec(best.t))}</div>
+        ${sparkline(ev,col)}
+        <div class="ev-foot">
+          <span class="gap">${footTxt}</span>
+          <span class="arrow">${arrowSvg()}</span>
+        </div>
+      </button>`;
+    });
+  });
+  grid.innerHTML=html;
+  grid.querySelectorAll(".card").forEach(c=> c.addEventListener("click",()=>openModal(c.dataset.id)));
+}
+
+/* ---------------- progression chart (SVG) ---------------- */
+function chartSVG(ev, goalSec){
+  const sw=sortAsc(ev.swims); const secs=sw.map(s=>toSec(s.t));
+  const W=560,H=300, L=18,R=18,T=34,B=46;
+  const hasStd=!!ev.std; const bSec=hasStd?toSec(ev.std.B):NaN;
+  const vals=[...secs]; if(isFinite(goalSec)) vals.push(goalSec); if(hasStd) vals.push(bSec);
+  let maxV=Math.max(...secs); let minV=Math.min(...vals);
+  const padV=((maxV-minV)||1)*0.16; const top=minV-padV, bot=maxV+padV;
+  const plotW=W-L-R, plotH=H-T-B;
+  const X=i=> sw.length<2 ? L+plotW/2 : L + i*plotW/(sw.length-1);
+  const Y=v=> T + (v-top)/(bot-top)*plotH;
+  let g="";
+  if(hasStd){
+    const bY=Y(bSec);
+    if(bY>=T-2 && bY<=T+plotH+2){
+      g+=`<line x1="${L}" y1="${bY.toFixed(1)}" x2="${W-R}" y2="${bY.toFixed(1)}" stroke="#F4C152" stroke-width="1.4" stroke-dasharray="6 5" opacity=".75"/>
+          <text x="${W-R}" y="${(bY-6).toFixed(1)}" fill="#F4C152" font-size="11" text-anchor="end" font-family="Oswald" letter-spacing=".06em">B CUT ${esc(ev.std.B)}</text>`;
+    }
+  }
+  if(isFinite(goalSec)){
+    const gY=Y(goalSec);
+    if(gY>=T-2 && gY<=T+plotH+2){
+      g+=`<line x1="${L}" y1="${gY.toFixed(1)}" x2="${W-R}" y2="${gY.toFixed(1)}" stroke="#3AD7DE" stroke-width="1.6" stroke-dasharray="2 5" opacity=".9"/>
+          <text x="${L}" y="${(gY-6).toFixed(1)}" fill="#3AD7DE" font-size="11" text-anchor="start" font-family="Oswald" letter-spacing=".08em">GOAL ${fmt(goalSec)}</text>`;
+    }
+  }
+  if(sw.length>=2){
+    const pts=secs.map((v,i)=>`${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(" ");
+    const area=`${X(0).toFixed(1)},${(T+plotH).toFixed(1)} `+pts+` ${X(sw.length-1).toFixed(1)},${(T+plotH).toFixed(1)}`;
+    g+=`<polygon points="${area}" fill="url(#agrad)" opacity=".5"/>
+        <polyline points="${pts}" fill="none" stroke="#3AD7DE" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>`;
+  }
+  const bi=secs.indexOf(Math.min(...secs));
+  sw.forEach((s,i)=>{
+    const isBest=i===bi; const cy=Y(secs[i]);
+    g+=`<circle cx="${X(i).toFixed(1)}" cy="${cy.toFixed(1)}" r="${isBest?6:4.5}" fill="${isBest?'#F4C152':'#0A1B2C'}" stroke="${isBest?'#fff':'#3AD7DE'}" stroke-width="2"/>`;
+    g+=`<text x="${X(i).toFixed(1)}" y="${(cy-12).toFixed(1)}" fill="${isBest?'#F4C152':'#cfe4ec'}" font-size="${isBest?12:11}" text-anchor="middle" font-family="Oswald" font-weight="${isBest?600:400}">${fmt(secs[i])}</text>`;
+    g+=`<text x="${X(i).toFixed(1)}" y="${(T+plotH+20).toFixed(1)}" fill="#7e9bb0" font-size="10.5" text-anchor="middle" font-family="Oswald">${shortDate(s.d)}</text>`;
+    g+=`<text x="${X(i).toFixed(1)}" y="${(T+plotH+33).toFixed(1)}" fill="#5E7E94" font-size="9.5" text-anchor="middle" font-family="-apple-system,sans-serif">${esc(s.meet.length>12?s.meet.slice(0,11)+'…':s.meet)}</text>`;
+  });
+  const note = sw.length<2 ? `<text x="${(L+plotW/2).toFixed(1)}" y="${(T-14).toFixed(1)}" fill="#93B2C6" font-size="11.5" text-anchor="middle" font-family="-apple-system,sans-serif">Swum once — race it again to draw your line.</text>` : "";
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Time progression chart">
+    <defs><linearGradient id="agrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3AD7DE" stop-opacity=".35"/><stop offset="1" stop-color="#3AD7DE" stop-opacity="0"/>
+    </linearGradient></defs>
+    <text x="${L}" y="14" fill="#5E7E94" font-size="10.5" font-family="Oswald" letter-spacing=".14em">FASTER ↑</text>
+    ${note}${g}
+  </svg>`;
+}
+
+/* ---------------- standards ladder (SVG) ---------------- */
+function ladderSVG(ev, goalSec){
+  const W=300,H=360, trackX=78, topY=22, botY=H-26;
+  const aaaa=toSec(ev.std.AAAA), b=toSec(ev.std.B), bb=toSec(ev.std.BB);
+  const baseline=b + (b-bb)*0.7;
+  const fastTop=aaaa - (toSec(ev.std.AAA)-aaaa)*0.4;
+  const span=baseline-fastTop;
+  const pos=v=>{ let p=(baseline-v)/span; p=Math.max(0,Math.min(1,p)); return botY-(botY-topY)*p; };
+  const best=toSec(bestSwim(ev).t); const nc=nextCut(ev);
+  let g=`<line x1="${trackX}" y1="${topY}" x2="${trackX}" y2="${botY}" stroke="#27506F" stroke-width="3" stroke-linecap="round"/>`;
+  const rows=CUTS.map(c=>({c, y:pos(toSec(ev.std[c])), t:ev.std[c]}));
+  let lastLY=-99; rows.forEach(r=>{ let ly=r.y; if(ly-lastLY<15) ly=lastLY+15; r.ly=ly; lastLY=ly; });
+  rows.forEach(r=>{
+    const achieved = best<=toSec(r.t); const isNext = r.c===nc;
+    const col = achieved? "#4FD0A6" : (isNext? "#F4C152" : "#5E7E94");
+    g+=`<line x1="${trackX-9}" y1="${r.y.toFixed(1)}" x2="${trackX+9}" y2="${r.y.toFixed(1)}" stroke="${col}" stroke-width="${isNext?4:3}" stroke-linecap="round"/>`;
+    g+=`<text x="${trackX-16}" y="${(r.y+4).toFixed(1)}" fill="${col}" font-size="14" font-weight="${isNext||achieved?600:500}" text-anchor="end" font-family="Oswald" letter-spacing=".04em">${r.c}</text>`;
+    g+=`<text x="${trackX+16}" y="${(r.ly+4).toFixed(1)}" fill="${achieved?'#cfe4ec':(isNext?'#F4C152':'#7e9bb0')}" font-size="12" text-anchor="start" font-family="Oswald">${esc(r.t)}</text>`;
+    if(isNext) g+=`<text x="${trackX+16}" y="${(r.ly+16).toFixed(1)}" fill="#F4C152" font-size="9" text-anchor="start" font-family="Oswald" letter-spacing=".16em">NEXT TARGET</text>`;
+  });
+  const yY=pos(best);
+  g+=`<line x1="${trackX-22}" y1="${yY.toFixed(1)}" x2="${W-10}" y2="${yY.toFixed(1)}" stroke="#3AD7DE" stroke-width="2" stroke-dasharray="1 4" opacity=".55"/>`;
+  g+=`<circle cx="${trackX}" cy="${yY.toFixed(1)}" r="6.5" fill="#3AD7DE" stroke="#06121F" stroke-width="2"/>`;
+  g+=`<rect x="${trackX-78}" y="${(yY-11).toFixed(1)}" width="54" height="22" rx="6" fill="#3AD7DE"/>`;
+  g+=`<text x="${(trackX-51)}" y="${(yY+4).toFixed(1)}" fill="#06121F" font-size="12" font-weight="700" text-anchor="middle" font-family="Oswald">${fmt(best)}</text>`;
+  g+=`<text x="${trackX-78}" y="${(yY-14).toFixed(1)}" fill="#3AD7DE" font-size="9" font-family="Oswald" letter-spacing=".16em">YOU</text>`;
+  if(isFinite(goalSec)){
+    const gY=pos(goalSec);
+    g+=`<polygon points="${W-10},${(gY-7).toFixed(1)} ${W-10},${(gY+7).toFixed(1)} ${W-22},${gY.toFixed(1)}" fill="#F4C152"/>`;
+    g+=`<line x1="${trackX}" y1="${gY.toFixed(1)}" x2="${W-22}" y2="${gY.toFixed(1)}" stroke="#F4C152" stroke-width="1.6" stroke-dasharray="3 4" opacity=".8"/>`;
+    g+=`<text x="${W-10}" y="${(gY-10).toFixed(1)}" fill="#F4C152" font-size="9" text-anchor="end" font-family="Oswald" letter-spacing=".14em">GOAL</text>`;
+  }
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="USA Swimming standards ladder">${g}</svg>`;
+}
+function renderStdList(ev){
+  const nc=nextCut(ev); const best=toSec(bestSwim(ev).t);
+  document.getElementById("stdList").innerHTML = CUTS.map(c=>{
+    return `<div class="stdpill" ${c===nc?'data-next="1"':''}><div class="s">${c}</div><div class="t">${esc(ev.std[c])}</div></div>`;
+  }).join("");
+}
+function historyTable(ev){
+  const asc=sortAsc(ev.swims); const bestId=bestSwim(ev);
+  let rows="";
+  asc.forEach((s,i)=>{
+    const isBest = s===bestId || (toSec(s.t)===toSec(bestId.t) && s.d===bestId.d && s.meet===bestId.meet);
+    let delta="";
+    if(i>0){ const d=toSec(asc[i-1].t)-toSec(s.t); if(Math.abs(d)>=0.01){ delta = d>0?`<span class="delta down">▼ ${d.toFixed(2)}</span>`:`<span class="delta up">▲ ${Math.abs(d).toFixed(2)}</span>`; } }
+    rows+=`<tr class="${isBest?'best':''}"><td class="t">${fmt(toSec(s.t))}${isBest?'<span class="bestmark">PB</span>':''}</td><td>${esc(longDate(s.d))}</td><td>${esc(s.meet||"—")}</td><td>${delta}</td><td class="act"><button class="del" data-sid="${esc(s.sid)}" aria-label="Delete this swim"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 7h14M9 7V5h6v2M7 7l1 13h8l1-13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button></td></tr>`;
+  });
+  return `<table class="swims"><thead><tr><th>Time</th><th>Date</th><th>Meet</th><th>Vs previous</th><th></th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+function suggestGoal(ev){ const best=toSec(bestSwim(ev).t); if(!ev.std) return fmt(best-0.5); const b=toSec(ev.std.B); const tgt=best>b?Math.max(b,best-1.0):best-0.5; return fmt(tgt); }
+function flash(el){ if(!el) return; el.classList.add("show"); clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove("show"),1800); }
+
+/* ---------------- event modal ---------------- */
+function openModal(id){
+  const ev=buildEvents().find(e=>e.id===id); if(!ev) return;
+  const col=STROKES[ev.stroke].c;
+  const best=bestSwim(ev); const bestSec=toSec(best.t);
+  const goalKey=K("goal."+ev.id), noteKey=K("note."+ev.id);
+  const goalSec=toSec(Store.get(goalKey)||"");
+  const hasStd=!!ev.std;
+
+  const insight = hasStd
+    ? `<div class="split">
+        <div class="subcard">
+          <h4>${icon("ladder")} Standards ladder</h4>
+          <div class="cap">USA Swimming 2024–28 · ${ageGroupLabel(ageGroup(ageFrom(getProfile().dob)))} ${sexWord(getProfile().sex)} · ${ev.course}</div>
+          <div id="ladderWrap">${ladderSVG(ev,goalSec)}</div>
+          <div class="stdlist" id="stdList"></div>
+        </div>
+        <div class="subcard">
+          <h4>${icon("chart")} Progression</h4>
+          <div class="cap">Race times so far — your line climbs as you get faster.</div>
+          <div id="chartWrap">${chartSVG(ev,goalSec)}</div>
+        </div>
+      </div>`
+    : `<div class="subcard">
+          <h4>${icon("chart")} Progression</h4>
+          <div class="cap">Race times so far — your line climbs as you get faster.</div>
+          <div id="chartWrap">${chartSVG(ev,goalSec)}</div>
+        </div>
+       <div class="nostd">Add your <b>birthdate</b> and <b>gender</b> to unlock the USA Swimming standards ladder and the cuts you're chasing in this event.<br><button class="mini-btn" type="button" id="nostdSetup">Set up profile</button></div>`;
+
+  const modal=document.getElementById("modal");
+  modal.style.setProperty("--accent",col);
+  modal.innerHTML = `
+    <div class="m-head">
+      <div class="titles">
+        <div class="m-evt" id="m-evt">${esc(ev.name)}</div>
+        <div class="m-tags">
+          <span class="m-tag stroke">${STROKES[ev.stroke].label}</span>
+          <span class="m-tag">${ev.course==="SCY"?"Short Course Yards":"Long Course Meters"}</span>
+          <span class="m-tag">${ev.swims.length} ${ev.swims.length===1?"swim":"swims"}</span>
+        </div>
+      </div>
+      <button class="x" data-close aria-label="Close">&times;</button>
+    </div>
+    <div class="m-body">
+      <div class="pbcard">
+        <div><div class="lbl">Personal Best</div><div class="val">${fmt(bestSec)}</div></div>
+        <div class="meta">set at <b>${esc(best.meet||"—")}</b><br>${esc(longDate(best.d))}</div>
+      </div>
+
+      <div class="goalbox">
+        <div class="ghead">${icon("target")} Set your next goal</div>
+        <div class="goalrow">
+          <input id="goalInput" type="text" inputmode="decimal" placeholder="e.g. ${suggestGoal(ev)}" value="${esc(Store.get(goalKey)||"")}" aria-label="Goal time">
+          <div class="goalresult" id="goalResult"></div>
+          <div class="hint">Type a time like <b>32.50</b> or <b>1:14.00</b>. It saves automatically and shows on your chart${hasStd?" and ladder":""}.</div>
+        </div>
+      </div>
+
+      ${insight}
+
+      <div class="history">
+        <h4>${icon("stop")} Race history</h4>
+        ${historyTable(ev)}
+      </div>
+
+      <div class="noteblock">
+        <h4>${icon("note")} Notes for this event</h4>
+        <textarea class="note" id="evNote" placeholder="Splits, technique cues, how the race felt, what to fix next time…">${esc(Store.get(noteKey)||"")}</textarea>
+        <div class="saverow">
+          <button class="btn btn-red" id="saveEvNote">Save note</button>
+          <span class="saved" id="evNoteSaved">Saved</span>
+        </div>
+      </div>
+    </div>`;
+
+  if(hasStd) renderStdList(ev);
+
+  const gi=modal.querySelector("#goalInput");
+  const updateGoal=()=>{
+    const raw=gi.value.trim(); Store.set(goalKey, raw); const gs=toSec(raw);
+    if(hasStd){ const lw=document.getElementById("ladderWrap"); if(lw) lw.innerHTML=ladderSVG(ev,gs); }
+    const cw=document.getElementById("chartWrap"); if(cw) cw.innerHTML=chartSVG(ev,gs);
+    const gr=document.getElementById("goalResult");
+    if(isFinite(gs)){
+      const diff=bestSec-gs;
+      if(diff>0){ gr.className="goalresult"; gr.innerHTML=`Drop <b>${diff.toFixed(2)}s</b> to hit it`; }
+      else if(diff<0){ gr.className="goalresult win"; gr.innerHTML=`<b>Already faster — set a bolder goal!</b>`; }
+      else { gr.className="goalresult"; gr.innerHTML=`Right on your best`; }
+    } else { gr.className="goalresult"; gr.innerHTML=""; }
+  };
+  gi.addEventListener("input",updateGoal); updateGoal();
+
+  const en=modal.querySelector("#evNote"); const enSaved=modal.querySelector("#evNoteSaved");
+  modal.querySelector("#saveEvNote").addEventListener("click",()=>{ Store.set(noteKey, en.value); flash(enSaved); });
+  en.addEventListener("input",()=>{ Store.set(noteKey, en.value); });
+
+  const ns=modal.querySelector("#nostdSetup"); if(ns) ns.addEventListener("click",()=>{ closeScrim("scrim"); openSetup(); });
+
+  modal.querySelectorAll(".del").forEach(b=> b.addEventListener("click",()=>{ deleteSwim(b.dataset.sid); afterMutate(ev.id); }));
+
+  openScrim("scrim");
+  setTimeout(()=>{ const x=modal.querySelector(".x"); if(x) x.focus(); },50);
+}
+function afterMutate(id){
+  renderAll();
+  const still=buildEvents().find(e=>e.id===id);
+  if(still) openModal(id); else closeScrim("scrim");
+}
+
+/* ---------------- swims mutations + CSV parsing ---------------- */
+function addSwims(list){
+  if(!list || !list.length) return 0;
+  const swims=getSwims();
+  list.forEach(r=>{ const seq=nextSeq(); swims.push({ sid:"s"+seq, eid:r.eid, t:r.t, d:r.d||"", meet:r.meet||"", seq:seq }); });
+  saveSwims(swims); return list.length;
+}
+function deleteSwim(sid){ saveSwims(getSwims().filter(s=>s.sid!==sid)); }
+function normTime(str){
+  if(str==null) return null; let s=String(str).trim(); if(!s) return null;
+  const m=s.match(/(\d{1,3}:)?\d{1,2}(\.\d{1,2})?/); if(!m) return null; s=m[0];
+  const sec=toSec(s); return (isFinite(sec)&&sec>0) ? s : null;
+}
 function normDate(str){
   if(!str) return ""; const s=String(str).trim(); if(!s) return "";
   let m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/); if(m) return `${m[1]}-${pad2(m[2])}-${pad2(m[3])}`;
@@ -551,7 +1096,9 @@ function parseEventStr(str){
   if(!str) return null; const s=String(str).trim().toLowerCase();
   const dm=s.match(/(\d+)/); if(!dm) return null; const dist=+dm[1];
   let course="scy";
-  if(/\blcm\b|meter|metre|long[\s_]course|\blc\b/.test(s)) course="lcm";
+  if(/\bscm\b|short\s*course\s*met/.test(s)) course="scm";
+  else if(/\blcm\b|\blc\b|long\s*course|\bl\b|metre|meter/.test(s)) course="lcm";
+  else if(/\bscy\b|\bsc\b|short\s*course|\by\b|yard/.test(s)) course="scy";
   let code=null;
   if(/free|freestyle|\bfr\b/.test(s)) code="fr";
   else if(/back|backstroke|\bbk\b/.test(s)) code="bk";
@@ -559,231 +1106,236 @@ function parseEventStr(str){
   else if(/butterfly|fly|\bfl\b/.test(s)) code="fl";
   else if(/medley|individual|\bim\b/.test(s)) code="im";
   if(!code) return null;
-  const id=`${dist}${code}-${course}`; return catalogById(id)?id:null;
+  const id=`${dist}${code}-${course}`; return catalogById(id) ? id : null;
+}
+function splitLine(line){
+  if(line.indexOf("\t")>=0) return line.split("\t").map(x=>x.trim());
+  const out=[]; let cur="", q=false;
+  for(let i=0;i<line.length;i++){ const c=line[i];
+    if(q){ if(c==='"'){ if(line[i+1]==='"'){ cur+='"'; i++; } else q=false; } else cur+=c; }
+    else { if(c==='"') q=true; else if(c===','){ out.push(cur); cur=""; } else cur+=c; }
+  }
+  out.push(cur); return out.map(x=>x.trim());
 }
 function parseRows(raw){
+  const lines=String(raw).split(/\r?\n/).filter(l=>l.trim()!=="");
+  if(!lines.length) return [];
+  let idx={event:0, time:1, date:2, meet:3}, isHeader=false, start=0;
+  const head=splitLine(lines[0]).map(h=>h.trim().toLowerCase());
+  isHeader = head.some(h=>h==="event"||h==="time") && !head.some(h=>/^\d/.test(h));
+  if(isHeader){
+    start=1;
+    const find=pred=>head.findIndex(pred);
+    idx.event=find(h=>h==="event"||h.indexOf("event")===0);
+    idx.time =find(h=>h==="time");                 // exact, so "time standard" is ignored
+    idx.date =find(h=>h.indexOf("date")>=0);        // e.g. "swim date"
+    idx.meet =find(h=>h.indexOf("meet")>=0);
+  }
   const out=[];
-  String(raw).split(/\r?\n/).forEach(line=>{ const l=line.trim(); if(!l) return; const parts=l.split(/\t|,/).map(x=>x.trim()); if(parts.length<2) return; if(/event/i.test(parts[0])&&/time/i.test(parts[1])) return; const eid=parseEventStr(parts[0]); const t=normTime(parts[1]); if(!eid||!t) return; out.push({eid,t,d:normDate(parts[2]||""),meet:(parts[3]||"").trim()}); });
+  for(let r=start;r<lines.length;r++){
+    const p=splitLine(lines[r]); if(p.length<2) continue;
+    let ev, tm, dt="", mt="";
+    if(isHeader){
+      ev = idx.event>=0 ? p[idx.event] : p[0];
+      tm = idx.time>=0  ? p[idx.time]  : p[1];
+      dt = idx.date>=0  ? (p[idx.date]||"") : "";
+      mt = idx.meet>=0  ? (p[idx.meet]||"") : "";
+    } else {
+      ev=p[0]; tm=p[1]; const rest=p.slice(2);
+      let di=-1;
+      for(let i=0;i<rest.length;i++){ if(normDate(rest[i])){ di=i; dt=rest[i]; break; } }   // date in any position
+      for(let i=0;i<rest.length;i++){ if(i!==di && rest[i] && rest[i].trim()){ mt=rest[i]; break; } }
+    }
+    const eid=parseEventStr(ev); const t=normTime(tm);
+    if(!eid||!t) continue;
+    out.push({ eid, t, d:normDate(dt), meet:String(mt||"").trim() });
+  }
   return out;
 }
-function downloadBlob(text,name,type){ const blob=new Blob([text],{type:type||"text/plain"}); const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); },120); }
-function downloadTemplate(){ const csv="Event,Time,Date,Meet\n50 Free SCY,32.50,2026-01-15,Winter Classic\n100 Free SCY,1:12.00,2026-01-15,Winter Classic\n50 Back SCY,38.40,2026-01-15,Winter Classic\n50 Free LCM,30.10,2026-06-01,Summer Open\n"; downloadBlob(csv,"swim-times-template.csv","text/csv"); }
 
-let toastTimer=null;
-function toast(msg){ const t=document.getElementById("toast"); t.innerHTML=msg; t.classList.add("show"); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove("show"),2200); }
-
-let scrimFocus=null;
-function openScrim(id){ scrimFocus=document.activeElement; const s=document.getElementById(id); s.classList.add("open"); document.body.style.overflow="hidden"; s.scrollTop=0; }
-function closeScrim(id){ const s=document.getElementById(id); s.classList.remove("open"); const others=["scrim","editSwimmerScrim","newSwimmerScrim","addScrim"].filter(i=>i!==id); if(!others.some(i=>document.getElementById(i).classList.contains("open"))) document.body.style.overflow=""; if(scrimFocus&&scrimFocus.focus) scrimFocus.focus(); }
-function wireNewScrims(){
-  const NEW_SCRIMS=["editSwimmerScrim","newSwimmerScrim","addScrim"];
-  NEW_SCRIMS.forEach(id=>{ const s=document.getElementById(id); if(!s) return; s.addEventListener("click",e=>{ if(e.target===s||(e.target.closest&&e.target.closest("[data-close]"))) closeScrim(id); }); });
-  document.addEventListener("keydown",e=>{ if(e.key!=="Escape") return; for(const id of ["addScrim","editSwimmerScrim","newSwimmerScrim"]){ const s=document.getElementById(id); if(s&&s.classList.contains("open")){ closeScrim(id); return; } } });
+/* ---------------- downloads ---------------- */
+function downloadBlob(text,name,type){
+  const blob=new Blob([text],{type:type||"text/plain"}); const url=URL.createObjectURL(blob);
+  const a=document.createElement("a"); a.href=url; a.download=name; document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); },120);
 }
+function downloadTemplate(){
+  const csv=
+    "EVENT,TIME,AGE,POINTS,Time Standard,Meet,LSC,Team,Swim Date\n"+
+    "50 Free SCY,32.50,11,,B,Winter Classic,,Wahoos,2026-01-15\n"+
+    "100 Free SCY,1:12.00,11,,BB,Winter Classic,,Wahoos,2026-01-15\n"+
+    "50 Back LCM,38.40,11,,A,Summer Open,,Wahoos,2026-06-01\n";
+  downloadBlob(csv,"swim-import-template.csv","text/csv");
+}
+function exportCSV(){
+  let csv="Event,Time,Date,Meet\n";
+  getSwims().forEach(s=>{ const c=catalogById(s.eid); if(!c) return; csv+=`${c.name} ${c.course},${s.t},${s.d||""},${(s.meet||"").replace(/,/g,";")}\n`; });
+  downloadBlob(csv,"my-swim-times.csv","text/csv");
+}
+function safeName(s){ return (String(s||"").trim().toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"")) || "swimmer"; }
+function exportBackup(){
+  const pre="tpl.s."+activeId+".";
+  const data={};
+  Store.keys().filter(k=>k && k.indexOf(pre)===0).forEach(k=>{ data[k.slice(pre.length)]=Store.get(k); });
+  const p=getProfile();
+  const payload={ app:"rsa-wahoos-swim-tracker", version:2, savedAt:new Date().toISOString(), swimmer:{name:p.name||"", photo:p.photo||""}, data };
+  downloadBlob(JSON.stringify(payload), `${safeName(p.name)}-swim-logbook-${todayISO()}.json`, "application/json");
+  toast("Saved this swimmer's logbook to a file");
+}
+function importBackup(text){
+  let obj=null; try{ obj=JSON.parse(text); }catch(e){ obj=null; }
+  const raw = obj && obj.data && typeof obj.data==="object" ? obj.data : null;
+  if(!raw){ toast("That file isn't a valid logbook backup"); return; }
+  // normalize keys to plain suffixes (supports v1 "tpl.xxx" backups and v2 suffix backups)
+  const data={};
+  Object.keys(raw).forEach(k=>{
+    let suf=k;
+    if(k.indexOf("tpl.s.")===0) suf=k.replace(/^tpl\.s\.[^.]+\./,"");
+    else if(k.indexOf("tpl.")===0) suf=k.slice(4);
+    data[suf]=raw[k];
+  });
+  if(!data.profile && !data.swims){ toast("That file isn't a valid logbook backup"); return; }
+  const id=createSwimmer();                                  // load as a NEW swimmer (never overwrites)
+  Object.keys(data).forEach(suf=>{ Store.set("tpl.s."+id+"."+suf, data[suf]); });
+  switchTo(id);
+  const c=getSwims().length, nm=getProfile().name||"swimmer";
+  toast(`Loaded ${esc(nm)} — ${c} ${c===1?"swim":"swims"}`);
+}
+function loadBackup(){ document.getElementById("backupFile").click(); }
 
-/* swimmer bar */
+/* ---------------- swimmer switch / add / remove ---------------- */
+function switchTo(id){
+  if(anyScrimOpen()) SCRIMS.forEach(s=>closeScrim(s));
+  setActive(id);
+  const n=document.getElementById("athleteName"); if(n) n.textContent=getProfile().name||"";
+  const j=document.getElementById("journal"); if(j) j.value=Store.get(K("journal"))||"";
+  const lbl=document.getElementById("btnSetupLabel"); if(lbl) lbl.textContent=(getProfile().dob||getProfile().name)?"Edit profile":"Set up profile";
+  renderSwimmerBar(); paintPorthole(); renderAll();
+}
+function newSwimmer(){ const id=createSwimmer(); switchTo(id); openSetup(); }
+function removeSwimmer(){
+  const nm=getProfile().name||"this swimmer";
+  if(!window.confirm(`Remove ${nm} and all their times, goals and notes from this device? This can't be undone. Save a backup first if you want to keep them.`)) return;
+  const pre="tpl.s."+activeId+".";
+  Store.keys().filter(k=>k && k.indexOf(pre)===0).forEach(k=>Store.remove(k));
+  const left=getRoster().filter(id=>id!==activeId); saveRoster(left);
+  if(left.length){ switchTo(left[0]); }
+  else { const id=createSwimmer(); switchTo(id); openSetup(); }
+  toast(`${esc(nm)} removed`);
+}
+function initials(name){ const p=String(name||"").trim().split(/\s+/).filter(Boolean); return p.length ? (p[0][0]+(p[1]?p[1][0]:"")).toUpperCase() : ""; }
 function renderSwimmerBar(){
   const bar=document.getElementById("swimmerBar"); if(!bar) return;
-  const roster=getRoster();
-  let out="";
-  const gActive=ACTIVE==="gunnar";
-  out+=`<button class="sw-chip${gActive?" active":""}" data-swimmer="gunnar" aria-pressed="${gActive}"><img src="gunnar.webp" alt=""> Gunnar</button>`;
-  roster.forEach(r=>{
-    const isActive=ACTIVE===r.id;
-    out+=`<button class="sw-chip${isActive?" active":""}" data-swimmer="${esc(r.id)}" aria-pressed="${isActive}">`;
-    if(r.photo) out+=`<img src="${r.photo}" alt=""> `;
-    out+=esc(r.name||"Swimmer")+"</button>";
+  let html="";
+  getRoster().forEach(id=>{
+    const p=profileOf(id); const active=id===activeId;
+    const av = p.photo ? `<img src="${p.photo}" alt="">` : (initials(p.name) ? `<span class="ini">${esc(initials(p.name))}</span>` : photoIcon());
+    html += `<button class="swpill${active?' active':''}" data-id="${id}" type="button" aria-pressed="${active?'true':'false'}"><span class="swav">${av}</span><span class="swname">${esc(p.name||"New swimmer")}</span></button>`;
   });
-  if(ACTIVE!=="gunnar"){
-    out+=`<button class="mini-btn" id="manageSwimmerBtn" style="padding:6px 12px;gap:5px"><svg viewBox="0 0 24 24" fill="none" width="14" height="14"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor" stroke-width="1.8"/></svg>Manage</button>`;
-  }
-  out+=`<button class="sw-add" id="addSwimmerBtn">+ New Swimmer</button>`;
-  bar.innerHTML=out;
-  bar.querySelectorAll(".sw-chip").forEach(btn=>btn.addEventListener("click",()=>{
-    const id=btn.dataset.swimmer;
-    if(id===ACTIVE) return;
-    ACTIVE=id; Store.set("rsa.active",ACTIVE); renderSwimmerBar(); renderHero(); renderGrid(); renderJournal();
-  }));
-  if(ACTIVE!=="gunnar"){ const mb=document.getElementById("manageSwimmerBtn"); if(mb) mb.addEventListener("click",openEditSwimmer); }
-  document.getElementById("addSwimmerBtn").addEventListener("click",openNewSwimmer);
+  html += `<button class="swpill new" id="swNew" type="button"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>New swimmer</button>`;
+  bar.innerHTML=html;
+  bar.querySelectorAll(".swpill[data-id]").forEach(b=> b.addEventListener("click",()=>{ if(b.dataset.id!==activeId) switchTo(b.dataset.id); }));
+  document.getElementById("swNew").addEventListener("click",newSwimmer);
 }
 
-/* new swimmer modal */
-let nsPhoto="", nsSex=null;
-function _photoIcon(){ return '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.7"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>'; }
-function _camIcon(){ return '<svg viewBox="0 0 24 24" fill="none"><path d="M3 8.5A1.5 1.5 0 014.5 7h2L8 5h8l1.5 2h2A1.5 1.5 0 0121 8.5v9A1.5 1.5 0 0119.5 19h-15A1.5 1.5 0 013 17.5z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="12.5" r="3" stroke="currentColor" stroke-width="1.7"/></svg>'; }
-function openNewSwimmer(){ nsPhoto=""; nsSex="M"; buildNewSwimmerModal(); openScrim("newSwimmerScrim"); setTimeout(()=>{ const n=document.getElementById("nsName"); if(n) n.focus(); },60); }
-function buildNewSwimmerModal(){
-  const m=document.getElementById("newSwimmerModal");
+/* ---------------- setup modal ---------------- */
+let setupPhoto=null;     // working copy while setup modal open
+let curSex=null;
+let photoMode="porthole"; // "porthole" | "setup"
+function openSetup(){ buildSetupModal(); openScrim("setupScrim"); setTimeout(()=>{ const n=document.getElementById("spName"); if(n) n.focus(); },60); }
+function buildSetupModal(){
+  const p=getProfile(); setupPhoto = p.photo || ""; curSex = p.sex || null;
+  const m=document.getElementById("setupModal");
   m.innerHTML=`
     <div class="m-head">
-      <div class="titles"><div class="m-evt" style="font-size:clamp(22px,3.5vw,32px)">Add Swimmer</div>
-        <div class="m-tags"><span class="m-tag">New logbook profile</span></div></div>
+      <div class="titles"><div class="m-evt" id="setupTitle">Your profile</div>
+        <div class="m-tags"><span class="m-tag">Personalize your logbook</span></div></div>
       <button class="x" data-close aria-label="Close">&times;</button>
     </div>
     <div class="m-body">
       <div class="setup-photo">
-        <div class="pv" id="nsPv">${_photoIcon()}</div>
+        <div class="pv" id="setupPv">${setupPhoto?`<img src="${setupPhoto}" alt="">`:photoIcon()}</div>
         <div>
           <div class="pa">
-            <button class="mini-btn" type="button" id="nsPhotoBtn">${_camIcon()}Upload photo</button>
-            <button class="mini-btn" type="button" id="nsPhotoRemove" style="display:none">Remove</button>
+            <button class="mini-btn" type="button" id="setupPhotoBtn">${camIcon()}Upload photo</button>
+            <button class="mini-btn" type="button" id="setupPhotoRemove" style="display:${setupPhoto?'inline-flex':'none'}">Remove</button>
           </div>
-          <div style="font-size:12px;color:var(--mist2)">Optional. Saved on this device only.</div>
+          <div class="hint" style="font-size:12px;color:var(--mist2)">A square headshot looks best. Saved on this device only.</div>
         </div>
       </div>
-      <div class="field"><label for="nsName">Swimmer name</label>
-        <input class="input" id="nsName" type="text" placeholder="e.g. Olivia Roney" autocomplete="off"></div>
+      <div class="field"><label for="spName">Swimmer name</label>
+        <input class="input" id="spName" type="text" placeholder="e.g. Alex Rivers" value="${esc(p.name||"")}"></div>
       <div class="two">
-        <div class="field"><label for="nsDob">Birthdate <span style="text-transform:none;letter-spacing:0;color:var(--mist2)">(for standards)</span></label>
-          <input class="input" id="nsDob" type="date" max="${todayISO()}"></div>
+        <div class="field"><label for="spDob">Birthdate</label>
+          <input class="input" id="spDob" type="date" value="${esc(p.dob||"")}" max="${todayISO()}"></div>
         <div class="field"><label>Competes as</label>
-          <div class="seg" id="nsSeg" role="group">
-            <button type="button" data-sex="F" aria-pressed="false">Girls</button>
-            <button type="button" data-sex="M" aria-pressed="true">Boys</button>
+          <div class="seg" id="spSex" role="group" aria-label="Category">
+            <button type="button" data-sex="F" aria-pressed="${p.sex==='F'?'true':'false'}">Girls</button>
+            <button type="button" data-sex="M" aria-pressed="${p.sex==='M'?'true':'false'}">Boys</button>
           </div></div>
       </div>
-      <div class="saverow" style="justify-content:flex-start;margin-top:4px">
-        <button class="btn btn-red" id="nsSave" type="button">Save swimmer</button>
+      <div class="hint" id="spAgeHint" style="font-size:12.5px;color:var(--mist);margin:-4px 0 18px;min-height:18px"></div>
+      <div class="saverow" style="justify-content:flex-start">
+        <button class="btn btn-red" id="spSave">Save profile</button>
         <button class="mini-btn" type="button" data-close>Cancel</button>
       </div>
-    </div>`;
-  m.querySelector("#nsPhotoBtn").addEventListener("click",()=>document.getElementById("nsPhotoInput").click());
-  m.querySelector("#nsPhotoRemove").addEventListener("click",()=>{ nsPhoto=""; _updateNsPv(); });
-  m.querySelectorAll("#nsSeg button").forEach(btn=>btn.addEventListener("click",()=>{
-    nsSex=btn.dataset.sex;
-    m.querySelectorAll("#nsSeg button").forEach(b=>b.setAttribute("aria-pressed",b===btn?"true":"false"));
-  }));
-  m.querySelector("#nsSave").addEventListener("click",()=>{
-    try{
-      const nameVal=m.querySelector("#nsName");
-      if(!nameVal){ toast("Form error — please reload and try again"); return; }
-      const name=nameVal.value.trim();
-      if(!name){ nameVal.focus(); toast("Enter a swimmer name"); return; }
-      const dob=m.querySelector("#nsDob").value;
-      const sex=nsSex||"M";
-      const seq=(parseInt(Store.get("rsa.swimmerSeq")||"0",10)||0)+1;
-      Store.set("rsa.swimmerSeq",String(seq));
-      const id="s"+seq;
-      saveSProfile(id,{name,dob,sex,photo:nsPhoto});
-      const roster=getRoster(); roster.push({id,name,dob,sex,photo:nsPhoto}); saveRoster(roster);
-      ACTIVE=id; Store.set("rsa.active",ACTIVE);
-      closeScrim("newSwimmerScrim");
-      renderSwimmerBar(); renderHero(); renderGrid(); renderJournal();
-      toast("<b>"+esc(name)+"</b> added — log their first swim!");
-    }catch(err){ console.error("Add swimmer failed:",err); toast("Something went wrong — try again"); }
-  });
-}
-function _updateNsPv(){
-  const pv=document.getElementById("nsPv"); if(!pv) return;
-  pv.innerHTML=nsPhoto?`<img src="${nsPhoto}" alt="">`:_photoIcon();
-  const rm=document.getElementById("nsPhotoRemove"); if(rm) rm.style.display=nsPhoto?"inline-flex":"none";
-}
-document.getElementById("nsPhotoInput").addEventListener("change",e=>{
-  const f=e.target.files&&e.target.files[0]; e.target.value=""; if(!f) return;
-  const r=new FileReader(); r.onload=()=>{ nsPhoto=String(r.result||""); _updateNsPv(); _updateEsPv(); }; r.readAsDataURL(f);
-});
-
-/* edit / manage swimmer modal */
-function openEditSwimmer(){ buildEditSwimmerModal(); openScrim("editSwimmerScrim"); setTimeout(()=>{ const n=document.getElementById("esName"); if(n) n.focus(); },60); }
-function buildEditSwimmerModal(){
-  const id=ACTIVE; const prof=getSProfile(id);
-  nsPhoto=prof.photo||""; nsSex=prof.sex||null;
-  const m=document.getElementById("editSwimmerModal");
-  m.innerHTML=`
-    <div class="m-head">
-      <div class="titles"><div class="m-evt" style="font-size:clamp(22px,3.5vw,32px)">Edit Profile</div>
-        <div class="m-tags"><span class="m-tag">${esc(prof.name||"Swimmer")}</span></div></div>
-      <button class="x" data-close aria-label="Close">&times;</button>
-    </div>
-    <div class="m-body">
-      <div class="setup-photo">
-        <div class="pv" id="esPv">${nsPhoto?`<img src="${nsPhoto}" alt="">`:_photoIcon()}</div>
-        <div>
-          <div class="pa">
-            <button class="mini-btn" type="button" id="esPhotoBtn">${_camIcon()}Upload photo</button>
-            <button class="mini-btn" type="button" id="esPhotoRemove" style="display:${nsPhoto?"inline-flex":"none"}">Remove</button>
-          </div>
-          <div style="font-size:12px;color:var(--mist2)">Saved on this device only.</div>
+      <div class="manage-foot">
+        <span class="manage-foot-label">This swimmer</span>
+        <div class="manage-foot-row">
+          <button class="mini-btn" type="button" id="spBackup"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 4v9m0 0l-3.5-3.5M12 13l3.5-3.5M5 16v2a2 2 0 002 2h10a2 2 0 002-2v-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Save backup file</button>
+          <button class="mini-btn danger-btn" type="button" id="spRemove"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 7h14M9 7V5h6v2M7 7l1 13h8l1-13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Remove this swimmer</button>
         </div>
       </div>
-      <div class="field"><label for="esName">Swimmer name</label>
-        <input class="input" id="esName" type="text" placeholder="e.g. Olivia Roney" value="${esc(prof.name||"")}" autocomplete="off"></div>
-      <div class="two">
-        <div class="field"><label for="esDob">Birthdate <span style="text-transform:none;letter-spacing:0;color:var(--mist2)">(for standards)</span></label>
-          <input class="input" id="esDob" type="date" max="${todayISO()}" value="${esc(prof.dob||"")}"></div>
-        <div class="field"><label>Competes as</label>
-          <div class="seg" id="esSeg" role="group">
-            <button type="button" data-sex="F" aria-pressed="${prof.sex==="F"?"true":"false"}">Girls</button>
-            <button type="button" data-sex="M" aria-pressed="${prof.sex==="M"?"true":"false"}">Boys</button>
-          </div></div>
-      </div>
-      <div class="saverow" style="justify-content:flex-start;margin-top:4px">
-        <button class="btn btn-red" id="esSave">Save changes</button>
-        <button class="mini-btn" type="button" data-close>Cancel</button>
-      </div>
-      <hr style="border:0;border-top:1px solid var(--line);margin:26px 0 18px">
-      <div style="font-family:var(--display);text-transform:uppercase;letter-spacing:.12em;font-size:11px;color:var(--mist2);margin-bottom:12px">Data</div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <button class="mini-btn" type="button" id="esClearSwims" style="color:var(--gold);border-color:color-mix(in srgb,var(--gold) 40%,var(--line2))">Clear all swims</button>
-        <button class="mini-btn" type="button" id="esRemove" style="color:var(--red2);border-color:color-mix(in srgb,var(--red2) 40%,var(--line2))">Remove swimmer</button>
-      </div>
     </div>`;
-  m.querySelector("#esPhotoBtn").addEventListener("click",()=>document.getElementById("nsPhotoInput").click());
-  m.querySelector("#esPhotoRemove").addEventListener("click",()=>{ nsPhoto=""; _updateEsPv(); });
-  m.querySelectorAll("#esSeg button").forEach(btn=>btn.addEventListener("click",()=>{
-    nsSex=btn.dataset.sex;
-    m.querySelectorAll("#esSeg button").forEach(b=>b.setAttribute("aria-pressed",b===btn?"true":"false"));
+
+  m.querySelector("#setupPhotoBtn").addEventListener("click",()=>{ photoMode="setup"; document.getElementById("photoInput").click(); });
+  m.querySelector("#setupPhotoRemove").addEventListener("click",()=>{ setupPhoto=""; updateSetupPv(); });
+  m.querySelector("#spBackup").addEventListener("click",exportBackup);
+  m.querySelector("#spRemove").addEventListener("click",()=>{ closeScrim("setupScrim"); removeSwimmer(); });
+  m.querySelectorAll("#spSex button").forEach(btn=>btn.addEventListener("click",()=>{
+    curSex=btn.dataset.sex;
+    m.querySelectorAll("#spSex button").forEach(b=>b.setAttribute("aria-pressed", b===btn?"true":"false"));
+    updateSpHint();
   }));
-  m.querySelector("#esSave").addEventListener("click",()=>{
-    const name=m.querySelector("#esName").value.trim();
-    if(!name){ m.querySelector("#esName").focus(); toast("Enter a name"); return; }
-    const dob=m.querySelector("#esDob").value;
-    const sex=nsSex||prof.sex||"M";
-    const updated={name,dob,sex,photo:nsPhoto};
-    saveSProfile(id,updated);
-    const roster=getRoster(); const ri=roster.findIndex(r=>r.id===id);
-    if(ri>=0){ roster[ri]={id,...updated}; saveRoster(roster); }
-    closeScrim("editSwimmerScrim");
-    renderSwimmerBar(); renderHero(); toast("<b>"+esc(name)+"</b>'s profile updated");
+  m.querySelector("#spDob").addEventListener("input",updateSpHint);
+  m.querySelector("#spSave").addEventListener("click",()=>{
+    const p2=getProfile();
+    p2.name=m.querySelector("#spName").value.trim();
+    p2.dob=m.querySelector("#spDob").value;
+    if(curSex) p2.sex=curSex;
+    p2.photo=setupPhoto||"";
+    saveProfile(p2);
+    const n=document.getElementById("athleteName"); if(n) n.textContent=p2.name||"";
+    paintPorthole(); renderAll(); closeScrim("setupScrim"); toast("Profile saved");
   });
-  m.querySelector("#esClearSwims").addEventListener("click",()=>{
-    const p=getSProfile(id);
-    if(!confirm("Clear all logged swims for "+(p.name||"this swimmer")+"? This cannot be undone.")) return;
-    saveDSwims(id,[]); Store.set("rsa."+id+".seq","0");
-    closeScrim("editSwimmerScrim");
-    renderGrid(); renderHero(); toast("All swims cleared");
-  });
-  m.querySelector("#esRemove").addEventListener("click",()=>{
-    const p=getSProfile(id);
-    if(!confirm("Remove "+(p.name||"this swimmer")+" and all their data? This cannot be undone.")) return;
-    Store.keys().filter(k=>k&&k.startsWith("rsa."+id+".")).forEach(k=>Store.remove(k));
-    const newRoster=getRoster().filter(r=>r.id!==id); saveRoster(newRoster);
-    ACTIVE="gunnar"; Store.set("rsa.active","gunnar");
-    closeScrim("editSwimmerScrim");
-    renderSwimmerBar(); renderHero(); renderGrid(); renderJournal();
-    toast("Swimmer removed");
-  });
+  updateSpHint();
 }
-function _updateEsPv(){
-  const pv=document.getElementById("esPv"); if(!pv) return;
-  pv.innerHTML=nsPhoto?`<img src="${nsPhoto}" alt="">`:_photoIcon();
-  const rm=document.getElementById("esPhotoRemove"); if(rm) rm.style.display=nsPhoto?"inline-flex":"none";
+function updateSetupPv(){
+  const pv=document.getElementById("setupPv"); if(!pv) return;
+  pv.innerHTML = setupPhoto?`<img src="${setupPhoto}" alt="">`:photoIcon();
+  const rm=document.getElementById("setupPhotoRemove"); if(rm) rm.style.display = setupPhoto?"inline-flex":"none";
+}
+function updateSpHint(){
+  const el=document.getElementById("spAgeHint"); if(!el) return;
+  const dob=document.getElementById("spDob").value;
+  if(dob && curSex){ const age=ageFrom(dob); el.innerHTML=`Standards will be shown for <b style="color:var(--foam)">${ageGroupLabel(ageGroup(age))} ${sexWord(curSex)}</b> (age ${age}).`; }
+  else if(dob){ el.textContent="Pick a category to see your standards."; }
+  else { el.textContent="Add a birthdate and category to unlock USA Swimming standards."; }
 }
 
-/* add-times modal */
-function openAddTimes(){ if(ACTIVE==="gunnar") return; buildAddTimesModal(); openScrim("addScrim"); setTimeout(()=>{ const s=document.getElementById("qaEvent"); if(s) s.focus(); },60); }
+/* ---------------- add-times modal ---------------- */
+function openAdd(){ buildAddModal(); openScrim("addScrim"); setTimeout(()=>{ const s=document.getElementById("qaEvent"); if(s) s.focus(); },60); }
 function eventOptions(){
   const scy=CATALOG.filter(c=>c.course==="SCY"), lcm=CATALOG.filter(c=>c.course==="LCM");
-  const opt=c=>`<option value="${c.id}">${esc(c.name)} ${c.course}</option>`;
+  const opt=c=>`<option value="${c.id}">${esc(c.name)}</option>`;
   return `<optgroup label="Short Course Yards">${scy.map(opt).join("")}</optgroup><optgroup label="Long Course Meters">${lcm.map(opt).join("")}</optgroup>`;
 }
-function buildAddTimesModal(){
+function buildAddModal(){
   const m=document.getElementById("addModal");
   m.innerHTML=`
     <div class="m-head">
-      <div class="titles"><div class="m-evt" style="font-size:clamp(22px,3.5vw,32px)">Add Times</div>
-        <div class="m-tags"><span class="m-tag">Log a single swim or import a season</span></div></div>
+      <div class="titles"><div class="m-evt" id="addTitle">Add times</div>
+        <div class="m-tags"><span class="m-tag">Log a single swim or import a whole season</span></div></div>
       <button class="x" data-close aria-label="Close">&times;</button>
     </div>
     <div class="m-body">
@@ -791,6 +1343,7 @@ function buildAddTimesModal(){
         <button class="tab" id="tabQuick" role="tab" aria-selected="true">Quick add</button>
         <button class="tab" id="tabBulk" role="tab" aria-selected="false">Upload / paste</button>
       </div>
+
       <div class="tabpane active" id="paneQuick" role="tabpanel">
         <div class="qa-grid">
           <div class="field full"><label for="qaEvent">Event</label>
@@ -808,16 +1361,20 @@ function buildAddTimesModal(){
           <button class="mini-btn" type="button" data-close>Done</button>
         </div>
       </div>
+
       <div class="tabpane" id="paneBulk" role="tabpanel">
-        <div class="dropzone" id="dropzone" tabindex="0">
-          <svg viewBox="0 0 24 24" fill="none"><path d="M12 16V4m0 0l-4 4m4-4l4 4M5 20h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="dropzone" id="dropzone">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 16V4m0 0l-4 4m4-4l4 4M5 20h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
           <div><b>Choose a CSV file</b> or drag &amp; drop it here</div>
-          <div style="font-size:12px;color:var(--mist2)">Columns: Event, Time, Date (opt), Meet (opt)</div>
+          <div style="font-size:12px;color:var(--mist2)">Reads Event, Time, Meet, Swim Date. Other columns are ignored.</div>
         </div>
-        <div class="csv-help">New here? <button class="linkbtn" type="button" id="dlTemplate">Download a template CSV</button><br>
-          Or paste rows: <code>50 Free SCY, 32.50, 2026-01-15, Winter Classic</code></div>
+        <input type="file" id="csvFile" class="hidden-file" accept=".csv,.txt,text/csv,text/plain">
+        <div class="csv-help">
+          New here? <button class="linkbtn" type="button" id="dlTemplate">Download a template CSV</button> to see the format.<br>
+          You can paste straight from a spreadsheet (with or without the header row). Extra columns like Age, Points, Time Standard, LSC and Team are ignored. Add the course in the event when it isn't yards, for example <code>50 Free LCM</code>.
+        </div>
         <div class="field" style="margin-top:14px"><label for="pasteBox">Paste times</label>
-          <textarea class="input paste" id="pasteBox" placeholder="50 Free SCY, 32.50, 2026-01-15, Winter Classic&#10;100 Back SCY, 1:12.00&#10;50 Free LCM, 30.10, 2026-06-01, Summer Open"></textarea></div>
+          <textarea class="input paste" id="pasteBox" placeholder="50 Free SCY, 32.50, Winter Classic, 2026-01-15&#10;100 Free SCY, 1:12.00, Winter Classic, 2026-01-15&#10;50 Back LCM, 38.40"></textarea></div>
         <div class="goalresult" id="bulkMsg" style="min-height:18px;margin:2px 2px 14px"></div>
         <div class="saverow" style="justify-content:flex-start">
           <button class="btn btn-red" id="bulkImport">Import pasted times</button>
@@ -825,18 +1382,27 @@ function buildAddTimesModal(){
         </div>
       </div>
     </div>`;
-  const setTab=(quick)=>{ m.querySelector("#tabQuick").setAttribute("aria-selected",quick?"true":"false"); m.querySelector("#tabBulk").setAttribute("aria-selected",quick?"false":"true"); m.querySelector("#paneQuick").classList.toggle("active",quick); m.querySelector("#paneBulk").classList.toggle("active",!quick); };
+
+  // tabs
+  const setTab=(quick)=>{
+    m.querySelector("#tabQuick").setAttribute("aria-selected", quick?"true":"false");
+    m.querySelector("#tabBulk").setAttribute("aria-selected", quick?"false":"true");
+    m.querySelector("#paneQuick").classList.toggle("active", quick);
+    m.querySelector("#paneBulk").classList.toggle("active", !quick);
+  };
   m.querySelector("#tabQuick").addEventListener("click",()=>setTab(true));
   m.querySelector("#tabBulk").addEventListener("click",()=>setTab(false));
+
+  // quick add
   const qaAdd=()=>{
     const eid=m.querySelector("#qaEvent").value;
     const t=normTime(m.querySelector("#qaTime").value);
     const msg=m.querySelector("#qaMsg");
-    if(!t){ msg.className="goalresult"; msg.innerHTML=`<b style="color:var(--red2)">Enter a valid time</b>`; m.querySelector("#qaTime").focus(); return; }
+    if(!t){ msg.className="goalresult"; msg.innerHTML=`<b style="color:var(--red2)">Enter a valid time</b> like 32.50 or 1:14.00`; m.querySelector("#qaTime").focus(); return; }
     const d=normDate(m.querySelector("#qaDate").value);
     const meet=m.querySelector("#qaMeet").value.trim();
-    addDSwims(ACTIVE,[{eid,t,d,meet}]);
-    renderGrid(); renderHero();
+    addSwims([{eid,t,d,meet}]);
+    renderAll();
     const cat=catalogById(eid);
     msg.className="goalresult win"; msg.innerHTML=`<b>Added ${esc(cat.name)} ${cat.course} — ${esc(t)}</b>`;
     m.querySelector("#qaTime").value=""; m.querySelector("#qaDate").value=""; m.querySelector("#qaMeet").value="";
@@ -844,508 +1410,143 @@ function buildAddTimesModal(){
   };
   m.querySelector("#qaAdd").addEventListener("click",qaAdd);
   m.querySelector("#qaTime").addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); qaAdd(); }});
+  m.querySelector("#qaMeet").addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); qaAdd(); }});
+
+  // bulk
   m.querySelector("#dlTemplate").addEventListener("click",downloadTemplate);
   const importText=(raw)=>{
     const rows=parseRows(raw); const msg=m.querySelector("#bulkMsg");
-    if(!rows.length){ msg.className="goalresult"; msg.innerHTML=`<b style="color:var(--red2)">Couldn't read any swims.</b> Check the format.`; return; }
-    addDSwims(ACTIVE,rows); renderGrid(); renderHero();
+    if(!rows.length){ msg.className="goalresult"; msg.innerHTML=`<b style="color:var(--red2)">Couldn't read any swims.</b> Check the format and try again.`; return; }
+    addSwims(rows); renderAll();
     msg.className="goalresult win"; msg.innerHTML=`<b>Imported ${rows.length} ${rows.length===1?"swim":"swims"}.</b>`;
-    m.querySelector("#pasteBox").value=""; toast(`Imported ${rows.length} ${rows.length===1?"swim":"swims"}`);
+    m.querySelector("#pasteBox").value="";
+    toast(`Imported ${rows.length} ${rows.length===1?"swim":"swims"}`);
   };
   m.querySelector("#bulkImport").addEventListener("click",()=>importText(m.querySelector("#pasteBox").value));
-  const dz=m.querySelector("#dropzone"); const cf=document.getElementById("csvFileInput");
+
+  const dz=m.querySelector("#dropzone"); const cf=m.querySelector("#csvFile");
   dz.addEventListener("click",()=>cf.click());
   dz.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); cf.click(); }});
   ["dragenter","dragover"].forEach(ev=>dz.addEventListener(ev,e=>{ e.preventDefault(); dz.classList.add("drag"); }));
   ["dragleave","drop"].forEach(ev=>dz.addEventListener(ev,e=>{ e.preventDefault(); dz.classList.remove("drag"); }));
-  dz.addEventListener("drop",e=>{ const f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0]; if(f){ const r=new FileReader(); r.onload=()=>importText(String(r.result||"")); r.onerror=()=>toast("Couldn't read file"); r.readAsText(f); } });
-  cf.addEventListener("change",e=>{ const f=e.target.files&&e.target.files[0]; e.target.value=""; if(!f) return; const r=new FileReader(); r.onload=()=>importText(String(r.result||"")); r.readAsText(f); });
+  dz.addEventListener("drop",e=>{ const f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0]; if(f) readCsv(f, importText); });
+  cf.addEventListener("change",e=>{ const f=e.target.files&&e.target.files[0]; e.target.value=""; if(f) readCsv(f, importText); });
 }
+function readCsv(file, cb){ const r=new FileReader(); r.onload=()=>cb(String(r.result||"")); r.onerror=()=>toast("Couldn't read that file"); r.readAsText(file); }
 
-const STROKES = {
-  free:{label:"Freestyle", c:"#3AD7DE"},
-  back:{label:"Backstroke", c:"#6FB7E8"},
-  breast:{label:"Breaststroke", c:"#4FD0A6"},
-  fly:{label:"Butterfly", c:"#F4C152"},
-  im:{label:"Individual Medley", c:"#E23A48"}
-};
+/* ---------------- toast ---------------- */
+let toastTimer=null;
+function toast(msg){ const t=document.getElementById("toast"); t.innerHTML=msg; t.classList.add("show"); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove("show"),2200); }
 
-/* ---------------- data (his times + USA-S 11-12 Boys standards) ---------------- */
-const EVENTS = [
-  {id:"50fr-scy", name:"50 Free", stroke:"free", course:"SCY",
-   swims:[
-     {d:"2025-11-22", t:"36.42", meet:"Turkey Classic"},
-     {d:"2025-12-07", t:"36.67", meet:"Arctic Blast"},
-     {d:"2025-12-20", t:"37.20", meet:"Reindeer Games"},
-     {d:"2026-02-14", t:"35.13", meet:"Valentine Splash"},
-     {d:"2026-03-14", t:"33.99", meet:"Reagan Rocks"},
-     {d:"2026-05-30", t:"33.55", meet:"May Mayhem"}],
-   std:{AAAA:"24.59",AAA:"25.79",AA:"26.99",A:"28.09",BB:"30.49",B:"32.79"}},
-
-  {id:"100fr-scy", name:"100 Free", stroke:"free", course:"SCY",
-   swims:[
-     {d:"2025-11-23", t:"1:21.64", meet:"Turkey Classic"},
-     {d:"2025-12-06", t:"1:28.60", meet:"Arctic Blast"},
-     {d:"2026-02-15", t:"1:18.19", meet:"Valentine Splash"},
-     {d:"2026-03-15", t:"1:15.05", meet:"Reagan Rocks"}],
-   std:{AAAA:"53.59",AAA:"56.19",AA:"58.69",A:"1:01.29",BB:"1:06.39",B:"1:11.49"}},
-
-  {id:"200fr-scy", name:"200 Free", stroke:"free", course:"SCY",
-   swims:[
-     {d:"2025-11-21", t:"2:55.60", meet:"Turkey Classic"},
-     {d:"2026-02-14", t:"2:44.14", meet:"Valentine Splash"},
-     {d:"2026-03-14", t:"2:44.01", meet:"Reagan Rocks"}],
-   std:{AAAA:"1:56.99",AAA:"2:02.59",AA:"2:08.19",A:"2:13.69",BB:"2:24.89",B:"2:35.99"}},
-
-  {id:"50bk-scy", name:"50 Back", stroke:"back", course:"SCY",
-   swims:[
-     {d:"2025-11-23", t:"45.62", meet:"Turkey Classic"},
-     {d:"2025-12-07", t:"42.77", meet:"Arctic Blast"},
-     {d:"2025-12-20", t:"43.39", meet:"Reindeer Games"},
-     {d:"2026-05-30", t:"38.84", meet:"May Mayhem"}],
-   std:{AAAA:"28.19",AAA:"29.69",AA:"31.19",A:"32.69",BB:"35.59",B:"38.49"}},
-
-  {id:"100bk-scy", name:"100 Back", stroke:"back", course:"SCY",
-   swims:[
-     {d:"2025-11-22", t:"1:36.96", meet:"Turkey Classic"}],
-   std:{AAAA:"59.49",AAA:"1:02.79",AA:"1:05.99",A:"1:09.29",BB:"1:15.69",B:"1:22.19"}},
-
-  {id:"50br-scy", name:"50 Breast", stroke:"breast", course:"SCY",
-   swims:[
-     {d:"2025-12-07", t:"56.25", meet:"Arctic Blast"},
-     {d:"2025-12-20", t:"54.37", meet:"Reindeer Games"},
-     {d:"2026-02-14", t:"52.76", meet:"Valentine Splash"},
-     {d:"2026-03-15", t:"48.33", meet:"Reagan Rocks"},
-     {d:"2026-05-30", t:"48.85", meet:"May Mayhem"}],
-   std:{AAAA:"31.49",AAA:"33.29",AA:"34.99",A:"36.69",BB:"40.09",B:"43.49"}},
-
-  {id:"100br-scy", name:"100 Breast", stroke:"breast", course:"SCY",
-   swims:[
-     {d:"2025-12-06", t:"1:58.81", meet:"Arctic Blast"}],
-   std:{AAAA:"1:07.79",AAA:"1:11.39",AA:"1:14.89",A:"1:18.39",BB:"1:25.49",B:"1:32.59"}},
-
-  {id:"50fl-scy", name:"50 Fly", stroke:"fly", course:"SCY",
-   swims:[
-     {d:"2025-11-22", t:"51.08", meet:"Turkey Classic"},
-     {d:"2025-12-20", t:"48.32", meet:"Reindeer Games"},
-     {d:"2026-05-30", t:"39.90", meet:"May Mayhem"}],
-   std:{AAAA:"26.69",AAA:"28.19",AA:"29.69",A:"31.19",BB:"34.19",B:"37.09"}},
-
-  {id:"100im-scy", name:"100 IM", stroke:"im", course:"SCY",
-   swims:[
-     {d:"2025-11-23", t:"1:40.48", meet:"Turkey Classic"},
-     {d:"2026-02-14", t:"1:29.04", meet:"Valentine Splash"},
-     {d:"2026-03-14", t:"1:29.67", meet:"Reagan Rocks"},
-     {d:"2026-05-30", t:"1:31.06", meet:"May Mayhem"}],
-   std:{AAAA:"1:01.09",AAA:"1:03.99",AA:"1:06.99",A:"1:09.99",BB:"1:15.89",B:"1:21.89"}},
-
-  {id:"200im-scy", name:"200 IM", stroke:"im", course:"SCY",
-   swims:[
-     {d:"2026-02-15", t:"3:11.59", meet:"Valentine Splash"},
-     {d:"2026-03-15", t:"3:05.35", meet:"Reagan Rocks"}],
-   std:{AAAA:"2:12.09",AAA:"2:18.79",AA:"2:25.59",A:"2:32.29",BB:"2:45.79",B:"2:59.29"}},
-
-  {id:"50fr-lcm", name:"50 Free", stroke:"free", course:"LCM",
-   swims:[
-     {d:"2026-04-26", t:"41.40", meet:"Warm Up to Long Course"}],
-   std:{AAAA:"28.09",AAA:"29.39",AA:"30.69",A:"32.09",BB:"34.79",B:"37.39"}},
-
-  {id:"200fr-lcm", name:"200 Free", stroke:"free", course:"LCM",
-   swims:[
-     {d:"2026-04-26", t:"3:13.66", meet:"Warm Up to Long Course"}],
-   std:{AAAA:"2:14.39",AAA:"2:20.79",AA:"2:27.19",A:"2:33.59",BB:"2:46.39",B:"2:59.19"}}
-];
-
-/* ---------------- helpers ---------------- */
-const CUTS = ["AAAA","AAA","AA","A","BB","B"]; // fast -> slow
-function toSec(t){ const s=String(t).trim(); if(!s) return NaN; const p=s.split(":"); return p.length===2 ? (+p[0])*60 + parseFloat(p[1]) : parseFloat(p[0]); }
-function fmt(sec){ if(!isFinite(sec)) return "—"; sec=Math.max(0,sec); const m=Math.floor(sec/60); const s=sec-m*60; return m>0 ? m+":"+s.toFixed(2).padStart(5,"0") : s.toFixed(2); }
-function sortAsc(swims){ return [...swims].sort((a,b)=> a.d<b.d?-1:a.d>b.d?1:0); }
-function bestSwim(ev){ return [...ev.swims].sort((a,b)=> toSec(a.t)-toSec(b.t))[0]; }
-function firstSwim(ev){ return sortAsc(ev.swims)[0]; }
-function dropSec(ev){ if(ev.swims.length<2) return 0; const d = toSec(firstSwim(ev).t) - toSec(bestSwim(ev).t); return d>0?d:0; }
-function gapToB(ev){ if(!ev.std) return Infinity; return toSec(bestSwim(ev).t) - toSec(ev.std.B); }
-function shortDate(d){ const [y,m,day]=d.split("-"); return (+m)+"/"+(+day); }
-function nextCut(ev){ if(!ev.std) return null; const best=toSec(bestSwim(ev).t); const slowToFast=[...CUTS].reverse(); for(const c of slowToFast){ if(toSec(ev.std[c])<best) return c; } return null; }
-const SVGNS="http://www.w3.org/2000/svg";
-function esc(s){ return String(s).replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m])); }
-
-/* ---------------- hero ---------------- */
-function computeAge(){ const dob=new Date(ATHLETE.dob+"T00:00:00"); const now=new Date();
-  let a=now.getFullYear()-dob.getFullYear(); const md=now.getMonth()-dob.getMonth(); 
-  if(md<0||(md===0&&now.getDate()<dob.getDate())) a--; return a; }
-
-function renderHero(){
-  const prof=getActiveProfile();
-  const evs=getActiveEvents();
-  // update name + photo
-  const nameEl=document.getElementById("athleteName");
-  if(nameEl) nameEl.textContent = prof.name||"Swimmer";
-  const pimg=document.getElementById("portholeImg");
-  if(pimg) pimg.src = prof.photo||"gunnar.webp";
-  // age badge
-  const age = ACTIVE==="gunnar" ? computeAge() : ageFrom(prof.dob);
-  const ag = ageGroup(age);
-  const agLabel = ag ? (ag+" "+sexWord(prof.sex||"M")) : (prof.name||"Swimmer");
-  document.getElementById("ageBadge").textContent = age!=null ? age+" · "+agLabel : (prof.name||"");
-  document.getElementById("evCount").textContent = evs.length;
-  // stats
-  if(evs.length===0){
-    document.getElementById("statStrip").innerHTML="";
-    document.getElementById("spotlight").innerHTML = ACTIVE!=="gunnar" ? `<div class="tag">${icon("wave")} No swims yet</div><div class="big">Tap <b style="cursor:pointer;color:var(--aqua)" onclick="openAddTimes()">+ Add Times</b> to log the first swim.</div>` : "";
-    return;
-  }
-  const totalDrop=evs.reduce((s,ev)=>s+dropSec(ev),0);
-  const meets=new Set(); evs.forEach(ev=>ev.swims.forEach(s=>{ if(s.meet) meets.add(s.meet); }));
-  const stats=[
-    {ic:icon("lanes"), num:evs.length, lab:"Events Raced", c:"var(--aqua)"},
-    {ic:icon("medal"), num:evs.length, lab:"Personal Bests", c:"var(--gold)"},
-    {ic:icon("stop"), num:totalDrop.toFixed(1)+"s", lab:"Time Dropped", c:"var(--green)"},
-    {ic:icon("flag"), num:meets.size, lab:"Meets", c:"var(--red2)"}
-  ];
-  document.getElementById("statStrip").innerHTML = stats.map(s=>
-    `<div class="stat" style="--accent:${s.c}">${s.ic}<div class="num">${s.num}</div><div class="lab">${s.lab}</div></div>`).join("");
-  // spotlight
-  const evsWith=evs.filter(ev=>ev.std);
-  const sp=document.getElementById("spotlight");
-  if(evsWith.length){
-    const closest=[...evsWith].sort((a,b)=>gapToB(a)-gapToB(b))[0];
-    const g=gapToB(closest);
-    if(isFinite(g) && g>0){
-      sp.innerHTML=`<div class="tag">${icon("target")} Closest to a cut</div><div class="big">Just <b>${g.toFixed(2)}s</b> from a <em>B</em> standard in the <em>${esc(closest.name)} ${closest.course}</em>.</div>`;
-    } else if(isFinite(g)){
-      sp.innerHTML=`<div class="tag">${icon("target")} On the board</div><div class="big">Already cracked a <em>B</em> standard. Time to climb the ladder.</div>`;
-    } else { sp.innerHTML=""; }
-  } else { sp.innerHTML=""; }
-}
-function refreshFooterName(){ /* hook if needed */ }
-
-/* ---------------- icons ---------------- */
-function icon(name){
-  const p={
-    lanes:'<path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
-    medal:'<circle cx="12" cy="15" r="5" stroke="currentColor" stroke-width="2"/><path d="M9 3l2 6M15 3l-2 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
-    stop:'<circle cx="12" cy="13" r="7" stroke="currentColor" stroke-width="2"/><path d="M12 13V9M10 3h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
-    flag:'<path d="M5 21V4m0 0l11 2-2 4 2 4-11 1" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>',
-    target:'<circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3.2" stroke="currentColor" stroke-width="2"/>',
-    wave:'<path d="M3 12c2.5-3 4.5-3 7 0s4.5 3 7 0M3 17c2.5-3 4.5-3 7 0s4.5 3 7 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
-    chart:'<path d="M4 19V5M4 19h16M8 15l3-4 3 2 4-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
-    ladder:'<path d="M8 3v18M16 3v18M8 7h8M8 12h8M8 17h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
-    note:'<path d="M5 4h11l3 3v13H5zM15 4v4h4" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>'
-  }[name]||"";
-  return `<svg class="ic" viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true">${p}</svg>`;
-}
-
-/* ---------------- event cards ---------------- */
-function sparkline(ev, color){
-  const sw=sortAsc(ev.swims); const secs=sw.map(s=>toSec(s.t));
-  const w=220,h=34,pad=4;
-  if(secs.length<2){ return `<svg class="spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><circle cx="${w/2}" cy="${h/2}" r="3.5" fill="${color}"/></svg>`; }
-  const min=Math.min(...secs),max=Math.max(...secs),rng=(max-min)||1;
-  const X=i=> pad + i*(w-2*pad)/(secs.length-1);
-  const Y=v=> pad + (v-min)/rng*(h-2*pad); // faster (small) -> top
-  const pts=secs.map((v,i)=>`${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(" ");
-  const last=secs.length-1, bi=secs.indexOf(min);
-  return `<svg class="spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
-    <polyline points="${pts}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>
-    <circle cx="${X(bi).toFixed(1)}" cy="${Y(min).toFixed(1)}" r="3.5" fill="${color}"/>
-  </svg>`;
-}
-
-let currentFilter="all";
-function renderGrid(){
-  const ACTIVE_EVENTS=getActiveEvents();
-  const grid=document.getElementById("eventGrid");
-  const atBtn=document.getElementById("addTimesBtn"); if(atBtn) atBtn.style.display=ACTIVE!=="gunnar"?"inline-flex":"none";
-  const order=["free","back","breast","fly","im"];
-  const list=ACTIVE_EVENTS.filter(ev=> currentFilter==="all" || ev.course===currentFilter);
-  // group by stroke, keep stroke order, SCY before LCM within
-  let html="";
-  if(!list.length && ACTIVE!=="gunnar"){
-    html=`<div class="empty-state" style="grid-column:1/-1">
-      <div class="eico">${icon("wave")}</div>
-      <h3>No swims yet</h3>
-      <p>Log the first time to start building the progression graph.</p>
-      <div class="row"><button class="btn btn-red" onclick="openAddTimes()">+ Add Times</button></div>
-    </div>`;
-  }
-  order.forEach(stk=>{
-    const evs=list.filter(e=>e.stroke===stk).sort((a,b)=> (a.course>b.course?1:-1) || (toSec(bestSwim(a).t)-toSec(bestSwim(b).t)));
-    if(!evs.length) return;
-    const col=STROKES[stk].c;
-    html+=`<div class="grouplabel" style="--accent:${col}"><span class="swatch"></span>${STROKES[stk].label}</div>`;
-    evs.forEach(ev=>{
-      const best=bestSwim(ev); const g=gapToB(ev); const nc=nextCut(ev);
-      const gapFooter = (g!==null&&g!==Infinity&&isFinite(g)) ? (g>0?`<b>${g.toFixed(2)}s</b> to B cut`:`B cut achieved`) : ``;
-      html+=`<button class="card" style="--accent:${col}" data-id="${ev.id}" aria-label="${esc(ev.name)} ${ev.course}, best ${fmt(toSec(best.t))}. Open details.">
-        <span class="stripe"></span>
-        <div class="ev-top"><span class="ev-name">${esc(ev.name)}</span><span class="course">${ev.course}</span></div>
-        <div class="pb"><span class="pbtag">PERSONAL BEST</span>${fmt(toSec(best.t))}</div>
-        ${sparkline(ev,col)}
-        <div class="ev-foot">
-          <span class="gap">${gapFooter}</span>
-          <span class="arrow">${arrowSvg()}</span>
-        </div>
-      </button>`;
-    });
-  });
-  grid.innerHTML=html;
-  grid.querySelectorAll(".card").forEach(c=> c.addEventListener("click",()=>openModal(c.dataset.id)));
-}
-function arrowSvg(){ return `<svg viewBox="0 0 24 24" width="20" height="20" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`; }
-
-/* ---------------- progression chart (SVG) ---------------- */
-function chartSVG(ev, goalSec){
-  const sw=sortAsc(ev.swims); const secs=sw.map(s=>toSec(s.t));
-  const W=560,H=300, L=18,R=18,T=34,B=46;
-  const bSec=ev.std ? toSec(ev.std.B) : NaN;
-  const vals=[...secs]; if(isFinite(goalSec)) vals.push(goalSec); if(isFinite(bSec)) vals.push(bSec);
-  let maxV=Math.max(...secs);
-  let minV=Math.min(...vals);
-  const padV=((maxV-minV)||1)*0.16;
-  const top=minV-padV, bot=maxV+padV;
-  const plotW=W-L-R, plotH=H-T-B;
-  const X=i=> sw.length<2 ? L+plotW/2 : L + i*plotW/(sw.length-1);
-  const Y=v=> T + (v-top)/(bot-top)*plotH; // faster -> top
-  let g="";
-  // gridlines: B cut + goal
-  const bY=isFinite(bSec)?Y(bSec):null;
-  if(bY!==null && bY>=T-2 && bY<=T+plotH+2){
-    g+=`<line x1="${L}" y1="${bY.toFixed(1)}" x2="${W-R}" y2="${bY.toFixed(1)}" stroke="#F4C152" stroke-width="1.4" stroke-dasharray="6 5" opacity=".75"/>
-        <text x="${W-R}" y="${(bY-6).toFixed(1)}" fill="#F4C152" font-size="11" text-anchor="end" font-family="Oswald" letter-spacing=".06em">B CUT ${ev.std?esc(ev.std.B):""}</text>`;
-  }
-  if(isFinite(goalSec)){
-    const gY=Y(goalSec);
-    if(gY>=T-2 && gY<=T+plotH+2){
-      g+=`<line x1="${L}" y1="${gY.toFixed(1)}" x2="${W-R}" y2="${gY.toFixed(1)}" stroke="#3AD7DE" stroke-width="1.6" stroke-dasharray="2 5" opacity=".9"/>
-          <text x="${L}" y="${(gY-6).toFixed(1)}" fill="#3AD7DE" font-size="11" text-anchor="start" font-family="Oswald" letter-spacing=".08em">GOAL ${fmt(goalSec)}</text>`;
-    }
-  }
-  // line + area
-  if(sw.length>=2){
-    const pts=secs.map((v,i)=>`${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(" ");
-    const area=`${X(0).toFixed(1)},${(T+plotH).toFixed(1)} `+pts+` ${X(sw.length-1).toFixed(1)},${(T+plotH).toFixed(1)}`;
-    g+=`<polygon points="${area}" fill="url(#agrad)" opacity=".5"/>
-        <polyline points="${pts}" fill="none" stroke="#3AD7DE" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>`;
-  }
-  const bi=secs.indexOf(Math.min(...secs));
-  sw.forEach((s,i)=>{
-    const isBest=i===bi; const cy=Y(secs[i]);
-    g+=`<circle cx="${X(i).toFixed(1)}" cy="${cy.toFixed(1)}" r="${isBest?6:4.5}" fill="${isBest?'#F4C152':'#0A1B2C'}" stroke="${isBest?'#fff':'#3AD7DE'}" stroke-width="2"/>`;
-    // value label
-    g+=`<text x="${X(i).toFixed(1)}" y="${(cy-12).toFixed(1)}" fill="${isBest?'#F4C152':'#cfe4ec'}" font-size="${isBest?12:11}" text-anchor="middle" font-family="Oswald" font-weight="${isBest?600:400}">${fmt(secs[i])}</text>`;
-    // x label
-    g+=`<text x="${X(i).toFixed(1)}" y="${(T+plotH+20).toFixed(1)}" fill="#7e9bb0" font-size="10.5" text-anchor="middle" font-family="Oswald">${shortDate(s.d)}</text>`;
-    g+=`<text x="${X(i).toFixed(1)}" y="${(T+plotH+33).toFixed(1)}" fill="#5E7E94" font-size="9.5" text-anchor="middle" font-family="-apple-system,sans-serif">${esc(s.meet.length>12?s.meet.slice(0,11)+'…':s.meet)}</text>`;
-  });
-  const note = sw.length<2 ? `<text x="${(L+plotW/2).toFixed(1)}" y="${(T-14).toFixed(1)}" fill="#93B2C6" font-size="11.5" text-anchor="middle" font-family="-apple-system,sans-serif">Swum once — race it again to draw your line.</text>` : "";
-  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Time progression chart">
-    <defs><linearGradient id="agrad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#3AD7DE" stop-opacity=".35"/><stop offset="1" stop-color="#3AD7DE" stop-opacity="0"/>
-    </linearGradient></defs>
-    <text x="${L}" y="14" fill="#5E7E94" font-size="10.5" font-family="Oswald" letter-spacing=".14em">FASTER ↑</text>
-    ${note}${g}
-  </svg>`;
-}
-
-/* ---------------- standards ladder (SVG signature) ---------------- */
-function ladderSVG(ev, goalSec){
-  if(!ev.std) return `<svg viewBox="0 0 300 120" style="width:100%;opacity:.5"><text x="150" y="60" text-anchor="middle" fill="#5E7E94" font-size="13" font-family="-apple-system,sans-serif">Set birthdate &amp; category to see standards</text></svg>`;
-  const W=300,H=360, trackX=78, topY=22, botY=H-26;
-  const aaaa=toSec(ev.std.AAAA), b=toSec(ev.std.B), bb=toSec(ev.std.BB);
-  const baseline=b + (b-bb)*0.7;       // a touch slower than B so sub-B times fit
-  const fastTop=aaaa - (toSec(ev.std.AAA)-aaaa)*0.4;
-  const span=baseline-fastTop;
-  const pos=v=>{ let p=(baseline-v)/span; p=Math.max(0,Math.min(1,p)); return botY-(botY-topY)*p; };
-  const best=toSec(bestSwim(ev).t);
-  const nc=nextCut(ev);
-  let g=`<line x1="${trackX}" y1="${topY}" x2="${trackX}" y2="${botY}" stroke="#27506F" stroke-width="3" stroke-linecap="round"/>`;
-  // labels with simple collision avoidance for the time text on the right
-  const rows=CUTS.map(c=>({c, y:pos(toSec(ev.std[c])), t:ev.std[c]}));
-  // place time labels (right) avoiding overlap, top->bottom
-  let lastLY=-99;
-  rows.forEach(r=>{ let ly=r.y; if(ly-lastLY<15) ly=lastLY+15; r.ly=ly; lastLY=ly; });
-  rows.forEach(r=>{
-    const achieved = best<=toSec(r.t);
-    const isNext = r.c===nc;
-    const col = achieved? "#4FD0A6" : (isNext? "#F4C152" : "#5E7E94");
-    g+=`<line x1="${trackX-9}" y1="${r.y.toFixed(1)}" x2="${trackX+9}" y2="${r.y.toFixed(1)}" stroke="${col}" stroke-width="${isNext?4:3}" stroke-linecap="round"/>`;
-    g+=`<text x="${trackX-16}" y="${(r.y+4).toFixed(1)}" fill="${col}" font-size="14" font-weight="${isNext||achieved?600:500}" text-anchor="end" font-family="Oswald" letter-spacing=".04em">${r.c}</text>`;
-    g+=`<text x="${trackX+16}" y="${(r.ly+4).toFixed(1)}" fill="${achieved?'#cfe4ec':(isNext?'#F4C152':'#7e9bb0')}" font-size="12" text-anchor="start" font-family="Oswald">${esc(r.t)}</text>`;
-    if(isNext) g+=`<text x="${trackX+16}" y="${(r.ly+16).toFixed(1)}" fill="#F4C152" font-size="9" text-anchor="start" font-family="Oswald" letter-spacing=".16em">NEXT TARGET</text>`;
-  });
-  // YOU marker
-  const yY=pos(best);
-  g+=`<line x1="${trackX-22}" y1="${yY.toFixed(1)}" x2="${W-10}" y2="${yY.toFixed(1)}" stroke="#3AD7DE" stroke-width="2" stroke-dasharray="1 4" opacity=".55"/>`;
-  g+=`<circle cx="${trackX}" cy="${yY.toFixed(1)}" r="6.5" fill="#3AD7DE" stroke="#06121F" stroke-width="2"/>`;
-  g+=`<rect x="${trackX-78}" y="${(yY-11).toFixed(1)}" width="54" height="22" rx="6" fill="#3AD7DE"/>`;
-  g+=`<text x="${(trackX-51)}" y="${(yY+4).toFixed(1)}" fill="#06121F" font-size="12" font-weight="700" text-anchor="middle" font-family="Oswald">${fmt(best)}</text>`;
-  g+=`<text x="${trackX-78}" y="${(yY-14).toFixed(1)}" fill="#3AD7DE" font-size="9" font-family="Oswald" letter-spacing=".16em">YOU</text>`;
-  // GOAL marker
-  if(isFinite(goalSec)){
-    const gY=pos(goalSec);
-    g+=`<polygon points="${W-10},${(gY-7).toFixed(1)} ${W-10},${(gY+7).toFixed(1)} ${W-22},${gY.toFixed(1)}" fill="#F4C152"/>`;
-    g+=`<line x1="${trackX}" y1="${gY.toFixed(1)}" x2="${W-22}" y2="${gY.toFixed(1)}" stroke="#F4C152" stroke-width="1.6" stroke-dasharray="3 4" opacity=".8"/>`;
-    g+=`<text x="${W-10}" y="${(gY-10).toFixed(1)}" fill="#F4C152" font-size="9" text-anchor="end" font-family="Oswald" letter-spacing=".14em">GOAL</text>`;
-  }
-  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="USA Swimming standards ladder">${g}</svg>`;
-}
-
-/* ---------------- modal ---------------- */
-let lastFocus=null;
-function openModal(id){
-  const ev=getActiveEvents().find(e=>e.id===id); if(!ev) return;
-  lastFocus=document.activeElement;
-  const col=STROKES[ev.stroke].c;
-  const best=bestSwim(ev); const bestSec=toSec(best.t);
-  const goalKey=activeKey("goal."+ev.id), noteKey=activeKey("note."+ev.id);
-  const goalSec=toSec(Store.get(goalKey)||"");
-  const nc=nextCut(ev);
-
-  const modal=document.getElementById("modal");
-  modal.style.setProperty("--accent",col);
-  modal.innerHTML = `
-    <div class="m-head">
-      <div class="titles">
-        <div class="m-evt" id="m-evt">${esc(ev.name)}</div>
-        <div class="m-tags">
-          <span class="m-tag stroke">${STROKES[ev.stroke].label}</span>
-          <span class="m-tag">${ev.course==="SCY"?"Short Course Yards":"Long Course Meters"}</span>
-          <span class="m-tag">${ev.swims.length} ${ev.swims.length===1?"swim":"swims"}</span>
-        </div>
-      </div>
-      <button class="x" id="closeX" aria-label="Close">&times;</button>
-    </div>
-    <div class="m-body">
-      <div class="pbcard">
-        <div><div class="lbl">Personal Best</div><div class="val">${fmt(bestSec)}</div></div>
-        <div class="meta">set at <b>${esc(best.meet)}</b><br>${esc(longDate(best.d))}</div>
-      </div>
-
-      <div class="goalbox">
-        <div class="ghead">${icon("target")} Set your next goal</div>
-        <div class="goalrow">
-          <input id="goalInput" type="text" inputmode="decimal" placeholder="e.g. ${suggestGoal(ev)}" value="${esc(Store.get(goalKey)||"")}" aria-label="Goal time">
-          <div class="goalresult" id="goalResult"></div>
-          <div class="hint">Type a time like <b>32.50</b> or <b>1:14.00</b>. It saves automatically and shows on your chart and ladder.</div>
-        </div>
-      </div>
-
-      <div class="split">
-        <div class="subcard">
-          <h4>${icon("ladder")} Standards ladder</h4>
-          <div class="cap">USA Swimming 2024–28 · ${ev.std ? ageGroupLabel(ageGroup(ageFrom(getActiveProfile().dob||"")))+" "+sexWord(getActiveProfile().sex||"M") : "Set profile for standards"} · ${ev.course}</div>
-          <div id="ladderWrap">${ladderSVG(ev,goalSec)}</div>
-          <div class="stdlist" id="stdList"></div>
-        </div>
-        <div class="subcard">
-          <h4>${icon("chart")} Progression</h4>
-          <div class="cap">Race times this season — your line climbs as you get faster.</div>
-          <div id="chartWrap">${chartSVG(ev,goalSec)}</div>
-        </div>
-      </div>
-
-      <div class="history">
-        <h4>${icon("stop")} Race history</h4>
-        ${historyTable(ev)}
-      </div>
-
-      <div class="noteblock">
-        <h4>${icon("note")} Notes for this event</h4>
-        <textarea class="note" id="evNote" placeholder="Splits, technique cues, how the race felt, what to fix next time…">${esc(Store.get(noteKey)||"")}</textarea>
-        <div class="saverow">
-          <span class="saved" id="evNoteSaved">✓ Saved</span>
-        </div>
-      </div>
-    </div>`;
-
-  renderStdList(ev);
-  // goal live update
-  const gi=modal.querySelector("#goalInput");
-  const updateGoal=()=>{
-    const raw=gi.value.trim();
-    Store.set(goalKey, raw);
-    const gs=toSec(raw);
-    document.getElementById("ladderWrap").innerHTML=ladderSVG(ev,gs);
-    document.getElementById("chartWrap").innerHTML=chartSVG(ev,gs);
-    const gr=document.getElementById("goalResult");
-    if(isFinite(gs)){
-      const diff=bestSec-gs;
-      if(diff>0){ gr.className="goalresult"; gr.innerHTML=`Drop <b>${diff.toFixed(2)}s</b> to hit it`; }
-      else if(diff<0){ gr.className="goalresult win"; gr.innerHTML=`<b>Already faster — set a bolder goal!</b>`; }
-      else { gr.className="goalresult"; gr.innerHTML=`Right on your best`; }
-    } else { gr.className="goalresult"; gr.innerHTML=""; }
-  };
-  gi.addEventListener("input",updateGoal); updateGoal();
-
-  // event note
-  const en=modal.querySelector("#evNote");
-  const enSaved=modal.querySelector("#evNoteSaved");
-  en.addEventListener("input",()=>{ Store.set(noteKey, en.value); flash(enSaved); });
-
-  modal.querySelector("#closeX").addEventListener("click",closeModal);
-  const scrim=document.getElementById("scrim");
-  scrim.classList.add("open"); document.body.style.overflow="hidden";
-  scrim.scrollTop=0;
-  setTimeout(()=>modal.querySelector("#closeX").focus(),50);
-}
-function renderStdList(ev){
-  if(!ev.std){ document.getElementById("stdList").innerHTML="<div style=\'color:var(--mist2);font-size:13px;padding:12px 0\'>Add a birthdate &amp; category in swimmer profile to see standards.</div>"; return; }
-  const nc=nextCut(ev); const best=toSec(bestSwim(ev).t);
-  document.getElementById("stdList").innerHTML = CUTS.map(c=>{
-    return `<div class="stdpill" ${c===nc?'data-next="1"':''}><div class="s">${c}</div><div class="t">${esc(ev.std[c])}</div></div>`;
-  }).join("");
-}
-function historyTable(ev){
-  const asc=sortAsc(ev.swims); const bi=ev.swims.indexOf(bestSwim(ev));
-  const bestId=bestSwim(ev);
-  let rows="";
-  asc.forEach((s,i)=>{
-    const isBest = s===bestId || (toSec(s.t)===toSec(bestId.t) && s.d===bestId.d);
-    let delta="";
-    if(i>0){ const d=toSec(asc[i-1].t)-toSec(s.t); if(Math.abs(d)>=0.01){ delta = d>0?`<span class="delta down">▼ ${d.toFixed(2)}</span>`:`<span class="delta up">▲ ${Math.abs(d).toFixed(2)}</span>`; } }
-    rows+=`<tr class="${isBest?'best':''}"><td class="t">${fmt(toSec(s.t))}${isBest?'<span class="bestmark">PB</span>':''}</td><td>${esc(longDate(s.d))}</td><td>${esc(s.meet)}</td><td>${delta}</td></tr>`;
-  });
-  return `<table class="swims"><thead><tr><th>Time</th><th>Date</th><th>Meet</th><th>Vs previous</th></tr></thead><tbody>${rows}</tbody></table>`;
-}
-function suggestGoal(ev){ const best=toSec(bestSwim(ev).t); if(!ev.std) return fmt(best-1.0); const b=toSec(ev.std.B); const tgt=best>b?Math.max(b,best-1.0):best-0.5; return fmt(tgt); }
-function longDate(d){ const [y,m,day]=d.split("-"); const mo=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][(+m)-1]; return `${mo} ${(+day)}, ${y}`; }
-function flash(el){ el.classList.add("show"); clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove("show"),1800); }
-
-function closeModal(){ const scrim=document.getElementById("scrim"); scrim.classList.remove("open"); document.body.style.overflow=""; if(lastFocus) lastFocus.focus(); }
-document.getElementById("scrim").addEventListener("click",e=>{ if(e.target.id==="scrim") closeModal(); });
-document.addEventListener("keydown",e=>{ if(e.key==="Escape" && document.getElementById("scrim").classList.contains("open")) closeModal(); });
+/* ---------------- scrims (generic) ---------------- */
+let scrimFocus=null;
+const SCRIMS=["scrim","setupScrim","addScrim"];
+function anyScrimOpen(){ return SCRIMS.some(id=>document.getElementById(id).classList.contains("open")); }
+function openScrim(id){ scrimFocus=document.activeElement; const s=document.getElementById(id); s.classList.add("open"); document.body.style.overflow="hidden"; s.scrollTop=0; }
+function closeScrim(id){ const s=document.getElementById(id); s.classList.remove("open"); if(!anyScrimOpen()) document.body.style.overflow=""; if(scrimFocus&&scrimFocus.focus) scrimFocus.focus(); }
+function wireScrim(id){ const s=document.getElementById(id); s.addEventListener("click",e=>{ if(e.target===s || (e.target.closest && e.target.closest("[data-close]"))) closeScrim(id); }); }
+SCRIMS.forEach(wireScrim);
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ for(const id of ["addScrim","setupScrim","scrim"]){ if(document.getElementById(id).classList.contains("open")){ closeScrim(id); break; } } } });
 
 /* ---------------- filters ---------------- */
 document.getElementById("filters").addEventListener("click",e=>{
   const b=e.target.closest(".chip"); if(!b) return;
   currentFilter=b.dataset.f;
   document.querySelectorAll("#filters .chip").forEach(c=>c.setAttribute("aria-pressed", c===b?"true":"false"));
-  renderGrid();
+  renderGrid(buildEvents());
 });
 
 /* ---------------- journal ---------------- */
 function renderJournal(){
   const ta=document.getElementById("journal");
-  ta.removeEventListener("input",ta._jrnListener);
-  ta.value=Store.get(activeKey("journal"))||"";
+  ta.value=Store.get(K("journal"))||"";
   const saved=document.getElementById("journalSaved");
-  ta._jrnListener=()=>{ Store.set(activeKey("journal"), ta.value); flash(saved); };
-  ta.addEventListener("input",ta._jrnListener);
-  const prompts=["My goal for this summer","What went well at my last meet","One thing to fix in practice","A swimmer I look up to","My pre-race routine"];
+  document.getElementById("saveJournal").addEventListener("click",()=>{ Store.set(K("journal"), ta.value); flash(saved); });
+  ta.addEventListener("input",()=>{ Store.set(K("journal"), ta.value); });
+  const prompts=["My goal for this season","What went well at my last meet","One thing to fix in practice","A swimmer I look up to","My pre-race routine"];
   document.getElementById("prompts").innerHTML=prompts.map(p=>`<button class="prompt" type="button">${esc(p)}</button>`).join("");
   document.querySelectorAll(".prompt").forEach(btn=>btn.addEventListener("click",()=>{
-    const cur=ta.value.trimEnd(); ta.value=(cur?cur+"\n\n":"")+btn.textContent+":\n"; ta.focus(); Store.set(activeKey("journal"),ta.value);
+    const cur=ta.value.trimEnd(); ta.value=(cur?cur+"\n\n":"")+btn.textContent+":\n"; ta.focus(); Store.set(K("journal"),ta.value);
     ta.scrollTop=ta.scrollHeight;
   }));
 }
 
-/* ---------------- init ---------------- */
-wireNewScrims();
-renderSwimmerBar();
-renderHero();
-renderGrid();
-renderJournal();
+/* ---------------- render all ---------------- */
+function renderAll(){
+  const evs=buildEvents();
+  document.getElementById("evCount").textContent=evs.length;
+  renderBadge();
+  renderHeroStats(evs);
+  renderSpotlight(evs);
+  renderGrid(evs);
+  const empty=document.getElementById("emptyState");
+  const manage=document.getElementById("dataManage");
+  const filtersEl=document.getElementById("filters");
+  if(evs.length===0){ empty.style.display=""; manage.style.display="none"; filtersEl.style.visibility="hidden"; }
+  else { empty.style.display="none"; manage.style.display="flex"; filtersEl.style.visibility="visible"; }
+}
+
+/* ---------------- wire global buttons + init ---------------- */
+(function init(){
+  // multi-swimmer bootstrap: migrate old data, then pick an active swimmer
+  migrateIfNeeded();
+  let roster=getRoster();
+  if(!roster.length){ createSwimmer(); roster=getRoster(); }
+  let a=Store.get("tpl.active");
+  if(!a || roster.indexOf(a)<0) a=roster[0];
+  setActive(a);
+
+  // name (editable)
+  const nameEl=document.getElementById("athleteName");
+  nameEl.textContent = getProfile().name || "";
+  nameEl.addEventListener("blur",()=>{ const p=getProfile(); p.name=nameEl.textContent.trim(); saveProfile(p); });
+  nameEl.addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); nameEl.blur(); }});
+
+  // porthole photo
+  const ring=document.getElementById("portholeRing");
+  ring.addEventListener("click",()=>{ photoMode="porthole"; document.getElementById("photoInput").click(); });
+  ring.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); photoMode="porthole"; document.getElementById("photoInput").click(); }});
+
+  document.getElementById("photoInput").addEventListener("change",e=>{
+    const f=e.target.files&&e.target.files[0]; e.target.value=""; if(!f) return;
+    readPhoto(f,url=>{
+      if(!url){ toast("Couldn't read that image"); return; }
+      if(photoMode==="setup"){ setupPhoto=url; updateSetupPv(); }
+      else { const p=getProfile(); p.photo=url; saveProfile(p); paintPorthole(); toast("Photo updated"); }
+    });
+  });
+
+  // open buttons
+  document.getElementById("btnSetup").addEventListener("click",openSetup);
+  document.getElementById("emptySetup").addEventListener("click",openSetup);
+  document.getElementById("manageProfile").addEventListener("click",openSetup);
+  document.getElementById("btnAddTop").addEventListener("click",openAdd);
+  document.getElementById("emptyAdd").addEventListener("click",openAdd);
+  document.getElementById("manageAdd").addEventListener("click",openAdd);
+  document.getElementById("manageExport").addEventListener("click",exportCSV);
+  document.getElementById("manageSave").addEventListener("click",exportBackup);
+  document.getElementById("manageLoad").addEventListener("click",loadBackup);
+  document.getElementById("emptyLoad").addEventListener("click",loadBackup);
+  document.getElementById("manageClear").addEventListener("click",removeSwimmer);
+  document.getElementById("backupFile").addEventListener("change",e=>{
+    const f=e.target.files&&e.target.files[0]; e.target.value=""; if(!f) return;
+    const r=new FileReader(); r.onload=()=>importBackup(String(r.result||"")); r.onerror=()=>toast("Couldn't read that file"); r.readAsText(f);
+  });
+
+  // "Set up profile" / "Edit profile" label on the hero button
+  document.getElementById("btnSetupLabel").textContent = (getProfile().dob||getProfile().name) ? "Edit profile" : "Set up profile";
+
+  renderSwimmerBar();
+  paintPorthole();
+  renderAll();
+  renderJournal();
+
+  // first-run: nudge into setup when there's a single empty swimmer
+  if(getRoster().length===1 && !getProfile().dob && !getProfile().name && getSwims().length===0){
+    setTimeout(openSetup, 350);
+  }
+})();
+
 </script>
 </body>
 </html>
