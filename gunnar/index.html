@@ -487,7 +487,11 @@ const Store = (function(){
 /* ---------------- athlete ---------------- */
 const ATHLETE = { dob:"2014-11-05" };
 
-let ACTIVE = "gunnar";
+let ACTIVE = (function(){
+  const a=Store.get("rsa.active")||"gunnar";
+  if(a==="gunnar") return "gunnar";
+  try{ const r=JSON.parse(Store.get("rsa.roster")||"[]"); return r.some(x=>x.id===a)?a:"gunnar"; }catch(e){ return "gunnar"; }
+})();
 function activeKey(sub){ return ACTIVE==="gunnar" ? "rsa."+sub : "rsa."+ACTIVE+"."+sub; }
 function getActiveProfile(){
   if(ACTIVE==="gunnar") return {name:"Gunnar Roney",dob:"2014-11-05",sex:"M",photo:"gunnar.webp"};
@@ -598,7 +602,7 @@ function renderSwimmerBar(){
   bar.querySelectorAll(".sw-chip").forEach(btn=>btn.addEventListener("click",()=>{
     const id=btn.dataset.swimmer;
     if(id===ACTIVE) return;
-    ACTIVE=id; renderSwimmerBar(); renderHero(); renderGrid(); renderJournal();
+    ACTIVE=id; Store.set("rsa.active",ACTIVE); renderSwimmerBar(); renderHero(); renderGrid(); renderJournal();
   }));
   if(ACTIVE!=="gunnar"){ const mb=document.getElementById("manageSwimmerBtn"); if(mb) mb.addEventListener("click",openEditSwimmer); }
   document.getElementById("addSwimmerBtn").addEventListener("click",openNewSwimmer);
@@ -608,7 +612,7 @@ function renderSwimmerBar(){
 let nsPhoto="", nsSex=null;
 function _photoIcon(){ return '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.7"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>'; }
 function _camIcon(){ return '<svg viewBox="0 0 24 24" fill="none"><path d="M3 8.5A1.5 1.5 0 014.5 7h2L8 5h8l1.5 2h2A1.5 1.5 0 0121 8.5v9A1.5 1.5 0 0119.5 19h-15A1.5 1.5 0 013 17.5z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="12.5" r="3" stroke="currentColor" stroke-width="1.7"/></svg>'; }
-function openNewSwimmer(){ nsPhoto=""; nsSex=null; buildNewSwimmerModal(); openScrim("newSwimmerScrim"); setTimeout(()=>{ const n=document.getElementById("nsName"); if(n) n.focus(); },60); }
+function openNewSwimmer(){ nsPhoto=""; nsSex="M"; buildNewSwimmerModal(); openScrim("newSwimmerScrim"); setTimeout(()=>{ const n=document.getElementById("nsName"); if(n) n.focus(); },60); }
 function buildNewSwimmerModal(){
   const m=document.getElementById("newSwimmerModal");
   m.innerHTML=`
@@ -636,11 +640,11 @@ function buildNewSwimmerModal(){
         <div class="field"><label>Competes as</label>
           <div class="seg" id="nsSeg" role="group">
             <button type="button" data-sex="F" aria-pressed="false">Girls</button>
-            <button type="button" data-sex="M" aria-pressed="false">Boys</button>
+            <button type="button" data-sex="M" aria-pressed="true">Boys</button>
           </div></div>
       </div>
       <div class="saverow" style="justify-content:flex-start;margin-top:4px">
-        <button class="btn btn-red" id="nsSave">Add swimmer</button>
+        <button class="btn btn-red" id="nsSave" type="button">Save swimmer</button>
         <button class="mini-btn" type="button" data-close>Cancel</button>
       </div>
     </div>`;
@@ -651,18 +655,23 @@ function buildNewSwimmerModal(){
     m.querySelectorAll("#nsSeg button").forEach(b=>b.setAttribute("aria-pressed",b===btn?"true":"false"));
   }));
   m.querySelector("#nsSave").addEventListener("click",()=>{
-    const name=m.querySelector("#nsName").value.trim();
-    if(!name){ m.querySelector("#nsName").focus(); toast("Enter a name"); return; }
-    const dob=m.querySelector("#nsDob").value;
-    const seq=(parseInt(Store.get("rsa.swimmerSeq")||"0",10)||0)+1;
-    Store.set("rsa.swimmerSeq",String(seq));
-    const id="s"+seq;
-    saveSProfile(id,{name,dob,sex:nsSex||"M",photo:nsPhoto});
-    const roster=getRoster(); roster.push({id,name,dob,sex:nsSex||"M",photo:nsPhoto}); saveRoster(roster);
-    ACTIVE=id;
-    closeScrim("newSwimmerScrim");
-    renderSwimmerBar(); renderHero(); renderGrid(); renderJournal();
-    toast("<b>"+esc(name)+"</b> added — log their first time!");
+    try{
+      const nameVal=m.querySelector("#nsName");
+      if(!nameVal){ toast("Form error — please reload and try again"); return; }
+      const name=nameVal.value.trim();
+      if(!name){ nameVal.focus(); toast("Enter a swimmer name"); return; }
+      const dob=m.querySelector("#nsDob").value;
+      const sex=nsSex||"M";
+      const seq=(parseInt(Store.get("rsa.swimmerSeq")||"0",10)||0)+1;
+      Store.set("rsa.swimmerSeq",String(seq));
+      const id="s"+seq;
+      saveSProfile(id,{name,dob,sex,photo:nsPhoto});
+      const roster=getRoster(); roster.push({id,name,dob,sex,photo:nsPhoto}); saveRoster(roster);
+      ACTIVE=id; Store.set("rsa.active",ACTIVE);
+      closeScrim("newSwimmerScrim");
+      renderSwimmerBar(); renderHero(); renderGrid(); renderJournal();
+      toast("<b>"+esc(name)+"</b> added — log their first swim!");
+    }catch(err){ console.error("Add swimmer failed:",err); toast("Something went wrong — try again"); }
   });
 }
 function _updateNsPv(){
@@ -750,7 +759,7 @@ function buildEditSwimmerModal(){
     if(!confirm("Remove "+(p.name||"this swimmer")+" and all their data? This cannot be undone.")) return;
     Store.keys().filter(k=>k&&k.startsWith("rsa."+id+".")).forEach(k=>Store.remove(k));
     const newRoster=getRoster().filter(r=>r.id!==id); saveRoster(newRoster);
-    ACTIVE="gunnar";
+    ACTIVE="gunnar"; Store.set("rsa.active","gunnar");
     closeScrim("editSwimmerScrim");
     renderSwimmerBar(); renderHero(); renderGrid(); renderJournal();
     toast("Swimmer removed");
