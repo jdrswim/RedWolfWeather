@@ -1709,8 +1709,37 @@ const GHSync = (function(){
     if(getToken()) setBtn("connected","☁ Synced"); else setBtn("","☁ Connect");
   }
 
-  return { schedulePush, backgroundPull, init };
+  return { schedulePush, backgroundPull, init, openModal, getToken };
 })();
+
+function openWelcome(){
+  const m=document.getElementById("syncModal"); if(!m) return;
+  m.innerHTML=`
+    <div class="m-head">
+      <div class="titles">
+        <div class="m-evt" style="font-size:clamp(18px,3vw,26px)">Welcome to Swim Tracker</div>
+        <div class="m-tags"><span class="m-tag">How would you like to start?</span></div>
+      </div>
+    </div>
+    <div class="m-body">
+      <div style="display:flex;flex-direction:column;gap:12px;margin-top:6px">
+        <button class="btn btn-red" id="wlConnect" type="button" style="font-size:14px;padding:16px 20px;text-align:left;display:flex;align-items:flex-start;gap:14px;line-height:1.4">
+          <span style="font-size:24px;line-height:1;margin-top:1px">☁</span>
+          <span><strong>Load my data from GitHub</strong><br><span style="font-size:12px;opacity:.7;font-weight:400">I've used this tracker before — connect to restore swimmers &amp; times</span></span>
+        </button>
+        <button class="mini-btn" id="wlFresh" type="button" style="font-size:14px;padding:14px 20px;text-align:left;display:flex;align-items:flex-start;gap:14px;line-height:1.4;width:100%">
+          <span style="font-size:22px;line-height:1;margin-top:1px">✦</span>
+          <span><strong>Start fresh</strong><br><span style="font-size:12px;opacity:.7">Set up a new swimmer from scratch</span></span>
+        </button>
+      </div>
+      <p style="margin-top:18px;font-size:12px;color:var(--mist2);text-align:center">
+        You can always connect GitHub sync later via the <strong>☁ Connect</strong> button in the swimmer bar.
+      </p>
+    </div>`;
+  document.getElementById("wlConnect").addEventListener("click",()=>{ GHSync.openModal(); });
+  document.getElementById("wlFresh").addEventListener("click",()=>{ closeScrim("syncScrim"); setTimeout(openSetup,80); });
+  openScrim("syncScrim");
+}
 
 function reloadAll(){
   const roster=getRoster();
@@ -1785,9 +1814,12 @@ function reloadAll(){
   GHSync.init();
   GHSync.backgroundPull();
 
-  // first-run: nudge into setup when there's a single empty swimmer
+  // first-run: no data + no token → welcome choice; token present → backgroundPull handles it
   if(getRoster().length===1 && !getProfile().dob && !getProfile().name && getSwims().length===0){
-    setTimeout(openSetup, 350);
+    if(!GHSync.getToken()){
+      setTimeout(openWelcome, 350);
+    }
+    // else: token present — backgroundPull() already running; let it apply remote data and reloadAll
   }
 })();
 
