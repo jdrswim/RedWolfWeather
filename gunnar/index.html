@@ -45,6 +45,21 @@ body{
 
 .wrap{max-width:1120px;margin:0 auto;padding:0 22px}
 
+/* ---- github sync button ---- */
+.sw-sync{
+  display:inline-flex;align-items:center;gap:6px;padding:6px 13px;border-radius:20px;
+  border:1px dashed var(--line2);background:transparent;color:var(--mist2);font-size:12.5px;
+  font-family:var(--body);cursor:pointer;transition:border-color .15s,color .15s,border-style .15s;white-space:nowrap;
+}
+.sw-sync:hover,.sw-sync:focus-visible{border-color:var(--aqua);color:var(--aqua);border-style:solid;outline:none}
+.sw-sync.connected{border-style:solid;border-color:var(--line2);color:var(--mist)}
+.sw-sync.syncing{color:var(--aqua-deep);border-color:var(--aqua-deep);border-style:solid}
+.sw-sync.ok{color:var(--green);border-color:var(--green);border-style:solid}
+.sw-sync.err{color:var(--red2);border-color:var(--red2);border-style:solid}
+@keyframes spin{to{transform:rotate(360deg)}}
+.sw-sync .spin{display:inline-block}
+.sw-sync.syncing .spin{animation:spin .8s linear infinite}
+
 /* ---- lane rope divider ---- */
 .rope{height:10px;margin:0;border:0;background:
   repeating-linear-gradient(90deg,var(--red) 0 22px, #0c1f30 22px 24px, var(--aqua-deep) 24px 46px, #0c1f30 46px 48px);
@@ -600,6 +615,10 @@ table.swims td.act{text-align:right;width:36px;padding-right:4px}
   <div class="modal" id="addModal" style="max-width:640px"></div>
 </div>
 
+<div class="scrim" id="syncScrim" role="dialog" aria-modal="true">
+  <div class="modal" id="syncModal" style="max-width:520px"></div>
+</div>
+
 <input type="file" id="photoInput" class="hidden-file" accept="image/*" aria-hidden="true">
 <input type="file" id="backupFile" class="hidden-file" accept=".json,application/json" aria-hidden="true">
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -661,7 +680,7 @@ let activeId = null;   // current swimmer id
 let SEQ = 0;           // per-swimmer swim counter (loaded on switch)
 
 function getRoster(){ try{ const a=JSON.parse(Store.get("tpl.roster")||"[]"); return Array.isArray(a)?a:[]; }catch(e){ return []; } }
-function saveRoster(a){ Store.set("tpl.roster", JSON.stringify(a)); }
+function saveRoster(a){ Store.set("tpl.roster", JSON.stringify(a)); GHSync.schedulePush(); }
 function K(suffix){ return "tpl.s."+activeId+"."+suffix; }            // active swimmer key
 function profileOf(id){ try{ return JSON.parse(Store.get("tpl.s."+id+".profile")||"{}"); }catch(e){ return {}; } }
 function newId(){ return "sw"+Date.now().toString(36)+Math.floor(Math.random()*1e6).toString(36); }
@@ -669,9 +688,9 @@ function createSwimmer(){ const id=newId(); const r=getRoster(); r.push(id); sav
 function setActive(id){ activeId=id; Store.set("tpl.active", id); SEQ = parseInt(Store.get(K("seq"))||"0",10) || 0; }
 
 function getProfile(){ try{ return JSON.parse(Store.get(K("profile"))||"{}"); }catch(e){ return {}; } }
-function saveProfile(p){ Store.set(K("profile"), JSON.stringify(p)); renderSwimmerBar(); }
+function saveProfile(p){ Store.set(K("profile"), JSON.stringify(p)); GHSync.schedulePush(); renderSwimmerBar(); }
 function getSwims(){ try{ const a=JSON.parse(Store.get(K("swims"))||"[]"); return Array.isArray(a)?a:[]; }catch(e){ return []; } }
-function saveSwims(a){ Store.set(K("swims"), JSON.stringify(a)); }
+function saveSwims(a){ Store.set(K("swims"), JSON.stringify(a)); GHSync.schedulePush(); }
 function nextSeq(){ SEQ++; Store.set(K("seq"), String(SEQ)); return SEQ; }
 
 /* one-time migration: fold any old single-swimmer data into the roster model */
@@ -1233,6 +1252,7 @@ function renderSwimmerBar(){
     html += `<button class="swpill${active?' active':''}" data-id="${id}" type="button" aria-pressed="${active?'true':'false'}"><span class="swav">${av}</span><span class="swname">${esc(p.name||"New swimmer")}</span></button>`;
   });
   html += `<button class="swpill new" id="swNew" type="button"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>New swimmer</button>`;
+  html += `<button class="sw-sync" id="syncBtn" type="button" title="GitHub sync — save data across devices"><span class="spin"><svg viewBox="0 0 24 24" fill="none" width="14" height="14" aria-hidden="true"><path d="M4 12a8 8 0 018-8 8 8 0 017.4 5M20 12a8 8 0 01-8 8 8 8 0 01-7.4-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span id="syncLabel">Sync</span></button>`;
   bar.innerHTML=html;
   bar.querySelectorAll(".swpill[data-id]").forEach(b=> b.addEventListener("click",()=>{ if(b.dataset.id!==activeId) switchTo(b.dataset.id); }));
   document.getElementById("swNew").addEventListener("click",newSwimmer);
@@ -1440,13 +1460,13 @@ function toast(msg){ const t=document.getElementById("toast"); t.innerHTML=msg; 
 
 /* ---------------- scrims (generic) ---------------- */
 let scrimFocus=null;
-const SCRIMS=["scrim","setupScrim","addScrim"];
+const SCRIMS=["scrim","setupScrim","addScrim","syncScrim"];
 function anyScrimOpen(){ return SCRIMS.some(id=>document.getElementById(id).classList.contains("open")); }
 function openScrim(id){ scrimFocus=document.activeElement; const s=document.getElementById(id); s.classList.add("open"); document.body.style.overflow="hidden"; s.scrollTop=0; }
 function closeScrim(id){ const s=document.getElementById(id); s.classList.remove("open"); if(!anyScrimOpen()) document.body.style.overflow=""; if(scrimFocus&&scrimFocus.focus) scrimFocus.focus(); }
 function wireScrim(id){ const s=document.getElementById(id); s.addEventListener("click",e=>{ if(e.target===s || (e.target.closest && e.target.closest("[data-close]"))) closeScrim(id); }); }
 SCRIMS.forEach(wireScrim);
-document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ for(const id of ["addScrim","setupScrim","scrim"]){ if(document.getElementById(id).classList.contains("open")){ closeScrim(id); break; } } } });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ for(const id of ["syncScrim","addScrim","setupScrim","scrim"]){ if(document.getElementById(id).classList.contains("open")){ closeScrim(id); break; } } } });
 
 /* ---------------- filters ---------------- */
 document.getElementById("filters").addEventListener("click",e=>{
@@ -1484,6 +1504,219 @@ function renderAll(){
   const filtersEl=document.getElementById("filters");
   if(evs.length===0){ empty.style.display=""; manage.style.display="none"; filtersEl.style.visibility="hidden"; }
   else { empty.style.display="none"; manage.style.display="flex"; filtersEl.style.visibility="visible"; }
+}
+
+/* ============================================================
+   GitHub Sync — stores all tpl.* data in gunnar/data.json
+   Token is kept in localStorage (never in source code).
+   ============================================================ */
+const GHSync = (function(){
+  const REPO    = "jdrswim/RedWolfWeather";
+  const FILE    = "gunnar/data.json";
+  const API     = "https://api.github.com";
+  const TK_KEY  = "__gh_sync_token";
+  const TS_KEY  = "__gh_sync_ts";   // local timestamp of last successful push
+  let _sha      = null;             // current file SHA (needed by GitHub for updates)
+  let _pushTimer= null;
+
+  function getToken(){ return (localStorage&&localStorage.getItem(TK_KEY))||""; }
+  function setToken(t){ if(localStorage){ if(t) localStorage.setItem(TK_KEY,t.trim()); else localStorage.removeItem(TK_KEY); } }
+  function getLocalTs(){ return (localStorage&&localStorage.getItem(TS_KEY))||""; }
+  function setLocalTs(ts){ if(localStorage) localStorage.setItem(TS_KEY,ts); }
+
+  function setBtn(state, label){
+    const btn=document.getElementById("syncBtn"); if(!btn) return;
+    btn.className="sw-sync"+(state?" "+state:"");
+    const lbl=document.getElementById("syncLabel"); if(lbl) lbl.textContent=label;
+  }
+
+  function allTplData(){
+    const d={};
+    Store.keys().filter(k=>k&&k.startsWith("tpl.")).forEach(k=>{ d[k]=Store.get(k); });
+    return d;
+  }
+
+  function applyData(storeData){
+    Store.keys().filter(k=>k&&k.startsWith("tpl.")).forEach(k=>Store.remove(k));
+    Object.keys(storeData||{}).forEach(k=>{ if(k.startsWith("tpl.")) Store.set(k,storeData[k]); });
+  }
+
+  async function fetchFile(token){
+    const r=await fetch(`${API}/repos/${REPO}/contents/${FILE}`,{
+      headers:{"Authorization":"token "+token,"Accept":"application/vnd.github.v3+json"}
+    });
+    if(r.status===404) return null;
+    if(!r.ok) throw new Error("HTTP "+r.status);
+    const j=await r.json(); _sha=j.sha;
+    const text=decodeURIComponent(escape(atob(j.content.replace(/\s/g,""))));
+    return JSON.parse(text);
+  }
+
+  async function writeFile(token, payload){
+    const content=btoa(unescape(encodeURIComponent(JSON.stringify(payload,null,2))));
+    const body={message:"Update swim data",content,committer:{name:"Swim Tracker",email:"noreply@redwolfweather.com"}};
+    if(_sha) body.sha=_sha;
+    const r=await fetch(`${API}/repos/${REPO}/contents/${FILE}`,{
+      method:"PUT",
+      headers:{"Authorization":"token "+token,"Content-Type":"application/json","Accept":"application/vnd.github.v3+json"},
+      body:JSON.stringify(body)
+    });
+    if(r.status===409){
+      // SHA stale — fetch current SHA and retry once
+      const cur=await fetch(`${API}/repos/${REPO}/contents/${FILE}`,{headers:{"Authorization":"token "+token}});
+      if(cur.ok){ const j=await cur.json(); _sha=j.sha; body.sha=_sha; }
+      const r2=await fetch(`${API}/repos/${REPO}/contents/${FILE}`,{
+        method:"PUT",headers:{"Authorization":"token "+token,"Content-Type":"application/json"},body:JSON.stringify(body)
+      });
+      if(!r2.ok) throw new Error("HTTP "+r2.status+" (after SHA retry)");
+      const j2=await r2.json(); _sha=j2.content.sha;
+    } else {
+      if(!r.ok) throw new Error("HTTP "+r.status);
+      const j=await r.json(); _sha=j.content.sha;
+    }
+  }
+
+  async function push(){
+    const token=getToken(); if(!token){ setBtn("","☁ Connect"); return; }
+    setBtn("syncing","Saving…");
+    try{
+      const ts=new Date().toISOString();
+      await writeFile(token,{v:1,updated:ts,store:allTplData()});
+      setLocalTs(ts);
+      setBtn("ok","Saved ✓");
+      setTimeout(()=>setBtn("connected","☁ Synced"),2000);
+    }catch(e){ console.error("GHSync push:",e); setBtn("err","Sync error"); }
+  }
+
+  function schedulePush(){
+    clearTimeout(_pushTimer);
+    _pushTimer=setTimeout(push,1800);
+  }
+
+  async function backgroundPull(){
+    const token=getToken(); if(!token){ setBtn("","☁ Connect"); return; }
+    setBtn("syncing","Checking…");
+    try{
+      const remote=await fetchFile(token);
+      if(!remote){ setBtn("connected","☁ Synced"); await push(); return; } // no remote file yet — push local
+      const remoteTs=remote.updated||"";
+      const localTs=getLocalTs();
+      if(remoteTs>localTs && remote.store && Object.keys(remote.store).length>0){
+        // Remote is newer — apply and re-render
+        applyData(remote.store);
+        setLocalTs(remoteTs);
+        reloadAll();
+        setBtn("ok","Synced ✓");
+        setTimeout(()=>setBtn("connected","☁ Synced"),2000);
+        toast("Loaded latest data from GitHub ☁");
+      } else {
+        setBtn("connected","☁ Synced");
+        if(!remoteTs) await push(); // first push if remote was empty
+      }
+    }catch(e){ console.error("GHSync pull:",e); setBtn("err","Offline"); }
+  }
+
+  function openModal(){
+    const m=document.getElementById("syncModal"); if(!m) return;
+    const tok=getToken();
+    m.innerHTML=`
+      <div class="m-head">
+        <div class="titles">
+          <div class="m-evt" style="font-size:clamp(20px,3vw,28px)">GitHub Sync</div>
+          <div class="m-tags"><span class="m-tag">Save data across all devices</span></div>
+        </div>
+        <button class="x" data-close aria-label="Close">&times;</button>
+      </div>
+      <div class="m-body">
+        <p style="color:var(--mist);font-size:14px;line-height:1.7;margin-bottom:20px">
+          All swimmer data is saved to <code style="background:var(--panel2);padding:2px 7px;border-radius:5px;font-size:12px">gunnar/data.json</code> in your GitHub repo.
+          Any phone, tablet, or computer that opens this page and has the token will automatically stay in sync.
+        </p>
+        <div style="background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:20px">
+          <div style="font-family:var(--display);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mist2);margin-bottom:10px">One-time setup (do this once)</div>
+          <ol style="color:var(--mist);font-size:13px;line-height:2;padding-left:20px;margin:0">
+            <li>Go to <b style="color:var(--foam)">github.com</b> → Settings → Developer settings</li>
+            <li>Personal access tokens → Tokens (classic) → <b style="color:var(--foam)">Generate new token</b></li>
+            <li>Give it a name (e.g. "Swim Tracker"), check the <b style="color:var(--aqua)">repo</b> scope</li>
+            <li>Click Generate, then copy the <code style="background:var(--panel2);padding:1px 5px;border-radius:4px">ghp_...</code> token</li>
+            <li>Paste it below and click <b style="color:var(--foam)">Connect</b></li>
+          </ol>
+        </div>
+        <div class="field">
+          <label for="syncToken">Personal Access Token</label>
+          <input class="input" id="syncToken" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" value="${esc(tok)}" autocomplete="off" spellcheck="false">
+        </div>
+        <div class="saverow" style="justify-content:flex-start;margin-top:6px">
+          <button class="btn btn-red" id="syncConnect" type="button">Connect &amp; Sync</button>
+          <button class="mini-btn" type="button" data-close>Cancel</button>
+          ${tok?`<button class="mini-btn danger-btn" id="syncDisconnect" type="button" style="margin-left:auto">Disconnect</button>`:""}
+        </div>
+        <div id="syncMsg" style="min-height:18px;margin-top:12px;font-size:13px;color:var(--mist2)"></div>
+      </div>`;
+
+    const msg=m.querySelector("#syncMsg");
+    m.querySelector("#syncConnect").addEventListener("click",async()=>{
+      const t=(m.querySelector("#syncToken").value||"").trim();
+      if(!t){ msg.textContent="Paste your token first"; return; }
+      msg.innerHTML='<span style="color:var(--aqua)">Testing connection…</span>';
+      try{
+        setToken(t);
+        const remote=await fetchFile(t);
+        if(remote && remote.store && Object.keys(remote.store).length>0){
+          applyData(remote.store);
+          if(remote.updated) setLocalTs(remote.updated);
+          reloadAll();
+          closeScrim("syncScrim");
+          setBtn("ok","Synced ✓");
+          setTimeout(()=>setBtn("connected","☁ Synced"),2000);
+          toast("Connected! Loaded data from GitHub ☁");
+        } else {
+          // No remote data — push local
+          await push();
+          closeScrim("syncScrim");
+          toast("Connected! Data saved to GitHub ☁");
+        }
+      }catch(e){
+        setToken("");
+        msg.innerHTML=`<span style="color:var(--red2)">Could not connect — check the token and try again.<br><small>${esc(e.message)}</small></span>`;
+      }
+    });
+
+    const discBtn=m.querySelector("#syncDisconnect");
+    if(discBtn) discBtn.addEventListener("click",()=>{
+      setToken(""); _sha=null;
+      setBtn("","☁ Connect");
+      closeScrim("syncScrim");
+      toast("Sync disconnected — data stays saved locally");
+    });
+
+    openScrim("syncScrim");
+    setTimeout(()=>{ const i=m.querySelector("#syncToken"); if(i) i.focus(); },60);
+  }
+
+  function init(){
+    // Wire sync button click (it lives inside swimmer bar, re-created on each render)
+    document.addEventListener("click",e=>{ if(e.target.closest("#syncBtn")) openModal(); });
+    setBtn(getToken()?"connected":"","getToken()"!=="" ? "☁ Synced" : "☁ Connect");
+    // Correct the label based on actual token presence
+    if(getToken()) setBtn("connected","☁ Synced"); else setBtn("","☁ Connect");
+  }
+
+  return { schedulePush, backgroundPull, init };
+})();
+
+function reloadAll(){
+  const roster=getRoster();
+  if(!roster.length){ createSwimmer(); }
+  let a=Store.get("tpl.active");
+  if(!a||getRoster().indexOf(a)<0) a=getRoster()[0];
+  setActive(a);
+  renderSwimmerBar();
+  paintPorthole();
+  renderAll();
+  renderJournal();
+  const nameEl=document.getElementById("athleteName"); if(nameEl) nameEl.textContent=getProfile().name||"";
+  const lbl=document.getElementById("btnSetupLabel"); if(lbl) lbl.textContent=(getProfile().dob||getProfile().name)?"Edit profile":"Set up profile";
 }
 
 /* ---------------- wire global buttons + init ---------------- */
@@ -1540,6 +1773,10 @@ function renderAll(){
   paintPorthole();
   renderAll();
   renderJournal();
+
+  // wire sync button + kick off background pull from GitHub
+  GHSync.init();
+  GHSync.backgroundPull();
 
   // first-run: nudge into setup when there's a single empty swimmer
   if(getRoster().length===1 && !getProfile().dob && !getProfile().name && getSwims().length===0){
