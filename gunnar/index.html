@@ -45,21 +45,6 @@ body{
 
 .wrap{max-width:1120px;margin:0 auto;padding:0 22px}
 
-/* ---- github sync button ---- */
-.sw-sync{
-  display:inline-flex;align-items:center;gap:6px;padding:6px 13px;border-radius:20px;
-  border:1px dashed var(--line2);background:transparent;color:var(--mist2);font-size:12.5px;
-  font-family:var(--body);cursor:pointer;transition:border-color .15s,color .15s,border-style .15s;white-space:nowrap;
-}
-.sw-sync:hover,.sw-sync:focus-visible{border-color:var(--aqua);color:var(--aqua);border-style:solid;outline:none}
-.sw-sync.connected{border-style:solid;border-color:var(--line2);color:var(--mist)}
-.sw-sync.syncing{color:var(--aqua-deep);border-color:var(--aqua-deep);border-style:solid}
-.sw-sync.ok{color:var(--green);border-color:var(--green);border-style:solid}
-.sw-sync.err{color:var(--red2);border-color:var(--red2);border-style:solid}
-@keyframes spin{to{transform:rotate(360deg)}}
-.sw-sync .spin{display:inline-block}
-.sw-sync.syncing .spin{animation:spin .8s linear infinite}
-
 /* ---- lane rope divider ---- */
 .rope{height:10px;margin:0;border:0;background:
   repeating-linear-gradient(90deg,var(--red) 0 22px, #0c1f30 22px 24px, var(--aqua-deep) 24px 46px, #0c1f30 46px 48px);
@@ -432,6 +417,17 @@ table.swims td.act{text-align:right;width:36px;padding-right:4px}
 .swpill.new{border-style:dashed;border-color:var(--line2);color:var(--aqua);padding:8px 17px}
 .swpill.new:hover{background:rgba(58,215,222,.06);border-color:var(--aqua)}
 .swpill.new svg{width:15px;height:15px}
+.swpill.ghost{border:0;background:none;color:var(--mist2);padding:8px 10px;letter-spacing:.05em}
+.swpill.ghost:hover{color:var(--red2)}
+.swpill.ghost svg{width:15px;height:15px}
+.sw-sync{margin-left:auto;flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line2);border-radius:20px;padding:6px 14px;background:none;color:var(--mist2);font-size:12px;cursor:pointer;letter-spacing:.04em;transition:color .2s,border-color .2s}
+.sw-sync:hover{color:var(--aqua);border-color:var(--aqua)}
+.sw-sync .spin{display:inline-block;font-size:14px}
+.sw-sync.syncing .spin{animation:spin 1s linear infinite}
+.sw-sync.connected{color:var(--aqua);border-color:var(--aqua-deep)}
+.sw-sync.ok{color:var(--green);border-color:var(--green)}
+.sw-sync.err{color:var(--red2);border-color:var(--red2)}
+@keyframes spin{to{transform:rotate(360deg)}}
 @media(max-width:520px){ .swpill .swname{max-width:110px} }
 
 /* manage footer inside Edit Profile modal */
@@ -478,6 +474,7 @@ table.swims td.act{text-align:right;width:36px;padding-right:4px}
   /* 16px inputs so iOS doesn't zoom when focusing a field */
   .input,.paste,select.input,textarea.input{font-size:16px}
   .mini-btn{min-height:40px}
+  .tab{margin-right:15px;font-size:12px;padding:11px 1px}
 }
 @media(max-width:380px){
   .athlete{font-size:33px}
@@ -485,6 +482,9 @@ table.swims td.act{text-align:right;width:36px;padding-right:4px}
   .brand img{height:54px}
   .porthole .ring{width:78px;height:78px}
 }
+
+.exlink{color:var(--aqua);text-decoration:underline;text-underline-offset:2px;font-weight:600}
+.exlink:hover{color:var(--foam)}
 
 </style>
 </head>
@@ -615,6 +615,7 @@ table.swims td.act{text-align:right;width:36px;padding-right:4px}
   <div class="modal" id="addModal" style="max-width:640px"></div>
 </div>
 
+<!-- ===== GITHUB SYNC MODAL ===== -->
 <div class="scrim" id="syncScrim" role="dialog" aria-modal="true">
   <div class="modal" id="syncModal" style="max-width:520px"></div>
 </div>
@@ -1141,14 +1142,14 @@ function parseRows(raw){
   if(!lines.length) return [];
   let idx={event:0, time:1, date:2, meet:3}, isHeader=false, start=0;
   const head=splitLine(lines[0]).map(h=>h.trim().toLowerCase());
-  isHeader = head.some(h=>h==="event"||h==="time") && !head.some(h=>/^\d/.test(h));
+  isHeader = head.some(h=>h==="event"||h.indexOf("event")===0) && !head.some(h=>/^\d/.test(h));
   if(isHeader){
     start=1;
     const find=pred=>head.findIndex(pred);
     idx.event=find(h=>h==="event"||h.indexOf("event")===0);
-    idx.time =find(h=>h==="time");                 // exact, so "time standard" is ignored
-    idx.date =find(h=>h.indexOf("date")>=0);        // e.g. "swim date"
-    idx.meet =find(h=>h.indexOf("meet")>=0);
+    idx.time =find(h=>h==="time"||h.indexOf("swim time")===0);   // matches "Swim Time...", skips "Time Standard"
+    idx.date =find(h=>h.indexOf("swim date")===0||h.indexOf("date")>=0);
+    idx.meet =find(h=>h==="meet"||h.indexOf("meet")===0);
   }
   const out=[];
   for(let r=start;r<lines.length;r++){
@@ -1169,6 +1170,22 @@ function parseRows(raw){
     if(!eid||!t) continue;
     out.push({ eid, t, d:normDate(dt), meet:String(mt||"").trim() });
   }
+  return out;
+}
+/* Raw USA Swimming "Individual Times Search" paste: fixed tab-separated columns
+   Event, Swim Time, Age, Points, Time Standard, Meet, LSC, Team, Swim Date.
+   Header rows and junk are skipped automatically (event/time will not parse). */
+function parseUsaRows(raw){
+  const out=[];
+  String(raw).split(/\r?\n/).forEach(line=>{
+    if(!line.trim()) return;
+    const p=line.split("\t");
+    if(p.length<2) return;
+    const eid=parseEventStr((p[0]||"").trim());
+    const t=normTime(p[1]||"");
+    if(!eid||!t) return;                       // skips the "Event Sort..." header and any stray lines
+    out.push({ eid, t, d:normDate((p[8]||"").trim()), meet:String(p[5]||"").trim() });
+  });
   return out;
 }
 
@@ -1232,6 +1249,16 @@ function switchTo(id){
   renderSwimmerBar(); paintPorthole(); renderAll();
 }
 function newSwimmer(){ const id=createSwimmer(); switchTo(id); openSetup(); }
+function startFresh(){
+  if(!window.confirm("Start fresh? This removes every swimmer and all data on this device and begins a new, blank logbook. Save a backup first if you want to keep anything.")) return;
+  Store.keys().filter(k=>k && k.indexOf("tpl.")===0).forEach(k=>Store.remove(k));
+  const id=createSwimmer(); setActive(id);
+  const n=document.getElementById("athleteName"); if(n) n.textContent="";
+  const j=document.getElementById("journal"); if(j) j.value="";
+  document.getElementById("btnSetupLabel").textContent="Set up profile";
+  renderSwimmerBar(); paintPorthole(); renderAll(); openSetup();
+  toast("Fresh logbook ready");
+}
 function removeSwimmer(){
   const nm=getProfile().name||"this swimmer";
   if(!window.confirm(`Remove ${nm} and all their times, goals and notes from this device? This can't be undone. Save a backup first if you want to keep them.`)) return;
@@ -1252,10 +1279,12 @@ function renderSwimmerBar(){
     html += `<button class="swpill${active?' active':''}" data-id="${id}" type="button" aria-pressed="${active?'true':'false'}"><span class="swav">${av}</span><span class="swname">${esc(p.name||"New swimmer")}</span></button>`;
   });
   html += `<button class="swpill new" id="swNew" type="button"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>New swimmer</button>`;
-  html += `<button class="sw-sync" id="syncBtn" type="button" title="GitHub sync — save data across devices"><span class="spin"><svg viewBox="0 0 24 24" fill="none" width="14" height="14" aria-hidden="true"><path d="M4 12a8 8 0 018-8 8 8 0 017.4 5M20 12a8 8 0 01-8 8 8 8 0 01-7.4-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span id="syncLabel">Sync</span></button>`;
+  html += `<button class="swpill ghost" id="swFresh" type="button" title="Clear everything and begin a new blank logbook"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 12a8 8 0 1 1 2.3 5.6M4 12V7m0 5h5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>Start fresh</button>`;
+  html += `<button class="sw-sync" id="syncBtn" type="button" title="GitHub sync"><span class="spin">⟳</span><span id="syncLabel">Sync</span></button>`;
   bar.innerHTML=html;
   bar.querySelectorAll(".swpill[data-id]").forEach(b=> b.addEventListener("click",()=>{ if(b.dataset.id!==activeId) switchTo(b.dataset.id); }));
   document.getElementById("swNew").addEventListener("click",newSwimmer);
+  document.getElementById("swFresh").addEventListener("click",startFresh);
 }
 
 /* ---------------- setup modal ---------------- */
@@ -1360,8 +1389,9 @@ function buildAddModal(){
     </div>
     <div class="m-body">
       <div class="tabs" role="tablist">
-        <button class="tab" id="tabQuick" role="tab" aria-selected="true">Quick add</button>
-        <button class="tab" id="tabBulk" role="tab" aria-selected="false">Upload / paste</button>
+        <button class="tab" id="tabQuick" role="tab" aria-selected="true">One off</button>
+        <button class="tab" id="tabUsa" role="tab" aria-selected="false">USA Swimming</button>
+        <button class="tab" id="tabCsv" role="tab" aria-selected="false">CSV file</button>
       </div>
 
       <div class="tabpane active" id="paneQuick" role="tabpanel">
@@ -1382,7 +1412,20 @@ function buildAddModal(){
         </div>
       </div>
 
-      <div class="tabpane" id="paneBulk" role="tabpanel">
+      <div class="tabpane" id="paneUsa" role="tabpanel">
+        <div class="csv-help" style="margin-bottom:11px">
+          Open <a href="https://data.usaswimming.org/datahub/usas/individualsearch" target="_blank" rel="noopener" class="exlink">USA Swimming Individual Times Search</a>, find the swimmer, then select the whole results table, copy it, and paste it below. The app reads Event, Time, Meet and Swim Date and ignores the rest, so paste it exactly as it comes (the header row is fine too).
+        </div>
+        <div class="field"><label for="usaBox">Paste USA Swimming data</label>
+          <textarea class="input paste" id="usaBox" placeholder="50 FR SCY&#9;22.58&#9;21&#9;640&#9;Slower than B&#9;2007 Georgia Tech Fall Invit&#9;NC&#9;Unattached&#9;11/16/2007&#10;100 BR SCY&#9;55.64&#9;21&#9;870&#9;2008 Winter Nationals&#9;2008 ACC Champs&#9;US&#9;Unattached&#9;02/27/2008"></textarea></div>
+        <div class="goalresult" id="usaMsg" style="min-height:18px;margin:2px 2px 14px"></div>
+        <div class="saverow" style="justify-content:flex-start">
+          <button class="btn btn-red" id="usaImport">Import times</button>
+          <button class="mini-btn" type="button" data-close>Done</button>
+        </div>
+      </div>
+
+      <div class="tabpane" id="paneCsv" role="tabpanel">
         <div class="dropzone" id="dropzone">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 16V4m0 0l-4 4m4-4l4 4M5 20h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
           <div><b>Choose a CSV file</b> or drag &amp; drop it here</div>
@@ -1390,28 +1433,24 @@ function buildAddModal(){
         </div>
         <input type="file" id="csvFile" class="hidden-file" accept=".csv,.txt,text/csv,text/plain">
         <div class="csv-help">
-          New here? <button class="linkbtn" type="button" id="dlTemplate">Download a template CSV</button> to see the format.<br>
-          You can paste straight from a spreadsheet (with or without the header row). Extra columns like Age, Points, Time Standard, LSC and Team are ignored. Add the course in the event when it isn't yards, for example <code>50 Free LCM</code>.
+          <button class="linkbtn" type="button" id="dlTemplate">Download the CSV template</button>, fill it in, then upload it here. Age, Points, Time Standard, LSC and Team are ignored, so you can leave them or paste them in. Add the course in the event when it isn't yards, for example <code>50 Free LCM</code>.
         </div>
-        <div class="field" style="margin-top:14px"><label for="pasteBox">Paste times</label>
-          <textarea class="input paste" id="pasteBox" placeholder="50 Free SCY, 32.50, Winter Classic, 2026-01-15&#10;100 Free SCY, 1:12.00, Winter Classic, 2026-01-15&#10;50 Back LCM, 38.40"></textarea></div>
-        <div class="goalresult" id="bulkMsg" style="min-height:18px;margin:2px 2px 14px"></div>
-        <div class="saverow" style="justify-content:flex-start">
-          <button class="btn btn-red" id="bulkImport">Import pasted times</button>
-          <button class="mini-btn" type="button" data-close>Done</button>
-        </div>
+        <div class="goalresult" id="csvMsg" style="min-height:18px;margin:9px 2px 0"></div>
       </div>
     </div>`;
 
-  // tabs
-  const setTab=(quick)=>{
-    m.querySelector("#tabQuick").setAttribute("aria-selected", quick?"true":"false");
-    m.querySelector("#tabBulk").setAttribute("aria-selected", quick?"false":"true");
-    m.querySelector("#paneQuick").classList.toggle("active", quick);
-    m.querySelector("#paneBulk").classList.toggle("active", !quick);
+  // tabs (three)
+  const TABS={quick:"tabQuick", usa:"tabUsa", csv:"tabCsv"};
+  const PANES={quick:"paneQuick", usa:"paneUsa", csv:"paneCsv"};
+  const setTab=(which)=>{
+    Object.keys(TABS).forEach(k=>{
+      m.querySelector("#"+TABS[k]).setAttribute("aria-selected", k===which?"true":"false");
+      m.querySelector("#"+PANES[k]).classList.toggle("active", k===which);
+    });
   };
-  m.querySelector("#tabQuick").addEventListener("click",()=>setTab(true));
-  m.querySelector("#tabBulk").addEventListener("click",()=>setTab(false));
+  m.querySelector("#tabQuick").addEventListener("click",()=>setTab("quick"));
+  m.querySelector("#tabUsa").addEventListener("click",()=>setTab("usa"));
+  m.querySelector("#tabCsv").addEventListener("click",()=>setTab("csv"));
 
   // quick add
   const qaAdd=()=>{
@@ -1432,25 +1471,33 @@ function buildAddModal(){
   m.querySelector("#qaTime").addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); qaAdd(); }});
   m.querySelector("#qaMeet").addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); qaAdd(); }});
 
-  // bulk
-  m.querySelector("#dlTemplate").addEventListener("click",downloadTemplate);
-  const importText=(raw)=>{
-    const rows=parseRows(raw); const msg=m.querySelector("#bulkMsg");
-    if(!rows.length){ msg.className="goalresult"; msg.innerHTML=`<b style="color:var(--red2)">Couldn't read any swims.</b> Check the format and try again.`; return; }
+  // shared importer -> writes result into the given message element
+  const importInto=(rows, msgEl, clearEl)=>{
+    if(!rows.length){ msgEl.className="goalresult"; msgEl.innerHTML=`<b style="color:var(--red2)">Couldn't read any swims.</b> Check the data and try again.`; return; }
     addSwims(rows); renderAll();
-    msg.className="goalresult win"; msg.innerHTML=`<b>Imported ${rows.length} ${rows.length===1?"swim":"swims"}.</b>`;
-    m.querySelector("#pasteBox").value="";
+    msgEl.className="goalresult win"; msgEl.innerHTML=`<b>Imported ${rows.length} ${rows.length===1?"swim":"swims"}.</b>`;
+    if(clearEl) clearEl.value="";
     toast(`Imported ${rows.length} ${rows.length===1?"swim":"swims"}`);
   };
-  m.querySelector("#bulkImport").addEventListener("click",()=>importText(m.querySelector("#pasteBox").value));
 
+  // USA Swimming paste
+  m.querySelector("#usaImport").addEventListener("click",()=>{
+    const raw=m.querySelector("#usaBox").value;
+    let rows=parseUsaRows(raw); if(!rows.length) rows=parseRows(raw);   // fall back to flexible parse
+    importInto(rows, m.querySelector("#usaMsg"), m.querySelector("#usaBox"));
+  });
+
+  // CSV file
+  m.querySelector("#dlTemplate").addEventListener("click",downloadTemplate);
+  const csvMsg=m.querySelector("#csvMsg");
   const dz=m.querySelector("#dropzone"); const cf=m.querySelector("#csvFile");
+  const handleFile=f=>readCsv(f, raw=>importInto(parseRows(raw), csvMsg));
   dz.addEventListener("click",()=>cf.click());
   dz.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); cf.click(); }});
   ["dragenter","dragover"].forEach(ev=>dz.addEventListener(ev,e=>{ e.preventDefault(); dz.classList.add("drag"); }));
   ["dragleave","drop"].forEach(ev=>dz.addEventListener(ev,e=>{ e.preventDefault(); dz.classList.remove("drag"); }));
-  dz.addEventListener("drop",e=>{ const f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0]; if(f) readCsv(f, importText); });
-  cf.addEventListener("change",e=>{ const f=e.target.files&&e.target.files[0]; e.target.value=""; if(f) readCsv(f, importText); });
+  dz.addEventListener("drop",e=>{ const f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0]; if(f) handleFile(f); });
+  cf.addEventListener("change",e=>{ const f=e.target.files&&e.target.files[0]; e.target.value=""; if(f) handleFile(f); });
 }
 function readCsv(file, cb){ const r=new FileReader(); r.onload=()=>cb(String(r.result||"")); r.onerror=()=>toast("Couldn't read that file"); r.readAsText(file); }
 
@@ -1515,8 +1562,8 @@ const GHSync = (function(){
   const FILE    = "gunnar/data.json";
   const API     = "https://api.github.com";
   const TK_KEY  = "__gh_sync_token";
-  const TS_KEY  = "__gh_sync_ts";   // local timestamp of last successful push
-  let _sha      = null;             // current file SHA (needed by GitHub for updates)
+  const TS_KEY  = "__gh_sync_ts";
+  let _sha      = null;
   let _pushTimer= null;
 
   function getToken(){ return (localStorage&&localStorage.getItem(TK_KEY))||""; }
@@ -1562,7 +1609,6 @@ const GHSync = (function(){
       body:JSON.stringify(body)
     });
     if(r.status===409){
-      // SHA stale — fetch current SHA and retry once
       const cur=await fetch(`${API}/repos/${REPO}/contents/${FILE}`,{headers:{"Authorization":"token "+token}});
       if(cur.ok){ const j=await cur.json(); _sha=j.sha; body.sha=_sha; }
       const r2=await fetch(`${API}/repos/${REPO}/contents/${FILE}`,{
@@ -1605,11 +1651,10 @@ const GHSync = (function(){
     setBtn("syncing","Checking…");
     try{
       const remote=await fetchFile(token);
-      if(!remote){ setBtn("connected","☁ Synced"); await push(); return; } // no remote file yet — push local
+      if(!remote){ setBtn("connected","☁ Synced"); await push(); return; }
       const remoteTs=remote.updated||"";
       const localTs=getLocalTs();
       if(remoteTs>localTs && remote.store && Object.keys(remote.store).length>0){
-        // Remote is newer — apply and re-render
         applyData(remote.store);
         setLocalTs(remoteTs);
         reloadAll();
@@ -1618,7 +1663,7 @@ const GHSync = (function(){
         toast("Loaded latest data from GitHub ☁");
       } else {
         setBtn("connected","☁ Synced");
-        if(!remoteTs) await push(); // first push if remote was empty
+        if(!remoteTs) await push();
       }
     }catch(e){ console.error("GHSync pull:",e); setBtn("err","Offline"); }
   }
@@ -1678,7 +1723,6 @@ const GHSync = (function(){
           setTimeout(()=>setBtn("connected","☁ Synced"),2000);
           toast("Connected! Loaded data from GitHub ☁");
         } else {
-          // No remote data — push local
           await push();
           closeScrim("syncScrim");
           toast("Connected! Data saved to GitHub ☁");
@@ -1702,10 +1746,7 @@ const GHSync = (function(){
   }
 
   function init(){
-    // Wire sync button click (it lives inside swimmer bar, re-created on each render)
     document.addEventListener("click",e=>{ if(e.target.closest("#syncBtn")) openModal(); });
-    setBtn(getToken()?"connected":"","getToken()"!=="" ? "☁ Synced" : "☁ Connect");
-    // Correct the label based on actual token presence
     if(getToken()) setBtn("connected","☁ Synced"); else setBtn("","☁ Connect");
   }
 
