@@ -886,10 +886,11 @@ function chartSVG(ev, goalSec){
   const hasStd=!!ev.std; const bSec=hasStd?toSec(ev.std.B):NaN;
   const vals=[...secs]; if(isFinite(goalSec)) vals.push(goalSec); if(hasStd) vals.push(bSec);
   let maxV=Math.max(...secs); let minV=Math.min(...vals);
-  const padV=((maxV-minV)||1)*0.16; const top=minV-padV, bot=maxV+padV;
+  // Inverted Y: slower times at top, faster at bottom (line drops as swimmer improves)
+  const padV=((maxV-minV)||1)*0.16; const top=maxV+padV, bot=minV-padV;
   const plotW=W-L-R, plotH=H-T-B;
   const X=i=> sw.length<2 ? L+plotW/2 : L + i*plotW/(sw.length-1);
-  const Y=v=> T + (v-top)/(bot-top)*plotH;
+  const Y=v=> T + (top-v)/(top-bot)*plotH;
   let g="";
   if(hasStd){
     const bY=Y(bSec);
@@ -902,12 +903,13 @@ function chartSVG(ev, goalSec){
     const gY=Y(goalSec);
     if(gY>=T-2 && gY<=T+plotH+2){
       g+=`<line x1="${L}" y1="${gY.toFixed(1)}" x2="${W-R}" y2="${gY.toFixed(1)}" stroke="#3AD7DE" stroke-width="1.6" stroke-dasharray="2 5" opacity=".9"/>
-          <text x="${L}" y="${(gY-6).toFixed(1)}" fill="#3AD7DE" font-size="11" text-anchor="start" font-family="Oswald" letter-spacing=".08em">GOAL ${fmt(goalSec)}</text>`;
+          <text x="${L}" y="${(gY+14).toFixed(1)}" fill="#3AD7DE" font-size="11" text-anchor="start" font-family="Oswald" letter-spacing=".08em">GOAL ${fmt(goalSec)}</text>`;
     }
   }
   if(sw.length>=2){
     const pts=secs.map((v,i)=>`${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(" ");
-    const area=`${X(0).toFixed(1)},${(T+plotH).toFixed(1)} `+pts+` ${X(sw.length-1).toFixed(1)},${(T+plotH).toFixed(1)}`;
+    // Fill above the line (from chart top down to the data line — expands as times improve)
+    const area=`${X(0).toFixed(1)},${T.toFixed(1)} `+pts+` ${X(sw.length-1).toFixed(1)},${T.toFixed(1)}`;
     g+=`<polygon points="${area}" fill="url(#agrad)" opacity=".5"/>
         <polyline points="${pts}" fill="none" stroke="#3AD7DE" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>`;
   }
@@ -915,6 +917,7 @@ function chartSVG(ev, goalSec){
   sw.forEach((s,i)=>{
     const isBest=i===bi; const cy=Y(secs[i]);
     g+=`<circle cx="${X(i).toFixed(1)}" cy="${cy.toFixed(1)}" r="${isBest?6:4.5}" fill="${isBest?'#F4C152':'#0A1B2C'}" stroke="${isBest?'#fff':'#3AD7DE'}" stroke-width="2"/>`;
+    // Labels above the dot (cy - 12); for inverted axis, "above" a data point is toward smaller Y (toward slower), so use cy-12 for labels that don't overlap the line
     g+=`<text x="${X(i).toFixed(1)}" y="${(cy-12).toFixed(1)}" fill="${isBest?'#F4C152':'#cfe4ec'}" font-size="${isBest?12:11}" text-anchor="middle" font-family="Oswald" font-weight="${isBest?600:400}">${fmt(secs[i])}</text>`;
     g+=`<text x="${X(i).toFixed(1)}" y="${(T+plotH+20).toFixed(1)}" fill="#7e9bb0" font-size="10.5" text-anchor="middle" font-family="Oswald">${shortDate(s.d)}</text>`;
     g+=`<text x="${X(i).toFixed(1)}" y="${(T+plotH+33).toFixed(1)}" fill="#5E7E94" font-size="9.5" text-anchor="middle" font-family="-apple-system,sans-serif">${esc(s.meet.length>12?s.meet.slice(0,11)+'…':s.meet)}</text>`;
@@ -922,9 +925,10 @@ function chartSVG(ev, goalSec){
   const note = sw.length<2 ? `<text x="${(L+plotW/2).toFixed(1)}" y="${(T-14).toFixed(1)}" fill="#93B2C6" font-size="11.5" text-anchor="middle" font-family="-apple-system,sans-serif">Swum once — race it again to draw your line.</text>` : "";
   return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Time progression chart">
     <defs><linearGradient id="agrad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#3AD7DE" stop-opacity=".35"/><stop offset="1" stop-color="#3AD7DE" stop-opacity="0"/>
+      <stop offset="0" stop-color="#3AD7DE" stop-opacity=".3"/><stop offset="1" stop-color="#3AD7DE" stop-opacity="0"/>
     </linearGradient></defs>
-    <text x="${L}" y="14" fill="#5E7E94" font-size="10.5" font-family="Oswald" letter-spacing=".14em">FASTER ↑</text>
+    <text x="${L}" y="14" fill="#5E7E94" font-size="10.5" font-family="Oswald" letter-spacing=".14em">SLOWER ↑</text>
+    <text x="${L}" y="${(T+plotH+13).toFixed(1)}" fill="#5E7E94" font-size="10.5" font-family="Oswald" letter-spacing=".14em">↓ FASTER</text>
     ${note}${g}
   </svg>`;
 }
