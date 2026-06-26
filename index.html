@@ -3330,6 +3330,17 @@ function rktRender(el,data){
     return !isNaN(t)&&t>nowMs&&t<nowMs+windowMs;
   });
   list.sort(function(a,b){return new Date(a.net||a.window_start)-new Date(b.net||b.window_start);});
+  // Deduplicate: same launch ID (safety), then same pad within 2 hours (generic NET dates)
+  var seenId={}, seenPadBucket={};
+  var statusRank={'Go':0,'Hold':1,'TBD':2,'Success':3,'Failure':4};
+  list=list.filter(function(l){
+    if(seenId[l.id])return false; seenId[l.id]=true;
+    var t=new Date(l.net||l.window_start).getTime();
+    var padId=(l.pad&&l.pad.id)||'x';
+    var bucket=padId+'_'+Math.floor(t/7200000); // 2-hour buckets per pad
+    if(seenPadBucket[bucket])return false; seenPadBucket[bucket]=true;
+    return true;
+  });
   list=list.slice(0,10);
   if(!list.length){el.innerHTML='<div class="rkt-empty">No upcoming east coast launches in the next 90 days.<br><span style="font-size:10px;color:var(--mu)">Check back soon — data refreshes every 2 hours.</span></div>';return;}
   var html='';
