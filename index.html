@@ -1595,10 +1595,10 @@ function sunSetMode(mode){
 }
 
 var TIDE_STATIONS={
-  hiltonhead: {id:"8670870",label:"Coligny Beach · Hilton Head Island, SC"},
-  wrightsville:{id:"8658120",label:"Wrightsville Beach, NC"},
-  emerald:     {id:"8656483",label:"Emerald Isle, NC"},
-  oakisland:   {id:"8658163",label:"Oak Island Beach, NC",wtStation:"8658120"},
+  hiltonhead: {id:"8669625",label:"Coligny Beach · Hilton Head Island, SC",wtStation:"8670870"},
+  wrightsville:{id:"8658163",label:"Wrightsville Beach, NC"},
+  emerald:     {id:"TEC2837",label:"Emerald Isle · Bogue Inlet, NC",wtStation:"8656483"},
+  oakisland:   {id:"8659182",label:"Oak Island Beach, NC",wtStation:"8658163"},
   hatteras:    {id:"8654467",label:"Cape Hatteras · Hatteras Inlet, NC"},
   corolla:     {id:"8651370",label:"Corolla Beach · Duck, NC"}
 };
@@ -3199,7 +3199,7 @@ function rktLikelihood(netStr,padLat,padLon,statusAbbrev,orbit){
     '</div>'
   };
 }
-var RKT_CACHE_KEY='rkt_v5_cache'; // bumped: restored east-coast-only filter
+var RKT_CACHE_KEY='rkt_v6_cache'; // bumped: relaxed country_code filter
 var RKT_CACHE_TTL=7200000; // 2 hours
 // Production server first; dev server as fallback
 var RKT_URLS=['https://ll2.thespacedevs.com/2.2.0/launch/upcoming/?limit=50&format=json',
@@ -3288,14 +3288,23 @@ function fetchRockets(){
       RKT_CITIES.forEach(function(c,i){window._rktClouds[c.name]=maps[i];});
     }).catch(function(){window._rktClouds=window._rktClouds||{};});
 
-  // Check localStorage cache for launch data
+  // Check localStorage cache — shorten TTL to 15 min if a launch is within 6 hours
   try{
     var cached=localStorage.getItem(RKT_CACHE_KEY);
     if(cached){
       var obj=JSON.parse(cached);
-      if(obj&&obj.ts&&(Date.now()-obj.ts)<RKT_CACHE_TTL&&obj.data){
-        cloudPromise.then(function(){rktRender(el,obj.data);});
-        return;
+      if(obj&&obj.ts&&obj.data){
+        var age=Date.now()-obj.ts;
+        var soonMs=6*3600*1000, shortTTL=900000; // 15 min when launch is imminent
+        var hasSoon=(obj.data.results||[]).some(function(l){
+          var t=new Date(l.net||l.window_start||'').getTime();
+          return t>Date.now()&&t<Date.now()+soonMs;
+        });
+        var ttl=hasSoon?shortTTL:RKT_CACHE_TTL;
+        if(age<ttl){
+          cloudPromise.then(function(){rktRender(el,obj.data);});
+          return;
+        }
       }
     }
   }catch(e){}
@@ -3322,7 +3331,9 @@ function rktRender(el,data){
     if(!l.pad||!l.pad.latitude||!l.pad.longitude)return false;
     var lat=parseFloat(l.pad.latitude),lon=parseFloat(l.pad.longitude);
     // East coast US only: covers KSC/CCAFS (~-80.6) and Wallops (~-75.5)
-    if(!l.pad.location||l.pad.location.country_code!=='USA')return false;
+    // Only reject if we positively know it's a non-US country; missing location falls through to coord check
+    var cc=l.pad.location&&l.pad.location.country_code;
+    if(cc&&cc!=='USA'&&cc!=='US')return false;
     if(lon<-84||lon>-71||lat<25||lat>42)return false;
     var netStr=l.net||l.window_start||'';
     if(!netStr)return false;
@@ -3330,6 +3341,17 @@ function rktRender(el,data){
     return !isNaN(t)&&t>nowMs&&t<nowMs+windowMs;
   });
   list.sort(function(a,b){return new Date(a.net||a.window_start)-new Date(b.net||b.window_start);});
+  // Deduplicate: same launch ID (safety), then same pad within 2 hours (generic NET dates)
+  var seenId={}, seenPadBucket={};
+  var statusRank={'Go':0,'Hold':1,'TBD':2,'Success':3,'Failure':4};
+  list=list.filter(function(l){
+    if(seenId[l.id])return false; seenId[l.id]=true;
+    var t=new Date(l.net||l.window_start).getTime();
+    var padId=(l.pad&&l.pad.id)||'x';
+    var bucket=padId+'_'+Math.floor(t/7200000); // 2-hour buckets per pad
+    if(seenPadBucket[bucket])return false; seenPadBucket[bucket]=true;
+    return true;
+  });
   list=list.slice(0,10);
   if(!list.length){el.innerHTML='<div class="rkt-empty">No upcoming east coast launches in the next 90 days.<br><span style="font-size:10px;color:var(--mu)">Check back soon — data refreshes every 2 hours.</span></div>';return;}
   var html='';
@@ -3458,7 +3480,7 @@ function rktRender(el,data){
         visHtml+
       '</div>';
   });
-  html+='<div class="rkt-note">Visibility estimates assume dark or twilight conditions — daytime launches are rarely visible.<br>T+ offsets are approximate based on distance to the pad. Look in the listed compass direction.<br>Map: © OpenStreetMap contributors, © CARTO · Launch data: Launch Library 2 (thespacedevs.com) · Cached 2 hrs</div>';
+  html+='<div class="rkt-note">Visibility estimates assume dark or twilight conditions — daytime launches are rarely visible.<br>T+ offsets are approximate based on distance to the pad. Look in the listed compass direction.<br>Map: © OpenStreetMap contributors, © CARTO · Launch data: Launch Library 2 (thespacedevs.com) · <button onclick="(function(){try{localStorage.removeItem(\'rkt_v5_cache\');}catch(e){}fetchRockets();})()" style="background:none;border:none;color:var(--cyan);font-size:9px;cursor:pointer;padding:0;font-family:inherit;letter-spacing:.3px;text-decoration:underline">↻ Refresh</button></div>';
   el.innerHTML=html;
   rktInitMaps(list);
 }
