@@ -3199,10 +3199,10 @@ function rktLikelihood(netStr,padLat,padLon,statusAbbrev,orbit){
     '</div>'
   };
 }
-var RKT_CACHE_KEY='rkt_v7_cache'; // bumped: v2.3.0 API endpoint (/launches/ plural)
+var RKT_CACHE_KEY='rkt_v8_cache'; // bumped: v2.3.0 host (ll→ll2) + country obj
 var RKT_CACHE_TTL=7200000; // 2 hours
-// Production server first; dev server as fallback — v2.3.0 uses /launches/ (plural)
-var RKT_URLS=['https://ll2.thespacedevs.com/2.3.0/launches/upcoming/?limit=50&format=json',
+// v2.3.0: production host is ll.thespacedevs.com (not ll2); path is /launches/ (plural)
+var RKT_URLS=['https://ll.thespacedevs.com/2.3.0/launches/upcoming/?limit=50&format=json',
               'https://lldev.thespacedevs.com/2.3.0/launches/upcoming/?limit=50&format=json'];
 
 // ── Trajectory map helpers ─────────────────────────────────
@@ -3331,8 +3331,10 @@ function rktRender(el,data){
     if(!l.pad||!l.pad.latitude||!l.pad.longitude)return false;
     var lat=parseFloat(l.pad.latitude),lon=parseFloat(l.pad.longitude);
     // East coast US only: covers KSC/CCAFS (~-80.6) and Wallops (~-75.5)
-    // Only reject if we positively know it's a non-US country; missing location falls through to coord check
-    var cc=l.pad.location&&l.pad.location.country_code;
+    // v2.3.0: country_code replaced by country.alpha_3_code / alpha_2_code object
+    var loc=l.pad.location;
+    var cc=(loc&&loc.country&&(loc.country.alpha_3_code||loc.country.alpha_2_code))||
+           (loc&&loc.country_code); // v2.2.0 fallback
     if(cc&&cc!=='USA'&&cc!=='US')return false;
     if(lon<-84||lon>-71||lat<25||lat>42)return false;
     var netStr=l.net||l.window_start||'';
