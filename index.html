@@ -3199,7 +3199,7 @@ function rktLikelihood(netStr,padLat,padLon,statusAbbrev,orbit){
     '</div>'
   };
 }
-var RKT_CACHE_KEY='rkt_v5_cache'; // bumped: restored east-coast-only filter
+var RKT_CACHE_KEY='rkt_v6_cache'; // bumped: relaxed country_code filter
 var RKT_CACHE_TTL=7200000; // 2 hours
 // Production server first; dev server as fallback
 var RKT_URLS=['https://ll2.thespacedevs.com/2.2.0/launch/upcoming/?limit=50&format=json',
@@ -3331,7 +3331,9 @@ function rktRender(el,data){
     if(!l.pad||!l.pad.latitude||!l.pad.longitude)return false;
     var lat=parseFloat(l.pad.latitude),lon=parseFloat(l.pad.longitude);
     // East coast US only: covers KSC/CCAFS (~-80.6) and Wallops (~-75.5)
-    if(!l.pad.location||l.pad.location.country_code!=='USA')return false;
+    // Only reject if we positively know it's a non-US country; missing location falls through to coord check
+    var cc=l.pad.location&&l.pad.location.country_code;
+    if(cc&&cc!=='USA'&&cc!=='US')return false;
     if(lon<-84||lon>-71||lat<25||lat>42)return false;
     var netStr=l.net||l.window_start||'';
     if(!netStr)return false;
