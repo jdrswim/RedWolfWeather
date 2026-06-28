@@ -3288,14 +3288,23 @@ function fetchRockets(){
       RKT_CITIES.forEach(function(c,i){window._rktClouds[c.name]=maps[i];});
     }).catch(function(){window._rktClouds=window._rktClouds||{};});
 
-  // Check localStorage cache for launch data
+  // Check localStorage cache — shorten TTL to 15 min if a launch is within 6 hours
   try{
     var cached=localStorage.getItem(RKT_CACHE_KEY);
     if(cached){
       var obj=JSON.parse(cached);
-      if(obj&&obj.ts&&(Date.now()-obj.ts)<RKT_CACHE_TTL&&obj.data){
-        cloudPromise.then(function(){rktRender(el,obj.data);});
-        return;
+      if(obj&&obj.ts&&obj.data){
+        var age=Date.now()-obj.ts;
+        var soonMs=6*3600*1000, shortTTL=900000; // 15 min when launch is imminent
+        var hasSoon=(obj.data.results||[]).some(function(l){
+          var t=new Date(l.net||l.window_start||'').getTime();
+          return t>Date.now()&&t<Date.now()+soonMs;
+        });
+        var ttl=hasSoon?shortTTL:RKT_CACHE_TTL;
+        if(age<ttl){
+          cloudPromise.then(function(){rktRender(el,obj.data);});
+          return;
+        }
       }
     }
   }catch(e){}
@@ -3469,7 +3478,7 @@ function rktRender(el,data){
         visHtml+
       '</div>';
   });
-  html+='<div class="rkt-note">Visibility estimates assume dark or twilight conditions — daytime launches are rarely visible.<br>T+ offsets are approximate based on distance to the pad. Look in the listed compass direction.<br>Map: © OpenStreetMap contributors, © CARTO · Launch data: Launch Library 2 (thespacedevs.com) · Cached 2 hrs</div>';
+  html+='<div class="rkt-note">Visibility estimates assume dark or twilight conditions — daytime launches are rarely visible.<br>T+ offsets are approximate based on distance to the pad. Look in the listed compass direction.<br>Map: © OpenStreetMap contributors, © CARTO · Launch data: Launch Library 2 (thespacedevs.com) · <button onclick="(function(){try{localStorage.removeItem(\'rkt_v5_cache\');}catch(e){}fetchRockets();})()" style="background:none;border:none;color:var(--cyan);font-size:9px;cursor:pointer;padding:0;font-family:inherit;letter-spacing:.3px;text-decoration:underline">↻ Refresh</button></div>';
   el.innerHTML=html;
   rktInitMaps(list);
 }
