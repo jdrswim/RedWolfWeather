@@ -217,7 +217,10 @@ function eveningLog() {
   Logger.log('=== eveningLog END ===');
 }
 
-// 7 AM — record yesterday's overnight low (min observed 7 PM yesterday – 7 AM today)
+// 7 AM — write yesterday's authoritative hi/lo from ACIS ThreadEx (same source as NOWData).
+// ACIS finalizes the previous calendar day's record overnight, so by 7 AM it exactly
+// matches the official NWS daily max/min. This overwrites any preliminary values written
+// by eveningLog or the 8 PM nightlyLog fallback.
 function morningLog() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getSheetByName('Accuracy');
@@ -227,13 +230,50 @@ function morningLog() {
   var yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
   var ds        = Utilities.formatDate(yesterday, TZ, 'yyyy-MM-dd');
   Logger.log('=== morningLog START ' + Utilities.formatDate(now, TZ, 'yyyy-MM-dd HH:mm z') + ' ===');
-  var result = fetchNWSWindow_(yesterday, 19, today, 7);
-  if (!result || result.lo === null) {
-    Logger.log('Morning (for ' + ds + '): no low temp data returned from NWS');
-  } else {
-    nightlyWrite_(sheet, ds, 'actual_low', result.lo, 'actual_low', result.lo, true);
-    Logger.log('Morning ' + Utilities.formatDate(today, TZ, 'yyyy-MM-dd') + ':  Lo:' + result.lo + ' for ' + ds + '  (NWS KRDU 7p–7a, ' + result.count + ' obs)');
+
+  // ── Primary: ACIS ThreadEx — exact match to NOWData calendar-day hi/lo ──
+  var opts = { headers: { 'User-Agent': 'WolfpackWeather/2.0' }, muteHttpExceptions: true };
+  var acisUrl = 'https://data.rcc-acis.org/StnData?sid=KRDU&sdate=' + ds + '&edate=' + ds + '&elems=1,2&output=json';
+  var acisOk = false;
+  try {
+    var acisResp = UrlFetchApp.fetch(acisUrl, opts);
+    if (acisResp.getResponseCode() === 200) {
+      var acisRows = JSON.parse(acisResp.getContentText()).data || [];
+      if (acisRows.length > 0) {
+        var hiVal = acisRows[0][1], loVal = acisRows[0][2];
+        if (hiVal !== 'M' && hiVal !== '' && hiVal != null &&
+            loVal !== 'M' && loVal !== '' && loVal != null) {
+          var rduHigh = Math.round(Number(hiVal));
+          var rduLow  = Math.round(Number(loVal));
+          nightlyWrite_(sheet, ds, 'actual_high', rduHigh, 'actual_low', rduLow, true);
+          var mcSheet = ss.getSheetByName('Microclimate');
+          if (mcSheet) updateMicroclimateRDU_(mcSheet, ds, rduHigh, rduLow);
+          Logger.log('Morning ACIS ' + ds + ':  Hi:' + rduHigh + '  Lo:' + rduLow + '  (ThreadEx — matches NOWData)');
+          acisOk = true;
+        } else {
+          Logger.log('Morning ACIS: values marked missing (M) for ' + ds);
+        }
+      } else {
+        Logger.log('Morning ACIS: no rows returned for ' + ds);
+      }
+    } else {
+      Logger.log('Morning ACIS fetch failed: HTTP ' + acisResp.getResponseCode());
+    }
+  } catch (e) {
+    Logger.log('Morning ACIS error: ' + e.message);
   }
+
+  // ── Fallback: NWS hourly window only if ACIS had no data ──
+  if (!acisOk) {
+    var result = fetchNWSWindow_(yesterday, 19, today, 7);
+    if (result && result.lo !== null) {
+      nightlyWrite_(sheet, ds, 'actual_low', result.lo, 'actual_low', result.lo, true);
+      Logger.log('Morning NWS fallback ' + ds + ':  Lo:' + result.lo + '  (NWS KRDU 7p–7a, ' + result.count + ' obs)');
+    } else {
+      Logger.log('Morning (for ' + ds + '): no data from ACIS or NWS');
+    }
+  }
+
   Logger.log('=== morningLog END ===');
 }
 
@@ -452,9 +492,11 @@ function nightlyLogMicroclimate_(ss) {
   var WU_KEY = '6532d6454b8aa370768e63d6ba5a832e';
   var now    = new Date();
 
-  // Process today (if >= 8 PM) and yesterday — same look-back pattern as nightlyLogActuals_
-  var hourET    = parseInt(Utilities.formatDate(now, TZ, 'H'));
-  var startBack = (hourET >= 20) ? 0 : 1;
+  // Only process yesterday — never today. ACIS does not finalize the current calendar
+  // day until overnight. Writing today's actuals at 8 PM causes wrong values (NWS hourly
+  // fallback misses the true max/min). Yesterday's authoritative hi/lo is written by
+  // morningLog at 7 AM using ACIS ThreadEx, and re-confirmed here at 8 PM.
+  var startBack = 1;
 
   for (var daysBack = startBack; daysBack <= 1; daysBack++) {
     var td          = new Date(now.getFullYear(), now.getMonth(), now.getDate() - daysBack);
@@ -572,6 +614,30 @@ function nightlyLogMicroclimate_(ss) {
 
     Logger.log('MC ' + ds + ':  RWF Hi:' + rwfHigh + ' Lo:' + rwfLow + '  |  RDU Hi:' + rduHigh + ' Lo:' + rduLow);
   }
+}
+
+// ─────────────────────────────────────────────────────────────
+// MICROCLIMATE RDU UPDATER  (used by morningLog to keep Microclimate in sync)
+// ─────────────────────────────────────────────────────────────
+function updateMicroclimateRDU_(mcSheet, ds, rduHigh, rduLow) {
+  var mcData    = mcSheet.getDataRange().getValues();
+  var mcHeaders = mcData[0].map(function(h) { return String(h).trim(); });
+  var mcDateCol  = mcHeaders.indexOf('date');
+  var mcRduHiCol = mcHeaders.indexOf('rdu_high');
+  var mcRduLoCol = mcHeaders.indexOf('rdu_low');
+  if (mcDateCol < 0 || mcRduHiCol < 0 || mcRduLoCol < 0) return;
+  var rowIdx = -1;
+  for (var i = 1; i < mcData.length; i++) {
+    if (normDateStr_(mcData[i][mcDateCol]) === ds) { rowIdx = i; break; }
+  }
+  if (rowIdx < 0) {
+    var newRow = new Array(mcHeaders.length).fill('');
+    newRow[mcDateCol] = ds;
+    mcSheet.appendRow(newRow);
+    rowIdx = mcSheet.getLastRow() - 1;
+  }
+  mcSheet.getRange(rowIdx + 1, mcRduHiCol + 1).setValue(rduHigh);
+  mcSheet.getRange(rowIdx + 1, mcRduLoCol + 1).setValue(rduLow);
 }
 
 // ─────────────────────────────────────────────────────────────
